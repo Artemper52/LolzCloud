@@ -1,5 +1,5 @@
 # Upload this file to Artemper52/LolzCloud as .github/workflows/build.yml on main.
-# The first run imports the pinned 0.9.0 source and publishes only after all checks pass.
+# The first run imports the pinned 0.9.1 source and publishes only after all checks pass.
 # Subsequent runs retain normal Windows Setup / Legacy / Linux release builds.
 name: Build and release
 'on':
@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Import the verified 0.9.0 source once, retaining this workflow
+      - name: Import the verified 0.9.1 source once, retaining this workflow
         id: source
         shell: bash
         run: >
@@ -42,10 +42,11 @@ jobs:
           version=$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')
 
           if [ "$GITHUB_REF" = refs/heads/main ] && { [ "$GITHUB_EVENT_NAME" = push ] || [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; } &&
-          [ "$version" = 0.8.5 ]; then
-            release_archive="$RUNNER_TEMP/lolzcloud-source-090.zip"
-            curl --fail --silent --show-error --retry 3 https://lolzcloud.com/downloads/LolzCloud-0.9.0-source.zip -o "$release_archive"
-            printf '%s  %s\n' a4e28f47927e78f4b4aed936f921edd2351a34a74f3abf6408f5a7591dde3156 "$release_archive" | sha256sum -c -
+          [ "$version" = 0.9.0 ]; then
+            git diff --quiet 394ce5347add1568b58bedb4e06fb077495201e3 HEAD -- . ':(exclude).github'
+            release_archive="$RUNNER_TEMP/lolzcloud-source-091.zip"
+            curl --fail --silent --show-error --retry 3 https://lolzcloud.com/downloads/LolzCloud-0.9.1-import-source.zip -o "$release_archive"
+            printf '%s  %s\n' b7968d2157327c9beed8cc50bd9f8bf3f43c0c87bedd12adad3f832df9999814 "$release_archive" | sha256sum -c -
             python3 - <<'PY'
           import json, os, shutil, zipfile
 
@@ -53,13 +54,13 @@ jobs:
 
           temporary = Path(os.environ['RUNNER_TEMP'])
 
-          source = temporary / 'lolzcloud-source-090'
+          source = temporary / 'lolzcloud-source-091'
 
           destination = Path(os.environ['GITHUB_WORKSPACE'])
 
-          with zipfile.ZipFile(temporary / 'lolzcloud-source-090.zip') as archive:
+          with zipfile.ZipFile(temporary / 'lolzcloud-source-091.zip') as archive:
               archive.extractall(source)
-          assert json.loads((source / 'package.json').read_text())['version'] == '0.9.0'
+          assert json.loads((source / 'package.json').read_text())['version'] == '0.9.1'
 
           names = ['.gitattributes', '.gitignore', 'CONTRIBUTING.md', 'LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', 'package.json',
           'package-lock.json', 'config', 'docs', 'licenses', 'server', 'source', 'tests', 'tools']
@@ -75,7 +76,7 @@ jobs:
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git add -A -- . ':(exclude).github'
-            if ! git diff --cached --quiet; then git commit -m 'Import verified LolzCloud 0.9.0 source'; fi
+            if ! git diff --cached --quiet; then git commit -m 'Import verified LolzCloud 0.9.1 source'; fi
             git push origin HEAD:main
             bootstrapped=true
           fi
@@ -102,6 +103,7 @@ jobs:
       - run: npm run test:player
       - run: npm run test:rooms
       - run: npm run test:updates
+      - run: npm run test:signin
       - name: Build Windows Setup, portable and Legacy releases
         run: node tools/release-windows.cjs
         env:
