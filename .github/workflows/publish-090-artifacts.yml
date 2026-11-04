@@ -1,0 +1,133 @@
+name: Publish verified 0.9.0 artifacts
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: publish-lolzcloud-090
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TESTED_REF: 848c850f39743ebbed491cc8665c293b9c038ddd
+      BUILD_RUN: '41909586808'
+      RELEASE_TAG: v0.9.0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 848c850f39743ebbed491cc8665c293b9c038ddd
+          fetch-depth: 0
+      - name: Verify successful build jobs and immutable artifact identities
+        shell: bash
+        run: |
+          set -eu
+          gh run view "$BUILD_RUN" --repo "$GITHUB_REPOSITORY" --json headSha,status,jobs > "$RUNNER_TEMP/build-run.json"
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$BUILD_RUN/artifacts" > "$RUNNER_TEMP/build-artifacts.json"
+          node <<'JS'
+          const fs = require('node:fs');
+          const run = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + '/build-run.json'));
+          if (run.headSha !== process.env.TESTED_REF || run.status !== 'completed') throw Error('Unexpected build revision or status');
+          for (const name of ['source', 'windows', 'linux (x64, ubuntu-24.04)', 'linux (arm64, ubuntu-24.04-arm)']) {
+            if (!run.jobs.some(job => job.name === name && job.status === 'completed' && job.conclusion === 'success')) throw Error('Required build did not pass: ' + name);
+          }
+          const expected = {
+            'LolzCloud-windows-x64': '8ce8c2e2d48f30d59e159d55d7385fc267f42718d97375c8f0ad316b0f58a3a5',
+            'LolzCloud-linux-x64': 'e6f58c0d3c7adb6c98020a8634ee94e3e0a9a2e2565423ae01ba2c293e9ba6e0',
+            'LolzCloud-linux-arm64': '0d382eaa896059a1faab6c9f72fa91955f106a3267aff81fc88577ed196a03d1'
+          };
+          const artifacts = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + '/build-artifacts.json')).artifacts;
+          if (artifacts.length !== 3) throw Error('Unexpected artifact count');
+          for (const [name, digest] of Object.entries(expected)) {
+            if (!artifacts.some(artifact => artifact.name === name && !artifact.expired && artifact.digest === 'sha256:' + digest)) throw Error('Artifact identity mismatch: ' + name);
+          }
+          console.log('All four required jobs passed; all three artifact digests match.');
+          JS
+      - uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: 41909586808
+          path: release-assets
+          merge-multiple: true
+      - name: Flatten Windows paths and verify update payloads
+        shell: bash
+        run: |
+          set -eu
+          cd release-assets
+          if test -d windows-release; then
+            for file in windows-release/*; do
+              test -f "$file"
+              test ! -e "$(basename "$file")"
+              mv "$file" .
+            done
+            rmdir windows-release
+          fi
+          node <<'JS'
+          const fs = require('node:fs'), crypto = require('node:crypto');
+          const files = [
+            'LolzCloud-0.9.0-source.zip',
+            'LolzCloud-0.9.0-win-x64.zip', 'LolzCloud-0.9.0-win7-legacy-x64.zip',
+            'LolzCloud-0.9.0-win-x64-Setup.exe', 'LolzCloud-0.9.0-win7-legacy-Setup.exe',
+            'LolzCloud-0.9.0-win-x64-Setup.exe.blockmap', 'LolzCloud-0.9.0-win7-legacy-Setup.exe.blockmap',
+            'LolzCloud-0.9.0-linux-x64.tar.gz', 'LolzCloud-0.9.0-linux-arm64.tar.gz',
+            'LolzCloud-0.9.0-linux-x64.AppImage', 'LolzCloud-0.9.0-linux-arm64.AppImage',
+            'latest.yml', 'legacy.yml', 'update.json', 'update-legacy.json'
+          ];
+          const actual = fs.readdirSync('.').sort();
+          if (JSON.stringify(actual) !== JSON.stringify([...files].sort())) throw Error('Unexpected release file layout: ' + actual.join(', '));
+          for (const name of ['update.json', 'update-legacy.json']) {
+            const manifest = JSON.parse(fs.readFileSync(name));
+            if (manifest.version !== '0.9.0' || manifest.tag !== 'v0.9.0') throw Error('Unexpected update version');
+            for (const artifact of [manifest.archive, manifest.setup]) {
+              if (!artifact || !files.includes(artifact.name) || artifact.url !== 'https://github.com/' + process.env.GITHUB_REPOSITORY + '/releases/download/v0.9.0/' + artifact.name) throw Error('Unexpected update URL');
+              if (fs.statSync(artifact.name).size !== artifact.size) throw Error('Update size mismatch');
+              const digest = crypto.createHash('sha256').update(fs.readFileSync(artifact.name)).digest('hex');
+              if (digest !== artifact.sha256) throw Error('Update hash mismatch');
+            }
+          }
+          for (const [metadata, setup] of [['latest.yml', 'LolzCloud-0.9.0-win-x64-Setup.exe'], ['legacy.yml', 'LolzCloud-0.9.0-win7-legacy-Setup.exe']]) {
+            const text = fs.readFileSync(metadata, 'utf8');
+            const digest = crypto.createHash('sha512').update(fs.readFileSync(setup)).digest('base64');
+            if (!text.includes('version: 0.9.0') || !text.includes(setup) || !text.includes('sha512: ' + digest) || !text.includes('size: ' + fs.statSync(setup).size)) throw Error('Native updater metadata mismatch');
+          }
+          const checksums = files.sort().map(name => crypto.createHash('sha256').update(fs.readFileSync(name)).digest('hex') + '  ' + name).join('\n') + '\n';
+          fs.writeFileSync('SHA256SUMS.txt', checksums);
+          console.log('All 15 release files and both updater channels verified.');
+          JS
+      - name: Correct only the unpublished staging tag and publish complete release
+        shell: bash
+        run: |
+          set -eu
+          test "$(git rev-parse HEAD)" = "$TESTED_REF"
+          if gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$RUNNER_TEMP/existing-release.json" 2> "$RUNNER_TEMP/release-error.txt"; then
+            node -e 'if (!JSON.parse(require("fs").readFileSync(process.env.RUNNER_TEMP + "/existing-release.json")).draft) throw Error("Release is already public; refusing to change it")'
+          else
+            grep -q 'HTTP 404' "$RUNNER_TEMP/release-error.txt" || { cat "$RUNNER_TEMP/release-error.txt"; exit 1; }
+          fi
+          old=$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")
+          if test "$old" != "$TESTED_REF"; then
+            test "$old" = e3c2be45530739df72f742cb810ed70751a6b466
+            git merge-base --is-ancestor "$old" HEAD
+            git tag -f "$RELEASE_TAG" HEAD
+            git push --force-with-lease="refs/tags/$RELEASE_TAG:$old" origin "refs/tags/$RELEASE_TAG"
+          fi
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title 'LolzCloud 0.9.0' --notes-file docs/releases/0.9.0.md
+          fi
+          gh release upload "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --clobber
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets > "$RUNNER_TEMP/uploaded-assets.json"
+          node <<'JS'
+          const fs = require('node:fs');
+          const expected = fs.readdirSync('release-assets');
+          const assets = JSON.parse(fs.readFileSync(process.env.RUNNER_TEMP + '/uploaded-assets.json')).assets;
+          if (assets.length !== expected.length) throw Error('Incomplete release upload');
+          for (const name of expected) if (!assets.some(asset => asset.name === name && asset.size === fs.statSync('release-assets/' + name).size && asset.state === 'uploaded')) throw Error('Incomplete asset: ' + name);
+          JS
+          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
+          printf 'Published https://github.com/%s/releases/tag/%s\n' "$GITHUB_REPOSITORY" "$RELEASE_TAG"
