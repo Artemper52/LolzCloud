@@ -58,6 +58,7 @@ async function archiveLinux(directory, arch, version) {
   fs.copyFileSync(path.join(root, 'source/app/lib/assets/logo.png'), path.join(directory, 'lolzcloud.png'));
   fs.writeFileSync(path.join(directory, 'lolzcloud.desktop'), '[Desktop Entry]\nType=Application\nName=LolzCloud\nComment=SoundCloud player with Lolzteam integration\nExec=LolzCloud %U\nIcon=lolzcloud\nTerminal=false\nCategories=AudioVideo;Audio;Music;\nStartupWMClass=LolzCloud\n');
   const filename = path.join(root, 'dist', `LolzCloud-${version}-linux-${arch}.tar.gz`);
+  fs.mkdirSync(path.dirname(filename), { recursive: true });
   await tar.c({ cwd: path.dirname(directory), file: filename, gzip: true, portable: true, noMtime: true, onWriteEntry(entry) { entry.stat.mode = entryMode(entry); } }, [path.basename(directory)]);
   console.log('Linux archive: ' + filename);
   return filename;
