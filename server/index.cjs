@@ -3,7 +3,8 @@ const http = require('node:http'), fs = require('node:fs'), path = require('node
 const { CloudStore, HttpError, profile, safeNext, hash } = require('./core.cjs');
 const ROOT = path.join(__dirname, 'public');
 const cookies = req => Object.fromEntries(String(req.headers.cookie || '').split(';').map(row => row.trim().split(/=(.*)/s).slice(0, 2)).filter(row => row.length === 2));
-function createServer({ origin = 'https://lolzcloud.com', clientId = process.env.LOLZ_CLIENT_ID, spicyKey = process.env.SPICY_LYRICS_SECRET_KEY, store = new CloudStore({ filename: path.join(process.env.LOLZCLOUD_STATE || '/var/lib/lolzcloud', 'sessions.json'), origin }), fetcher = fetch, verifyProfile = null } = {}) {
+function createServer({ origin = 'https://lolzcloud.com', clientId = process.env.LOLZ_CLIENT_ID, redirectMode = process.env.LOLZ_REDIRECT_MODE ?? 'explicit', spicyKey = process.env.SPICY_LYRICS_SECRET_KEY, store = new CloudStore({ filename: path.join(process.env.LOLZCLOUD_STATE || '/var/lib/lolzcloud', 'sessions.json'), origin }), fetcher = fetch, verifyProfile = null } = {}) {
+  if (!['explicit', 'registered'].includes(redirectMode)) throw new Error('LOLZ_REDIRECT_MODE must be explicit or registered.');
   const limits = new Map(), lyrics = new Map(); let upstream = 0;
   function limit(key, max, window = 60000) {
     const now = Date.now(); let entry = limits.get(key);
@@ -59,7 +60,8 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
         const state = store.beginLogin(url.searchParams.get('next'));
         res.setHeader('Set-Cookie', cookie('__Host-lc_login', state, 600));
         const destination = new URL('https://lolz.live/account/authorize');
-        for (const [key, value] of Object.entries({ client_id: clientId, response_type: 'token', scope: 'basic read', redirect_uri: origin + '/auth/lolz/callback', state })) destination.searchParams.set(key, value);
+        for (const [key, value] of Object.entries({ client_id: clientId, response_type: 'token', scope: 'basic read', state })) destination.searchParams.set(key, value);
+        if (redirectMode === 'explicit') destination.searchParams.set('redirect_uri', origin + '/auth/lolz/callback');
         return redirect(res, destination.href);
       }
       if (url.pathname === '/auth/lolz/callback' && method === 'GET') return page(res, 'callback.html');
