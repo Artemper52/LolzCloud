@@ -209,7 +209,7 @@ jobs:
         run: |
           set -eu
           tag="v$(node -p 'require("./package.json").version')"
-          if test "$BOOTSTRAPPED" = true; then
+          if test "$BOOTSTRAPPED" = true || test "$CREATE_RELEASE_TAG" = true; then
             if git rev-parse --verify --quiet "refs/tags/$tag" >/dev/null; then
               test "$(git rev-parse "$tag^{commit}")" = "$(git rev-parse HEAD)"
             else
@@ -225,6 +225,7 @@ jobs:
           printf 'tag=%s\n' "$tag" >> "$GITHUB_OUTPUT"
         env:
           BOOTSTRAPPED: ${{ needs.source.outputs.bootstrapped }}
+          CREATE_RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.publish }}
       - uses: actions/download-artifact@v4
         with:
           path: release-assets
