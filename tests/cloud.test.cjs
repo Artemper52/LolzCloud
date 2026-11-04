@@ -45,6 +45,41 @@ test('OAuth callback binds state to its browser, rejects replay and never trusts
   assert.equal((await call('/api/auth/complete', { method: 'POST', secret: null, body, headers: { Origin: 'https://lolzcloud.com', Cookie: '__Host-lc_login=' + state } })).status, 403);
   assert.ok(!JSON.stringify([...store.sessions]).includes(body.accessToken));
 });
+test('OAuth redirect modes preserve the request and cookie while only explicit mode sends the callback URI', async t => {
+  for (const redirectMode of ['explicit', 'registered']) {
+    const { call, store } = await setup(t, { redirectMode });
+    const response = await call('/auth/lolz?next=%2Frooms', { secret: null }), destination = new URL(response.headers.get('location'));
+    assert.equal(response.status, 303);
+    assert.equal(destination.origin + destination.pathname, 'https://lolz.live/account/authorize');
+    assert.equal(destination.searchParams.get('client_id'), 'fixture-client');
+    assert.equal(destination.searchParams.get('response_type'), 'token');
+    assert.equal(destination.searchParams.get('scope'), 'basic read');
+    const state = destination.searchParams.get('state'); assert.match(state, /^[\w-]{43}$/);
+    assert.match(response.headers.get('set-cookie'), new RegExp('^__Host-lc_login=' + state + '; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=600$'));
+    assert.equal(store.states.size, 1);
+    assert.deepEqual([...destination.searchParams.keys()].sort(), redirectMode === 'explicit' ? ['client_id', 'redirect_uri', 'response_type', 'scope', 'state'] : ['client_id', 'response_type', 'scope', 'state']);
+    if (redirectMode === 'explicit') assert.equal(destination.searchParams.get('redirect_uri'), 'https://lolzcloud.com/auth/lolz/callback');
+  }
+  for (const redirectMode of ['', 'unrecognized']) assert.throws(() => createServer({ redirectMode, store: new CloudStore() }), /LOLZ_REDIRECT_MODE/);
+});
+test('neither OAuth redirect mode can complete login with a mismatched browser state', async t => {
+  for (const redirectMode of ['explicit', 'registered']) {
+    let verified = 0;
+    const { call } = await setup(t, { redirectMode, verifyProfile: async () => { verified++; return alice; } });
+    const response = await call('/auth/lolz?next=%2Frooms', { secret: null }), state = new URL(response.headers.get('location')).searchParams.get('state');
+    const headers = { Origin: 'https://lolzcloud.com', Cookie: '__Host-lc_login=' + state };
+    const body = { state: 'x'.repeat(43), accessToken: 'fixture-only-not-a-real-token', user_id: 999 };
+    assert.equal((await call('/api/auth/complete', { method: 'POST', secret: null, body, headers })).status, 403);
+    assert.equal(verified, 0);
+    body.state = state;
+    const accepted = await call('/api/auth/complete', { method: 'POST', secret: null, body, headers });
+    assert.equal(accepted.status, 200);
+    assert.equal((await accepted.json()).user.id, alice.id);
+    assert.equal(verified, 1);
+    assert.equal((await call('/api/auth/complete', { method: 'POST', secret: null, body, headers })).status, 403);
+    assert.equal(verified, 1);
+  }
+});
 test('desktop pairing needs an authenticated approval and can only be redeemed once', async t => {
   const { call, a } = await setup(t), pair = await (await call('/api/desktop/start', { method: 'POST', secret: null, body: {} })).json();
   assert.equal((await (await call('/api/desktop/poll', { method: 'POST', secret: null, body: { deviceCode: pair.deviceCode } })).json()).pending, true);
