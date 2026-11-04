@@ -87,8 +87,31 @@ app.whenReady().then(async () => {
     assert.ok((await host.webContents.executeJavaScript('document.getElementById("lc-wave-request-labels").textContent')).includes('1900-е'));
     await host.webContents.executeJavaScript('document.getElementById("lc-wave-request-form").dispatchEvent(new Event("submit", {cancelable:true}))'); await delay(80);
     assert.ok(calls.some(row=>row?.type==='wave-request'&&row.text==='Ковбойские песни 1900-х'));
-    const animated = await host.webContents.executeJavaScript(`(async()=>{const c=document.getElementById('lc-wave-canvas');const a=c.toDataURL();await new Promise(r=>setTimeout(r,100));return a!==c.toDataURL()})()`);
-    assert.equal(animated, true, 'Wave visual must actually animate.');
+    // Offscreen CI windows must be visible to the page, with OS motion preferences
+    // explicitly controlled; production still honours the user's reduced-motion setting.
+    host.showInactive();
+    host.webContents.debugger.attach('1.3');
+    await host.webContents.debugger.sendCommand('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'no-preference' }] });
+    const animated = await host.webContents.executeJavaScript(`new Promise(resolve => {
+      const canvas = document.getElementById('lc-wave-canvas');
+      let first = null, size = '', frames = 0, done = false;
+      const finish = changed => {
+        if (done) return; done = true; clearTimeout(timeout);
+        resolve({ changed, frames, hidden: document.hidden, reduced: matchMedia('(prefers-reduced-motion: reduce)').matches, width: canvas.width, height: canvas.height });
+      };
+      const timeout = setTimeout(() => finish(false), 3000);
+      const sample = () => {
+        if (done) return; frames++;
+        if (!document.hidden && canvas.width && canvas.height) {
+          const currentSize = canvas.width + 'x' + canvas.height, pixels = canvas.toDataURL();
+          if (size !== currentSize) { size = currentSize; first = pixels; }
+          else if (pixels !== first) { finish(true); return; }
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    })`);
+    assert.equal(animated.changed, true, 'Wave visual must actually animate: ' + JSON.stringify(animated));
     music.configurePreferences({ reduceMotion: true });
     const still = await host.webContents.executeJavaScript(`(async()=>{document.documentElement.dataset.motion='reduced';await new Promise(r=>setTimeout(r,50));const c=document.getElementById('lc-wave-canvas'),a=c.toDataURL();await new Promise(r=>setTimeout(r,120));return a===c.toDataURL()})()`);
     assert.equal(still, true, 'Reduced-motion preference must stop the wave renderer.');
