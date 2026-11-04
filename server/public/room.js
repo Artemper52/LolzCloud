@@ -1,52 +1,87 @@
 (() => {
   'use strict';
-  const { request, avatar } = window.LolzCloudSite, el = id => document.getElementById(id), id = location.pathname.match(/\/room\/([a-f0-9]{32})/)?.[1];
-  const key = 'lolzcloud-room-' + id;
-  let connection; try { connection = sessionStorage.getItem(key); if (!connection) { connection = crypto.randomUUID(); sessionStorage.setItem(key, connection); } } catch { connection = crypto.randomUUID(); }
-  let data = null, widget = null, loaded = '', started = false, ready = false, busy = false, stopped = false, receivedAt = 0, signature = '';
-  function target() { const track = data?.playback; return Math.min(track?.duration || 14400, (track?.position || 0) + (track?.playing ? (Math.max(0, data.serverTime - data.updatedAt) / 1000 + (performance.now() - receivedAt) / 1000) * (track.rate || 1) : 0)) * 1000; }
-  function sync() {
-    if (!widget || !ready || !data) return;
-    if (!started || !data.playback.playing || !data.playback.url) { widget.pause(); return; }
-    widget.play(); const track = data.playback.url;
-    widget.getPosition(position => { if (started && ready && data?.playback.url === track && Math.abs(position - target()) > 1600) widget.seekTo(target()); });
+  const { request, avatar } = window.LolzCloudSite, { RoomClock, DriftCorrection } = window.LolzCloudRoomSync, el = id => document.getElementById(id), id = location.pathname.match(/\/room\/([a-f0-9]{32})/)?.[1];
+  const connection = crypto.randomUUID(), clock = new RoomClock(), correction = new DriftCorrection();
+  let state = null, widget = null, loaded = '', ready = false, started = false, stopped = false, lease = '', sequence = 0, publishing = false, pendingPublish = null, lastApplied = 0, lastHeartbeat = 0, busyJoin = false, eventStream = null, queueSignature = '', peopleSignature = '', chatSignature = '', historySignature = '', generation = 0, settingsFilled = false;
+  const health = { status: 'autoplay', driftMs: null }, isController = () => !!lease && state?.controller?.connection === connection, target = () => clock.position(state) * 1000;
+  const message = error => { el('status').textContent = error instanceof Error ? error.message : String(error || ''); };
+  const node = (tag, value, className) => { const result = document.createElement(tag); result.textContent = value; if (className) result.className = className; return result; };
+  const button = (label, handler) => { const result = node('button', label); result.type = 'button'; result.onclick = () => Promise.resolve(handler()).catch(message); return result; };
+  async function call(action, data, method = 'POST') { const sent = performance.now(); const response = await fetch('/api/rooms/' + id + '/' + action, { method, credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.LolzCloudSession?.csrf || '' }, ...(method !== 'GET' ? { body: JSON.stringify(data) } : {}) }); const value = await response.json(); if (!response.ok) { const error = new Error(value.error || 'Нет соединения с комнатой.'); error.status = response.status; throw error; } const room = value.room || value; if (Number.isFinite(room.serverTime)) clock.sample(room.serverTime, sent); return value; }
+  async function calibrate() { for (let attempt = 0; attempt < 3; attempt++) { const sent = performance.now(); try { const value = await request('/api/clock'); clock.sample(value.serverTime, sent); } catch { break; } } }
+  function seekNow(position) { if (!widget || !ready) return; lastApplied = performance.now(); widget.seekTo(position); }
+  function sync(force = false) {
+    if (!widget || !ready || !state || !loaded) return;
+    if (!started) { lastApplied = performance.now(); widget.pause(); health.status = 'autoplay'; return; }
+    const track = state.playback, source = loaded, token = generation;
+    widget.isPaused(paused => { if (token !== generation || source !== loaded) return; if (track.playing === paused) { lastApplied = performance.now(); track.playing ? widget.play() : widget.pause(); } });
+    widget.getPosition(position => { if (token !== generation || source !== loaded || !state || state.playback.url !== source) return; const decision = correction.decide(position, target(), performance.now(), source, force); health.driftMs = Math.round(decision.drift); if (decision.seek) seekNow(Math.max(0, decision.position)); health.status = 'ready'; el('connection-status').textContent = Math.abs(decision.drift) < 350 ? 'Вместе · синхронно' : 'Выравниваем · ' + (Math.abs(decision.drift) / 1000).toFixed(1) + ' с'; });
+  }
+  function widgetReady(token) { if (token !== generation) return; ready = true; health.status = started ? 'ready' : 'autoplay'; widget.setVolume(Number(el('volume').value)); sync(true); }
+  function nativeUpdate() { if (!isController() || performance.now() - lastApplied < 800 || !ready) return; const token = generation; widget.getPosition(position => widget.isPaused(paused => { if (token === generation && isController()) void publish({ position: position / 1000, playing: !paused }); })); }
+  function load(track) {
+    const url = track.url; if (url === loaded) return; generation++; const token = generation; loaded = url; ready = false; health.status = 'buffering';
+    if (!url) { widget?.pause(); return; }
+    if (widget) widget.load(url, { auto_play: false, show_comments: false, show_reposts: false, callback: () => widgetReady(token) });
+    else { el('player').src = 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) + '&auto_play=false&show_comments=false&show_reposts=false'; widget = SC.Widget(el('player')); widget.bind(SC.Widget.Events.READY, () => widgetReady(generation)); for (const name of ['PLAY', 'PAUSE', 'SEEK']) widget.bind(SC.Widget.Events[name], nativeUpdate); widget.bind(SC.Widget.Events.FINISH, () => { if (isController() && state?.settings.autoNext) void nextTrack().catch(message); }); widget.bind(SC.Widget.Events.ERROR, () => { health.status = 'error'; message('SoundCloud не смог открыть трек. Проверь доступность записи.'); }); }
+  }
+  function renderQueue() {
+    const signature = JSON.stringify([state.queue, state.canControl]); if (signature === queueSignature) return; queueSignature = signature; el('queue-list').replaceChildren(); el('queue-count').textContent = state.queue.length + ' / 50';
+    if (!state.queue.length) el('queue-list').append(node('p', 'Предложи первую песню — выберем следующую вместе.', 'empty-state'));
+    for (const row of state.queue) { const item = node('article', '', 'queue-item'), info = node('div', '', 'queue-info'); info.append(node('strong', row.track.title), node('small', row.proposedBy.name + ' · ' + (row.approved ? 'В очереди' : 'Ждёт одобрения'))); item.append(info, button((row.voted ? '♥ ' : '♡ ') + row.votes, () => queue({ type: 'vote', id: row.id }))); if (state.canControl) item.append(button(row.approved ? 'Отложить' : 'Одобрить', () => queue({ type: 'approve', id: row.id }))); if (state.canControl || row.proposedBy.id === window.LolzCloudSession?.user.id) item.append(button('Убрать', () => queue({ type: 'remove', id: row.id }))); el('queue-list').append(item); }
+  }
+  function renderPeople() {
+    const signature = JSON.stringify(state.participants); if (signature === peopleSignature) return; peopleSignature = signature; el('participants').replaceChildren(); el('people-count').textContent = state.participants.length;
+    for (const user of state.participants) { const row = node('div', '', 'person'), info = node('span', '', 'person-info'), link = node('a', user.name); link.href = user.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; info.append(link, node('small', (user.role === 'owner' ? 'Владелец' : user.role === 'dj' ? 'Диджей' : 'Слушатель') + (user.sync?.status === 'buffering' ? ' · загружает трек' : user.sync?.status === 'autoplay' ? ' · ждёт нажатия Play' : user.sync?.status === 'error' ? ' · ошибка трека' : user.online ? ' · в сети' : ' · не в сети'))); row.append(avatar(user), info); if (state.host && user.id !== state.owner.id) row.append(button(user.role === 'dj' ? 'Снять DJ' : 'Дать DJ', () => control({ type: 'role', userId: user.id, role: user.role === 'dj' ? 'listener' : 'dj' })), button('Исключить', () => control({ type: 'kick', userId: user.id }))); el('participants').append(row); }
+  }
+  function renderConversation() {
+    const signature = JSON.stringify(state.chat); if (signature !== chatSignature) { chatSignature = signature; const bottom = el('chat-messages').scrollHeight - el('chat-messages').scrollTop - el('chat-messages').clientHeight < 70; el('chat-messages').replaceChildren(); for (const row of state.chat) { const line = node('p', '', 'chat-message'); line.append(node('strong', row.user.name), node('span', row.text)); el('chat-messages').append(line); } if (bottom) el('chat-messages').scrollTop = el('chat-messages').scrollHeight; }
+    el('chat-input').disabled = !state.settings.chat; el('reactions').replaceChildren(...state.reactions.slice(-8).map(row => node('span', row.emoji + ' ' + row.user.name, 'reaction-chip')));
+    const history = JSON.stringify(state.history); if (history !== historySignature) { historySignature = history; el('room-history').replaceChildren(...[...state.history].reverse().map(row => { const line = node('p', '', 'history-track'), link = node('a', row.artist + ' — ' + row.title); link.href = row.url; link.target = '_blank'; link.rel = 'noopener noreferrer'; line.append(link, button('В очередь', () => queue({ type: 'add', track: row }))); return line; })); }
   }
   function render(value) {
-    data = value; receivedAt = performance.now();
-    el('track-title').textContent = value.playback.title; el('track-artist').textContent = value.playback.artist;
-    el('room-status').textContent = value.owner.name + ' · ведущий' + (value.playback.playing ? ' · играет' : ' · пауза');
-    const people = JSON.stringify(value.participants);
-    if (people !== signature) {
-      signature = people; el('participants').replaceChildren(); el('people-count').textContent = value.participants.length;
-      for (const user of value.participants) {
-        const link = document.createElement('a'); link.className = 'person'; link.href = user.url; link.target = '_blank'; link.rel = 'noopener noreferrer';
-        const info = document.createElement('span'); info.className = 'person-info'; const name = document.createElement('strong'), role = document.createElement('small');
-        name.textContent = user.name; role.textContent = user.host ? user.online ? 'Ведущий' : 'Ведущий не в сети' : 'Слушает с нами'; info.append(name, role); link.append(avatar(user), info);
-        if (user.online) { const dot = document.createElement('span'); dot.className = 'online'; link.append(dot); }
-        el('participants').append(link);
-      }
-    }
-    const url = value.playback.url; el('player').parentElement.classList.toggle('has-track', !!url);
-    if (!url) { if (widget) widget.pause(); el('join').disabled = true; return; }
-    if (url !== loaded) {
-      loaded = url; ready = false; el('join').disabled = true;
-      if (widget) widget.load(url, { auto_play: false, show_comments: false, show_reposts: false, show_user: true });
-      else {
-        el('player').src = 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) + '&auto_play=false&show_comments=false&show_reposts=false';
-        widget = SC.Widget(el('player')); widget.bind(SC.Widget.Events.READY, () => { ready = true; el('join').disabled = false; widget.seekTo(target()); sync(); });
-        widget.bind(SC.Widget.Events.ERROR, () => { el('status').textContent = 'SoundCloud не смог открыть этот трек. Проверь его доступность или вход в SoundCloud.'; });
-      }
-    }
-    sync();
+    if (state && (value.epoch < state.epoch || value.epoch === state.epoch && value.revision < state.revision)) return; state = value;
+    if (lease && value.controller?.connection !== connection) { lease = ''; message('Ведущий теперь на другом устройстве. Здесь можно продолжить слушать.'); }
+    el('room-name').textContent = value.settings.name; el('room-description').textContent = value.settings.description; document.title = value.settings.name + ' · LolzCloud';
+    el('track-title').textContent = value.playback.title || 'Выбери первую песню'; el('track-artist').textContent = value.playback.artist;
+    el('room-status').textContent = value.reconnecting ? 'Ведущий переподключается. Позиция сохранена.' : value.playback.playing ? 'Один момент музыки для всей комнаты' : 'Общая пауза';
+    el('claim-host').hidden = !value.canControl || isController(); el('release-host').hidden = !isController(); el('host-controls').hidden = !isController(); el('controller-info').textContent = value.controller ? value.controller.user.name + ' · ' + value.controller.name : 'Пульт свободен. Владелец или диджей может продолжить.';
+    el('join').textContent = isController() ? (value.playback.playing ? 'Пауза для всех' : 'Слушать вместе') : started ? 'Пауза только у меня' : 'Слушать вместе';
+    el('host-seek').max = value.playback.duration || 1; if (document.activeElement !== el('host-seek')) el('host-seek').value = clock.position(value); el('room-settings').hidden = !value.host;
+    if (!settingsFilled && value.host) { settingsFilled = true; el('settings-name').value = value.settings.name; el('settings-description').value = value.settings.description; el('settings-public').checked = value.settings.public; el('settings-chat').checked = value.settings.chat; el('settings-auto').checked = value.settings.autoNext; el('settings-capacity').value = value.settings.capacity; }
+    el('player').parentElement.classList.toggle('has-track', !!value.playback.url); load(value.playback); renderQueue(); renderPeople(); renderConversation(); sync();
   }
-  el('join').onclick = () => { started = !started; el('join').textContent = started ? 'Приостановить у меня' : 'Подключиться к прослушиванию'; sync(); };
-  el('copy-invite').onclick = async () => { try { await navigator.clipboard.writeText(location.origin + '/room/' + id + '/'); el('status').textContent = 'Приглашение скопировано.'; } catch { el('status').textContent = 'Скопируй ссылку на комнату из адресной строки.'; } };
-  async function poll() {
-    if (busy || stopped) return; busy = true;
-    try { if (!await window.LolzCloudSessionReady) return; render(await request('/api/rooms/' + id + '/join', { connection })); el('status').textContent = ''; }
-    catch (error) { el('status').textContent = error.message; if (/закрыта|не найдена/.test(error.message)) { stopped = true; widget?.pause(); el('join').disabled = true; el('participants').replaceChildren(); el('people-count').textContent = '0'; } }
-    finally { busy = false; }
+  async function control(data) { const result = await call('control', data); if (result.lease) { lease = result.lease; sequence = 0; started = true; } render(result.room); return result; }
+  async function publish(patch) {
+    pendingPublish = { ...pendingPublish, ...patch }; if (publishing || !isController()) return; publishing = true;
+    try { while (pendingPublish && isController()) { const update = pendingPublish; pendingPublish = null; const playback = { ...state.playback, position: clock.position(state), ...update, rate: 1 }; const value = await call('state', { lease, connection, sequence: ++sequence, fresh: true, private: false, playback }, 'PUT'); render(value); } }
+    catch (error) { if (error.status === 409) { lease = ''; void poll(); } message(error); } finally { publishing = false; }
   }
-  window.addEventListener('pagehide', () => { if (!window.LolzCloudSession) return; fetch('/api/rooms/' + id + '/leave', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.LolzCloudSession.csrf }, body: JSON.stringify({ connection }), keepalive: true }).catch(() => {}); });
-  setInterval(poll, 3000); void poll();
+  async function queue(data) { const value = await call('queue', { ...data, lease, connection }); render(value.room); return value; }
+  async function nextTrack() { if (!isController()) return; const value = await queue({ type: 'next' }); if (value.track) await openTrack(value.track.url); else await publish({ playing: false }); }
+  async function openTrack(url) {
+    if (!isController()) throw new Error('Сначала нажми «Вести здесь».'); let parsed; try { parsed = new URL(url); } catch { throw new Error('Нужна ссылка SoundCloud.'); }
+    if (parsed.protocol !== 'https:' || !['soundcloud.com', 'www.soundcloud.com'].includes(parsed.hostname) || !/^\/[\w-]+\/[\w-]+\/?$/.test(parsed.pathname)) throw new Error('Нужна ссылка на один трек SoundCloud.');
+    url = 'https://soundcloud.com' + parsed.pathname.replace(/\/$/, ''); await publish({ url, title: parsed.pathname.split('/').pop(), artist: '', duration: 0, position: 0, playing: false }); const token = generation, deadline = performance.now() + 15000;
+    await new Promise((resolve, reject) => { const timer = setInterval(() => { if (token !== generation || !isController()) { clearInterval(timer); reject(new Error('Трек или ведущий сменился.')); } else if (ready) { clearInterval(timer); resolve(); } else if (performance.now() > deadline) { clearInterval(timer); reject(new Error('SoundCloud долго открывает трек. Попробуй ещё раз.')); } }, 100); });
+    widget.getCurrentSound(sound => { if (token === generation && isController()) void publish({ title: sound.title || state.playback.title, artist: sound.user?.username || '', duration: (sound.duration || 0) / 1000, position: 0, playing: true }); });
+  }
+  function stream() {
+    eventStream?.close(); eventStream = new EventSource('/api/rooms/' + id + '/events');
+    eventStream.addEventListener('state', event => { try { const value = JSON.parse(event.data); if (clock.offset === null) clock.sample(value.serverTime, performance.now(), performance.now()); el('connection-status').textContent = 'В комнате'; render(value); } catch (error) { message(error); } });
+    eventStream.addEventListener('closed', () => { stopped = true; widget?.pause(); eventStream.close(); message('Комната закрыта или доступ отозван.'); }); eventStream.onerror = () => { el('connection-status').textContent = 'Восстанавливаем связь…'; };
+  }
+  async function poll() { if (busyJoin || stopped) return; busyJoin = true; try { if (!await window.LolzCloudSessionReady) return; render(await call('join', { connection, health })); } catch (error) { message(error); if ([403, 404].includes(error.status)) { stopped = true; widget?.pause(); eventStream?.close(); } } finally { busyJoin = false; } }
+  el('join').onclick = () => { if (isController()) { started = true; void publish({ playing: !state.playback.playing }); return; } started = !started; el('join').textContent = started ? 'Пауза только у меня' : 'Слушать вместе'; if (started && widget && ready) { lastApplied = performance.now(); widget.play(); sync(true); } else sync(); void poll(); };
+  el('resync').onclick = () => { started = true; el('join').textContent = 'Пауза только у меня'; sync(true); }; el('volume').oninput = () => widget?.setVolume(Number(el('volume').value));
+  el('copy-invite').onclick = () => navigator.clipboard.writeText(location.origin + '/room/' + id + '/').then(() => message('Приглашение скопировано.')).catch(() => message('Скопируй адрес комнаты из адресной строки.'));
+  el('claim-host').onclick = () => control({ type: 'claim', connection, force: state?.host === true, name: 'Браузер' }).catch(message); el('release-host').onclick = () => control({ type: 'release', connection, lease }).then(() => { lease = ''; }).catch(message);
+  el('host-track-form').onsubmit = event => { event.preventDefault(); void openTrack(el('host-track').value.trim()).catch(message); }; el('host-play').onclick = () => publish({ playing: !state.playback.playing }); el('host-next').onclick = () => nextTrack().catch(message); el('host-seek').onchange = () => publish({ position: Number(el('host-seek').value) });
+  el('queue-form').onsubmit = async event => { event.preventDefault(); try { await queue({ type: 'add', track: { url: el('queue-url').value } }); el('queue-url').value = ''; } catch (error) { message(error); } };
+  el('chat-form').onsubmit = async event => { event.preventDefault(); try { render(await call('message', { text: el('chat-input').value })); el('chat-input').value = ''; } catch (error) { message(error); } }; document.querySelectorAll('[data-reaction]').forEach(button => { button.onclick = () => call('message', { type: 'reaction', emoji: button.dataset.reaction }).then(render).catch(message); });
+  el('settings-form').onsubmit = event => { event.preventDefault(); void control({ type: 'settings', settings: { name: el('settings-name').value, description: el('settings-description').value, public: el('settings-public').checked, chat: el('settings-chat').checked, autoNext: el('settings-auto').checked, capacity: Number(el('settings-capacity').value) } }).catch(message); };
+  window.addEventListener('online', () => { void calibrate(); void poll(); }); document.addEventListener('visibilitychange', () => { if (!document.hidden) { void calibrate(); void poll(); sync(true); } });
+  window.addEventListener('pagehide', () => { eventStream?.close(); const csrf = window.LolzCloudSession?.csrf; if (csrf) { if (lease) void fetch('/api/rooms/' + id + '/control', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf }, body: JSON.stringify({ type: 'release', connection, lease }), keepalive: true }); void fetch('/api/rooms/' + id + '/leave', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf }, body: JSON.stringify({ connection }), keepalive: true }); } });
+  setInterval(() => { sync(); if (isController() && performance.now() - lastHeartbeat > 4000) { lastHeartbeat = performance.now(); if (ready && widget) widget.getPosition(position => { if (isController()) void publish({ position: position / 1000 }); }); else void publish({}); } }, 1000);
+  setInterval(poll, 8000); setInterval(calibrate, 30000); window.LolzCloudSessionReady.then(async session => { if (!session) return; await calibrate(); await poll(); if (!stopped) stream(); });
 })();

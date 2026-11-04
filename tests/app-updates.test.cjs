@@ -1,0 +1,40 @@
+'use strict';
+const test = require('node:test'), assert = require('node:assert/strict'), fs = require('node:fs'), path = require('node:path'), os = require('node:os'), crypto = require('node:crypto'), { EventEmitter } = require('node:events'), { ZipFile } = require('yazl');
+const { newer, download, extract, digestFrom } = require('../source/integrations/portable-update.cjs');
+const { AppUpdates, validateManifest } = require('../source/integrations/app-updates.cjs');
+function temporary(t) { const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'LolzCloud-update-test-')); t.after(() => { const resolved = path.resolve(directory); if (path.dirname(resolved) === path.resolve(os.tmpdir()) && path.basename(resolved).startsWith('LolzCloud-update-test-')) fs.rmSync(resolved, { recursive: true, force: true }); }); return directory; }
+function manifest(bytes = Buffer.from('fixture-setup'), legacy = false) { const version = '1.0.0', tag = 'v' + version, names = { archive: 'LolzCloud-' + version + (legacy ? '-win7-legacy-x64.zip' : '-win-x64.zip'), setup: 'LolzCloud-' + version + (legacy ? '-win7-legacy' : '-win-x64') + '-Setup.exe' }, result = { version, tag, channel: legacy ? 'legacy' : 'latest' }; for (const [kind, name] of Object.entries(names)) result[kind] = { name, url: 'https://github.com/Artemper52/LolzCloud/releases/download/' + tag + '/' + name, size: bytes.length, sha256: crypto.createHash('sha256').update(bytes).digest('hex') }; return result; }
+async function zip(filename, entries) { const archive = new ZipFile(), stream = fs.createWriteStream(filename); archive.outputStream.pipe(stream); for (const entry of entries) archive.addBuffer(Buffer.from(entry.body), 'LolzCloud-win32-x64/' + entry.name, entry.options); archive.end(); await new Promise((resolve, reject) => { stream.on('close', resolve); stream.on('error', reject); }); }
+test('update manifests isolate legacy and modern channels, reject other repositories and compare versions numerically', () => {
+  assert.equal(newer('0.10.0', '0.9.9'), true); assert.equal(newer('0.9.0', '0.9.0'), false); assert.equal(newer('0.8.9', '0.9.0'), false); assert.equal(newer('1.0.0-beta', '0.9.0'), false);
+  validateManifest(manifest()); validateManifest(manifest(undefined, true), true); assert.throws(() => validateManifest(manifest(), true)); const malicious = manifest(); malicious.setup.url = 'https://example.test/installer.exe'; assert.throws(() => validateManifest(malicious));
+  assert.equal(digestFrom('a'.repeat(64) + '  fixture.zip\n', 'fixture.zip'), 'a'.repeat(64)); assert.throws(() => digestFrom('a'.repeat(64) + '  other.zip', 'fixture.zip'));
+});
+test('portable updates verify both byte count and SHA-256 and never retain a bad download', async t => {
+  const directory = temporary(t), bytes = Buffer.from('fixture-binary'), digest = crypto.createHash('sha256').update(bytes).digest('hex'), asset = { browser_download_url: 'https://github.com/Artemper52/LolzCloud/releases/download/v1.0.0/fixture.zip', size: bytes.length }, filename = path.join(directory, 'valid.zip');
+  await download(asset, digest, filename, async () => new Response(bytes)); assert.deepEqual(fs.readFileSync(filename), bytes);
+  const bad = path.join(directory, 'bad.zip'); await assert.rejects(download(asset, '0'.repeat(64), bad, async () => new Response(bytes))); assert.equal(fs.existsSync(bad), false);
+  await assert.rejects(download({ ...asset, size: 1 }, digest, bad, async () => new Response(bytes))); assert.equal(fs.existsSync(bad), false);
+});
+test('portable extraction accepts a complete application and rejects traversal and symlink entries', async t => {
+  const directory = temporary(t), valid = path.join(directory, 'valid.zip'); await zip(valid, [{ name: 'LolzCloud.exe', body: 'fixture' }, { name: 'resources/app.asar', body: 'fixture' }, { name: 'lolzcloud-portable.json', body: JSON.stringify({ appId: 'app.lolzcloud.desktop', version: '1.0.0' }) }]);
+  const extracted = await extract(valid, path.join(directory, 'app')); assert.equal(fs.readFileSync(path.join(extracted, 'LolzCloud.exe'), 'utf8'), 'fixture');
+  const traversal = path.join(directory, 'traversal.zip'); await zip(traversal, [{ name: 'escape__/outside', body: 'malicious' }]); fs.writeFileSync(traversal, Buffer.from(fs.readFileSync(traversal).toString('latin1').replaceAll('escape__', '../../..'), 'latin1')); await assert.rejects(extract(traversal, path.join(directory, 'blocked'))); assert.equal(fs.existsSync(path.join(directory, 'outside')), false);
+  const symlink = path.join(directory, 'symlink.zip'); await zip(symlink, [{ name: 'link', body: '../outside', options: { mode: 0o120777 } }]); await assert.rejects(extract(symlink, path.join(directory, 'blocked-link')));
+});
+test('one update click downloads, verifies, saves the profile and requests a silent restart in that order', async t => {
+  const directory = temporary(t), bytes = Buffer.from('fixture-setup'), value = manifest(bytes), setup = path.join(directory, value.setup.name); fs.writeFileSync(setup, bytes); const events = [], native = new EventEmitter();
+  native.setFeedURL = config => { assert.ok(config.url.startsWith('https://github.com/Artemper52/LolzCloud/')); }; native.checkForUpdates = async () => ({ updateInfo: { version: value.version, files: [{ url: value.setup.name }] } }); native.downloadUpdate = async () => { events.push('download'); native.emit('download-progress', { percent: 50 }); return [setup]; }; native.quitAndInstall = (silent, restart) => events.push('restart:' + silent + ':' + restart);
+  const updates = new AppUpdates({ app: { getVersion: () => '0.9.0', isPackaged: true }, platform: 'win32', fetcher: async () => new Response(JSON.stringify(value)), nativeFactory: () => native, prepareRestart: async () => { events.push('save-profile'); } }); updates.installed = () => true; t.after(() => updates.dispose());
+  await updates.check(); assert.equal(updates.state().status, 'available'); await updates.install(); assert.deepEqual(events, ['download', 'save-profile', 'restart:true:true']); assert.equal(updates.state().status, 'installing');
+});
+test('a corrupted installer cannot trigger profile shutdown or execute an update', async t => {
+  const directory = temporary(t), bytes = Buffer.from('fixture-setup'), value = manifest(bytes), setup = path.join(directory, value.setup.name); fs.writeFileSync(setup, Buffer.from('wrong-content')); let shutdown = false, executed = false; const native = new EventEmitter(); native.setFeedURL = () => {}; native.checkForUpdates = async () => ({ updateInfo: { version: value.version, files: [{ url: value.setup.name }] } }); native.downloadUpdate = async () => [setup]; native.quitAndInstall = () => { executed = true; };
+  const updates = new AppUpdates({ app: { getVersion: () => '0.9.0', isPackaged: true }, platform: 'win32', fetcher: async () => new Response(JSON.stringify(value)), nativeFactory: () => native, prepareRestart: async () => { shutdown = true; } }); updates.installed = () => true; t.after(() => updates.dispose()); await updates.check(); await assert.rejects(updates.install()); assert.equal(shutdown, false); assert.equal(executed, false); assert.equal(updates.state().status, 'error');
+});
+
+test('the official website can deliver updates while GitHub is unavailable', async t => {
+  const value = manifest(); for (const key of ['archive', 'setup']) value[key].url = 'https://lolzcloud.com/downloads/' + value[key].name;
+  const updates = new AppUpdates({ app: { getVersion: () => '0.9.0', isPackaged: true }, platform: 'win32', fetcher: async url => url.startsWith('https://lolzcloud.com/') ? new Response(JSON.stringify(value)) : new Response('unavailable', { status: 503 }), prepareRestart: async () => {} }); t.after(() => updates.dispose());
+  await updates.check(); assert.equal(updates.state().status, 'available'); assert.equal(updates.feed, 'https://lolzcloud.com/downloads/'); assert.equal(updates.manifest.setup.url, value.setup.url);
+});

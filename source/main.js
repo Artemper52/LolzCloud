@@ -1,5 +1,7 @@
 const { app, globalShortcut, shell, ipcMain, BrowserWindow, Tray, Menu, nativeImage, screen, session} = require('electron')
 const path = require('node:path')
+require('./integrations/legacy-runtime.cjs').install();
+if (process.argv.includes('--self-test')) { require('./integrations/self-test.cjs').run(app); return; }
 if (process.argv.includes('--import-soundcloud-session')) {
   require('./integrations/session-import.cjs').runImportChild(app);
   return;
@@ -15,6 +17,7 @@ if (!singleInstance) app.quit();
 let lolzteam;
 let finishedQuitting = false;
 let quitStarted = false;
+let updates;
 
 
 let mainWindow;
@@ -38,6 +41,9 @@ function createWindow () {
   })
 
   mainWindow.setMenuBarVisibility(false)
+  const paletteKey = (event, input) => { if (input.type === 'keyDown' && (input.control || input.meta) && !input.alt && String(input.key).toLowerCase() === 'k') { event.preventDefault(); mainWindow.webContents.send('lolzcloud:palette'); } };
+  mainWindow.webContents.on('before-input-event', paletteKey);
+  mainWindow.webContents.on('did-attach-webview', (_event, contents) => { contents.on('before-input-event', paletteKey); });
   mainWindow.webContents.on('will-attach-webview', (event, preferences) => {
     // SoundCloud plugins only use DOM APIs. Remote pages never need Node or the token.
     preferences.preload = path.join(__dirname, 'guest-preload.cjs');
@@ -87,6 +93,12 @@ app.whenReady().then(async () => {
   lolzteam = registerLolzteam(app, () => mainWindow);
   await lolzteam.ready;
   createWindow()
+  updates = new (require('./integrations/app-updates.cjs').AppUpdates)({ app, onState: state => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('updates:state', state); }, prepareRestart: async () => { quitStarted = true; await lolzteam.shutdown(); finishedQuitting = true; } });
+  ipcMain.handle('updates:action', async (event, action) => {
+    if (event.sender !== mainWindow?.webContents || event.senderFrame !== event.sender.mainFrame || event.senderFrame.url.split(/[?#]/)[0] !== require('node:url').pathToFileURL(path.join(__dirname, 'app/index.html')).href) return { ok: false, error: 'Недоверенное окно.' };
+    try { if (action?.type === 'check') await updates.check(); else if (action?.type === 'install') await updates.install(); else if (action?.type !== 'state') throw new Error('Неизвестная команда обновления.'); return { ok: true, state: updates.state() }; }
+    catch (error) { return { ok: false, error: error.message, state: updates.state() }; }
+  });
   if (process.argv.includes('--mini')) void lolzteam.act({ type: 'mini' });
 
   apppath = __dirname
@@ -151,6 +163,7 @@ app.on('before-quit', event => {
   event.preventDefault();
   if (quitStarted) return;
   quitStarted = true;
+  updates?.dispose();
   lolzteam.shutdown().catch(() => {}).finally(() => {
     finishedQuitting = true;
     app.quit();

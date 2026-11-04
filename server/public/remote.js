@@ -1,0 +1,12 @@
+(() => {
+  'use strict';
+  const id = location.pathname.split('/').pop(), el = name => document.getElementById(name);
+  let csrf = '', busy = false, stopped = false;
+  async function request(url, options = {}) { const response = await fetch(url, { ...options, headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf } }); const value = await response.json(); if (!response.ok) { if (response.status === 401 || response.status === 404) stopped = true; throw new Error(value.error || 'Нет соединения с компьютером.'); } return value; }
+  const clock = value => Math.floor(value / 60) + ':' + String(Math.floor(value % 60)).padStart(2, '0');
+  async function refresh() { if (busy || stopped || document.hidden) return; busy = true; try { if (!csrf) csrf = (await request('/api/session')).csrf; const state = await request('/api/remotes/' + id); el('remote-name').textContent = state.name; el('remote-title').textContent = state.private ? 'Приватное прослушивание' : state.playback.title; el('remote-artist').textContent = state.private ? '' : state.playback.artist; el('remote-seek').max = state.playback.duration || 1; if (document.activeElement !== el('remote-seek')) el('remote-seek').value = state.playback.position; if (document.activeElement !== el('remote-volume')) el('remote-volume').value = Math.round(state.volume * 100); el('remote-time').textContent = state.private ? '' : clock(state.playback.position) + ' / ' + clock(state.playback.duration); el('remote-status').textContent = state.playback.playing ? 'Играет на компьютере' : 'На паузе'; } catch (error) { el('remote-status').textContent = error.message; } finally { busy = false; } }
+  async function command(command, value) { try { if (!csrf) csrf = (await request('/api/session')).csrf; await request('/api/remotes/' + id + '/command', { method: 'POST', body: JSON.stringify({ command, value }) }); el('remote-status').textContent = 'Команда отправлена'; } catch (error) { el('remote-status').textContent = error.message; } }
+  document.querySelectorAll('[data-command]').forEach(button => { button.onclick = () => command(button.dataset.command); });
+  el('remote-volume').onchange = () => command('volume', Number(el('remote-volume').value) / 100); el('remote-seek').onchange = () => command('seek', Number(el('remote-seek').value));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) void refresh(); }); void refresh(); setInterval(refresh, 2000);
+})();

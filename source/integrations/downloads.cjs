@@ -62,10 +62,10 @@ class Downloads {
   enqueue(track) {
     const url = scUrl(track?.url); if (!url) throw new Error('Сначала выбери трек SoundCloud.');
     if (this.closed) throw new Error('Скачивание завершает работу.');
-    const previous = this.items.findLast(row => row.url === url && (['queued', 'downloading', 'converting'].includes(row.status) || row.status === 'complete' && fs.existsSync(path.join(this.directory, row.file))));
+    const previous = this.items.slice().reverse().find(row => row.url === url && (['queued', 'downloading', 'converting'].includes(row.status) || row.status === 'complete' && fs.existsSync(path.join(this.directory, row.file))));
     if (previous) return previous.id;
     if (this.items.filter(row => ['queued', 'downloading', 'converting'].includes(row.status)).length >= 20) throw new Error('В очереди уже 20 песен. Дождись завершения.');
-    const retry = this.items.findLast(row => row.url === url && ['error', 'cancelled'].includes(row.status));
+    const retry = this.items.slice().reverse().find(row => row.url === url && ['error', 'cancelled'].includes(row.status));
     if (retry) this.items.splice(this.items.indexOf(retry), 1);
     const item = { id: retry?.id || randomUUID(), url, title: clean(track.title, 180), artist: clean(track.artist, 100), status: 'queued', percent: 0, bytes: 0, file: '', error: '', createdAt: Date.now() };
     this.items.push(item); this.save(); this.pump(); return item.id;
@@ -73,7 +73,14 @@ class Downloads {
   pump() {
     if (this.running || this.closed) return;
     const item = this.items.find(row => row.status === 'queued'); if (!item) return;
-    this.running = this.run(item).finally(() => { this.running = null; this.pump(); });
+    this.running = this.run(item).catch(() => {
+      // A failed cleanup/history write must not become an unhandled rejection
+      // in the main process. A finished MP3 remains usable even if the disk is full.
+      if (!['complete', 'cancelled'].includes(item.status)) item.status = 'error';
+      item.error = item.status === 'complete'
+        ? 'MP3 сохранён, но не удалось записать историю загрузок. Проверь место и доступ к папке данных.'
+        : 'Не удалось завершить загрузку. Проверь место и доступ к папкам загрузок и данных.';
+    }).finally(() => { this.running = null; this.pump(); });
   }
   async run(item) {
     const control = new AbortController(), timeout = setTimeout(() => control.abort(), 30 * 60_000);
@@ -103,8 +110,8 @@ class Downloads {
     } finally {
       clearTimeout(timeout); this.controllers.delete(item.id);
       if (item.status !== 'complete' && item.file) {
-        await fsp.rm(path.join(this.directory, item.file), { force: true });
-        item.file = '';
+        try { await fsp.rm(path.join(this.directory, item.file), { force: true }); item.file = ''; }
+        catch { item.error = 'Не удалось удалить отменённый MP3. Проверь доступ к папке загрузок.'; }
       }
       await Promise.allSettled([sourceFile, outputFile].map(file => fsp.rm(file, { force: true })));
       this.save();

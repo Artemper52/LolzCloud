@@ -1,6 +1,7 @@
 'use strict';
 const { clean } = require('./lolzteam/status.cjs');
 const { scUrl } = require('./music.cjs');
+const { fetchClientId, waitForClient } = require('./soundcloud-client.cjs');
 function normalizeTrack(value) {
   if (!value || value.kind === 'playlist' || value.streamable === false || ['BLOCK', 'SNIP'].includes(value.policy)) return null;
   const url = scUrl(value.url || value.permalink_url);
@@ -20,15 +21,29 @@ function releaseYear(value) {
   return Number.isInteger(year) && year >= 1800 && year <= new Date().getFullYear() + 1 ? year : 0;
 }
 class SoundCloudDiscovery {
-  constructor(fetcher = fetch) { this.fetcher = fetcher; this.ids = new Map(); this.cache = new Map(); this.retryAt = 0; this.client = null; }
-  async clientId() { return this.client ||= require('soundcloud-downloader').default.getClientID().catch(error => { this.client = null; throw error; }); }
+  constructor(fetcher = fetch, { clientIdFetcher = () => fetchClientId(fetcher) } = {}) { this.fetcher = fetcher; this.clientIdFetcher = clientIdFetcher; this.ids = new Map(); this.cache = new Map(); this.retryAt = 0; this.client = null; }
+  clientId(signal) {
+    if (!this.client) {
+      const request = Promise.resolve().then(() => this.clientIdFetcher()).catch(error => { if (this.client === request) this.client = null; throw error; });
+      this.client = request;
+    }
+    return waitForClient(this.client, signal);
+  }
   async request(endpoint, params = {}, { signal, headers = {} } = {}) {
     if (Date.now() < this.retryAt) throw new Error('SoundCloud попросил сделать паузу. Попробуй волну немного позже.');
     const url = new URL('https://api-v2.soundcloud.com' + endpoint);
     for (const [key, value] of Object.entries(params)) url.searchParams.set(key, String(value));
-    url.searchParams.set('client_id', await this.clientId());
-    const timeout = AbortSignal.timeout(15_000);
-    const response = await this.fetcher(url.href, { signal: signal ? AbortSignal.any([signal, timeout]) : timeout, redirect: 'error', headers: { Accept: 'application/json', ...headers } });
+    const timeout = AbortSignal.timeout(15_000), deadline = signal ? AbortSignal.any([signal, timeout]) : timeout;
+    let response;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      deadline.throwIfAborted();
+      url.searchParams.set('client_id', await this.clientId(deadline));
+      const current = this.client;
+      response = await this.fetcher(url.href, { signal: deadline, redirect: 'error', headers: { Accept: 'application/json', ...headers } });
+      if (response.status !== 401 || attempt > 0 || headers.Authorization) break;
+      await response.body?.cancel();
+      if (this.client === current) this.client = null;
+    }
     if (response.status === 429) { this.retryAt = Date.now() + Math.max(60_000, (Number(response.headers.get('retry-after')) || 60) * 1000); throw new Error('SoundCloud попросил сделать паузу. Попробуй волну немного позже.'); }
     if (!response.ok) { const error = new Error('Не удалось получить данные SoundCloud. Попробуй позже.'); error.status = response.status; throw error; }
     return response.json();

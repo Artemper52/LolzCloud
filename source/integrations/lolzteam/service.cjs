@@ -169,6 +169,7 @@ class LolzteamService {
       displayPlayback: this.displayPlayback(),
       transitioning: !!this.pendingPlayback || !track.title && !!this.lastPlayback,
       fresh: this.isFresh(),
+      sampledAt: this.receivedAt,
       private: this.isPrivate(),
       restorePending: (this.ownsStatus || !!this.pendingWrite) && (!this.settings.enabled || this.closing),
       busy: this.busy > 0,
@@ -200,7 +201,7 @@ class LolzteamService {
   }
 
   isPrivate() {
-    return this.settings.privateMode || this.settings.excludedTracks.includes(this.playback.url);
+    return this.localPlaybackActive === true || this.settings.privateMode || this.settings.excludedTracks.includes(this.playback.url);
   }
 
   configure(patch) {

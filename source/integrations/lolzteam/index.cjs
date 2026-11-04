@@ -25,7 +25,7 @@ function registerLolzteam(app, getWindow) {
   const ready = soundcloudSession.start();
   let loginImport = null;
   let importing = false;
-  const getState = () => ({ ...service.getState(), soundcloudSession: soundcloudSession.state(), discord: discord.getState(), features: studio.getState(), loginImport, importing });
+  const getState = () => ({ ...studio.snapshot(service.getState()), soundcloudSession: soundcloudSession.state(), discord: discord.getState(), features: studio.getState(), loginImport, importing });
   function notifyState() { const window = getWindow(); if (window && !window.isDestroyed()) window.webContents.send('lolzcloud:state', getState()); }
   const expected = pathToFileURL(path.resolve(__dirname, '../../app/index.html')).href;
   function trusted(event) {
@@ -85,6 +85,7 @@ function registerLolzteam(app, getWindow) {
   });
   ipcMain.on('lolzteam:playback', (event, playback) => {
     if (!trusted(event)) return;
+    studio.acceptSoundCloud(playback);
     service.setPlayback(playback);
     studio.setUpcoming(playback?.upNext);
     if (playback && Object.hasOwn(playback, 'account') && (playback.account !== null || !soundcloudSession.state().saved && !soundcloudSession.state().recovering)) service.setProfile(playback.account);

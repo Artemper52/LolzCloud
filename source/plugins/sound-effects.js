@@ -2,9 +2,15 @@
   if (window.__lolzcloudAudioFX) return;
   const audio = new Set(), graphs = new WeakMap(), sources = new WeakMap(), sourceNodes = new WeakMap(), settling = new WeakSet(), impulses = new WeakMap(), corsManaged = new WeakSet(), corsFallback = new WeakSet(), wantedPlayback = new WeakSet();
   const mediaTracks = new WeakMap();
+  const selectActive = () => [...audio].find(media => !media.paused) || [...audio].at(-1);
   const defaults = { enabled: false, gains: [0, 0, 0, 0, 0], rate: 1, preservesPitch: false, reverb: 0, echo: 0 };
   const status = window.__lolzcloudAudioFX = { config: { ...defaults }, attached: 0, unavailable: false, reason: '', rate: 1, mediaCount: 0, audio };
   const safety = { limiter: true, ceilingDb: -3, duckGain: 1 };
+  let normalization = { enabled: false, url: '', gainDb: 0 }, normalizationMeter = { available: false };
+  window.__lolzcloudSetNormalization = value => {
+    normalization = { enabled: value?.enabled === true, url: typeof value?.url === 'string' ? value.url : '', gainDb: Number.isFinite(value?.gainDb) ? Math.max(-8, Math.min(8, value.gainDb)) : 0 };
+    for (const media of audio) { const graph = graphs.get(media); if (graph?.normalizer) graph.normalizer.port.postMessage({ ...normalization, inputVolume: media.volume, key: mediaTracks.get(media) || normalization.url }); }
+  };
   let context;
   let desiredVolume = null;
   const tracker = window.LolzCloudBeatTracker ? new window.LolzCloudBeatTracker() : null;
@@ -25,7 +31,7 @@
     if (!owner.audioWorklet || !window.LolzCloudTempoWorkletSource || !window.AudioWorkletNode) return null;
     let module = workletModules.get(owner);
     if (!module) {
-      const url = URL.createObjectURL(new Blob([window.LolzCloudTempoWorkletSource], { type: 'text/javascript' }));
+      const url = URL.createObjectURL(new Blob([window.LolzCloudTempoWorkletSource, '\n', window.LolzCloudNormalizerSource || ''], { type: 'text/javascript' }));
       module = owner.audioWorklet.addModule(url).finally(() => URL.revokeObjectURL(url)); workletModules.set(owner, module);
     }
     return module;
@@ -159,6 +165,12 @@
       record.graph = graph; graphs.set(media, graph);
       const module = workletModule(owner);
       if (module) graph.limiterReady = module.then(() => {
+        if (window.LolzCloudNormalizerSource) {
+          const normalizer = new AudioWorkletNode(owner, 'lolzcloud-normalization', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2] });
+          normalizer.port.onmessage = event => { if (media === selectActive()) normalizationMeter = { available: true, ...event.data }; };
+          connect(normalizer, filters[0]); disconnect(source, filters[0]); connect(source, normalizer); graph.normalizer = normalizer;
+          normalizer.port.postMessage({ ...normalization, inputVolume: media.volume, key: mediaTracks.get(media) || normalization.url });
+        }
         const limiter = new AudioWorkletNode(owner, 'lolzcloud-limiter', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2], parameterData: { enabled: safety.limiter ? 1 : 0, ceilingDb: safety.ceilingDb } });
         limiter.port.onmessage = event => { const value = event.data; if (Number.isFinite(value?.peakDb) && Number.isFinite(value?.reductionDb)) graph.meter = { peakDb: Math.max(-96, Math.min(24, value.peakDb)), reductionDb: Math.max(0, Math.min(60, value.reductionDb)) }; };
         connect(limiter, output); disconnect(compressor, output); connect(compressor, limiter); graph.limiter = limiter;
@@ -204,6 +216,7 @@
     media.addEventListener('loadedmetadata', () => { setTempo(media); attach(media); });
     media.addEventListener('canplay', () => { setTempo(media); attach(media); });
     media.addEventListener('ratechange', () => setTempo(media));
+    media.addEventListener('volumechange', () => graphs.get(media)?.normalizer?.port.postMessage({ inputVolume: media.volume }));
     media.addEventListener('seeking', () => { if (sources.get(media) === rhythm.record) tracker?.reset(); });
     media.addEventListener('pause', () => { const record = sources.get(media); if (record?.worklet) disconnect(record.worklet); });
     media.addEventListener('ended', () => { window.__lolzcloudSnapshot?.(); const url = mediaTracks.get(media); if (url && window.__lolzcloudWaveActive && media.duration > 1 && media.currentTime >= media.duration - .5) console.log('LolzCloudReceive|WaveEnded|' + JSON.stringify({ url })); });
@@ -282,7 +295,7 @@
     const players = [...document.querySelectorAll('.playControls,#playControls,[data-testid="play-controls"],[data-testid="playback-controls"]')];
     const ui = { nativePlayersVisible: players.filter(node => node.getBoundingClientRect().height > 0 && getComputedStyle(node).visibility !== 'hidden').length,
       likeAvailable: !!document.querySelector('.playbackSoundBadge__like, .playControls .sc-button-like'), repeatAvailable: !!document.querySelector('.playControls .repeatControl, .playControls__repeat'), hiddenPromotions: Number(window.__lolzcloudPromotions?.hidden) || 0 };
-    return { attached: status.attached, unavailable: status.unavailable, reason: status.reason, mediaCount: audio.size, rate: status.rate, volume: desiredVolume ?? active?.volume ?? 1, ui, safety: { limiterAvailable: !!graph?.limiter, limiter: safety.limiter, ceilingDb: safety.ceilingDb, duckGain: safety.duckGain, ...(graph?.meter || { peakDb: -96, reductionDb: 0 }) }, sampledAt: Date.now(), tempo: { url: rhythm.url, available: rhythm.available, method: rhythm.record?.worklet ? 'worklet' : 'analyser', ...(tracker?.state(rhythm.record?.context.currentTime ?? performance.now() / 1000) || { bpm: 0, confidence: 0, beatAge: null }) } };
+    return { normalization: normalizationMeter, attached: status.attached, unavailable: status.unavailable, reason: status.reason, mediaCount: audio.size, rate: status.rate, volume: desiredVolume ?? active?.volume ?? 1, ui, safety: { limiterAvailable: !!graph?.limiter, limiter: safety.limiter, ceilingDb: safety.ceilingDb, duckGain: safety.duckGain, ...(graph?.meter || { peakDb: -96, reductionDb: 0 }) }, sampledAt: Date.now(), tempo: { url: rhythm.url, available: rhythm.available, method: rhythm.record?.worklet ? 'worklet' : 'analyser', ...(tracker?.state(rhythm.record?.context.currentTime ?? performance.now() / 1000) || { bpm: 0, confidence: 0, beatAge: null }) } };
   };
   if (tracker) setInterval(() => {
     const media = rhythmMedia(), record = media && sources.get(media);

@@ -1,11 +1,13 @@
 'use strict';
 const http = require('node:http'), fs = require('node:fs'), path = require('node:path');
 const { CloudStore, HttpError, profile, safeNext, hash } = require('./core.cjs');
+const { PlayerServices } = require('./player-services.cjs');
+const { RoomEngine } = require('./room-engine.cjs');
 const ROOT = path.join(__dirname, 'public');
 const cookies = req => Object.fromEntries(String(req.headers.cookie || '').split(';').map(row => row.trim().split(/=(.*)/s).slice(0, 2)).filter(row => row.length === 2));
 function createServer({ origin = 'https://lolzcloud.com', clientId = process.env.LOLZ_CLIENT_ID, redirectMode = process.env.LOLZ_REDIRECT_MODE ?? 'explicit', spicyKey = process.env.SPICY_LYRICS_SECRET_KEY, store = new CloudStore({ filename: path.join(process.env.LOLZCLOUD_STATE || '/var/lib/lolzcloud', 'sessions.json'), origin }), fetcher = fetch, verifyProfile = null } = {}) {
   if (!['explicit', 'registered'].includes(redirectMode)) throw new Error('LOLZ_REDIRECT_MODE must be explicit or registered.');
-  const limits = new Map(), lyrics = new Map(); let upstream = 0;
+  const limits = new Map(), lyrics = new Map(), rooms = new RoomEngine(store), players = new PlayerServices(store, rooms); let upstream = 0;
   function limit(key, max, window = 60000) {
     const now = Date.now(); let entry = limits.get(key);
     if (!entry || entry.until <= now) { entry = { count: 0, until: now + window }; limits.set(key, entry); }
@@ -14,7 +16,7 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
   }
   async function jsonBody(req) {
     if (!String(req.headers['content-type']).startsWith('application/json')) throw new HttpError(415, 'Нужен JSON-запрос.');
-    const chunks = []; let size = 0; for await (const chunk of req) { size += chunk.length; if (size > 16384) throw new HttpError(413, 'Слишком большой запрос.'); chunks.push(chunk); }
+    const chunks = []; let size = 0; const maximum = req.url === '/api/profile' ? 1050000 : 16384; for await (const chunk of req) { size += chunk.length; if (size > maximum) throw new HttpError(413, 'Слишком большой запрос.'); chunks.push(chunk); }
     try { return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}'); } catch { throw new HttpError(400, 'Некорректный запрос.'); }
   }
   async function apiJson(url, options = {}, max = 2_000_000) {
@@ -53,7 +55,7 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
       const url = new URL(req.url, origin), method = req.method;
       if (!['GET', 'POST', 'PUT', 'DELETE'].includes(method)) throw new HttpError(405, 'Метод не поддерживается.');
       const peer = String(req.headers['x-real-ip'] || req.socket.remoteAddress).slice(0, 100);
-      if (url.pathname === '/api/health' && method === 'GET') return send(res, { ok: true, oauthConfigured: !!clientId, spicyConfigured: !!spicyKey });
+      if (url.pathname === '/api/health' && method === 'GET') return send(res, { ok: true, version: '0.9.0', roomProtocol: 2, oauthConfigured: !!clientId, spicyConfigured: !!spicyKey });
       if (url.pathname === '/auth/lolz' && method === 'GET') {
         if (!clientId || !/^[a-zA-Z0-9_-]{5,100}$/.test(clientId)) throw new HttpError(503, 'Вход временно недоступен.');
         limit('login:' + peer, 20);
@@ -85,29 +87,53 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
         if (typeof data.deviceCode !== 'string' || !/^[\w-]{43}$/.test(data.deviceCode)) throw new HttpError(400, 'Неверный код подключения.');
         return send(res, store.pollDevice(data.deviceCode));
       }
-      const assets = { '/cloud/room.css': 'room.css', '/cloud/site.js': 'site.js', '/cloud/callback.js': 'callback.js', '/cloud/room.js': 'room.js' };
+      const assets = { '/cloud/room.css': 'room.css', '/cloud/site.js': 'site.js', '/cloud/callback.js': 'callback.js', '/cloud/room.js': 'room.js', '/cloud/remote.js': 'remote.js', '/cloud/queue.js': 'queue.js', '/cloud/room-sync.js': 'room-sync.js' };
       if (assets[url.pathname] && method === 'GET') {
         headers(res); res.writeHead(200, { 'Content-Type': url.pathname.endsWith('.css') ? 'text/css; charset=utf-8' : 'text/javascript; charset=utf-8' }); res.end(fs.readFileSync(path.join(ROOT, assets[url.pathname]))); return;
       }
       if (url.pathname === '/login' && method === 'GET') return page(res, 'login.html');
+      if (/^\/remote\/[a-f0-9]{32}$/.test(url.pathname) && method === 'GET') { if (!session(req, false)) return redirect(res, '/login?next=' + encodeURIComponent(safeNext(url.pathname))); return page(res, 'remote.html'); }
       if (url.pathname === '/connect' && method === 'GET' || url.pathname === '/rooms' && method === 'GET' || /^\/room\/[a-f0-9]{32}\/?$/.test(url.pathname) && method === 'GET') {
         if (!session(req, false)) return redirect(res, '/login?next=' + encodeURIComponent(safeNext(url.pathname + url.search)));
         return page(res, url.pathname === '/connect' ? 'connect.html' : url.pathname === '/rooms' ? 'rooms.html' : 'room.html', url.pathname.startsWith('/room/'));
       }
       const auth = session(req); limit('user:' + auth.user.id, 900);
+      if (url.pathname === '/api/clock' && method === 'GET') return send(res, { serverTime: store.now() });
       if (method !== 'GET') guard(req, auth);
       if (url.pathname === '/api/logout' && method === 'POST') { store.logout(auth.secret); res.setHeader('Set-Cookie', cookie('__Host-lc_session', '', 0)); return send(res, { ok: true }); }
       if (url.pathname === '/api/desktop/approve' && method === 'POST') { const data = await jsonBody(req); store.approveDevice(data.code, auth.user); return send(res, { ok: true }); }
+      if (url.pathname === '/api/profile' && method === 'GET') return send(res, players.getProfile(auth.user));
+      if (url.pathname === '/api/profile' && method === 'PUT') { limit('profile:' + auth.user.id, 10); return send(res, players.saveProfile(auth.user, await jsonBody(req))); }
+      if (url.pathname === '/api/remotes' && method === 'POST') { limit('remote-create:' + auth.user.id, 10); return send(res, players.createRemote(auth.user, (await jsonBody(req)).name), 201); }
+      const remote = url.pathname.match(/^\/api\/remotes\/([a-f0-9]{32})(?:\/(state|command))?$/);
+      if (remote) {
+        const [, id, action] = remote;
+        if (method === 'GET' && !action) return send(res, players.remoteView(id, auth.user));
+        if (method === 'DELETE' && !action) { players.remote(id, auth.user); players.remotes.delete(id); return send(res, { ok: true }); }
+        if (method === 'PUT' && action === 'state') return send(res, players.updateRemote(id, auth.user, await jsonBody(req)));
+        if (method === 'POST' && action === 'command') { limit('remote-command:' + auth.user.id, 120); return send(res, players.command(id, auth.user, await jsonBody(req))); }
+      }
       if (url.pathname === '/api/rooms' && method === 'POST') return send(res, store.createRoom(auth.user), 201);
-      if (url.pathname === '/api/rooms' && method === 'GET') return send(res, { rooms: [...store.rooms.values()].filter(room => room.owner.id === auth.user.id).map(room => store.viewRoom(room, auth.user)) });
-      const room = url.pathname.match(/^\/api\/rooms\/([a-f0-9]{32})(?:\/(join|leave|state))?$/);
+      if (url.pathname === '/api/rooms' && method === 'GET') return send(res, { rooms: [...store.rooms.values()].filter(room => room.owner.id === auth.user.id || room.settings?.public && !room.bans?.has(auth.user.id)).map(room => store.viewRoom(room, auth.user)) });
+      const room = url.pathname.match(/^\/api\/rooms\/([a-f0-9]{32})(?:\/(join|leave|state|queue|control|message|events))?$/);
       if (room) {
         const [, id, action] = room;
+        if (method === 'GET' && action === 'events') {
+          limit('events:' + auth.user.id, 20); store.viewRoom(store.room(id), auth.user);
+          res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-cache, no-transform', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' }); res.flushHeaders();
+          let finished = false, unsubscribe = () => {}, heartbeat;
+          const close = () => { if (finished) return; finished = true; clearInterval(heartbeat); unsubscribe(); res.end(); };
+          const push = () => { if (finished) return; try { if (auth.expires <= store.now()) return close(); const value = store.viewRoom(store.room(id), auth.user); if (!res.write('event: state\ndata: ' + JSON.stringify(value) + '\n\n')) close(); } catch { res.write('event: closed\ndata: {}\n\n'); close(); } };
+          unsubscribe = rooms.subscribe(id, push); heartbeat = setInterval(push, 5000); heartbeat.unref(); res.on('close', close); push(); return;
+        }
         if (method === 'GET' && !action) return send(res, store.viewRoom(store.room(id), auth.user));
         if (method === 'DELETE' && !action) { store.closeRoom(id, auth.user); return send(res, { ok: true }); }
         const data = await jsonBody(req);
+        if (method === 'POST' && action === 'queue') { limit('queue:' + auth.user.id, 60); const value = players.queue(id, auth.user, data); rooms.changed(id); return send(res, value); }
+        if (method === 'POST' && action === 'control') { limit('room-control:' + auth.user.id, 120); return send(res, rooms.control(id, auth.user, data)); }
+        if (method === 'POST' && action === 'message') { limit('room-message:' + auth.user.id, 30); return send(res, rooms.message(id, auth.user, data)); }
         if (method === 'PUT' && action === 'state') return send(res, store.updateRoom(id, auth.user, data));
-        if (method === 'POST' && action === 'join') return send(res, store.joinRoom(id, auth.user, data.connection));
+        if (method === 'POST' && action === 'join') return send(res, rooms.join(id, auth.user, data));
         if (method === 'POST' && action === 'leave') { store.leaveRoom(id, auth.user, data.connection); return send(res, { ok: true }); }
       }
       const lyric = url.pathname.match(/^\/api\/lyrics\/([a-zA-Z0-9]{22})$/);
@@ -138,13 +164,13 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
   });
   server.requestTimeout = 20000; server.headersTimeout = 10000;
   const cleanup = setInterval(() => { store.prune(); for (const [id, row] of lyrics) if (row.until <= Date.now()) lyrics.delete(id); }, 60000); cleanup.unref();
-  server.on('close', () => { clearInterval(cleanup); store.save(); }); server.store = store;
+  server.on('close', () => { clearInterval(cleanup); rooms.dispose(); store.save(); }); server.store = store;
   return server;
 }
 if (require.main === module) {
   const server = createServer(), port = Number(process.env.PORT) || 4387;
   server.listen(port, '127.0.0.1', () => console.log('LolzCloud cloud service ready.'));
-  const stop = () => { server.close(() => process.exit(0)); setTimeout(() => process.exit(1), 5000).unref(); };
+  const stop = () => { server.close(() => process.exit(0)); server.closeAllConnections(); setTimeout(() => process.exit(1), 5000).unref(); };
   process.on('SIGTERM', stop); process.on('SIGINT', stop);
 }
 module.exports = { createServer };

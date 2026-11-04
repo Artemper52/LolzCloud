@@ -35,6 +35,8 @@
   if (page === 'rooms') window.LolzCloudSessionReady.then(async session => {
     if (!session) return;
     const data = await request('/api/rooms');
-    for (const room of data.rooms) { const link = document.createElement('a'); link.href = room.url; link.className = 'button primary'; link.textContent = 'Открыть мою комнату ↗'; el('my-rooms').append(link); }
+    for (const room of data.rooms) { const link = document.createElement('a'), title = document.createElement('strong'), detail = document.createElement('small'); link.href = room.url; link.className = 'room-card'; title.textContent = room.settings?.name || 'Комната ' + room.owner.name; detail.textContent = room.participants.length + ' слушателей · ' + (room.playback.title || 'Выбирают музыку'); link.append(title, detail); el('my-rooms').append(link); }
+    if (!data.rooms.length) el('my-rooms').textContent = 'Сейчас нет открытых комнат. Пригласи друзей в свою.';
+    if (el('create-room')) el('create-room').onclick = async () => { el('create-room').disabled = true; try { const room = await request('/api/rooms', {}); location.assign(room.url); } catch (error) { el('status').textContent = error.message; el('create-room').disabled = false; } };
   }).catch(error => { el('status').textContent = error.message; });
 })();

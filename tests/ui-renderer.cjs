@@ -19,13 +19,15 @@ const track = { title: 'Original test song', artist: 'Test artist', url: 'https:
 service.setPlayback(track);
 service.setProfile({ url: 'https://soundcloud.com/test-listener', name: 'Test listener' });
 const lyrics = { key: lyricKey(track), revision: 1, loading: false, found: true, plain: '', source: 'Test fixture', lines: [{ time: 0, text: 'Original timing test', words: [{ time: 0, text: 'Original timing ' }, { time: 7, text: 'test' }] }, { time: 10, text: 'Another original line for testing' }] };
-const calls = []; let waveActive = false, waveWaiting = false, waveReaction = '', hostWindow, lastUpcoming = [], settingsDelay = 0; const lyricSettings = new LyricSettings();
+const calls = []; let waveActive = false, waveWaiting = false, waveReaction = '', hostWindow, lastUpcoming = [], settingsDelay = 0, lyricReplyDelay = 0; const lyricSettings = new LyricSettings();
 const features = () => ({ ...music.getState(), transport: { repeat: repeatIntent.read(service.playback) }, visuals: { url: track.url, bpm: 120, source: 'SoundCloud', beatAt: null }, audio: { attached: 1, unavailable: false, mediaCount: 1, rate: 1, volume: 1 }, downloads: { directory: 'Test downloads', items: [{ id: 'retry-fixture', url: track.url, title: 'Failed download fixture', artist: 'Test artist', status: 'error', percent: 0, error: 'Temporary error', exists: false }] }, room: { active: false, url: '', viewers: 0 }, hotkeyErrors: [], communityResults: [], lyrics, lyricSettings: lyricSettings.state(), wave: { active: waveActive, loading: false, waiting: waveWaiting, canFeedback: waveActive && !waveWaiting, reaction: waveReaction, error: '', queue: [], current: null, likes: 2, learned: 3, adventurous: .35 } });
 const state = () => ({ ...service.getState(), features: features(), discord: { connected: false, activity: null, error: '' } });
 ipcMain.handle('lolzteam:action', () => ({ ok: true, state: state() }));
+ipcMain.handle('updates:action', () => ({ ok: true, state: { currentVersion: '0.9.0', supported: false, status: 'unsupported' } }));
 ipcMain.handle('features:action', async (event, action) => {
   calls.push(action);
   if (settingsDelay && action.type === 'preferences') await delay(settingsDelay);
+  if (lyricReplyDelay && action.type === 'lyrics') await delay(lyricReplyDelay);
   if (action.type === 'wave-start') waveActive = true;
   if (action.type === 'media') event.sender.send('lolzcloud:media', { ...action, value: action.command === 'repeat' ? repeatIntent.choose(service.playback, action.mode) : action.value });
   if (action.type === 'lyrics-settings') lyricSettings.configure(action.settings);
@@ -142,6 +144,11 @@ app.whenReady().then(async () => {
     assert.equal(safetyBridge, -6, 'Protection controls must reach the sandboxed audio graph.');
     fs.writeFileSync(path.join(root, '.build/modern-shell-test.png'), (await host.webContents.capturePage()).toPNG());
     await host.webContents.executeJavaScript('document.querySelector("[data-view=lyrics]").click()'); await delay(300);
+    lyricReplyDelay = 100;
+    const lyricCalls = calls.filter(action => action?.type === 'lyrics').length;
+    await host.webContents.executeJavaScript('document.getElementById("lc-reload-lyrics").click();document.getElementById("lc-reload-lyrics").click()');
+    await until(() => calls.filter(action => action?.type === 'lyrics').length === lyricCalls + 2, 'An explicit lyric reload must reach the library even while the previous reply is pending.');
+    await delay(150); lyricReplyDelay = 0;
     const words = await host.webContents.executeJavaScript('({active:document.querySelector(".lc-lyric.is-active")?.textContent,word:!!document.querySelector(".lc-lyric.is-active .lc-word.is-current")})');
     assert.equal(words.active, 'Original timing test'); assert.equal(words.word, true);
     const seekFeedback = await host.webContents.executeJavaScript('(()=>{const box=document.createElement("div");document.body.append(box);const view=new window.LolzCloudLyricsView(box);view.setData({key:"instant-seek",revision:1,lines:[{time:0,text:"First line"},{time:10,text:"Second line"}],found:true});const sample={title:"Fixture",artist:"Fixture",duration:100,position:0,playing:true};view.setPlayback(sample);view.nodes[1].click();const instant=view.active===1;view.setPlayback({...sample,position:1});const stable=view.active===1;box.remove();view.credits.remove();return {instant,stable}})()');

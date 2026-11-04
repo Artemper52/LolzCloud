@@ -97,9 +97,11 @@ class PersonalWave {
   settings() { return this.request?.settings || this.data.preferences; }
   rank(candidates, omit = new Set()) {
     const snapshot = this.getSnapshot();
+    if (this.isDuplicate) candidates = candidates.filter(track => !this.isDuplicate(track, this.data.played24h, this.now()));
     return rankCandidates(candidates, this.profile(), { feedback: this.data.feedback, recent: this.recent.filter(row => row.startedAt > this.now() - DAY).slice(-3), current: snapshot.playback?.url || '', adventurous: this.data.adventurous, random: this.random, played24h: this.data.played24h, now: this.now(), settings: this.settings(), context: !snapshot.private ? contextProfile(this.getHistory(), this.now()) : null, blockedArtists: this.data.blockedArtists, omit, request: this.request });
   }
   allowed(track, profile = null) {
+    if (this.isDuplicate?.(track, this.data.played24h, this.now())) return false;
     if (playedRecently(track, this.data.played24h, this.now()) || this.data.feedback[track.url]?.banned || this.data.blockedArtists.some(name => norm(name) === norm(track.artist)) || !requestMatch(track, this.request).eligible) return false;
     const mode = this.settings().character; if (mode === 'mixed') return true;
     const known = (profile || this.profile()).tracks.get(track.url);

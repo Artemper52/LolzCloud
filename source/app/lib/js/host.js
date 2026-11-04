@@ -54,7 +54,7 @@
     const track = state.displayPlayback || state.playback;
     document.querySelector('.shell-player').setAttribute('aria-busy', String(state.transitioning === true));
     downloadItem = state.features?.downloads?.items.find(item => item.url === track.url && item.status !== 'cancelled' && item.status !== 'error') || null;
-    el('player-download').disabled = !track.title || state.fresh === false || state.transitioning;
+    el('player-download').disabled = state.local || !track.title || state.fresh === false || state.transitioning;
     el('player-download').dataset.status = downloadItem?.status || '';
     el('player-download').title = downloadItem?.exists ? 'MP3 сохранён · показать файл' : downloadItem && ['queued', 'downloading', 'converting'].includes(downloadItem.status) ? 'Скачивание · открыть очередь' : 'Установить песню · сохранить MP3';
     footerBackground.setState(true, track.playing && state.fresh !== false); headerBackground.setState(true, track.playing && state.fresh !== false);
@@ -66,7 +66,7 @@
     el('player-title').textContent = track.title || 'Выбери свой ритм'; el('player-artist').textContent = track.artist || 'Твоя музыка в LolzCloud';
     el('player-play-icon').setAttribute('d', track.playing ? 'M7 5h4v14H7zm6 0h4v14h-4z' : 'm8 5 11 7-11 7z');
     el('player-playPause').setAttribute('aria-label', track.playing ? 'Пауза' : 'Продолжить');
-    const canLike = !!track.title && !!state.soundcloudProfile?.url && !state.transitioning;
+    const canLike = !state.local && !!track.title && !!state.soundcloudProfile?.url && !state.transitioning;
     el('player-like').disabled = !canLike;
     el('player-like').setAttribute('aria-pressed', String(track.liked));
     el('player-like').setAttribute('aria-label', track.liked ? 'Убрать лайк' : 'Лайк');

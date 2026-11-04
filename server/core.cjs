@@ -101,5 +101,5 @@ class CloudStore {
     return { id: room.id, url: this.origin + '/room/' + room.id + '/', owner: room.owner, host: room.owner.id === user.id, participants: [...people.values()], viewers: Math.max(0, people.size - 1), playback: fresh ? room.playback : playback(null), updatedAt: room.updatedAt, revision: room.revision, serverTime: this.now() };
   }
 }
-function safeNext(value) { return typeof value === 'string' && /^(?:\/room\/[a-f0-9]{32}\/?|\/connect\?code=[a-zA-Z0-9_-]{12}|\/rooms)$/.test(value) ? value : '/rooms'; }
+function safeNext(value) { return typeof value === 'string' && /^(?:\/room\/[a-f0-9]{32}\/?|\/remote\/[a-f0-9]{32}|\/connect\?code=[a-zA-Z0-9_-]{12}|\/rooms)$/.test(value) ? value : '/rooms'; }
 module.exports = { CloudStore, HttpError, profile, playback, safeNext, hash, token };

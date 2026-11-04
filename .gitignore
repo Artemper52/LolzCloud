@@ -30,3 +30,9 @@ downloads.json
 sessions.json
 credentials.env
 soundcloud-session.json
+player-tools.json
+local-library.json
+release-radar.json
+rooms-state.json
+player-profiles.json
+profile-backups/

@@ -31,6 +31,10 @@ function migrateProfile(appData) {
 }
 
 function configureProfile(app) {
+  if (Number(process.versions.electron?.split('.')[0] || 99) < 23) {
+    app.setName('LolzCloud Legacy'); app.setAppUserModelId?.('app.lolzcloud.desktop.legacy');
+    const directory = path.join(app.getPath('appData'), 'LolzCloud Legacy'); fs.mkdirSync(directory, { recursive: true }); app.setPath('userData', directory); app.setPath('sessionData', directory); return { path: directory, migrated: false };
+  }
   app.setName('LolzCloud');
   app.setAppUserModelId?.('app.lolzcloud.desktop');
   const result = migrateProfile(app.getPath('appData'));

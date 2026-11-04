@@ -59,6 +59,24 @@ test('retrying a failed download reuses its row and completes without duplicate 
   const downloads = new Downloads(options); t.after(() => downloads.dispose()); const id = downloads.enqueue(song); await finish(downloads); assert.equal(downloads.state().items[0].status, 'error');
   assert.equal(downloads.retry(id), id); await finish(downloads); assert.equal(downloads.state().items.length, 1); assert.equal(downloads.state().items[0].status, 'complete'); assert.equal(downloads.enqueue(song), id); assert.equal(attempts, 2); assert.equal(fs.readdirSync(downloads.directory).length, 1); assert.throws(() => downloads.retry('missing'));
 });
+
+test('a failed history write cannot reject the background worker or discard a completed MP3', async t => {
+  const dir = directory(t); let began, resume;
+  const saving = new Promise(resolve => { began = resolve; }), release = new Promise(resolve => { resume = resolve; });
+  const downloads = new Downloads({ directory: path.join(dir, 'saved'), runtime: path.join(dir, 'runtime'), filename: path.join(dir, 'history.json'),
+    source: { async save(_url, file) { await fsp.writeFile(file, 'source'); began(); await release; return { track: song, mp3: true }; } },
+    encoder: async (input, output) => fsp.copyFile(input, output) });
+  t.after(() => downloads.dispose());
+  const id = downloads.enqueue(song); await saving;
+  const save = t.mock.method(downloads, 'save', () => { throw Object.assign(new Error('No free disk space'), { code: 'ENOSPC' }); });
+  resume();
+  try {
+    await finish(downloads);
+    assert.equal(downloads.state().items[0].status, 'complete');
+    assert.equal(fs.readFileSync(downloads.file(id), 'utf8'), 'source');
+    assert.match(downloads.state().items[0].error, /папк|место|истори/);
+  } finally { save.mock.restore(); }
+});
 test('interrupted jobs clean only their own UUID temporary files on restart', t => {
   const dir = directory(t), runtime = path.join(dir, 'runtime'); fs.mkdirSync(runtime); fs.writeFileSync(path.join(runtime, '2a7daa42-7340-8358-5e9b-472900a881d2.source'), 'partial'); fs.writeFileSync(path.join(runtime, 'keep.mp3'), 'keep');
   const downloads = new Downloads({ directory: path.join(dir, 'saved'), runtime, filename: path.join(dir, 'history.json'), source: {} }); assert.deepEqual(fs.readdirSync(runtime), ['keep.mp3']); t.after(() => downloads.dispose());

@@ -101,7 +101,7 @@ class SoundCloudAudioSource {
   async saveFormat(raw, track, choice, headers, filename, { signal, onProgress }) {
     const api = new URL(choice.url);
     if (api.origin !== 'https://api-v2.soundcloud.com' || api.username || api.password) throw new Error('Неизвестный источник аудио.');
-    api.searchParams.set('client_id', await this.provider.clientId());
+    api.searchParams.set('client_id', await this.provider.clientId(signal));
     if (raw.track_authorization) api.searchParams.set('track_authorization', raw.track_authorization);
     const info = await this.fetcher(api.href, { redirect: 'error', signal: AbortSignal.any([signal, AbortSignal.timeout(20_000)]), headers: { Accept: 'application/json', ...headers } });
     if (!info.ok) throw new Error('Не удалось открыть аудиопоток. Возможно, трек требует отдельного доступа.');

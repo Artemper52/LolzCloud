@@ -13,6 +13,8 @@
   let snapshot = null, feature = null, tab = 'share', lyricTrack = '', lyrics = null, lyricLoading = '';
   let dspApplied = '', soundDraft = null, keysDirty = false, lastLists = '', lastPresets = '', playRequest = 0, lyricsFont = 1, waveApplied = null, waveListSignature = '';
   let playerApplied = null;
+  let guestReady = false;
+  view.addEventListener('did-start-loading', () => { guestReady = false; });
   let safetyApplied = '', safetyRevision = -1, latestSafety = null;
   let sourceSignature = '';
   let lyricRequest = 0;
@@ -116,7 +118,7 @@
   studio.querySelectorAll('[data-tab]').forEach(button => { button.onclick = () => open(button.dataset.tab); });
   studio.addEventListener('click', event => { if (event.target === studio) studio.close(); });
   ipcRenderer.on('lolzcloud:studio', () => open());
-  ipcRenderer.on('appReqEsc', () => { if (studio.open) studio.close(); });
+  ipcRenderer.on('appReqEsc', () => { if (document.querySelector('.xp-modal[open]')) return; if (studio.open) studio.close(); });
   window.showsongshowcase = () => open('share');
   window.updatelyricshowcase = () => open('lyrics');
   studio.querySelectorAll('[data-do]').forEach(button => {
@@ -316,7 +318,7 @@
       el('wave-launcher').classList.toggle('is-playing', wave.active);
       const signature = JSON.stringify(wave.queue);
       if (signature !== waveListSignature) { waveListSignature = signature; fillList(el('wave-queue'), wave.queue, 'Здесь появятся треки, подобранные для тебя.', item => row(item.title, item.artist + ' · ' + item.reason, [['Слушать', () => action('wave-select', { url: item.url })]])); }
-      if (waveApplied !== wave.active) { const active = wave.active; view.executeJavaScript('window.__lolzcloudWaveActive = ' + JSON.stringify(active)).then(() => { waveApplied = active; }).catch(() => {}); }
+      if (guestReady && waveApplied !== wave.active) { const active = wave.active; view.executeJavaScript('window.__lolzcloudWaveActive = ' + JSON.stringify(active)).then(() => { waveApplied = active; }).catch(() => {}); }
     }
     el('card-title').textContent = hasTrack ? track.title : 'Включи любимый трек';
     el('card-artist').textContent = hasTrack ? track.artist : 'SoundCloud';
@@ -439,6 +441,7 @@
   }
   window.addEventListener('lolzcloud:state', event => { snapshot = event.detail; if (snapshot.features) feature = snapshot.features; render(); });
   async function media(command, value) {
+    if (!guestReady) return;
     const data = JSON.stringify([command, value]);
     await view.executeJavaScript(`window.__lolzcloudMediaCommand && window.__lolzcloudMediaCommand(...${data})`, true).catch(() => {});
   }
@@ -448,6 +451,7 @@
     const revision = Number.isFinite(config?.revision) ? config.revision : 0;
     if (revision < safetyRevision) return;
     safetyRevision = revision; latestSafety = config;
+    if (!guestReady) return;
     const signature = JSON.stringify(config); if (signature === safetyApplied) return;
     await view.executeJavaScript('window.__lolzcloudSetAudioSafety && window.__lolzcloudSetAudioSafety(' + signature + ')').then(() => { if (latestSafety === config) safetyApplied = signature; }).catch(() => {});
   }
@@ -466,6 +470,7 @@
     } catch { message('Не удалось открыть трек SoundCloud.', true); }
   });
   view.addEventListener('dom-ready', async () => {
+    guestReady = true;
     dspApplied = '';
     safetyApplied = '';
     waveApplied = null;
