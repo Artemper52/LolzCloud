@@ -1,0 +1,28 @@
+[Unit]
+Description=LolzCloud listening rooms and shared lyrics
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=lolzcloud
+Group=lolzcloud
+WorkingDirectory=/opt/lolzcloud-server/current
+ExecStart=/opt/lolzcloud-runtime/node index.cjs
+Environment=NODE_ENV=production
+Environment=PORT=4387
+Environment=LOLZCLOUD_STATE=/var/lib/lolzcloud
+EnvironmentFile=/etc/lolzcloud/credentials.env
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/lolzcloud
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+TimeoutStopSec=10
+
+[Install]
+WantedBy=multi-user.target

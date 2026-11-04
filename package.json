@@ -1,0 +1,61 @@
+{
+  "name": "lolzcloud",
+  "productName": "LolzCloud",
+  "version": "0.8.3",
+  "description": "SoundCloud player with Lolzteam music status, Discord presence and a local music studio",
+  "main": "source/main.js",
+  "license": "MIT",
+  "author": {
+    "name": "Artemper (artemper_lzt)",
+    "url": "https://github.com/Artemper52"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "prestart": "node tools/prepare.cjs",
+    "start": "electron .",
+    "test": "node --test tests/*.test.cjs",
+    "test:audio": "node tools/prepare.cjs && node tools/test-audio.cjs",
+    "test:ui": "node tools/prepare.cjs && node tools/test-ui.cjs",
+    "check": "node tools/check.cjs",
+    "build": "node tools/build.cjs",
+    "source:zip": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/source-archive.ps1",
+    "shortcut": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/desktop-shortcut.ps1",
+    "diagnose": "node tools/diagnose.cjs",
+    "test:persistence": "node tools/test-persistence.cjs",
+    "build:linux": "node tools/build-linux.cjs",
+    "build:appimage": "node tools/build-appimage.cjs"
+  },
+  "dependencies": {
+    "@ghostery/adblocker-electron": "2.20.3",
+    "@xmldom/xmldom": "0.9.12",
+    "cross-fetch": "4.1.0",
+    "discord-rpc": "4.0.1",
+    "ffmpeg-static": "5.3.0",
+    "soundcloud-downloader": "1.0.0"
+  },
+  "devDependencies": {
+    "@electron/asar": "4.3.1",
+    "@electron/fuses": "2.1.3",
+    "@electron/packager": "20.3.0",
+    "electron": "45.2.1",
+    "tar": "7.5.22"
+  },
+  "overrides": {
+    "soundcloud-downloader": {
+      "axios": "1.21.0"
+    },
+    "glob": "14.0.3",
+    "minimatch": "11.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Artemper52/LolzCloud.git"
+  },
+  "homepage": "https://lolzcloud.com",
+  "bugs": {
+    "url": "https://github.com/Artemper52/LolzCloud/issues"
+  }
+}

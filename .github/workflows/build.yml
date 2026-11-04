@@ -1,0 +1,127 @@
+name: Build and release
+on:
+  push:
+  pull_request:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the selected version tag after all checks pass
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: npm run test:audio
+      - run: npm run test:ui
+      - run: npm run test:persistence
+      - run: npm run build
+      - name: Prepare Windows and source archives
+        shell: pwsh
+        run: |
+          $releaseVersion = (Get-Content package.json | ConvertFrom-Json).version
+          Compress-Archive -LiteralPath dist/LolzCloud-win32-x64 -DestinationPath "dist/LolzCloud-$releaseVersion-win-x64.zip"
+          npm run source:zip
+          if ($LASTEXITCODE -ne 0) { throw 'Source archive failed.' }
+          Move-Item -LiteralPath dist/LolzCloud-source.zip -Destination "dist/LolzCloud-$releaseVersion-source.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LolzCloud-windows-x64
+          path: |
+            dist/LolzCloud-*-win-x64.zip
+            dist/LolzCloud-*-source.zip
+          if-no-files-found: error
+  linux:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    env:
+      LOLZCLOUD_BUILD_ARCH: ${{ matrix.arch }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: npm run build:linux
+      - name: Check native encrypted persistence with a real Linux keyring
+        shell: bash
+        run: |
+          set -eu
+          sudo apt-get update -qq
+          sudo apt-get install -y xvfb dbus-x11 gnome-keyring libsecret-1-0 libgtk-3-0 libnss3 libasound2t64 libgbm1 libatk-bridge2.0-0 libxkbcommon0 libxss1
+          dbus-run-session -- xvfb-run -a sh -c 'printf "%s" "lolzcloud-ci-keyring" | gnome-keyring-daemon --unlock --components=secrets >/dev/null; npm run test:persistence'
+      - name: Verify native converter and archive
+        shell: bash
+        run: |
+          set -eu
+          "dist/LolzCloud-linux-${LOLZCLOUD_BUILD_ARCH}/resources/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg" -version
+          tar -tzf "dist/LolzCloud-$(node -p 'require("./package.json").version')-linux-${LOLZCLOUD_BUILD_ARCH}.tar.gz" >/dev/null
+      - run: npm run build:appimage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LolzCloud-linux-${{ matrix.arch }}
+          path: |
+            dist/LolzCloud-*-linux-*.tar.gz
+            dist/LolzCloud-*-linux-*.AppImage
+          if-no-files-found: error
+  publish:
+    needs: [windows, linux]
+    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish)
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify release tag matches source version
+        id: version
+        shell: bash
+        run: |
+          set -eu
+          tag="v$(node -p 'require("./package.json").version')"
+          if test "$GITHUB_EVENT_NAME" = workflow_dispatch; then
+            test "$(git rev-parse "$tag^{commit}")" = "$(git rev-parse HEAD)"
+          else
+            test "$GITHUB_REF" = "refs/tags/$tag"
+          fi
+          printf 'tag=%s\n' "$tag" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+      - name: Create checksums and publish tested artifacts
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          set -eu
+          cd release-assets
+          sha256sum LolzCloud-*.zip LolzCloud-*.tar.gz LolzCloud-*.AppImage > SHA256SUMS.txt
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --title "LolzCloud ${RELEASE_TAG#v}" --notes "Windows x64 и Linux x64/ARM64. Автор: Artemper (artemper_lzt)."
+          fi
+          gh release upload "$RELEASE_TAG" ./* --repo "$GITHUB_REPOSITORY" --clobber

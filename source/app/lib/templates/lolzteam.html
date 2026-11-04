@@ -1,0 +1,71 @@
+<button id="lzt-launcher" type="button" title="Lolzteam: музыка в профиле (Ctrl+Shift+L)">
+  <span class="lzt-signal" aria-hidden="true"></span><span>LOLZTEAM</span><span id="lzt-launcher-state">Подключить</span>
+</button>
+<dialog id="lzt-dialog" aria-labelledby="lzt-heading">
+  <div class="lzt-shell">
+    <header class="lzt-header">
+      <div class="lzt-brand"><span class="lzt-cloud" aria-hidden="true">☁</span> LOLZCLOUD <span class="lzt-cross">×</span> <strong>LOLZTEAM</strong></div>
+      <button type="button" id="lzt-close" class="lzt-icon-button" aria-label="Закрыть панель Lolzteam">✕</button>
+    </header>
+    <div class="lzt-body">
+      <div class="lzt-story">
+        <span class="lzt-eyebrow"><span class="lzt-signal" aria-hidden="true"></span> МУЗЫКА В ПРОФИЛЕ</span>
+        <h1 id="lzt-heading">Твоя музыка.<br><span>В твоём профиле.</span></h1>
+        <p class="lzt-intro">Слушай в SoundCloud. Показывай, что играет,<br class="lzt-wide-only"> в статусе под ником на Lolzteam.</p>
+        <div class="lzt-player">
+          <div class="lzt-cover"><span id="lzt-cover-placeholder" aria-hidden="true">♫</span><img id="lzt-cover" alt="Обложка текущего трека" referrerpolicy="no-referrer" hidden></div>
+          <div class="lzt-track-meta"><span class="lzt-eyebrow" id="lzt-track-state">СЕЙЧАС В SOUNDCLOUD</span><h2 id="lzt-track-title">Включи любимый трек</h2><p id="lzt-track-artist">Музыка появится здесь автоматически</p></div>
+          <div class="lzt-progress" role="progressbar" aria-label="Прогресс трека" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="lzt-progress-fill"></span></div>
+          <div class="lzt-times"><span id="lzt-position">0:00</span><span id="lzt-duration">0:00</span></div>
+          <button id="lzt-now-listening" class="lzt-text-button" type="button">Я сейчас слушаю ↗</button>
+        </div>
+        <div class="lzt-preview-heading"><span class="lzt-eyebrow">ТАК ВЫГЛЯДИТ СТАТУС</span><span id="lzt-preview-example">Пример</span></div>
+        <div class="lzt-profile-preview">
+          <div class="lzt-avatar" id="lzt-avatar" aria-hidden="true">L</div>
+          <div class="lzt-preview-text"><strong id="lzt-preview-name">Твой профиль</strong><p id="lzt-preview-status">♫ Исполнитель — Трек · 1:23/3:45</p></div>
+          <button id="lzt-copy" class="lzt-icon-button" type="button" title="Скопировать статус" aria-label="Скопировать статус">⧉</button>
+        </div>
+        <div class="lzt-preview-footer"><span id="lzt-length">До 50 символов · тайм-код сохраняется</span><span>Обновление раз в минуту</span></div>
+        <div class="lzt-own-profiles"><button id="lzt-my-lolzteam" type="button" disabled>Мой Lolzteam ↗</button><button id="lzt-my-soundcloud" type="button" disabled>Мой SoundCloud ↗</button></div>
+        <p id="lzt-soundcloud-account" class="lzt-help">Профиль SoundCloud определится после входа в плеер.</p>
+        <form id="lzt-sc-profile-form" class="lzt-token-row"><input id="lzt-sc-profile-url" type="url" placeholder="https://soundcloud.com/твой-профиль" aria-label="Ссылка на мой профиль SoundCloud" autocomplete="off" required><button class="lzt-primary" type="submit">Сохранить</button></form>
+        <button id="lzt-refresh-sc-profile" class="lzt-text-button" type="button">Определить профиль после входа ↻</button>
+        <button id="lzt-import-soundcloud" class="lzt-primary" type="button">Перенести сохранённый вход</button>
+        <p id="lzt-import-hint" class="lzt-help">Использовать уже сохранённый вход без повторного ввода пароля.</p>
+        <div class="lzt-note"><span aria-hidden="true">↩</span><p>Прежний статус вернётся после паузы, выключения трансляции и обычного закрытия приложения.</p></div>
+      </div>
+      <div class="lzt-controls">
+        <section class="lzt-card" aria-labelledby="lzt-account-heading">
+          <div class="lzt-card-heading"><h2 id="lzt-account-heading">Аккаунт Lolzteam</h2><span id="lzt-account-badge" class="lzt-badge">Не привязан</span></div>
+          <form id="lzt-connect-form">
+            <label for="lzt-token">Личный API-токен</label>
+            <div class="lzt-token-row"><input id="lzt-token" type="password" placeholder="Вставь токен из своего профиля" autocomplete="off" spellcheck="false" maxlength="8192" aria-describedby="lzt-token-help"><button type="submit" id="lzt-connect" class="lzt-primary">Привязать</button></div>
+            <p id="lzt-token-help" class="lzt-help">При создании выбери права <b>basic</b>, <b>read</b> и <b>post</b>.</p>
+            <button type="button" id="lzt-get-token" class="lzt-text-button">Получить токен на Lolzteam ↗</button>
+            <div class="lzt-secure"><span aria-hidden="true">◇</span> Токен хранится зашифрованно на этом компьютере.</div>
+          </form>
+          <div id="lzt-connected" hidden>
+            <div class="lzt-connected-row"><div class="lzt-account-icon" aria-hidden="true">✓</div><div><strong id="lzt-account-name"></strong><p id="lzt-account-id" class="lzt-help"></p></div><button type="button" id="lzt-open-profile" class="lzt-text-button">Профиль ↗</button></div>
+            <button type="button" id="lzt-disconnect" class="lzt-text-button lzt-muted-button">Отвязать аккаунт</button>
+            <button type="button" id="lzt-forget" class="lzt-text-button lzt-danger" hidden>Отвязать, оставив статус на форуме</button>
+          </div>
+        </section>
+        <section class="lzt-card lzt-broadcast-card" aria-label="Трансляция музыки">
+          <div class="lzt-broadcast-row"><div><h2>Транслировать музыку</h2><p class="lzt-help" id="lzt-broadcast-help">Привяжи аккаунт, чтобы начать.</p></div><label class="lzt-switch"><input id="lzt-enabled" type="checkbox" aria-label="Транслировать музыку в статус Lolzteam" disabled><span aria-hidden="true"></span></label></div>
+          <div class="lzt-sync"><span class="lzt-signal" id="lzt-sync-dot" aria-hidden="true"></span><span id="lzt-sync-text">В ожидании подключения</span></div>
+          <label class="lzt-discord-option"><input id="lzt-discord-enabled" type="checkbox" checked><span>Показывать трек и мои профили в Discord</span></label>
+          <p id="lzt-discord-state" class="lzt-help">Ожидаем Discord…</p>
+          <p class="lzt-discord-help">В Discord кнопки видны другим пользователям. В своём Rich Presence ты их не увидишь; проверить ссылки можно кнопками профилей слева.</p>
+        </section>
+        <section class="lzt-card lzt-format-card" aria-labelledby="lzt-format-heading">
+          <div class="lzt-card-heading"><h2 id="lzt-format-heading">Настрой под себя</h2></div>
+          <div class="lzt-fields"><div><label for="lzt-format">Формат статуса</label><select id="lzt-format"><option value="artist-title">Исполнитель — Трек</option><option value="title-artist">Трек — Исполнитель</option><option value="title">Только трек</option></select></div><div><label for="lzt-prefix">Префикс</label><input id="lzt-prefix" type="text" value="♫" maxlength="8" autocomplete="off"></div></div>
+          <div class="lzt-options"><label><input id="lzt-show-time" type="checkbox" checked><span>Тайм-код</span></label><label><input id="lzt-show-duration" type="checkbox" checked><span>Длительность трека</span></label></div>
+          <div class="lzt-pause-field"><label for="lzt-pause">Когда музыка на паузе</label><select id="lzt-pause"><option value="restore">Вернуть прежний статус</option><option value="paused">Показать трек с символом Ⅱ</option><option value="keep">Оставить последний статус</option></select></div>
+        </section>
+        <p id="lzt-message" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+    <footer class="lzt-footer"><span><span class="lzt-footer-mark" aria-hidden="true">↻</span> Трек + тайм-код · каждые 60 секунд</span><span>Слушай. Делись настроением.</span></footer>
+  </div>
+</dialog>

@@ -1,0 +1,21 @@
+'use strict';
+const fs = require('node:fs');
+const path = require('node:path');
+const { execFileSync } = require('node:child_process');
+const { root, APPIMAGETOOL, verifiedDownload } = require('./linux-artifacts.cjs');
+(async () => {
+  if (process.platform !== 'linux') throw new Error('Build AppImage on Linux or use the GitHub Actions Linux build.');
+  const arch = process.env.LOLZCLOUD_BUILD_ARCH || process.arch, tool = APPIMAGETOOL[arch];
+  if (!tool || arch !== process.arch) throw new Error('AppImage requires a native x64 or arm64 Linux runner.');
+  const version = require('../package.json').version;
+  const source = path.join(root, 'dist', 'LolzCloud-linux-' + arch), appdir = path.join(root, '.build', 'AppDir-' + arch);
+  if (!fs.existsSync(path.join(source, 'LolzCloud'))) throw new Error('Run npm run build:linux before building AppImage.');
+  if (!path.resolve(appdir).startsWith(path.join(root, '.build') + path.sep)) throw new Error('Invalid AppDir path.');
+  fs.rmSync(appdir, { recursive: true, force: true }); fs.cpSync(source, appdir, { recursive: true });
+  fs.writeFileSync(path.join(appdir, 'AppRun'), '#!/bin/sh\nHERE="$(dirname "$(readlink -f "$0")")"\nexec "$HERE/LolzCloud" "$@"\n', { mode: 0o755 });
+  fs.copyFileSync(path.join(appdir, 'lolzcloud.png'), path.join(appdir, '.DirIcon'));
+  const binary = await verifiedDownload(`https://github.com/AppImage/appimagetool/releases/download/1.9.1/appimagetool-${tool.name}.AppImage`, path.join(root, '.build', 'linux-vendor', 'appimagetool-' + arch), tool.digest);
+  const destination = path.join(root, 'dist', `LolzCloud-${version}-linux-${arch}.AppImage`);
+  execFileSync(binary, ['--appimage-extract-and-run', '--no-appstream', appdir, destination], { stdio: 'inherit', timeout: 180000, env: { ...process.env, ARCH: tool.name, VERSION: version, APPIMAGE_EXTRACT_AND_RUN: '1' } });
+  console.log('AppImage: ' + destination);
+})().catch(error => { console.error(error.message); process.exitCode = 1; });
