@@ -59,7 +59,15 @@ jobs:
           destination = Path(os.environ['GITHUB_WORKSPACE'])
 
           with zipfile.ZipFile(temporary / 'lolzcloud-source-091.zip') as archive:
-              archive.extractall(source)
+              for entry in archive.infolist():
+                  relative = Path(entry.filename.replace('\\', '/'))
+                  assert not relative.is_absolute() and '..' not in relative.parts and ':' not in str(relative)
+                  target = source / relative
+                  if entry.is_dir() or entry.filename.endswith(('/', '\\')):
+                      target.mkdir(parents=True, exist_ok=True)
+                  else:
+                      target.parent.mkdir(parents=True, exist_ok=True)
+                      target.write_bytes(archive.read(entry))
           assert json.loads((source / 'package.json').read_text())['version'] == '0.9.1'
 
           names = ['.gitattributes', '.gitignore', 'CONTRIBUTING.md', 'LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', 'package.json',
