@@ -11,6 +11,7 @@ const { clipboard, ClipboardItem, nativeImage } = require('electron');
 const repeatIntent = new RepeatIntent();
 const { MiniPlayerWindow } = require('../source/integrations/mini-window.cjs');
 const root = path.resolve(__dirname, '..'), temporary = process.env.LOLZCLOUD_UI_TEST_PROFILE;
+fs.mkdirSync(path.join(root, '.build'), { recursive: true });
 app.setPath('userData', temporary); app.disableHardwareAcceleration();
 const music = new MusicFeatures(path.join(temporary, 'music.json')); music.configureMini({ lyrics: true });
 const service = new LolzteamService({ store: { load: () => null, save() {} }, api: {} });
