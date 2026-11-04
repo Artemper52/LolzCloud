@@ -1,9 +1,13 @@
+# Upload this file to Artemper52/LolzCloud as .github/workflows/build.yml on main.
+# The first run imports the pinned 0.9.0 source and publishes only after all checks pass.
+# Subsequent runs retain normal Windows Setup / Legacy / Linux release builds.
 name: Build and release
-on:
-  push:
-  pull_request:
+'on':
+  push: null
+  pull_request: null
   release:
-    types: [published]
+    types:
+      - published
   workflow_dispatch:
     inputs:
       publish:
@@ -16,10 +20,75 @@ concurrency:
   group: build-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  source:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    outputs:
+      ref: ${{ steps.source.outputs.ref }}
+      bootstrapped: ${{ steps.source.outputs.bootstrapped }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Import the verified 0.9.0 source once, retaining this workflow
+        id: source
+        shell: bash
+        run: >
+          set -eu
+
+          bootstrapped=false
+
+          version=$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')
+
+          if [ "$GITHUB_REF" = refs/heads/main ] && { [ "$GITHUB_EVENT_NAME" = push ] || [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; } &&
+          [ "$version" = 0.8.5 ]; then
+            release_archive="$RUNNER_TEMP/lolzcloud-source-090.zip"
+            curl --fail --silent --show-error --retry 3 https://lolzcloud.com/downloads/LolzCloud-0.9.0-source.zip -o "$release_archive"
+            printf '%s  %s\n' a4e28f47927e78f4b4aed936f921edd2351a34a74f3abf6408f5a7591dde3156 "$release_archive" | sha256sum -c -
+            python3 - <<'PY'
+          import json, os, shutil, zipfile
+
+          from pathlib import Path
+
+          temporary = Path(os.environ['RUNNER_TEMP'])
+
+          source = temporary / 'lolzcloud-source-090'
+
+          destination = Path(os.environ['GITHUB_WORKSPACE'])
+
+          with zipfile.ZipFile(temporary / 'lolzcloud-source-090.zip') as archive:
+              archive.extractall(source)
+          assert json.loads((source / 'package.json').read_text())['version'] == '0.9.0'
+
+          names = ['.gitattributes', '.gitignore', 'CONTRIBUTING.md', 'LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', 'package.json',
+          'package-lock.json', 'config', 'docs', 'licenses', 'server', 'source', 'tests', 'tools']
+
+          for name in names:
+              item = source / name
+              target = destination / name
+              if item.is_dir():
+                  shutil.copytree(item, target, dirs_exist_ok=True)
+              else:
+                  shutil.copy2(item, target)
+          PY
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add -A -- . ':(exclude).github'
+            if ! git diff --cached --quiet; then git commit -m 'Import verified LolzCloud 0.9.0 source'; fi
+            git push origin HEAD:main
+            bootstrapped=true
+          fi
+
+          printf 'ref=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+          printf 'bootstrapped=%s\n' "$bootstrapped" >> "$GITHUB_OUTPUT"
   windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.source.outputs.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -30,12 +99,17 @@ jobs:
       - run: npm run test:audio
       - run: npm run test:ui
       - run: npm run test:persistence
-      - run: npm run build
+      - run: npm run test:player
+      - run: npm run test:rooms
+      - run: npm run test:updates
+      - name: Build Windows Setup, portable and Legacy releases
+        run: node tools/release-windows.cjs
+        env:
+          LOLZCLOUD_RELEASE_OUTPUT: dist/windows-release
       - name: Prepare Windows and source archives
         shell: pwsh
         run: |
           $releaseVersion = (Get-Content package.json | ConvertFrom-Json).version
-          Compress-Archive -LiteralPath dist/LolzCloud-win32-x64 -DestinationPath "dist/LolzCloud-$releaseVersion-win-x64.zip"
           npm run source:zip
           if ($LASTEXITCODE -ne 0) { throw 'Source archive failed.' }
           Move-Item -LiteralPath dist/LolzCloud-source.zip -Destination "dist/LolzCloud-$releaseVersion-source.zip"
@@ -43,9 +117,16 @@ jobs:
         with:
           name: LolzCloud-windows-x64
           path: |
-            dist/LolzCloud-*-win-x64.zip
+            dist/windows-release/LolzCloud-*.zip
+            dist/windows-release/LolzCloud-*-Setup.exe
+            dist/windows-release/LolzCloud-*-Setup.exe.blockmap
+            dist/windows-release/latest.yml
+            dist/windows-release/legacy.yml
+            dist/windows-release/update*.json
             dist/LolzCloud-*-source.zip
           if-no-files-found: error
+    needs:
+      - source
   linux:
     strategy:
       fail-fast: false
@@ -60,6 +141,8 @@ jobs:
       LOLZCLOUD_BUILD_ARCH: ${{ matrix.arch }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.source.outputs.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -70,15 +153,24 @@ jobs:
       - run: npm run build:linux
       - name: Check native encrypted persistence with a real Linux keyring
         shell: bash
-        run: |
+        run: >
           set -eu
+
           sudo apt-get update -qq
-          sudo apt-get install -y xvfb dbus-x11 gnome-keyring libsecret-1-0 libgtk-3-0 libnss3 libasound2t64 libgbm1 libatk-bridge2.0-0 libxkbcommon0 libxss1
+
+          sudo apt-get install -y xvfb dbus-x11 gnome-keyring libsecret-1-0 libgtk-3-0 libnss3 libasound2t64 libgbm1 libatk-bridge2.0-0
+          libxkbcommon0 libxss1
+
           node -p "require('electron')"
+
           sudo chown root:root node_modules/electron/dist/chrome-sandbox
+
           sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
+
           export XDG_CURRENT_DESKTOP=GNOME
-          dbus-run-session -- xvfb-run -a sh -c 'printf "%s" "lolzcloud-ci-keyring" | gnome-keyring-daemon --unlock --components=secrets >/dev/null; npm run test:persistence'
+
+          dbus-run-session -- xvfb-run -a sh -c 'printf "%s" "lolzcloud-ci-keyring" | gnome-keyring-daemon --unlock --components=secrets
+          >/dev/null; npm run test:persistence'
       - name: Verify native converter and archive
         shell: bash
         run: |
@@ -93,9 +185,16 @@ jobs:
             dist/LolzCloud-*-linux-*.tar.gz
             dist/LolzCloud-*-linux-*.AppImage
           if-no-files-found: error
+    needs:
+      - source
   publish:
-    needs: [windows, linux]
-    if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.publish)
+    needs:
+      - source
+      - windows
+      - linux
+    if: >-
+      needs.source.outputs.bootstrapped == 'true' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release' ||
+      (github.event_name == 'workflow_dispatch' && inputs.publish)
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -103,18 +202,29 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ needs.source.outputs.ref }}
       - name: Verify release tag matches source version
         id: version
         shell: bash
         run: |
           set -eu
           tag="v$(node -p 'require("./package.json").version')"
-          if test "$GITHUB_EVENT_NAME" = workflow_dispatch; then
+          if test "$BOOTSTRAPPED" = true; then
+            if git rev-parse --verify --quiet "refs/tags/$tag" >/dev/null; then
+              test "$(git rev-parse "$tag^{commit}")" = "$(git rev-parse HEAD)"
+            else
+              git tag "$tag"
+            fi
+            git push origin "refs/tags/$tag"
+          elif test "$GITHUB_EVENT_NAME" = workflow_dispatch; then
             test "$(git rev-parse "$tag^{commit}")" = "$(git rev-parse HEAD)"
           else
             test "$GITHUB_REF" = "refs/tags/$tag"
+            test "$(git rev-parse "$tag^{commit}")" = "$(git rev-parse HEAD)"
           fi
           printf 'tag=%s\n' "$tag" >> "$GITHUB_OUTPUT"
+        env:
+          BOOTSTRAPPED: ${{ needs.source.outputs.bootstrapped }}
       - uses: actions/download-artifact@v4
         with:
           path: release-assets
@@ -124,11 +234,19 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TAG: ${{ steps.version.outputs.tag }}
-        run: |
+        run: >
           set -eu
+
           cd release-assets
-          sha256sum LolzCloud-*.zip LolzCloud-*.tar.gz LolzCloud-*.AppImage > SHA256SUMS.txt
+
+          sha256sum LolzCloud-*.zip LolzCloud-*.tar.gz LolzCloud-*.AppImage LolzCloud-*-Setup.exe LolzCloud-*.blockmap latest.yml legacy.yml
+          update*.json > SHA256SUMS.txt
+
           if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --title "LolzCloud ${RELEASE_TAG#v}" --notes "Windows x64 и Linux x64/ARM64. Автор: Artemper (artemper_lzt)."
+            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title "LolzCloud ${RELEASE_TAG#v}" --notes-file "../docs/releases/${RELEASE_TAG#v}.md"
           fi
+
           gh release upload "$RELEASE_TAG" ./* --repo "$GITHUB_REPOSITORY" --clobber
+
+
+          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
