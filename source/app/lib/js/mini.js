@@ -61,7 +61,7 @@
       const lyricData = state.lyrics || (words.data?.key === [track.artist || '', track.title || '', track.duration || 0].join('\n') ? words.data : null);
       words.setFontScale(state.mini.fontScale); words.setData(lyricData); words.setPlayback(track, state.fresh);
       el('follow').disabled = !lyricData?.lines?.length || state.preferences?.autoFollow === false;
-      el('lyric-status').textContent = lyricData?.lines?.some(line => line.words?.length) ? 'ПОСЛОВНЫЙ ТЕКСТ' : lyricData?.lines?.length ? 'СИНХРОННЫЙ ТЕКСТ' : lyricData?.loading ? 'ИЩЕМ ТАЙМИНГИ…' : lyricData?.plain ? 'У ТЕКСТА НЕТ ТАЙМ-КОДОВ' : 'СЛОВА ТВОЕЙ МУЗЫКИ';
+      el('lyric-status').textContent = lyricData?.lines?.some(line => line.words?.length) ? 'ПОСЛОВНЫЙ ТЕКСТ' : lyricData?.lines?.length ? 'СИНХРОННЫЙ ТЕКСТ' : lyricData?.loading ? 'ИЩЕМ ТАЙМИНГИ…' : lyricData?.versionMismatch ? 'ДРУГАЯ ДЛИТЕЛЬНОСТЬ · БЕЗ СИНХРОНИЗАЦИИ' : lyricData?.plain ? 'У ТЕКСТА НЕТ ТАЙМ-КОДОВ' : lyricData?.attempts?.length ? 'ТЕКСТ НЕ НАЙДЕН · ПРОВЕРЬ ИСТОЧНИКИ' : 'СЛОВА ТВОЕЙ МУЗЫКИ';
     }
   }
   async function refresh(action = 'state') {

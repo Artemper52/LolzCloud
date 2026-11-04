@@ -17,6 +17,8 @@
   view.addEventListener('did-start-loading', () => { guestReady = false; });
   let safetyApplied = '', safetyRevision = -1, latestSafety = null;
   let sourceSignature = '';
+  let sourceIdentityKey = '';
+  let sourceIdentityUrl = '';
   let lyricRequest = 0;
   let waveArtistSignature = '', waveBlockedSignature = '';
   let requestDraftTouched = false, requestSubmitting = false;
@@ -197,6 +199,8 @@
   };
   el('source-merge').onchange = () => action('lyrics-settings', { settings: { merge: el('source-merge').checked } });
   el('source-track').onsubmit = async event => { event.preventDefault(); if (await action('lyrics-spotify', { url: el('source-spotify-track').value.trim() })) { lyricTrack = ''; open('lyrics'); } };
+  el('lyric-match').onsubmit = async event => { event.preventDefault(); if (await action('lyrics-match', { url: sourceIdentityUrl, title: el('lyric-match-title').value, artist: el('lyric-match-artist').value })) { lyricTrack = ''; open('lyrics'); } };
+  el('lyric-match-reset').onclick = async () => { const track = snapshot?.displayPlayback || snapshot?.playback; if (await action('lyrics-match', { url: track?.url, reset: true })) { sourceIdentityKey = ''; lyricTrack = ''; open('lyrics'); } };
   studio.querySelectorAll('[data-provider-page]').forEach(button => { button.onclick = () => action('lyrics-provider-page', { id: button.dataset.providerPage }); });
   studio.querySelectorAll('[data-remove-key]').forEach(button => { button.onclick = () => action('lyrics-settings', { settings: { remove: [button.dataset.removeKey] } }); });
   el('source-remove-spotify').onclick = () => action('lyrics-settings', { settings: { remove: ['spotifyId', 'spotifySecret'] } });
@@ -396,12 +400,16 @@
   function setLyrics(data) {
     lyrics = data; lyricView.setData(data);
     const searching = data.attempts?.find(attempt => attempt.status === 'searching');
-    const caption = data.lines?.some(line => line.words?.length) ? 'Пословно · ' + data.source : data.lines?.length ? 'По строкам · ' + data.source : data.plain ? 'Пока без тайм-кодов' : data.instrumental ? 'Инструментальная композиция' : 'Слова твоей музыки';
+    const caption = data.lines?.some(line => line.words?.length) ? 'Пословно · ' + data.source : data.lines?.length ? 'По строкам · ' + data.source : data.versionMismatch ? 'Длительность версии отличается · текст без синхронизации' : data.plain ? 'Текст без тайм-кодов · ' + data.source : data.instrumental ? 'Инструментальная композиция' : data.attempts?.length ? 'Текст не найден · проверь название в источниках' : 'Слова твоей музыки';
     el('lyric-status').textContent = data.loading ? (data.found ? caption + ' · ищем тайминги…' : 'Ищем слова' + (searching ? ' · ' + searching.name : '…')) : caption;
     el('lyric-follow').disabled = !data.lines?.length || feature?.preferences?.autoFollow === false;
   }
   function renderSources() {
     const settings = feature?.lyricSettings; if (!settings) return;
+    const track = snapshot?.displayPlayback || snapshot?.playback, identity = feature?.lyrics?.identity;
+    el('lyric-identity').textContent = identity?.title ? 'Ищем: ' + identity.artist + ' — ' + identity.title : 'Текущая запись: ' + (track?.artist || '') + ' — ' + (track?.title || 'Включи трек');
+    const identityKey = [track?.url, identity?.artist, identity?.title].join('\n');
+    if (sourceIdentityKey !== identityKey && !el('lyric-match').contains(document.activeElement)) { sourceIdentityKey = identityKey; sourceIdentityUrl = track?.url || ''; el('lyric-match-title').value = identity?.title || track?.title || ''; el('lyric-match-artist').value = identity?.artist || track?.artist || ''; }
     const shared = feature.room?.authenticated === true;
     el('shared-spicy-status').textContent = shared ? 'Spicy Lyrics подключён через LolzCloud. Общий ключ хранится на сервере.' : feature.room?.connecting ? 'Подтверди подключение в открытой вкладке браузера.' : 'Войди через Lolzteam на lolzcloud.com — личный ключ не нужен.';
     el('shared-spicy-login').hidden = shared || feature.room?.connecting;
@@ -467,7 +475,7 @@
         if (started) return;
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
-    } catch { message('Не удалось открыть трек SoundCloud.', true); }
+    } catch { if (id === playRequest) message('Не удалось открыть трек SoundCloud.', true); }
   });
   view.addEventListener('dom-ready', async () => {
     guestReady = true;

@@ -274,14 +274,23 @@
       reverb: Math.max(0, Math.min(.8, Number(config.reverb) || 0)), echo: Math.max(0, Math.min(.8, Number(config.echo) || 0)) };
     apply(); return true;
   };
+  let transportRequest = 0;
   window.__lolzcloudMediaCommand = (command, value) => {
       if (command === 'seek' && window.__lolzcloudPlayback?.seek(value)) return;
     if (command === 'like') { document.querySelector('.playbackSoundBadge__like, .playControls .sc-button-like')?.click(); setTimeout(() => window.__lolzcloudSnapshot?.(), 80); return; }
     if (command === 'repeat') return window.__lolzcloudRepeat?.set(value);
     const button = document.querySelector('.playControls__elements .playControl, .playControls__play');
     if (command === 'playPause') { button?.click(); return; }
-    if (command === 'next') { document.querySelector('.playControls__next')?.click(); return; }
-    if (command === 'previous') { document.querySelector('.playControls__prev')?.click(); return; }
+    if (command === 'next') { transportRequest++; document.querySelector('.playControls__next')?.click(); return; }
+    if (command === 'previous') {
+      const request = ++transportRequest, previous = document.querySelector('.playControls__prev'), badge = document.querySelector('.playbackSoundBadge__titleLink')?.href;
+      const media = [...audio].find(node => !node.paused) || [...audio].at(-1), position = media?.currentTime || 0;
+      previous?.click();
+      // SoundCloud treats the first previous click after a few seconds as
+      // restart. Only repeat it if that exact recording actually reset to 0.
+      setTimeout(() => { if (request === transportRequest && position > 3 && media?.currentTime < 1 && document.querySelector('.playbackSoundBadge__titleLink')?.href === badge) previous?.click(); }, 160);
+      return;
+    }
     if (command === 'play' || command === 'pause') { if (button && button.classList.contains('playing') !== (command === 'play')) button.click(); return; }
     const candidates = [...audio].filter(media => Number.isFinite(media.duration) && media.duration > 0);
     const active = candidates.find(media => !media.paused) || candidates.at(-1);

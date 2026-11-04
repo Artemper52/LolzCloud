@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { normalizeTrack } = require('./discovery.cjs');
 const { clean } = require('./lolzteam/status.cjs');
+const { scUrl } = require('./music.cjs');
 const { OPTIONS, DEFAULTS, validatePreferences, normalizePreferences, contextProfile, contextLabel, preferenceScore, searchHint, normalize: norm } = require('./wave-preferences.cjs');
 const { DAY, fingerprints, prunePlayed, playedRecently, markPlayed } = require('./wave-history.cjs');
 const { parseRequest, requestMatch } = require('./wave-request.cjs');
@@ -226,6 +227,14 @@ class PersonalWave {
     this.active = true; await this.next('start');
   }
   stop() { this.generation++; this.queueVersion++; this.active = false; this.waitingUntil = 0; }
+  replay(track) {
+    if (!this.active || this.disposed || !scUrl(track?.url)) return;
+    // A deliberate return is allowed without erasing the 24-hour exclusion
+    // cache or consuming the recommendation queue.
+    this.generation++; this.current = { ...track }; this.previous = null;
+    this.waitingUntil = this.now() + 25000; this.ignoreEndUntil = this.now() + 2000;
+    this.play(track.url, track);
+  }
   async select(url) {
     const index = this.queue.findIndex(track => track.url === url);
     if (index < 0 || playedRecently(this.queue[index], this.data.played24h, this.now())) throw new Error('Этот трек уже был в волне за последние 24 часа или ушёл из очереди.');

@@ -58,6 +58,11 @@ class SoundCloudSession {
     } finally { this.restoring = false; }
   }
   schedule() { clearTimeout(this.debounce); this.debounce = setTimeout(() => { void this.flush(); }, 500); this.debounce.unref?.(); }
+  async acceptImported() {
+    await this.busy; this.changedAt++; this.pendingRestore = false; this.signature = '';
+    this.status = { saved: false, restored: false, recovering: false, error: '' };
+    await this.flush();
+  }
   flush() {
     if (this.busy) return this.busy;
     this.busy = this.save().catch(() => { this.status.error = 'Не удалось сохранить вход SoundCloud. Повторим автоматически.'; }).finally(() => { this.busy = null; });

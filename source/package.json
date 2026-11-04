@@ -1,7 +1,7 @@
 {
   "name": "lolzcloud",
   "productName": "LolzCloud",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "LolzCloud desktop player",
   "main": "main.js",
   "license": "MIT",

@@ -4,6 +4,7 @@ const root = path.resolve(__dirname, '..');
 
 async function main() {
   require('./prepare.cjs').prepare();
+  await require('./build-session-helper.cjs').buildSessionHelper();
   const { packager } = await import('@electron/packager');
   const { flipFuses, FuseVersion, FuseV1Options } = await import('@electron/fuses');
   const asar = await import('@electron/asar');

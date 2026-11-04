@@ -30,7 +30,7 @@ function fixture(t) {
     await studio.shutdown();
     if (path.dirname(directory) === path.resolve(os.tmpdir()) && path.basename(directory).startsWith('LolzCloud-studio-actions-')) fs.rmSync(directory, { recursive: true, force: true });
   });
-  return { studio, keys, sent, directory };
+  return { studio, service, keys, sent, directory };
 }
 
 test('volume hotkeys update the audible command, both players and the saved volume together', async t => {
@@ -46,4 +46,18 @@ test('volume hotkeys update the audible command, both players and the saved volu
   await studio.act({ type: 'player', settings: { volume: 0 } });
   keys.get('Control+Alt+Down')();
   assert.equal(studio.getState().player.volume, 0);
+});
+
+test('footer, mini and hotkey transport return to actual previous tracks without restarting the current one', async t => {
+  const { studio, service, sent, keys } = fixture(t);
+  const song = id => ({ url: 'https://soundcloud.com/fixture/song-' + id, title: 'Song ' + id, artist: 'Artist', duration: 100, position: 70, playing: true });
+  const accept = value => { const allowed = studio.acceptSoundCloud(value); if (allowed) service.setPlayback(value); return allowed; };
+  [1, 2, 3].forEach(id => accept(song(id)));
+  await studio.act({ type: 'media', command: 'previous' });
+  assert.equal(sent.at(-1)[0], 'lolzcloud:play-url'); assert.equal(sent.at(-1)[1].url, song(2).url);
+  assert.equal(service.displayPlayback().url, song(2).url);
+  await studio.act({ type: 'media', command: 'previous' }); assert.equal(sent.at(-1)[1].url, song(1).url);
+  assert.equal(accept(song(2)), false); assert.equal(accept(song(3)), false); assert.equal(accept(song(1)), true);
+  await studio.act({ type: 'media', command: 'next' }); assert.equal(sent.at(-1)[1].url, song(2).url);
+  accept(song(2)); keys.get('Control+Alt+Left')(); assert.equal(sent.at(-1)[1].url, song(1).url);
 });

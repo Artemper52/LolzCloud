@@ -3,7 +3,7 @@
 const path = require('node:path');
 const fs = require('node:fs');
 const { pathToFileURL } = require('node:url');
-const { ipcMain, safeStorage, shell, session } = require('electron');
+const { ipcMain, safeStorage, shell, session, dialog, clipboard } = require('electron');
 const { createApi } = require('./api.cjs');
 const { EncryptedStore } = require('./store.cjs');
 const { LolzteamService } = require('./service.cjs');
@@ -13,6 +13,7 @@ const { createStudio } = require('../studio.cjs');
 const { readSessionProfile } = require('../sc-profile.cjs');
 const { soundcloudProfile } = require('../profiles.cjs');
 const { SoundCloudSession } = require('../soundcloud-session.cjs');
+const { BrowserSessionTransfer, MAX_BYTES } = require('../browser-session.cjs');
 
 function registerLolzteam(app, getWindow) {
   const service = new LolzteamService({
@@ -21,11 +22,21 @@ function registerLolzteam(app, getWindow) {
   });
   const discord = new DiscordPresence({ getSnapshot: () => service.getState() });
   const studio = createStudio({ app, service, getWindow, trusted, onStateChange: notifyState });
-  const soundcloudSession = new SoundCloudSession({ session: session.defaultSession, safeStorage, filename: path.join(app.getPath('userData'), 'soundcloud-session.json'), onRestored: () => { const window = getWindow(); if (window && !window.isDestroyed()) window.webContents.send('soundcloud:session-imported'); }, onCleared: () => { service.setProfile(null); notifyState(); } });
+  let sessionRevision = 0;
+  const soundcloudSession = new SoundCloudSession({ session: session.defaultSession, safeStorage, filename: path.join(app.getPath('userData'), 'soundcloud-session.json'), onRestored: () => { const window = getWindow(); if (window && !window.isDestroyed()) window.webContents.send('soundcloud:session-imported'); }, onCleared: () => { sessionRevision++; service.setProfile(null); notifyState(); } });
   const ready = soundcloudSession.start();
   let loginImport = null;
   let importing = false;
-  const getState = () => ({ ...studio.snapshot(service.getState()), soundcloudSession: soundcloudSession.state(), discord: discord.getState(), features: studio.getState(), loginImport, importing });
+  let pendingSessionFile = '';
+  async function finishSessionImport(result) {
+    const revision = ++sessionRevision;
+    await soundcloudSession.acceptImported(); loginImport = { ...result, verified: false };
+    service.setProfile(null, { replaceManual: true });
+    const window = getWindow(); if (window && !window.isDestroyed()) { window.webContents.send('soundcloud:session-imported'); window.show(); window.focus(); }
+    void readSessionProfile(session.defaultSession).then(profile => { if (revision !== sessionRevision) return; if (profile) service.setProfile(profile, { replaceManual: true }); loginImport = { ...result, verified: !!profile, verification: profile ? 'confirmed' : 'unconfirmed' }; notifyState(); }).catch(() => { if (revision === sessionRevision) { loginImport = { ...result, verified: false, verification: 'offline' }; notifyState(); } });
+  }
+  const browserSession = new BrowserSessionTransfer({ target: session.defaultSession, onChange: notifyState, onImported: finishSessionImport });
+  const getState = () => ({ ...studio.snapshot(service.getState()), soundcloudSession: soundcloudSession.state(), browserSession: browserSession.state(), discord: discord.getState(), features: studio.getState(), loginImport, importing });
   function notifyState() { const window = getWindow(); if (window && !window.isDestroyed()) window.webContents.send('lolzcloud:state', getState()); }
   const expected = pathToFileURL(path.resolve(__dirname, '../../app/index.html')).href;
   function trusted(event) {
@@ -34,7 +45,28 @@ function registerLolzteam(app, getWindow) {
     if (event.senderFrame !== event.sender.mainFrame) return false;
     return event.senderFrame.url.split(/[?#]/)[0] === expected;
   }
-  ready.then(() => readSessionProfile(session.defaultSession)).then(profile => { if (profile) service.setProfile(profile); }).catch(() => {});
+  ready.then(async () => { const revision = sessionRevision, profile = await readSessionProfile(session.defaultSession); if (profile && revision === sessionRevision) service.setProfile(profile); }).catch(() => {});
+  ipcMain.handle('soundcloud:action', async (event, action) => {
+    if (!trusted(event)) return { ok: false, error: 'Запрос из недоверенного окна отклонён.' };
+    try {
+      await ready;
+      if (action?.type === 'start') await shell.openExternal(await browserSession.start());
+      else if (action?.type === 'copy-link') clipboard.writeText(await browserSession.start());
+      else if (action?.type === 'open-browser') await shell.openExternal('https://soundcloud.com/you');
+      else if (action?.type === 'cancel') { if (browserSession.state().busy) throw new Error('Сначала дождись завершения переноса.'); browserSession.stop(); pendingSessionFile = ''; }
+      else if (action?.type === 'import-file' || action?.type === 'unlock-file') {
+        if (action.type === 'import-file') {
+          const selected = await dialog.showOpenDialog(getWindow(), { title: 'Перенести вход SoundCloud', properties: ['openFile'], filters: [{ name: 'Сессия SoundCloud', extensions: ['lolzcloud-session', 'json', 'txt'] }] });
+          pendingSessionFile = selected.canceled ? '' : selected.filePaths[0] || '';
+        }
+        if (pendingSessionFile) {
+          if (fs.statSync(pendingSessionFile).size > MAX_BYTES) throw new Error('Файл сессии слишком большой.');
+          await browserSession.importFile(fs.readFileSync(pendingSessionFile, 'utf8'), action.password); pendingSessionFile = '';
+        }
+      } else if (action?.type !== 'state') throw new Error('Неизвестная команда входа.');
+      return { ok: true, state: getState(), needsPassword: !!pendingSessionFile };
+    } catch (error) { return { ok: false, error: error.message || 'Не удалось перенести вход.', needsPassword: !!pendingSessionFile, state: getState() }; }
+  });
   ipcMain.handle('lolzteam:action', async (event, action) => {
     if (!trusted(event)) return { ok: false, error: 'Запрос из недоверенного окна отклонён.' };
     try {
@@ -69,10 +101,7 @@ function registerLolzteam(app, getWindow) {
           if (importing) throw new Error('Перенос входа уже выполняется.');
           importing = true;
           try {
-            loginImport = await importFromInstalled(app, session.defaultSession);
-            const profile = await readSessionProfile(session.defaultSession).catch(() => null);
-            if (profile) service.setProfile(profile);
-            getWindow().webContents.send('soundcloud:session-imported');
+            await finishSessionImport(await importFromInstalled(app, session.defaultSession));
           } finally { importing = false; }
           break;
         default: throw new Error('Неизвестное действие.');
@@ -85,7 +114,7 @@ function registerLolzteam(app, getWindow) {
   });
   ipcMain.on('lolzteam:playback', (event, playback) => {
     if (!trusted(event)) return;
-    studio.acceptSoundCloud(playback);
+    if (studio.acceptSoundCloud(playback) === false) return;
     service.setPlayback(playback);
     studio.setUpcoming(playback?.upNext);
     if (playback && Object.hasOwn(playback, 'account') && (playback.account !== null || !soundcloudSession.state().saved && !soundcloudSession.state().recovering)) service.setProfile(playback.account);
@@ -106,6 +135,7 @@ function registerLolzteam(app, getWindow) {
     act: action => studio.act(action),
     async shutdown() {
       clearInterval(timer);
+      await browserSession.dispose();
       await Promise.allSettled([service.shutdown(), discord.shutdown(), studio.shutdown(), soundcloudSession.dispose()]);
       if (diagnosticFile) { try { fs.unlinkSync(diagnosticFile); } catch { /* Already removed. */ } }
     },

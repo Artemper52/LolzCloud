@@ -6,6 +6,7 @@ const { writeJson } = require('./durable-json.cjs');
 const PROVIDERS = [
   { id: 'spicy', name: 'Spicy Lyrics', key: 'spicy', url: 'https://developers.spicylyrics.org/docs/keys' },
   { id: 'bini', name: 'BiniLyrics', url: 'https://lyrics.binimum.org' },
+  { id: 'better', name: 'Better Lyrics', url: 'https://docs.betterlyrics.org' },
   { id: 'musixmatch', name: 'Musixmatch', key: 'musixmatch', url: 'https://developer.musixmatch.com' },
   { id: 'unison', name: 'Unison', url: 'https://unison.boidu.dev' },
   { id: 'netease', name: 'NetEase', url: 'https://music.163.com' },

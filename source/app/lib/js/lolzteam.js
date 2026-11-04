@@ -73,7 +73,7 @@
   document.getElementById('lc-my-lolzteam').addEventListener('click', () => command({ type: 'open-profile' }));
   document.getElementById('lc-my-soundcloud').addEventListener('click', () => command({ type: 'open-soundcloud' }));
   element('now-listening').addEventListener('click', () => { lztDialog.close(); showsongshowcase(); });
-  element('import-soundcloud').addEventListener('click', () => command({ type: 'import-soundcloud' }));
+  element('import-soundcloud').addEventListener('click', () => { lztDialog.close(); window.LolzCloudSignIn?.open(); });
   element('sc-profile-form').addEventListener('submit', event => {
     event.preventDefault();
     command({ type: 'set-soundcloud-profile', url: element('sc-profile-url').value });
@@ -120,10 +120,10 @@
     element('soundcloud-account').textContent = scProfile ? `SoundCloud · ${scProfile.name}${state.soundcloudProfileSource === 'manual' ? ' · ссылка сохранена вручную' : ''}` : 'Профиль SoundCloud пока не определён. Можно войти в плеере или сохранить свою ссылку без входа.';
     if (document.activeElement !== element('sc-profile-url')) element('sc-profile-url').value = scProfile?.url || '';
     element('refresh-sc-profile').disabled = pending;
-    element('import-soundcloud').hidden = !!scProfile;
-    element('import-hint').hidden = !!scProfile;
+    element('import-soundcloud').hidden = false;
+    element('import-hint').hidden = false;
     element('import-soundcloud').disabled = pending || state.importing;
-    element('import-soundcloud').textContent = pending || state.importing ? 'Переносим вход…' : 'Перенести сохранённый вход';
+    element('import-soundcloud').textContent = pending || state.importing ? 'Переносим вход…' : 'Вход SoundCloud из браузера';
     element('discord-state').textContent = !config.discordEnabled ? 'Трансляция в Discord выключена'
       : (state.discord?.connected ? (state.discord.activity ? 'В Discord: трек · кнопки: ' + ((state.discord.activity.buttons || []).map(button => button.label).join(', ') || 'профили не указаны') : 'Discord подключён · ожидаем музыку') : (state.discord?.error || 'Подключаемся к Discord…'));
     const legacyDiscord = document.querySelector('input[name="discordrpc"]');

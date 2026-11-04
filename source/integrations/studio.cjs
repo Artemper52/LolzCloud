@@ -18,10 +18,12 @@ const { AudioDucker } = require('./audio-ducker.cjs');
 const { Downloads } = require('./downloads.cjs');
 const { SoundCloudAudioSource } = require('./audio-download.cjs');
 const { createPlayerExperience } = require('./player-experience.cjs');
+const { PlaybackHistory } = require('./playback-history.cjs');
 
 function createStudio({ app, service, getWindow, trusted, onStateChange = () => {} }) {
   const music = new MusicFeatures(path.join(app.getPath('userData'), 'music-library.json'));
   const repeat = new RepeatIntent();
+  const playbackHistory = new PlaybackHistory();
   const room = new ListeningRoom(() => service.getState(), { filename: path.join(app.getPath('userData'), 'cloud-session.json'), safeStorage, openExternal: url => shell.openExternal(url), onControlLost: () => getWindow()?.webContents.send('lolzcloud:media', { command: 'pause' }) });
   const shortcuts = new Set(); let hotkeyErrors = [], mini = null, audio = { attached: 0, unavailable: false };
   const ducker = new AudioDucker({ directory: path.join(app.getPath('userData'), 'runtime', 'audio'), settings: music.data.protection, onChange: config => { const host = getWindow(); if (host && !host.isDestroyed() && !host.webContents.isDestroyed()) host.webContents.send('lolzcloud:safety', config); } });
@@ -33,8 +35,8 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
   const downloads = new Downloads({ directory: path.join(app.getPath('downloads'), 'LolzCloud'), runtime: path.join(app.getPath('userData'), 'runtime', 'downloads'), filename: path.join(app.getPath('userData'), 'downloads.json'), source: new SoundCloudAudioSource(discovery, fetch, { session: session.defaultSession }) });
   const prefetch = new LyricPrefetcher(lyrics, discovery);
   let cloudAuthenticated = room.getState().authenticated;
-  const wave = new PersonalWave({ filename: path.join(app.getPath('userData'), 'wave-library.json'), provider: discovery, getSnapshot: () => service.getState(), getHistory: () => music.data.history, play: (url, track) => { service.beginPlayback({ ...track, url }); if (!service.isPrivate()) void lyrics.load(track); onStateChange(); getWindow()?.webContents.send('lolzcloud:play-url', { url, track }); } });
-  const experience = createPlayerExperience({ app, service, music, wave, lyrics, room, discovery, downloads, media, getWindow, notify: onStateChange, dialog, clipboard, play: async (url, track) => { if (!scUrl(url)) throw new Error('Нужна ссылка SoundCloud.'); wave.stop(); if (track?.title) service.beginPlayback({ ...track, url }); getWindow()?.webContents.send('lolzcloud:play-url', { url, track }); } });
+  const wave = new PersonalWave({ filename: path.join(app.getPath('userData'), 'wave-library.json'), provider: discovery, getSnapshot: () => service.getState(), getHistory: () => music.data.history, play: (url, track) => { playbackHistory.request({ url }); service.beginPlayback({ ...track, url }); if (!service.isPrivate()) void lyrics.load(track); onStateChange(); getWindow()?.webContents.send('lolzcloud:play-url', { url, track }); } });
+  const experience = createPlayerExperience({ app, service, music, wave, lyrics, room, discovery, downloads, media, getWindow, notify: onStateChange, dialog, clipboard, play: async (url, track) => { if (!scUrl(url)) throw new Error('Нужна ссылка SoundCloud.'); wave.stop(); playbackHistory.request({ url }); if (track?.title) service.beginPlayback({ ...track, url }); getWindow()?.webContents.send('lolzcloud:play-url', { url, track }); } });
   const shownTrack = () => experience.current();
   let roomWindow = null;
   async function openRoomWindow(value) {
@@ -63,6 +65,14 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
     }
     if (command === 'seek') wave.seeking();
     if (experience.localMedia(command, value)) return;
+    if (command === 'previous' || command === 'next') {
+      const track = playbackHistory.step(command === 'previous' ? -1 : 1);
+      if (track) {
+        if (wave.active) wave.replay(track);
+        else { service.beginPlayback(track); getWindow()?.webContents.send('lolzcloud:play-url', { url: track.url, track }); }
+        onStateChange(); return;
+      }
+    }
     if (command === 'next' && wave.active) { await wave.next('skip'); return; }
     if (command === 'repeat') value = repeat.choose(service.playback, value);
     getWindow()?.webContents.send('lolzcloud:media', { command, value });
@@ -130,6 +140,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
       case 'play-url': {
         const url = scUrl(action.url); if (!url) throw new Error('Нужна ссылка SoundCloud.');
         wave.stop();
+        playbackHistory.request({ url });
         getWindow()?.webContents.send('lolzcloud:play-url', url); break;
       }
       case 'media':
@@ -156,6 +167,10 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
       }
       case 'lyrics-settings': lyricSettings.configure(action.settings); lyricEngine.cooldowns.clear(); lyricEngine.spotifyToken = null; lyrics.invalidate(); void lyrics.load(service.playback); break;
       case 'lyrics-spotify': lyrics.setSpotify(service.playback, action.url); void lyrics.load(service.playback); break;
+      case 'lyrics-match': {
+        const track = shownTrack(); if (track.url !== action.url) throw new Error('Трек сменился. Проверь название ещё раз.');
+        lyrics.setIdentity(track, action.reset ? null : { title: action.title, artist: action.artist }); void lyrics.load(track); break;
+      }
       case 'lyrics-provider-page': {
         const provider = lyricSettings.state().providers.find(value => value.id === action.id);
         if (!provider) throw new Error('Неизвестный источник.');
@@ -231,7 +246,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
   ducker.start();
   if (miniController.saved.open) openMini();
   return {
-    getState: () => ({ ...getState(), tools: experience.state(), ...(experience.snapshot().local ? { transport: { repeat: { mode: experience.current().repeat } } } : {}) }), snapshot: base => experience.snapshot(base), acceptSoundCloud(playback) { experience.acceptSoundCloud(playback); room.observePlayback(playback); }, act, openMini, setUpcoming: urls => prefetch.setUpcoming(urls),
+    getState: () => ({ ...getState(), tools: experience.state(), ...(experience.snapshot().local ? { transport: { repeat: { mode: experience.current().repeat } } } : {}) }), snapshot: base => experience.snapshot(base), acceptSoundCloud(playback) { if (!playbackHistory.observe(playback)) return false; experience.acceptSoundCloud(playback); room.observePlayback(playback); return true; }, act, openMini, setUpcoming: urls => prefetch.setUpcoming(urls),
     observe() {
       experience.observe();
       const snapshot = service.getState();

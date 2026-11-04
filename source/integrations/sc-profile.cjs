@@ -22,8 +22,9 @@ function profileFromHtml(html) {
   return null;
 }
 async function readSessionProfile(session) {
-  const response = await session.fetch('https://soundcloud.com/you', { credentials: 'include', cache: 'no-store', signal: AbortSignal.timeout(15_000) });
-  if (response.ok) {
+  let response;
+  try { response = await session.fetch('https://soundcloud.com/you', { credentials: 'include', cache: 'no-store', signal: AbortSignal.timeout(8000) }); } catch { /* The API can still work when the web login page does not. */ }
+  if (response?.ok) {
     const profile = profileFromHtml(await response.text()); if (profile) return profile;
   }
   const tokens = await session.cookies.get({ url: 'https://soundcloud.com/', name: 'oauth_token' });

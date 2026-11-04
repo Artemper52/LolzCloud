@@ -61,6 +61,16 @@ test('simultaneous next requests share the same fill and start exactly one song'
   assert.equal(first, second); await new Promise(done => setImmediate(done)); resolve(model.tracks); await first;
   assert.equal(requests, 1); assert.equal(model.plays.length, 1);
 });
+
+test('deliberately replaying a previous wave track preserves the queue and daily exclusions', async t => {
+  const model = setup(t); await model.wave.start(); const first = model.wave.current;
+  model.wave.observe(model.snapshot()); await model.wave.next('skip'); const second = model.wave.current;
+  const queue = model.wave.queue.map(row => row.url); model.wave.replay(first);
+  assert.equal(model.wave.active, true); assert.equal(model.wave.current.url, first.url);
+  assert.deepEqual(model.wave.queue.map(row => row.url), queue);
+  assert.equal(playedRecently(second, model.wave.data.played24h, model.now()), true);
+  model.wave.observe(model.snapshot()); assert.equal(model.wave.active, true);
+});
 test('stopping while a request is pending cannot revive the wave or play a late result', async t => {
   let resolve; const model = setup(t, { provider: { related: () => new Promise(done => { resolve = done; }) } });
   const request = model.wave.start(); await new Promise(done => setImmediate(done)); model.wave.stop(); resolve(model.tracks); await request;

@@ -128,7 +128,7 @@ app.whenReady().then(async () => {
     assert.equal(new MusicFeatures(path.join(temporary, 'music.json')).data.preferences.startupView, 'audio');
     settingsDelay = 0; music.configurePreferences({ autoFollow: true, startupView: 'browser' });
     await host.webContents.executeJavaScript('document.querySelector("[data-go=sources]").click()'); await delay(100);
-    assert.equal(await host.webContents.executeJavaScript('document.querySelectorAll(".lc-provider").length'), 8);
+    assert.equal(await host.webContents.executeJavaScript('document.querySelectorAll(".lc-provider").length'), require('../source/integrations/lyric-settings.cjs').PROVIDERS.length);
     await host.webContents.executeJavaScript('document.getElementById("lc-source-merge").checked=false;document.getElementById("lc-source-merge").dispatchEvent(new Event("change"))'); await delay(80);
     assert.equal(lyricSettings.merge, false);
     await host.webContents.executeJavaScript('window.LolzCloudStudio.open("library")'); await delay(80);

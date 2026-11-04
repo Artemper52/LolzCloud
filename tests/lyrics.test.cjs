@@ -48,6 +48,7 @@ test('timing concatenation aligns split rows and never fabricates words or borro
 test('fallback is sequential, preserves plain progress, skips missing keys and continues after a refusal', async () => {
   const settings = new LyricSettings(), calls = [], updates = [];
   const engine = new LyricsEngine({ settings, adapters: {
+    better: async () => null,
     bini: async () => { calls.push('bini'); return plain; },
     unison: async () => { calls.push('unison'); throw new ProviderError('limited', Date.now() + 60_000); },
     netease: async () => { calls.push('netease'); return rich; },
@@ -55,12 +56,12 @@ test('fallback is sequential, preserves plain progress, skips missing keys and c
   } });
   const result = await engine.search(track, { onProgress: value => updates.push(value) });
   assert.deepEqual(calls, ['bini', 'unison', 'netease']); assert.equal(result.source, 'NetEase'); assert.equal(result.precision, 'word');
-  assert.equal(result.attempts[0].status, 'needs-key'); assert.equal(result.attempts[2].status, 'needs-key'); assert.equal(result.attempts[3].status, 'limited');
+  assert.equal(result.attempts.find(row => row.id === 'spicy').status, 'needs-key'); assert.equal(result.attempts.find(row => row.id === 'musixmatch').status, 'needs-key'); assert.equal(result.attempts.find(row => row.id === 'unison').status, 'limited');
   assert.ok(updates.some(value => value.plain === plain.plain));
   calls.length = 0; await engine.search({ ...track, title: 'Next test track' }); assert.deepEqual(calls, ['bini', 'netease']);
 });
 test('LRCLIB plain text cannot stop the subsequent QQ and KuGou attempts', async () => {
-  const settings = new LyricSettings(); settings.configure({ disabled: ['bini', 'unison', 'netease'] }); const calls = [];
+  const settings = new LyricSettings(); settings.configure({ disabled: ['bini', 'better', 'unison', 'netease'] }); const calls = [];
   const engine = new LyricsEngine({ settings, adapters: { lrclib: async () => plain, qq: async () => { calls.push('qq'); return null; }, kugou: async () => { calls.push('kugou'); return rich; } } });
   const result = await engine.search(track); assert.deepEqual(calls, ['qq', 'kugou']); assert.equal(result.source, 'KuGou');
 });
@@ -72,7 +73,7 @@ test('BiniLyrics follows its catalogue migration and only downloads approved lyr
   await assert.rejects(hostile.bini(track, {}), { code: 'invalid' });
 });
 test('Spicy uses the user client key, real Spotify ID and conditional contributor attribution', async () => {
-  const settings = new LyricSettings(); settings.configure({ keys: { spicy: 'sl_pk_original_test_key' }, disabled: ['bini', 'musixmatch', 'unison', 'netease', 'lrclib', 'qq', 'kugou'] });
+  const settings = new LyricSettings(); settings.configure({ keys: { spicy: 'sl_pk_original_test_key' }, disabled: ['bini', 'better', 'musixmatch', 'unison', 'netease', 'lrclib', 'qq', 'kugou'] });
   const engine = new LyricsEngine({ settings, fetcher: async (url, options) => {
     assert.ok(url.endsWith('/1234567890123456789012')); assert.equal(options.headers.Authorization, 'Bearer sl_pk_original_test_key');
     return json({ Body: { source: 'spicy_lyrics', Type: 'Line', UploadAttribution: { Maker: { username: 'Example maker', url: 'https://spicylyrics.org/uid/123' } }, Content: [{ Type: 'Vocal', StartTime: 2, EndTime: 4, Text: 'Original test' }] } });

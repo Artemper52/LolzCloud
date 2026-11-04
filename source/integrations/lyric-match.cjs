@@ -1,8 +1,9 @@
 'use strict';
-const normal = value => String(value || '').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+const { lyricIdentity, normalName: normal, sameArtists } = require('./lyric-identity.cjs');
 function sameRecording(candidate, track) {
+  candidate = candidate && lyricIdentity(candidate); track = lyricIdentity(track);
   if (!candidate || !normal(track.title) || !normal(track.artist)) return false;
-  if (normal(candidate.title) !== normal(track.title) || normal(candidate.artist) !== normal(track.artist)) return false;
+  if (normal(candidate.title) !== normal(track.title) || !sameArtists(candidate.artist, track.artist)) return false;
   return !(track.duration > 0 && (!(candidate.duration > 0) || Math.abs(candidate.duration - track.duration) > 2.5));
 }
 const wordCoverage = result => {

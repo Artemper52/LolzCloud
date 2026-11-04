@@ -2,6 +2,7 @@
 const { parseLrc, readTtml, parseYrc, parseRichsync, parseSpicy, tidyLines } = require('./lyric-formats.cjs');
 const { sameRecording, quality, wordCoverage, bestLyrics } = require('./lyric-match.cjs');
 const { LyricSettings, PROVIDERS } = require('./lyric-settings.cjs');
+const { lyricIdentity, lyricCandidates, artistNames } = require('./lyric-identity.cjs');
 const makeUrl = (base, values) => base + '?' + new URLSearchParams(Object.entries(values).filter(([, value]) => value !== undefined && value !== null).map(([key, value]) => [key, String(value)]));
 const metadata = (title, artist, duration) => ({ title, artist, duration: Number(duration) || 0 });
 const catalogueMatch = (rows, track, convert) => (Array.isArray(rows) ? rows : []).map(row => ({ row, track: convert(row) })).filter(value => sameRecording(value.track, track)).sort((a, b) => Math.abs(a.track.duration - track.duration) - Math.abs(b.track.duration - track.duration))[0];
@@ -15,12 +16,12 @@ class ProviderError extends Error {
 }
 class LyricsEngine {
   constructor({ settings = new LyricSettings(), fetcher = (...args) => fetch(...args), adapters = null, now = Date.now, shared = null } = {}) {
-    this.settings = settings; this.fetcher = fetcher; this.adapters = adapters; this.now = now; this.shared = shared; this.cooldowns = new Map(); this.spotifyToken = null;
+    this.settings = settings; this.fetcher = fetcher; this.adapters = adapters; this.now = now; this.shared = shared; this.cooldowns = new Map(); this.spotifyToken = null; this.albumCache = new Map();
   }
   async request(url, { signal, headers = {}, method = 'GET', body, text = false, redirectHosts = [] } = {}) {
     let response;
     for (let hop = 0; hop <= 2; hop++) {
-      response = await this.fetcher(url, { method, body, headers: { 'User-Agent': 'LolzCloud/0.4.0', ...headers }, signal, redirect: 'manual' });
+      response = await this.fetcher(url, { method, body, headers: { 'User-Agent': 'LolzCloud/0.9.1 (+https://lolzcloud.com; https://github.com/Artemper52/LolzCloud/issues)', ...headers }, signal, redirect: 'manual' });
       if (![301, 302, 303, 307, 308].includes(response.status)) break;
       const target = new URL(response.headers.get('location'), url);
       if (hop === 2 || method !== 'GET' || Object.keys(headers).some(key => /authorization/i.test(key)) || target.protocol !== 'https:' || target.username || target.password || !redirectHosts.includes(target.hostname)) throw new ProviderError('invalid');
@@ -89,13 +90,35 @@ class LyricsEngine {
   }
   async bini(track, ctx) {
     const redirectHosts = ['lyrics-api.binimum.org', 'lyrics-storage.binimum.org', 'lrc.red'];
-    const data = await this.request(makeUrl('https://lyrics-api.binimum.org/getLyrics', { q: track.artist + ' ' + track.title }), { signal: ctx.signal, redirectHosts });
-    const selected = catalogueMatch(data?.results, track, row => metadata(row.track_name, row.artist_name, row.duration));
+    let data = await this.request(makeUrl('https://lyrics-api.binimum.org/getLyrics', { q: track.artist + ' ' + track.title }), { signal: ctx.signal, redirectHosts });
+    let selected = catalogueMatch(data?.results, track, row => metadata(row.track_name, row.artist_name, row.duration));
+    if (!selected && artistNames(track.artist).length > 1) { data = await this.request(makeUrl('https://lyrics-api.binimum.org/getLyrics', { q: artistNames(track.artist)[0] + ' ' + track.title }), { signal: ctx.signal, redirectHosts }); selected = catalogueMatch(data?.results, track, row => metadata(row.track_name, row.artist_name, row.duration)); }
+    if (!selected) { data = await this.request(makeUrl('https://lyrics-api.binimum.org/getLyrics', { q: track.title }), { signal: ctx.signal, redirectHosts }); selected = catalogueMatch(data?.results, track, row => metadata(row.track_name, row.artist_name, row.duration)); }
     if (!selected?.row.lyricsUrl) return null;
     const url = new URL(selected.row.lyricsUrl, 'https://lyrics-storage.binimum.org/');
     if (url.protocol !== 'https:' || !['lyrics-storage.binimum.org', 'lrc.red'].includes(url.hostname) || url.username || url.password) throw new ProviderError('invalid');
     const text = await this.request(url.href, { signal: ctx.signal, text: true, redirectHosts });
     return { ...lyricsFrom(text, 'ttml'), recordId: selected.row.id, credits: [{ name: 'BiniLyrics', url: 'https://lyrics.binimum.org' }, ...(url.hostname === 'lrc.red' ? [{ name: 'lrc.red', url: 'https://lrc.red' }] : [])] };
+  }
+  async album(track, ctx) {
+    if (track.album) return track.album;
+    const key = [track.artist, track.title, track.duration].join('\n');
+    if (this.albumCache.has(key)) return this.albumCache.get(key);
+    this.appleRequests = (this.appleRequests || []).filter(time => this.now() - time < 60000);
+    if (this.appleRequests.length >= 18) return '';
+    this.appleRequests.push(this.now());
+    const request = this.request(makeUrl('https://itunes.apple.com/search', { term: artistNames(track.artist)[0] + ' ' + track.title, entity: 'song', country: 'US', limit: 12 }), { signal: ctx.signal }).then(data => catalogueMatch(data?.results, track, row => metadata(row.trackName, row.artistName, row.trackTimeMillis / 1000))?.row.collectionName || '', () => '');
+    this.albumCache.set(key, request);
+    if (this.albumCache.size > 80) this.albumCache.delete(this.albumCache.keys().next().value);
+    return request;
+  }
+  async better(track, ctx) {
+    const album = await this.album(track, ctx);
+    let data;
+    try { data = await this.request(makeUrl('https://api.betterlyrics.org/getLyrics', { s: track.title, a: track.artist, al: album, d: Math.round(track.duration) || 0 }), { signal: ctx.signal }); }
+    catch (error) { if (error.code === 'access') return null; throw error; }
+    if (typeof data?.ttml !== 'string') return null;
+    return { ...readTtml(data.ttml), credits: [{ name: 'Better Lyrics', url: 'https://better-lyrics.boidu.dev' }] };
   }
   async musixmatch(track, ctx) {
     const row = await this.musixTrack(track, ctx); if (!row) return null;
@@ -132,13 +155,23 @@ class LyricsEngine {
   }
   async lrclib(track, ctx) {
     const query = { track_name: track.title, artist_name: track.artist, duration: track.duration || undefined };
-    let record = await this.request(makeUrl('https://lrclib.net/api/get', query), { signal: ctx.signal });
+    let record = null;
+    try { record = await this.request(makeUrl('https://lrclib.net/api/get', query), { signal: ctx.signal }); }
+    catch (error) { if (error.code === 'limited' || ctx.signal?.aborted) throw error; /* Exact lookup failures must not prevent catalogue search. */ }
     if (record && !sameRecording(metadata(record.trackName, record.artistName, record.duration), track)) record = null;
     if (!parseLrc(record?.syncedLyrics).length && !record?.instrumental) {
       try {
-        const rows = await this.request(makeUrl('https://lrclib.net/api/search', { track_name: track.title, artist_name: track.artist }), { signal: ctx.signal });
-        const picks = (rows || []).filter(row => sameRecording(metadata(row.trackName, row.artistName, row.duration), track));
+        let rows = await this.request(makeUrl('https://lrclib.net/api/search', { track_name: track.title, artist_name: track.artist }), { signal: ctx.signal });
+        if (!rows?.length && artistNames(track.artist).length > 1) rows = await this.request(makeUrl('https://lrclib.net/api/search', { track_name: track.title, artist_name: artistNames(track.artist)[0] }), { signal: ctx.signal });
+        if (!rows?.length) rows = await this.request(makeUrl('https://lrclib.net/api/search', { track_name: track.title }), { signal: ctx.signal });
+        const picks = (rows || []).filter(row => sameRecording(metadata(row.trackName, row.artistName, row.duration), track)).sort((a, b) => Math.abs(a.duration - track.duration) - Math.abs(b.duration - track.duration));
         record = picks.find(row => parseLrc(row.syncedLyrics).length) || record || picks[0];
+        if (!record) {
+          // A shortened upload can still show the correct written lyrics; it
+          // must not borrow a full recording's synchronized timestamps.
+          const written = (rows || []).filter(row => row.plainLyrics && sameRecording(metadata(row.trackName, row.artistName, 0), { ...track, duration: 0 })).sort((a, b) => Math.abs(a.duration - track.duration) - Math.abs(b.duration - track.duration))[0];
+          if (written) return { lines: [], plain: written.plainLyrics.slice(0, 60000), versionMismatch: true, recordId: written.id };
+        }
       } catch (error) { if (!record) throw error; }
     }
     return record ? { lines: parseLrc(record.syncedLyrics), plain: record.plainLyrics?.slice(0, 60_000) || '', instrumental: record.instrumental === true, recordId: record.id } : null;
@@ -162,11 +195,24 @@ class LyricsEngine {
     const result = await this.request(makeUrl('https://lyrics.kugou.com/download', { ver: 1, client: 'pc', fmt: 'lrc', charset: 'utf8', id: pick.row.id, accesskey: pick.row.accesskey }), { signal: ctx.signal });
     return result?.status === 200 && result.content ? { ...lyricsFrom(Buffer.from(result.content, 'base64').toString('utf8')), recordId: pick.row.id } : null;
   }
-  async search(track, { signal, onProgress = () => {} } = {}) {
+  async search(track, options = {}) {
+    let best = null;
+    for (const candidate of lyricCandidates(track)) {
+      const result = await this.searchIdentity(candidate, { ...options, onProgress: value => options.onProgress?.({ ...value, identity: { ...value.identity, changed: value.identity?.title !== track.title || value.identity?.artist !== track.artist } }) });
+      result.identity.changed = result.identity.title !== track.title || result.identity.artist !== track.artist;
+      if (!best || quality(result) > quality(best)) best = result;
+      if (result.found && !result.versionMismatch) return result;
+    }
+    return best;
+  }
+  async searchIdentity(track, { signal, onProgress = () => {} } = {}) {
     if (!track?.title) throw new Error('Сначала включи трек.');
+    const original = { title: track.title, artist: track.artist };
+    track = lyricIdentity(track);
     const results = [], attempts = [], ctx = {};
     const currentBest = () => this.settings.merge ? bestLyrics(results) : [...results].sort((a, b) => quality(b) - quality(a))[0] || bestLyrics([]);
-    const emit = () => onProgress({ ...currentBest(), attempts: structuredClone(attempts) });
+    const identity = { title: track.title, artist: track.artist, changed: original.title !== track.title || original.artist !== track.artist };
+    const emit = () => onProgress({ ...currentBest(), identity, attempts: structuredClone(attempts) });
     for (const id of this.settings.order) {
       if (signal?.aborted) throw signal.reason;
       const provider = PROVIDERS.find(value => value.id === id), attempt = { id, name: provider.name, status: 'searching' }; attempts.push(attempt);
@@ -193,10 +239,10 @@ class LyricsEngine {
       }
       emit();
       const best = currentBest();
-      if (wordCoverage(best) >= .95) return { ...best, found: true, precision: 'word', attempts };
+      if (wordCoverage(best) >= .95) return { ...best, found: true, precision: 'word', attempts, identity };
     }
     const best = currentBest();
-    return { ...best, found: !!quality(best), attempts, instrumental: !quality(best) && results.some(result => result.instrumental) };
+    return { ...best, found: !!quality(best), attempts, identity, instrumental: !quality(best) && results.some(result => result.instrumental) };
   }
 }
 module.exports = { LyricsEngine, ProviderError, catalogueMatch };
