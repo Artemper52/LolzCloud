@@ -100,26 +100,13 @@ jobs:
           fs.writeFileSync('SHA256SUMS.txt', checksums);
           console.log('All 15 release files and both updater channels verified.');
           JS
-      - name: Correct only the unpublished staging tag and publish complete release
+      - name: Upload complete assets to the browser-created release draft
         shell: bash
         run: |
           set -eu
           test "$(git rev-parse HEAD)" = "$TESTED_REF"
-          if gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$RUNNER_TEMP/existing-release.json" 2> "$RUNNER_TEMP/release-error.txt"; then
-            node -e 'if (!JSON.parse(require("fs").readFileSync(process.env.RUNNER_TEMP + "/existing-release.json")).draft) throw Error("Release is already public; refusing to change it")'
-          else
-            grep -q 'HTTP 404' "$RUNNER_TEMP/release-error.txt" || { cat "$RUNNER_TEMP/release-error.txt"; exit 1; }
-          fi
-          old=$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")
-          if test "$old" != "$TESTED_REF"; then
-            test "$old" = e3c2be45530739df72f742cb810ed70751a6b466
-            git merge-base --is-ancestor "$old" HEAD
-            git tag -f "$RELEASE_TAG" HEAD
-            git push --force-with-lease="refs/tags/$RELEASE_TAG:$old" origin "refs/tags/$RELEASE_TAG"
-          fi
-          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title 'LolzCloud 0.9.0' --notes-file docs/releases/0.9.0.md
-          fi
+          gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft,targetCommitish,tagName > "$RUNNER_TEMP/existing-release.json"
+          node -e 'const r = JSON.parse(require("fs").readFileSync(process.env.RUNNER_TEMP + "/existing-release.json")); if (!r.isDraft || r.targetCommitish !== process.env.TESTED_REF || r.tagName !== process.env.RELEASE_TAG) throw Error("Expected an unpublished draft targeting the exact tested revision")'
           gh release upload "$RELEASE_TAG" release-assets/* --repo "$GITHUB_REPOSITORY" --clobber
           gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json assets > "$RUNNER_TEMP/uploaded-assets.json"
           node <<'JS'
@@ -129,5 +116,4 @@ jobs:
           if (assets.length !== expected.length) throw Error('Incomplete release upload');
           for (const name of expected) if (!assets.some(asset => asset.name === name && asset.size === fs.statSync('release-assets/' + name).size && asset.state === 'uploaded')) throw Error('Incomplete asset: ' + name);
           JS
-          gh release edit "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --draft=false --latest
-          printf 'Published https://github.com/%s/releases/tag/%s\n' "$GITHUB_REPOSITORY" "$RELEASE_TAG"
+          printf 'All assets uploaded and verified. Publish the complete draft through the browser.\n'
