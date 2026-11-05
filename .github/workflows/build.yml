@@ -1,5 +1,5 @@
 # Upload this file to Artemper52/LolzCloud as .github/workflows/build.yml on main.
-# The first run imports the pinned 0.9.3 source and publishes only after all checks pass.
+# The first run imports the pinned 0.9.4 source and publishes only after all checks pass.
 # Subsequent runs retain normal Windows Setup / Legacy / Linux release builds.
 name: Build and release
 'on':
@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Import the verified 0.9.3 source once, retaining this workflow
+      - name: Import the verified 0.9.4 source once, retaining this workflow
         id: source
         shell: bash
         run: >
@@ -42,11 +42,11 @@ jobs:
           version=$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')
 
           if [ "$GITHUB_REF" = refs/heads/main ] && { [ "$GITHUB_EVENT_NAME" = push ] || [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; } &&
-          [ "$version" = 0.9.2 ]; then
-            git diff --quiet dcfeb70ddcf9b45035491025c7cf2ac64b3b1e7a HEAD -- . ':(exclude).github'
-            release_archive="$RUNNER_TEMP/lolzcloud-source-093.zip"
-            curl --fail --silent --show-error --retry 3 https://lolzcloud.com/downloads/LolzCloud-0.9.3-import-source.zip -o "$release_archive"
-            printf '%s  %s\n' 738a6adbd0be7deed00fac0c83e36b492c94196ec5207745b38f3cf46e87c93b "$release_archive" | sha256sum -c -
+          [ "$version" = 0.9.3 ]; then
+            git diff --quiet 0af9019dc6c641196d240e145c8d787cdc914d35 HEAD -- . ':(exclude).github'
+            release_archive="$RUNNER_TEMP/lolzcloud-source-094.zip"
+            curl --fail --silent --show-error --retry 3 https://lolzcloud.com/downloads/LolzCloud-0.9.4-import-source.zip -o "$release_archive"
+            printf '%s  %s\n' 38530a248b7c506321c16a4f452a7353a4aff7292edcc3fe6223b47d54b700a5 "$release_archive" | sha256sum -c -
             python3 - <<'PY'
           import json, os, shutil, zipfile
 
@@ -54,11 +54,11 @@ jobs:
 
           temporary = Path(os.environ['RUNNER_TEMP'])
 
-          source = temporary / 'lolzcloud-source-093'
+          source = temporary / 'lolzcloud-source-094'
 
           destination = Path(os.environ['GITHUB_WORKSPACE'])
 
-          with zipfile.ZipFile(temporary / 'lolzcloud-source-093.zip') as archive:
+          with zipfile.ZipFile(temporary / 'lolzcloud-source-094.zip') as archive:
               for entry in archive.infolist():
                   relative = Path(entry.filename.replace('\\', '/'))
                   assert not relative.is_absolute() and '..' not in relative.parts and ':' not in str(relative)
@@ -68,7 +68,7 @@ jobs:
                   else:
                       target.parent.mkdir(parents=True, exist_ok=True)
                       target.write_bytes(archive.read(entry))
-          assert json.loads((source / 'package.json').read_text())['version'] == '0.9.3'
+          assert json.loads((source / 'package.json').read_text())['version'] == '0.9.4'
 
           names = ['.gitattributes', '.gitignore', 'CONTRIBUTING.md', 'LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', 'package.json',
           'package-lock.json', 'config', 'docs', 'licenses', 'server', 'source', 'tests', 'tools']
@@ -84,7 +84,7 @@ jobs:
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git add -A -- . ':(exclude).github'
-            if ! git diff --cached --quiet; then git commit -m 'Import verified LolzCloud 0.9.3 source'; fi
+            if ! git diff --cached --quiet; then git commit -m 'Import verified LolzCloud 0.9.4 source'; fi
             git push origin HEAD:main
             bootstrapped=true
           fi
@@ -93,7 +93,7 @@ jobs:
 
           printf 'bootstrapped=%s\n' "$bootstrapped" >> "$GITHUB_OUTPUT"
   windows:
-    runs-on: windows-latest
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
         with:
