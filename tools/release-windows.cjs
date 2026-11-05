@@ -9,7 +9,7 @@ async function main() {
   for (const legacy of [false, true]) {
     const output = path.join(releaseRoot, legacy ? 'legacy' : 'modern'); await node('build.cjs', legacy ? ['--legacy'] : [], { LOLZCLOUD_BUILD_PLATFORM: 'win32', LOLZCLOUD_BUILD_ARCH: 'x64', LOLZCLOUD_BUILD_OUTPUT: output });
     const appDirectory = path.join(output, 'LolzCloud-win32-x64'); const testDirectory = fs.mkdtempSync(path.join(temporary, 'LolzCloud-self-test-'));
-    await new Promise((resolve, reject) => { const child = spawn(path.join(appDirectory, 'LolzCloud.exe'), ['--self-test'], { env: { ...base, LOLZCLOUD_SELF_TEST_DIR: testDirectory }, windowsHide: true, stdio: 'inherit' }); child.on('error', reject); child.on('exit', code => code === 0 ? resolve() : reject(new Error('Native compatibility self-test failed: ' + code))); });
+    await require('./compatibility-test.cjs').testPackaged(path.join(appDirectory, 'LolzCloud.exe'), { env: { ...base, LOLZCLOUD_SELF_TEST_DIR: testDirectory }, expectedElectron: legacy ? '22.3.27' : require('electron/package.json').version });
     await node('build-setup.cjs', legacy ? ['--legacy'] : [], { LOLZCLOUD_SETUP_APP: appDirectory });
     const filename = path.join(releaseRoot, 'LolzCloud-' + version + (legacy ? '-win7-legacy-x64.zip' : '-win-x64.zip')); if (fs.existsSync(filename)) throw new Error('Portable archive already exists; choose a clean release output.'); await require('./windows-artifacts.cjs').archive(appDirectory, filename);
   }

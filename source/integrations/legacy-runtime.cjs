@@ -17,7 +17,7 @@ function install() {
   const { session, net } = require('electron');
   const attach = () => { const target = session.defaultSession; if (typeof target.fetch === 'function') return; target.fetch = (url, options = {}) => new Promise((resolve, reject) => {
     if (options.signal?.aborted) { reject(new Error('Request aborted')); return; }
-    const request = net.request({ url: String(url), method: options.method || 'GET', session: target, useSessionCookies: true, redirect: options.redirect === 'manual' ? 'manual' : 'error' });
+    const request = net.request({ url: String(url), method: options.method || 'GET', session: target, useSessionCookies: options.credentials !== 'omit', redirect: options.redirect === 'manual' ? 'manual' : 'error' });
     for (const [key, value] of Object.entries(options.headers || {})) request.setHeader(key, value);
     const abort = () => { request.abort(); reject(new Error('Request aborted')); }; options.signal?.addEventListener('abort', abort, { once: true });
     request.on('response', incoming => { options.signal?.removeEventListener('abort', abort); const headers = {}; for (const [key, value] of Object.entries(incoming.headers)) headers[key] = Array.isArray(value) ? value.join(', ') : String(value); resolve(response(new crossFetch.Response(incoming, { status: incoming.statusCode, headers }))); }); request.on('error', error => { options.signal?.removeEventListener('abort', abort); reject(error); }); if (options.body) request.write(options.body); request.end();

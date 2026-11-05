@@ -1,7 +1,7 @@
 {
   "name": "lolzcloud",
   "productName": "LolzCloud",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "description": "SoundCloud player with Lolzteam music status, Discord presence and a local music studio",
   "main": "source/main.js",
   "license": "MIT",
