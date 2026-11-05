@@ -1,9 +1,12 @@
 'use strict';
 require('../source/integrations/legacy-runtime.cjs').install();
-const { app, BrowserWindow, ipcMain, session, dialog, webContents } = require('electron'), fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
+const { app, BrowserWindow, ipcMain, session, dialog, webContents, safeStorage, clipboard } = require('electron'), fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
 const { LolzteamService } = require('../source/integrations/lolzteam/service.cjs');
 const { AudioDucker } = require('../source/integrations/audio-ducker.cjs');
 const { lyricKey } = require('../source/integrations/lyrics.cjs');
+const { ROOM_PARTITION, ROOM_COOKIE, roomGuestPreferences, protectRoomGuest } = require('../source/integrations/room-view.cjs');
+const { createServer } = require('../server/index.cjs');
+const { CloudStore } = require('../server/core.cjs');
 const temporary = process.env.LOLZCLOUD_PLAYER_TEST_PROFILE, root = path.resolve(__dirname, '..');
 fs.mkdirSync(path.join(root, '.build'), { recursive: true });
 if (!temporary || !path.basename(temporary).startsWith('LolzCloud-player-ui-')) throw new Error('An isolated test profile is required.');
@@ -13,7 +16,7 @@ const delay = value => new Promise(resolve => setTimeout(resolve, value));
 async function until(predicate, label, timeout = 8000) { const deadline = Date.now() + timeout; while (!await predicate()) { if (Date.now() > deadline) throw new Error(label); await delay(70); } }
 function wave() { const samples = 16000 * 100, buffer = Buffer.alloc(44 + samples * 2); buffer.write('RIFF'); buffer.writeUInt32LE(buffer.length - 8, 4); buffer.write('WAVEfmt ', 8); buffer.writeUInt32LE(16, 16); buffer.writeUInt16LE(1, 20); buffer.writeUInt16LE(1, 22); buffer.writeUInt32LE(16000, 24); buffer.writeUInt32LE(32000, 28); buffer.writeUInt16LE(2, 32); buffer.writeUInt16LE(16, 34); buffer.write('data', 36); buffer.writeUInt32LE(samples * 2, 40); for (let i = 0; i < samples; i++) buffer.writeInt16LE(Math.round(Math.sin(i * Math.PI * 2 * 440 / 16000) * 1000), 44 + i * 2); return buffer; }
 app.whenReady().then(async () => {
-  let host, studio, timer; const errors = [];
+  let host, studio, timer, roomServer; const errors = [];
   try {
     const fixture = { title: 'Fixture original song', artist: 'Fixture artist', url: 'https://soundcloud.com/fixture/original', duration: 100, position: 23, playing: false };
     const service = new LolzteamService({ store: { load: () => null, save() {} }, api: {} }); service.setPlayback(fixture);
@@ -24,7 +27,41 @@ app.whenReady().then(async () => {
     else session.defaultSession.protocol.interceptBufferProtocol('https', (_request, done) => done({ mimeType: 'text/html', data: Buffer.from(fixtureHtml) }));
     host = new BrowserWindow({ show: false, width: 1366, height: 850, frame: false, webPreferences: { nodeIntegration: true, contextIsolation: false, webviewTag: true, backgroundThrottling: false, offscreen: true } });
     host.webContents.on('console-message', (_event, ...args) => { const value = args[1]; if (typeof value === 'string' && /Uncaught|TypeError|SyntaxError/.test(value)) errors.push(value + ' @ ' + args[3] + ':' + args[2]); });
-    host.webContents.on('will-attach-webview', (_event, preferences) => { preferences.preload = path.join(root, 'source/guest-preload.cjs'); preferences.nodeIntegration = false; preferences.contextIsolation = true; preferences.sandbox = true; });
+    host.webContents.on('will-attach-webview', (event, preferences, params) => {
+      if (roomGuestPreferences(event, preferences, params)) return;
+      preferences.preload = path.join(root, 'source/guest-preload.cjs'); preferences.nodeIntegration = false; preferences.contextIsolation = true; preferences.sandbox = true;
+    });
+    host.webContents.on('did-attach-webview', (_event, contents) => {
+      if (contents.session === session.fromPartition(ROOM_PARTITION)) protectRoomGuest(contents);
+    });
+    const roomOrigin = 'https://lolzcloud.com', roomSession = session.fromPartition(ROOM_PARTITION);
+    let copiedInvite = '';
+    clipboard.writeText = value => { copiedInvite = value; };
+    const store = new CloudStore({ origin: roomOrigin });
+    roomServer = createServer({ origin: roomOrigin, store });
+    await new Promise(resolve => roomServer.listen(0, '127.0.0.1', resolve));
+    const loopback = 'http://127.0.0.1:' + roomServer.address().port;
+    const { secret: token, expires, user } = store.login({ id: 1, name: 'Fixture listener' });
+    const owner = store.login({ id: 2, name: 'Fixture DJ' }).user;
+    const publicRoom = store.createRoom(owner), ownRoom = store.createRoom(user);
+    Object.assign(store.room(publicRoom.id).settings, { name: 'Вечерний эфир', public: true, description: 'Музыка после работы' });
+    store.room(ownRoom.id).settings.name = 'Своя комната';
+    const fetchOriginal = globalThis.fetch;
+    globalThis.fetch = (value, options) => {
+      const url = String(value);
+      return fetchOriginal(url.startsWith(roomOrigin + '/api/') ? loopback + url.slice(roomOrigin.length) : value, options);
+    };
+    fs.writeFileSync(path.join(temporary, 'cloud-session.json'), JSON.stringify({ encryptedToken: safeStorage.encryptString(token).toString('base64'), expires, user }));
+    await roomSession.protocol.handle('https', async request => {
+      const url = new URL(request.url);
+      if (url.origin !== roomOrigin) return new Response('', { status: 404 });
+      if (url.pathname === '/assets/logo.svg') return new Response(fs.readFileSync(path.join(root, 'source/app/lib/assets/logo.svg')), { headers: { 'Content-Type': 'image/svg+xml' } });
+      const headers = new Headers(request.headers);
+      const cookie = (await roomSession.cookies.get({ url: roomOrigin, name: ROOM_COOKIE }))[0];
+      if (cookie) headers.set('Cookie', ROOM_COOKIE + '=' + cookie.value);
+      const body = request.method === 'GET' ? undefined : await request.text();
+      return fetchOriginal(loopback + url.pathname + url.search, { method: request.method, headers, body });
+    });
     const notify = () => { if (host && !host.isDestroyed() && studio) host.webContents.send('lolzcloud:state', { ...studio.snapshot(service.getState()), features: studio.getState(), discord: { connected: false } }); };
     studio = require('../source/integrations/studio.cjs').createStudio({ app, service, getWindow: () => host, trusted: event => event.sender === host.webContents && event.senderFrame === event.sender.mainFrame, onStateChange: notify });
     ipcMain.handle('lolzteam:action', () => ({ ok: true, state: { ...studio.snapshot(service.getState()), features: studio.getState(), discord: { connected: false } } }));
@@ -34,6 +71,36 @@ app.whenReady().then(async () => {
     await host.loadFile(path.join(root, 'source/app/index.html')); timer = setInterval(() => { studio.observe(); notify(); }, 500); notify();
     const js = code => host.webContents.executeJavaScript(code);
     await until(() => js('typeof window.LolzCloudPlayerTools?.palette === "function"'), 'New tools did not initialize');
+    await js('document.querySelector("[data-view=room]").click()');
+    await until(() => js('document.querySelector("#lc-room-cards h4")?.textContent==="Вечерний эфир"'), 'Public room did not appear in the application catalog');
+    assert.equal(await js('document.querySelectorAll("#lc-room-cards article").length'), 1);
+    await delay(400);
+    fs.writeFileSync(path.join(root, '.build/room-lobby.png'), (await host.webContents.capturePage()).toPNG());
+    await js('document.querySelector("[data-room-filter=own]").click()');
+    assert.equal(await js('document.querySelector("#lc-room-cards h4").textContent'), 'Своя комната');
+    await js('document.querySelector("[data-room-filter=public]").click(); document.querySelector("#lc-room-cards .primary").click()');
+    await until(() => js('!!document.querySelector("#lc-room-stage webview") && !document.getElementById("lc-room-stage").hidden'), 'Room did not open inside the application');
+    const roomView = '#lc-room-stage webview';
+    await until(() => js(`document.querySelector('${roomView}').executeJavaScript('typeof require === "undefined" && document.querySelector("#room-name")?.textContent === "Вечерний эфир"').catch(()=>false)`).catch(() => false), 'Sandboxed room failed to load');
+    assert.ok(await js(`document.querySelector('${roomView}').getBoundingClientRect().height > 300`), 'Room viewport did not fill the studio');
+    assert.equal((await session.defaultSession.cookies.get({ url: roomOrigin, name: ROOM_COOKIE })).length, 0);
+    await delay(300);
+    fs.writeFileSync(path.join(root, '.build/room-stage.png'), (await host.webContents.capturePage()).toPNG());
+    await js('document.getElementById("lc-room-copy-stage").click()');
+    await until(() => copiedInvite === publicRoom.url, 'The invitation was not copied');
+    await js(`document.querySelector('${roomView}').executeJavaScript('document.getElementById("chat-input").value = "Fixture chat"; document.getElementById("chat-form").requestSubmit()')`);
+    await until(() => store.room(publicRoom.id).chat.some(message => message.text === 'Fixture chat'), 'The embedded client could not send a chat message');
+    await js('document.getElementById("lc-room-leave").click()');
+    await until(() => js('!document.querySelector("#lc-room-stage webview")'), 'Leaving the room did not detach its player');
+    await until(() => store.room(publicRoom.id).members.size === 0, 'Leaving the embedded room did not remove the listener');
+    await js('document.querySelector("[data-view=settings]").click(); const pref=document.getElementById("lc-pref-window");pref.value="windows";pref.dispatchEvent(new Event("change"));');
+    await until(() => js('document.body.dataset.windowStyle==="windows"'), 'Windows window controls did not apply');
+    const savedStyle = JSON.parse(fs.readFileSync(path.join(temporary, 'music-library.json'), 'utf8')).preferences.windowStyle;
+    assert.equal(savedStyle, 'windows');
+    assert.ok(await js('document.querySelector(".window-controls").getBoundingClientRect().left > innerWidth / 2'));
+    await delay(300);
+    fs.writeFileSync(path.join(root, '.build/interface-windows.png'), (await host.webContents.capturePage()).toPNG());
+    await js('document.querySelector("[data-view=browser]").click()');
     await until(() => js('document.getElementById("webview").getWebContentsId() > 0'), 'SoundCloud fixture did not attach');
     const remote = webContents.fromId(await js('document.getElementById("webview").getWebContentsId()'));
     await until(() => remote.executeJavaScript('!!window.__lolzcloudMediaCommand && document.querySelector("audio")?.readyState >= 2'), 'SoundCloud audio hooks did not initialize');
@@ -86,7 +153,7 @@ app.whenReady().then(async () => {
     await js('document.getElementById("player-repeat").click()'); await until(() => studio.getState().transport.repeat.mode === 'one', 'Local repeat was not selected');
     await js('window.LolzCloudPlayerTools.open("library")'); await delay(100); fs.writeFileSync(path.join(root, '.build/player-offline-test.png'), (await host.webContents.capturePage()).toPNG());
     await js('(async()=>{const {ipcRenderer}=require("electron");await ipcRenderer.invoke("player-tools:action",{type:"profile-export"})})()'); const exported = JSON.parse(fs.readFileSync(path.join(temporary, 'exported-profile.json'))); assert.equal(exported.format, 'lolzcloud-profile'); assert.ok(!JSON.stringify(exported).includes(audioFile));
-    assert.deepEqual(errors, []); console.log('Player UI passed: actual detached SoundCloud pause/seek/volume/resume survive iframe loading, main/mini lyric clicks seek audio, mini repeat cycles all/one/off and saves a real MP3, Ctrl+K, bookmarks, timings, offline audio and profile.');
+    assert.deepEqual(errors, []); console.log('Player UI passed: room directory, sandboxed entry, shared chat, invitation and leave, Windows controls and preferences, detached audio transport, lyric seek, mini repeat and MP3, bookmarks and offline profile.');
   } catch (error) { console.error(error.stack); process.exitCode = 1; }
-  finally { clearInterval(timer); if (host && !host.isDestroyed()) { await host.webContents.executeJavaScript('window.LolzCloudLocal?.shutdown()').catch(() => {}); await delay(80); } if (studio) await studio.shutdown(); if (host && !host.isDestroyed()) host.destroy(); app.exit(process.exitCode || 0); }
+  finally { clearInterval(timer); if (host && !host.isDestroyed()) { await host.webContents.executeJavaScript('window.LolzCloudLocal?.shutdown()').catch(() => {}); await delay(80); } if (studio) await studio.shutdown(); if (host && !host.isDestroyed()) host.destroy(); if (roomServer) { roomServer.closeAllConnections(); await new Promise(resolve => roomServer.close(resolve)); } app.exit(process.exitCode || 0); }
 });

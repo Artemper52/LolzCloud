@@ -8,7 +8,7 @@
   const view = document.getElementById('webview'), el = id => document.getElementById(id);
   const footerBackground = new window.LolzCloudWaveView(el('player-gradient'), { ambient: true, fps: 24 });
   const headerBackground = new window.LolzCloudWaveView(el('titlebar-gradient'), { ambient: true, fps: 15 });
-  const labels = { browser: 'SoundCloud', wave: 'Моя волна', share: 'Сейчас слушаю', library: 'Моя музыка', community: 'Подборки', lyrics: 'Текст песни', audio: 'Звук и эффекты', room: 'Слушать вместе', private: 'Приватность', keys: 'Горячие клавиши', settings: 'Настройки', sources: 'Источники текста' };
+  const labels = { browser: 'SoundCloud', wave: 'Моя волна', share: 'Сейчас слушаю', library: 'Моя музыка', community: 'Подборки', lyrics: 'Текст песни', audio: 'Звук и эффекты', room: 'Комнаты', radar: 'Радар новинок', moments: 'Любимые моменты', versions: 'Другие версии', private: 'Приватность', keys: 'Горячие клавиши', settings: 'Настройки', sources: 'Источники текста' };
   let startupApplied = false, userNavigated = false;
   let downloadItem = null;
   window.showsongshowcase = () => window.LolzCloudStudio?.open('share');
@@ -16,6 +16,7 @@
   window.lolzSelectNavigation = name => {
     document.querySelectorAll('[data-view]').forEach(button => { const selected = button.dataset.view === (['private', 'keys', 'sources'].includes(name) ? 'settings' : name); button.classList.toggle('selected', selected); if (selected) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current'); });
     el('page-title').textContent = labels[name] || 'LolzCloud'; document.body.dataset.view = name;
+    window.dispatchEvent(new CustomEvent('lolzcloud:navigation', { detail: name }));
   };
   document.querySelectorAll('[data-view]').forEach(button => { button.onclick = () => {
     userNavigated = true;
@@ -39,6 +40,16 @@
   el('window-close').onclick = () => ipcRenderer.send('appReqCloseApp');
   el('window-minimize').onclick = () => ipcRenderer.send('appReqMinimizeApp');
   el('window-maximize').onclick = () => ipcRenderer.send('appReqToggleWindowMaximize');
+  el('window-fullscreen').onclick = () => ipcRenderer.send('appReqToggleFullscreen');
+  ipcRenderer.on('lolzcloud:window-state', (_event, maximized, fullscreen) => {
+    const button = el('window-maximize');
+    const label = maximized ? 'Восстановить размер окна' : 'Развернуть окно';
+    button.title = label; button.setAttribute('aria-label', label);
+    button.querySelector('use').setAttribute('href', maximized ? '#lc-icon-restore' : '#lc-icon-maximize');
+    const full = el('window-fullscreen');
+    full.title = fullscreen ? 'Выйти из полного экрана' : 'Полный экран';
+    full.setAttribute('aria-label', full.title); full.setAttribute('aria-pressed', String(!!fullscreen));
+  });
   el('titlebar').ondblclick = event => { if (!event.target.closest('button')) ipcRenderer.send('appReqToggleWindowMaximize'); };
   el('browser-back').onclick = () => { if (view.canGoBack()) view.goBack(); };
   el('browser-forward').onclick = () => { if (view.canGoForward()) view.goForward(); };
@@ -85,7 +96,7 @@
     el('player-volume-label').textContent = el('player-volume').value + '%';
     window.lolzArtwork(el('player-cover'), track.cover);
     el('account-name').textContent = state.user?.name || 'Твой профиль';
-    el('account-description').textContent = state.storagePending ? 'Восстанавливаем привязку…' : state.connected ? 'Lolzteam подключён' : 'Подключить Lolzteam';
+    el('account-description').textContent = state.storagePending ? 'Восстанавливаем привязку…' : 'Открыть профиль';
     el('account-avatar').textContent = (state.user?.name || 'L').slice(0, 1).toUpperCase();
     el('discord-indicator').classList.toggle('connected', !!state.discord?.connected);
     el('discord-indicator').title = state.discord?.connected ? 'Discord подключён' : 'Ожидаем Discord';

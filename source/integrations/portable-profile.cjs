@@ -1,7 +1,7 @@
 'use strict';
 const crypto = require('node:crypto'), { promisify } = require('node:util');
 const scrypt = promisify(crypto.scrypt);
-const { MusicFeatures, scUrl } = require('./music.cjs');
+const { MusicFeatures, scUrl, WINDOW_STYLES, STARTUP_VIEWS } = require('./music.cjs');
 const { normalizeSound } = require('./sound-settings.cjs');
 const { normalizePreferences } = require('./wave-preferences.cjs');
 const { normalizeTrack } = require('./discovery.cjs');
@@ -15,7 +15,8 @@ function normalizeProfile(value) {
   const preferences = { ...defaults.preferences };
   for (const key of ['autoFollow', 'reduceMotion']) if (typeof input.preferences?.[key] === 'boolean') preferences[key] = input.preferences[key];
   if (['comfortable', 'compact'].includes(input.preferences?.density)) preferences.density = input.preferences.density;
-  if (['browser', 'wave', 'library', 'audio'].includes(input.preferences?.startupView)) preferences.startupView = input.preferences.startupView;
+  if (STARTUP_VIEWS.includes(input.preferences?.startupView)) preferences.startupView = input.preferences.startupView;
+  if (WINDOW_STYLES.includes(input.preferences?.windowStyle)) preferences.windowStyle = input.preferences.windowStyle;
   const collections = (Array.isArray(input.collections) ? input.collections : []).slice(0, 100).map(row => ({ id: crypto.randomUUID(), title: text(row.title, 100), url: scUrl(row.url), addedAt: Date.now() })).filter(row => row.url);
   const customEffects = Object.create(null); for (const [name, sound] of Object.entries(input.customEffects || {}).slice(0, 100)) if (name && !['__proto__', 'constructor', 'prototype'].includes(name)) customEffects[text(name, 32)] = normalizeSound(sound);
   const wave = value.wave || {}, feedback = Object.create(null);

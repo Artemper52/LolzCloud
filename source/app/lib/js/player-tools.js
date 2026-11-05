@@ -7,7 +7,7 @@
   document.body.insertAdjacentHTML('beforeend', fs.readFileSync(path.join(__dirname, 'lib/templates/player-tools.html'), 'utf8'));
   const el = id => document.getElementById('xp-' + id), studio = document.getElementById('lc-studio'), view = document.getElementById('webview');
   const append = (template, target) => target?.append(el(template).content.cloneNode(true));
-  studio.querySelector('[data-pane=library]').prepend(el('library-template').content.cloneNode(true)); append('settings-template', studio.querySelector('[data-pane=settings]')); append('audio-template', studio.querySelector('[data-pane=audio]')); append('room-template', studio.querySelector('[data-pane=room]')); append('panes-template', studio.querySelector('[data-pane]')?.parentElement || studio);
+  studio.querySelector('[data-pane=library]').prepend(el('library-template').content.cloneNode(true)); append('settings-template', studio.querySelector('[data-pane=settings]')); append('audio-template', studio.querySelector('[data-pane=audio]')); append('room-template', document.getElementById('lc-room-lobby')); append('panes-template', studio.querySelector('[data-pane]')?.parentElement || studio);
   let snapshot = null, tools = null, searchRevision = 0, selection = 0, results = [], toastTimer, bookmarkTrack = null, timingTrack = null, timingRows = [], timingCursor = 0, timingRecording = false, timingUndo = [], stampBusy = false, normalConfig = { enabled: false }, latestGainAt = 0, stateBusy = false, listsSignature = '', searchTimer;
   const text = (tag, value, className) => { const node = document.createElement(tag); node.textContent = value; if (className) node.className = className; return node; };
   const current = () => snapshot?.displayPlayback || snapshot?.playback || {};
@@ -25,7 +25,8 @@
   function render(force = false) {
     if (!tools) return;
     el('normalization').checked = tools.normalization;
-    const signature = JSON.stringify([tools.library, tools.bookmarks, tools.radar, tools.versions, tools.groups, snapshot?.features?.room, el('local-filter').value, el('radar-week').checked]);
+    const room = snapshot?.features?.room;
+    const signature = JSON.stringify([tools.library, tools.bookmarks, tools.radar, tools.versions, tools.groups, room?.active, room?.controller?.name, room?.controller?.user.name, room?.queue, el('local-filter').value, el('radar-week').checked]);
     if (signature !== listsSignature || force) {
       listsSignature = signature;
       const query = el('local-filter').value.toLocaleLowerCase(), local = tools.library.tracks.filter(track => (track.title + ' ' + track.artist).toLocaleLowerCase().includes(query));
@@ -37,19 +38,23 @@
       list('radar-list', tracks, item => row(item.title, item.artist + (item.publishedAt ? ' · ' + new Date(item.publishedAt).toLocaleDateString('ru-RU') : ''), [['Слушать', () => action('play-url', { url: item.url })], ['Уже слушал', () => action('radar-heard', { url: item.url })]]), 'Непрослушанных новинок пока нет.');
       el('versions-source').textContent = tools.versions.loading ? 'Ищем версии…' : tools.versions.error || (tools.versions.source ? tools.versions.source.artist + ' — ' + tools.versions.source.title : 'Включи трек SoundCloud и начни поиск.');
       list('versions-list', tools.versions.candidates, item => { const source = tools.versions.source?.url, grouped = tools.groups.some(group => group.includes(source) && group.includes(item.url)); return row(item.title, item.artist + ' · ' + clock(item.duration) + ' · кандидат', [['Слушать', () => action('play-url', { url: item.url })], [grouped ? 'Разъединить' : 'Та же запись', () => action(grouped ? 'versions-ungroup' : 'versions-confirm', grouped ? { url: item.url } : { source, url: item.url })]]); }, 'Найденные версии появятся здесь.');
-      const room = snapshot?.features?.room;
-      el('room-controller').textContent = room?.controller ? 'Ведущий: ' + room.controller.user.name + ' · ' + room.controller.name : room?.active ? 'Пульт свободен' : 'Войди через Lolzteam и создай комнату.';
-      list('room-queue', room?.queue || [], item => row(item.track.title, item.proposedBy.name + ' · ' + item.votes + ' голосов · ' + (item.approved ? 'Одобрен' : 'Ждёт одобрения'), [[item.approved ? 'Отложить' : 'Одобрить', () => action('room-queue', { action: { type: 'approve', id: item.id } })], ['Убрать', () => action('room-queue', { action: { type: 'remove', id: item.id } })]]), 'Участники смогут предложить песни в окне комнаты.');
+
+      el('room-transport').hidden = !room?.active;
+      el('room-controller').textContent = room?.controller ? 'Ведущий · ' + room.controller.user.name + ' · ' + room.controller.name : 'Пульт свободен';
+      list('room-queue', room?.queue || [], item => row(item.track.title, item.proposedBy.name + ' · ' + item.votes + ' голосов', [[item.approved ? 'Отложить' : 'Одобрить', () => action('room-queue', { action: { type: 'approve', id: item.id } })], ['Убрать', () => action('room-queue', { action: { type: 'remove', id: item.id } })]]), 'Здесь появятся песни, предложенные участниками.');
     }
+    el('room-next').disabled = !room?.hosting;
     const remote = tools.remote; el('remote-start').hidden = !!remote; el('remote-stop').hidden = !remote; el('remote-details').hidden = !remote; if (remote) { if (el('remote-qr').src !== remote.qr) el('remote-qr').src = remote.qr; el('remote-status').textContent = remote.error || 'Пульт доступен только владельцу этого аккаунта.'; }
   }
   const nav = document.querySelector('.shell-sidebar nav');
-  const searchOpen = text('button', 'Поиск', ''); searchOpen.id = 'xp-search-open'; const hint = text('kbd', 'Ctrl K'); searchOpen.append(hint); nav.prepend(searchOpen);
-  for (const [name, label, icon] of [['radar', 'Радар новинок', '◉'], ['moments', 'Любимые моменты', '⌑']]) { const button = text('button', ''); button.append(text('span', icon), document.createTextNode(label)); button.onclick = () => open(name); nav.insertBefore(button, nav.querySelector('[data-view=settings]')); }
+  const searchOpen = text('button', '', ''); searchOpen.id = 'xp-search-open';
+  searchOpen.innerHTML = '<span><svg aria-hidden="true"><use href="#lc-icon-search"/></svg></span>Поиск <kbd>Ctrl K</kbd>';
+  nav.insertBefore(searchOpen, nav.querySelector('small')); searchOpen.onclick = () => palette();
+
   const footerBookmark = document.createElement('button'); footerBookmark.id = 'xp-player-bookmark'; footerBookmark.title = 'Сохранить момент трека'; footerBookmark.setAttribute('aria-label', 'Сохранить момент'); footerBookmark.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>'; document.getElementById('player-like').after(footerBookmark);
   const versionsButton = text('button', 'Другие версии ↗'); versionsButton.onclick = () => { open('versions'); void action('versions').catch(() => {}); }; studio.querySelector('[data-pane=share]')?.append(versionsButton);
   const timingButton = text('button', 'Тайминги'); timingButton.id = 'xp-edit-timings'; timingButton.onclick = () => timingOpen(); document.querySelector('.lc-lyric-tools').append(timingButton);
-  const commands = [ ['Моя волна', () => open('wave')], ['Моя музыка', () => open('library')], ['Радар новинок', () => open('radar')], ['Любимые моменты', () => open('moments')], ['Сохранить момент', () => bookmarkOpen()], ['Другие версии трека', () => { open('versions'); return action('versions'); }], ['Редактор таймингов', () => timingOpen()], ['Открыть текст песни', () => open('lyrics')], ['Открыть комнату в приложении', () => ipcRenderer.invoke('features:action', { type: 'room-window' })], ['Настройки и перенос профиля', () => open('settings')], ...['Original', 'Slowed', 'Speed Up', 'Slowed + Reverb', 'Bass Boost', 'Nightcore'].map(name => ['Звучание: ' + name, () => ipcRenderer.invoke('features:action', { type: 'dsp', settings: { preset: name } })]) ];
+  const commands = [ ['Моя волна', () => open('wave')], ['Моя музыка', () => open('library')], ['Радар новинок', () => open('radar')], ['Любимые моменты', () => open('moments')], ['Сохранить момент', () => bookmarkOpen()], ['Другие версии трека', () => { open('versions'); return action('versions'); }], ['Редактор таймингов', () => timingOpen()], ['Открыть текст песни', () => open('lyrics')], ['Открыть каталог комнат', () => open('room')], ['Настройки и перенос профиля', () => open('settings')], ...['Original', 'Slowed', 'Speed Up', 'Slowed + Reverb', 'Bass Boost', 'Nightcore'].map(name => ['Звучание: ' + name, () => ipcRenderer.invoke('features:action', { type: 'dsp', settings: { preset: name } })]) ];
   async function search() {
     const revision = ++searchRevision, query = el('search').value.trim().toLocaleLowerCase(), matching = commands.filter(([label]) => label.toLocaleLowerCase().includes(query)).map(([label, execute]) => ({ title: label, detail: 'Команда', execute }));
     try { const reply = await ipcRenderer.invoke('player-tools:action', { type: 'search', query }); if (revision !== searchRevision || !el('palette').open) return; if (!reply.ok) throw new Error(reply.error); results = [...matching, ...reply.result.results.map(item => ({ title: item.note || item.title, detail: (item.artist || '') + ' · ' + ({ local: 'На компьютере', bookmark: 'Закладка · ' + clock(item.position), collection: 'Подборка', track: 'История' })[item.kind], execute: () => action(item.kind === 'local' ? 'local-play' : item.kind === 'bookmark' ? 'bookmark-play' : 'play-url', item.kind === 'local' || item.kind === 'bookmark' ? { id: item.id } : { url: item.url }) }))]; selection = 0; renderSearch(); } catch (error) { el('results').replaceChildren(text('p', error.message, 'xp-empty')); }
@@ -84,8 +89,7 @@
   bind('versions-search', () => action('versions')); el('normalization').onchange = () => action('normalization', { enabled: el('normalization').checked }).catch(() => {});
   bind('profile-export', () => action('profile-export')); bind('profile-import', () => action('profile-import')); for (const type of ['push', 'pull']) bind('profile-' + type, async () => { const passphrase = el('cloud-password').value; el('cloud-password').value = ''; await action('profile-' + type, { passphrase }); });
   for (const type of ['start', 'stop', 'copy']) bind('remote-' + type, () => action('remote-' + type));
-  bind('room-window', async () => { const reply = await ipcRenderer.invoke('features:action', { type: 'room-window' }); if (!reply.ok) throw new Error(reply.error); }); bind('room-claim', async () => { const reply = await ipcRenderer.invoke('features:action', { type: 'room-claim' }); if (!reply.ok) throw new Error(reply.error); }); bind('room-next', () => action('room-next'));
-  el('room-join-form').onsubmit = async event => { event.preventDefault(); const reply = await ipcRenderer.invoke('features:action', { type: 'room-window', url: el('room-url').value }); if (!reply.ok) toast(reply.error, true); };
+  bind('room-next', () => action('room-next'));
   function sendNormalization() { void guest('window.__lolzcloudSetNormalization?.(' + JSON.stringify(normalConfig) + ')'); }
   ipcRenderer.on('lolzcloud:normalization', (_event, value) => { normalConfig = value; sendNormalization(); }); view.addEventListener('dom-ready', () => { guestReady = true; sendNormalization(); });
   ipcRenderer.on('lolzcloud:pause-soundcloud', () => { void guest('window.__lolzcloudMediaCommand?.("pause")'); });

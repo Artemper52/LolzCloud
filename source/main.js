@@ -1,5 +1,6 @@
 const { app, globalShortcut, shell, ipcMain, BrowserWindow, Tray, Menu, nativeImage, screen, session} = require('electron')
 const path = require('node:path')
+const { ROOM_PARTITION, roomGuestPreferences, protectRoomGuest } = require('./integrations/room-view.cjs');
 require('./integrations/legacy-runtime.cjs').install();
 if (process.argv.includes('--self-test')) { require('./integrations/self-test.cjs').run(app); return; }
 if (process.argv.includes('--import-soundcloud-session')) {
@@ -43,9 +44,13 @@ function createWindow () {
   mainWindow.setMenuBarVisibility(false)
   const paletteKey = (event, input) => { if (input.type === 'keyDown' && (input.control || input.meta) && !input.alt && String(input.key).toLowerCase() === 'k') { event.preventDefault(); mainWindow.webContents.send('lolzcloud:palette'); } };
   mainWindow.webContents.on('before-input-event', paletteKey);
-  mainWindow.webContents.on('did-attach-webview', (_event, contents) => { contents.on('before-input-event', paletteKey); });
-  mainWindow.webContents.on('will-attach-webview', (event, preferences) => {
+  mainWindow.webContents.on('did-attach-webview', (_event, contents) => {
+    contents.on('before-input-event', paletteKey);
+    if (contents.session === session.fromPartition(ROOM_PARTITION)) protectRoomGuest(contents);
+  });
+  mainWindow.webContents.on('will-attach-webview', (event, preferences, params) => {
     // SoundCloud plugins only use DOM APIs. Remote pages never need Node or the token.
+    if (roomGuestPreferences(event, preferences, params)) return;
     preferences.preload = path.join(__dirname, 'guest-preload.cjs');
     preferences.nodeIntegration = false;
     preferences.contextIsolation = true;
@@ -65,6 +70,13 @@ function createWindow () {
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
   });
+  function reportWindowState() {
+    mainWindow.webContents.send('lolzcloud:window-state', mainWindow.isMaximized() || mainWindow.isFullScreen(), mainWindow.isFullScreen());
+  }
+  for (const event of ['maximize', 'unmaximize', 'enter-full-screen', 'leave-full-screen']) {
+    mainWindow.on(event, reportWindowState);
+  }
+  mainWindow.webContents.on('did-finish-load', reportWindowState);
   mainWindow.on('close', event => {
     if (!finishedQuitting) {
       event.preventDefault();
@@ -231,7 +243,12 @@ ipcMain.on("appReqMinimizeApp",() => {
 });
 ipcMain.on('appReqToggleWindowMaximize', event => {
   if (event.sender !== mainWindow?.webContents) return;
-  if (mainWindow.isMaximized()) mainWindow.unmaximize(); else mainWindow.maximize();
+  if (mainWindow.isFullScreen()) mainWindow.setFullScreen(false);
+  else if (mainWindow.isMaximized()) mainWindow.unmaximize();
+  else mainWindow.maximize();
+});
+ipcMain.on('appReqToggleFullscreen', event => {
+  if (event.sender === mainWindow?.webContents) mainWindow.setFullScreen(!mainWindow.isFullScreen());
 });
 ipcMain.on("appReqCloseApp",() => {
   app.quit();

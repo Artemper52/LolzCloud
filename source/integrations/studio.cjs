@@ -6,6 +6,7 @@ const { copyCard } = require('./clipboard.cjs');
 const { RepeatIntent } = require('./repeat-intent.cjs');
 const { MusicFeatures, shareText, scUrl } = require('./music.cjs');
 const { ListeningRoom } = require('./room.cjs');
+const { ROOM_PARTITION, ROOM_COOKIE, roomUrl, roomCard } = require('./room-view.cjs');
 const { LyricsLibrary } = require('./lyrics.cjs');
 const { LyricPrefetcher } = require('./lyric-prefetch.cjs');
 const { LyricSettings } = require('./lyric-settings.cjs');
@@ -38,19 +39,33 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
   const wave = new PersonalWave({ filename: path.join(app.getPath('userData'), 'wave-library.json'), provider: discovery, getSnapshot: () => service.getState(), getHistory: () => music.data.history, play: (url, track) => { playbackHistory.request({ url }); service.beginPlayback({ ...track, url }); if (!service.isPrivate()) void lyrics.load(track); onStateChange(); getWindow()?.webContents.send('lolzcloud:play-url', { url, track }); } });
   const experience = createPlayerExperience({ app, service, music, wave, lyrics, room, discovery, downloads, media, getWindow, notify: onStateChange, dialog, clipboard, play: async (url, track) => { if (!scUrl(url)) throw new Error('Нужна ссылка SoundCloud.'); wave.stop(); playbackHistory.request({ url }); if (track?.title) service.beginPlayback({ ...track, url }); getWindow()?.webContents.send('lolzcloud:play-url', { url, track }); } });
   const shownTrack = () => experience.current();
-  let roomWindow = null;
-  async function openRoomWindow(value) {
-    if (!room.getState().authenticated) { await room.login(); throw new Error('Подтверди вход Lolzteam в браузере, затем открой комнату снова.'); }
-    let target;
-    if (value) { target = new URL(value); if (target.origin !== room.origin || !/^\/room\/[a-f0-9]{32}\/?$/.test(target.pathname)) throw new Error('Нужна ссылка на комнату LolzCloud.'); }
-    else { if (!room.getState().active) await room.start(); target = new URL(room.getState().url); }
-    await room.release().catch(() => {}); getWindow()?.webContents.send('lolzcloud:media', { command: 'pause' });
-    await session.defaultSession.cookies.set({ url: room.origin, name: '__Host-lc_session', value: room.token, path: '/', secure: true, httpOnly: true, sameSite: 'lax', expirationDate: room.expires / 1000 });
-    if (roomWindow && !roomWindow.isDestroyed()) { await roomWindow.loadURL(target.href); roomWindow.show(); return; }
-    roomWindow = new BrowserWindow({ width: 1200, height: 850, minWidth: 700, minHeight: 600, title: 'Слушаем вместе · LolzCloud', backgroundColor: '#0c110e', autoHideMenuBar: true, webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, backgroundThrottling: false } });
-    roomWindow.webContents.setWindowOpenHandler(({ url }) => { if (/^https:\/\//.test(url)) void shell.openExternal(url); return { action: 'deny' }; });
-    roomWindow.webContents.on('will-navigate', (event, url) => { try { if (new URL(url).origin !== room.origin) event.preventDefault(); } catch { event.preventDefault(); } });
-    roomWindow.on('closed', () => { roomWindow = null; }); await roomWindow.loadURL(target.href);
+  async function roomAction(action) {
+    if (!room.getState().authenticated) throw new Error('Сначала войди через Lolzteam.');
+    if (action?.type === 'list') {
+      const result = await room.request('/api/rooms');
+      return result.rooms.map(value => roomCard(value, room.origin)).filter(Boolean);
+    }
+    const value = action?.type === 'create'
+      ? await room.request('/api/rooms', { method: 'POST', body: {} })
+      : null;
+    const url = roomUrl(value?.url || action?.url, room.origin);
+    if (!url) throw new Error('Нужна ссылка на комнату LolzCloud.');
+    if (action.type === 'copy') { await clipboard.writeText(url); return null; }
+    const endpoint = '/api/rooms/' + url.split('/').at(-2);
+    if (action.type === 'close') {
+      if (url === room.getState().url) await room.stop();
+      else await room.request(endpoint, { method: 'DELETE' });
+      return null;
+    }
+    if (action.type !== 'open' && action.type !== 'create') throw new Error('Неизвестное действие комнаты.');
+    if (!value) await room.request(endpoint);
+    if (room.lease) await room.release();
+    await media('pause');
+    await session.fromPartition(ROOM_PARTITION).cookies.set({
+      url: room.origin, name: ROOM_COOKIE, value: room.token, path: '/', secure: true, httpOnly: true,
+      sameSite: 'lax', expirationDate: room.expires / 1000,
+    });
+    return url;
   }
   async function openCredit(url) {
     if (typeof url !== 'string' || !/^https:\/\//.test(url) || !lyrics.state(shownTrack()).credits?.some(credit => credit.url === url)) return;
@@ -188,9 +203,11 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
       }
       case 'room-start': await room.start(); break;
       case 'room-claim': if (!room.room) await room.start(); else await room.claim(); break;
-      case 'room-window': await openRoomWindow(action.url); break;
       case 'room-login': await room.login(); break;
-      case 'room-logout': await room.logout(); break;
+      case 'room-logout':
+        await room.logout();
+        await session.fromPartition(ROOM_PARTITION).cookies.remove(room.origin, ROOM_COOKIE);
+        break;
       case 'room-stop': await room.stop(); break;
       case 'room-copy': if (!room.getState().url) throw new Error('Сначала создай комнату.'); await clipboard.writeText(room.getState().url); break;
       case 'card-copy': case 'card-save': {
@@ -211,6 +228,12 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
   ipcMain.handle('features:action', async (event, action) => {
     if (!trusted(event)) return { ok: false, error: 'Недоверенное окно.' };
     try { return { ok: true, state: await act(action) }; } catch (error) { return { ok: false, error: error.message, state: getState() }; }
+  });
+  ipcMain.handle('rooms:action', async (event, action) => {
+    if (!trusted(event)) return { ok: false, error: 'Недоверенное окно.' };
+    try { return { ok: true, result: await roomAction(action) }; }
+    catch (error) { return { ok: false, error: error.message }; }
+    finally { if (action?.type !== 'list' || !room.getState().authenticated) onStateChange(); }
   });
   ipcMain.handle('player-tools:action', async (event, action) => {
     if (!trusted(event)) return { ok: false, error: 'Недоверенное окно.' };
@@ -261,7 +284,6 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
       if (!(wave.active && wave.waitingUntil && snapshot.playback.url !== wave.current?.url)) prefetch.observe(snapshot, wave.active ? wave.queue : null);
     },
     async shutdown() {
-      if (roomWindow && !roomWindow.isDestroyed()) roomWindow.close();
       await experience.shutdown();
       wave.dispose();
       await downloads.dispose();

@@ -1,0 +1,160 @@
+.shell-symbols {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.shell-sidebar {
+  background: linear-gradient(165deg, #1a231e 0%, #151c18 48%, #111814 100%);
+  padding: 18px 12px 12px;
+  min-height: 0;
+}
+
+.shell-brand { padding: 0 9px 16px; }
+.shell-brand img { border: 1px solid #9ae0b332; }
+.shell-brand small { color: #a1b7a8; }
+.shell-sidebar nav { flex: 1; min-height: 0; overflow: auto; scrollbar-width: thin; scrollbar-color: #4f6b59 transparent; gap: 3px; }
+.shell-sidebar nav > small { color: #99ada0; padding: 12px 9px 5px; }
+.shell-sidebar nav button {
+  min-height: 34px;
+  flex-shrink: 0;
+  gap: 10px;
+  padding: 3px 9px;
+  color: #b9c9c0;
+  font-weight: 550;
+  border: 1px solid transparent;
+}
+.shell-sidebar nav button > span {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: #8fc4a111;
+  color: #a3cfb4;
+}
+.shell-sidebar nav button svg, .sidebar-bottom button svg, .window-controls svg, #window-fullscreen svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.65;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.shell-sidebar nav button.selected {
+  color: #ecfff2;
+  border-color: #a6e0b728;
+  background: linear-gradient(95deg, #304737, #26352c);
+  box-shadow: inset 2px 0 #a8e5bc;
+}
+.shell-sidebar nav button[data-view=browser] {
+  background: #ff742e;
+  color: #261207;
+  font-weight: 750;
+  border-color: #ffc19760;
+  margin-bottom: 2px;
+}
+.shell-sidebar nav button[data-view=browser]:hover { background: #ff975e; }
+.shell-sidebar nav button[data-view=browser].selected { box-shadow: inset 0 0 0 1px #3d190b90; }
+.shell-sidebar nav button[data-view=browser] > span { color: #2d170b; background: #ffaf7a; }
+.shell-sidebar nav button[data-view=browser] svg { width: 21px; height: 21px; }
+.shell-sidebar nav button[data-view=room] > span { background: #a3e0ba22; color: #c1f4d1; }
+.shell-sidebar #xp-search-open { margin: 0 0 3px; }
+.shell-sidebar #xp-search-open kbd { margin-left: auto; }
+.sidebar-bottom { flex: 0 0 auto; padding-top: 8px; }
+#open-mini { padding: 6px 9px; }
+#open-account {
+  border: 1px solid #99d6ae2b;
+  background: linear-gradient(110deg, #2a3d30, #1e2d24);
+  border-radius: 12px;
+  margin-top: 5px;
+  padding: 8px;
+  min-width: 0;
+}
+#open-account:hover { border-color: #a7e9bd80; background: #304939; }
+#open-account .account-copy { flex: 1; min-width: 0; }
+#open-account strong { color: #effaf2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#open-account small { color: #b1d7bd; }
+#open-account > svg { flex-shrink: 0; color: #b8e8c7; }
+.shell-sidebar button:focus-visible, #titlebar button:focus-visible, .room-directory button:focus-visible {
+  outline: 2px solid #c3f5d4;
+  outline-offset: -2px;
+}
+
+.window-controls { align-items: center; }
+.window-controls button { display: grid; place-items: center; }
+.window-controls svg { width: 9px; height: 9px; opacity: 0; }
+.window-controls:hover svg, .window-controls button:focus-visible svg { opacity: 1; }
+.window-controls button { color: #182019; }
+#app-update-chip {
+  position: absolute;
+  left: 87px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 8px;
+  border: 1px solid #c0f2cf;
+  border-radius: 8px;
+  background: #b6e7c7;
+  color: #183725;
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+#app-update-chip[hidden] { display: none; }
+#app-update-chip:not(:disabled):hover { background: #d1f5dd; }
+#app-update-chip:active:not(:disabled) { transform: translateY(-50%); }
+#app-update-chip svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+body[data-window-style=windows] #app-update-chip, body[data-window-style=studio] #app-update-chip { left: 22px; }
+.update-announcement { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+#window-fullscreen {
+  display: grid;
+  place-items: center;
+  border: 1px solid #a3c4ae30;
+  color: #bddac7;
+  width: 29px;
+  height: 28px;
+  border-radius: 7px;
+  margin-right: 5px;
+}
+#window-fullscreen:hover, #window-fullscreen[aria-pressed=true] { background: #a3e5b822; }
+body[data-window-style=windows] #titlebar, body[data-window-style=studio] #titlebar { padding-right: 0; }
+body[data-window-style=windows] .window-controls, body[data-window-style=studio] .window-controls {
+  order: 3;
+  margin-left: 12px;
+  width: auto;
+  gap: 0;
+  align-self: stretch;
+}
+body[data-window-style=windows] .browser-navigation, body[data-window-style=studio] .browser-navigation { margin-left: 202px; }
+body[data-window-style=windows] .window-controls button, body[data-window-style=studio] .window-controls button {
+  width: 41px;
+  height: 100%;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  color: #dbe9df;
+}
+body[data-window-style=windows] .window-controls svg, body[data-window-style=studio] .window-controls svg {
+  width: 15px;
+  height: 15px;
+  opacity: 1;
+  stroke-width: 1.5;
+}
+body[data-window-style=windows] #window-close, body[data-window-style=studio] #window-close { order: 2; }
+body[data-window-style=windows] .window-controls button:hover { background: #ffffff15; }
+body[data-window-style=windows] #window-close:hover { background: #c42b38; }
+body[data-window-style=studio] .window-controls { align-self: center; gap: 5px; margin-right: 10px; }
+body[data-window-style=studio] .window-controls button { height: 28px; width: 30px; border: 1px solid #9de4b645; border-radius: 8px; color: #b9e8cb; }
+body[data-window-style=studio] .window-controls button:hover { background: #a1dcb529; }
+body[data-window-style=studio] #window-close:hover { color: #ffc3b9; border-color: #ffc3b972; }
+
+@media (max-height: 760px) {
+  .shell-sidebar { padding-top: 11px; }
+  .shell-brand { padding-bottom: 9px; }
+  .shell-sidebar nav button { min-height: 32px; padding: 3px 8px; }
+  .shell-sidebar nav button > span { width: 24px; height: 24px; }
+  .shell-sidebar nav > small { padding-top: 7px; }
+}

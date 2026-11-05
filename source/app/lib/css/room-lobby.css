@@ -1,0 +1,80 @@
+#lc-studio .room-hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(140px, 1fr);
+  min-height: 185px;
+  border-radius: 19px;
+  border: 1px solid #b1eec43d;
+  background: radial-gradient(ellipse at 83% 28%, #42644e, transparent 53%), linear-gradient(140deg, #243c2e, #182b21);
+}
+.room-hero-copy { position: relative; z-index: 1; padding: 18px 22px; }
+.room-brands { display: flex; align-items: center; gap: 7px; color: #d1e5d7; font-size: 11px; font-weight: 650; }
+.room-brands img { width: 23px; height: 23px; border-radius: 6px; }
+.room-brands svg { color: #ff955b; width: 24px; stroke: currentColor; stroke-width: 1.5; }
+#lc-studio .room-hero h2 { margin: 10px 0 7px; font-size: clamp(28px, 3vw, 44px); line-height: 1; letter-spacing: -.055em; color: #eefef3; }
+#lc-studio .room-hero p { color: #b9d2c2; line-height: 1.55; max-width: 370px; }
+#lc-studio .room-hero #lc-room-status, #lc-studio .room-hero #lc-room-code { margin: 8px 0 0; font-size: 10px; }
+#lc-studio .room-hero .lc-actions { margin-top: 9px; }
+#lc-studio #lc-room-lobby button.primary {
+  background: #b6e7c7;
+  color: #143522;
+  border-color: #b6e7c7;
+  font-weight: 700;
+}
+#lc-studio #lc-room-lobby button.primary:hover:not(:disabled) { background: #d1f5dd; }
+.room-hero-art { position: relative; display: grid; place-items: center; min-height: 190px; }
+.room-hero-art > img {
+  position: relative; z-index: 1;
+  width: clamp(73px, 10vw, 140px); aspect-ratio: 1;
+  border-radius: 26%; border: 1px solid #c2f9d781;
+  box-shadow: 0 18px 50px #061a116b, 0 0 45px #acf2c324;
+  transform: rotate(-9deg);
+}
+.room-orbit { position: absolute; width: min(95%, 300px); aspect-ratio: 1; border-radius: 50%; border: 1px solid #b3eed631; transform: rotate(-24deg) scaleY(.64); }
+.orbit-two { transform: rotate(29deg) scaleY(.69); }
+.orbit-three { transform: rotate(78deg) scaleY(.64); }
+.room-hero-art > span { position: absolute; z-index: 2; display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid #d8ffe74f; border-radius: 14px; background: #294d39; color: #dcffe7; box-shadow: 0 9px 20px #0c241a66; }
+.room-hero-art > span svg { width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.room-art-headphones { top: 15%; left: 17%; transform: rotate(-12deg); }
+.room-art-people { bottom: 12%; left: 23%; transform: rotate(10deg); }
+.room-hero-art > .room-art-soundcloud { top: 33%; right: 11%; background: #ff8c4e; color: #39200e; transform: rotate(12deg); }
+.room-directory { margin: 16px 0 13px; }
+.room-directory-header, .room-directory-tools, .room-card-top, .room-card-actions { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.room-directory-header h3 { margin: 0; color: #ebf7ef; font-size: 21px; letter-spacing: -.03em; }
+.room-directory-header p { margin: 4px 0 0; }
+.room-directory-tools { margin-top: 13px; flex-wrap: wrap; }
+.room-directory svg, .room-invitation svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.room-filters, .room-search { display: flex; align-items: center; gap: 5px; }
+.room-search svg { color: #a4c2af; flex-shrink: 0; }
+#lc-studio .room-filters button[aria-pressed=true] { background: #b6e7c7; color: #153622; border-color: #b6e7c7; }
+#lc-room-directory-status { min-height: 1.25em; margin: 8px 0 4px; }
+.room-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(214px, 1fr)); gap: 11px; }
+.room-card { display: flex; flex-direction: column; min-width: 0; padding: 14px; border: 1px solid #a8d7ba23; background: linear-gradient(145deg, #283a30, #1d2a23); border-radius: 14px; }
+.room-card-avatar { width: 37px; height: 37px; position: relative; display: grid; place-items: center; background: #b1dfc525; color: #d4f5e1; border-radius: 10px; font-weight: 750; overflow: hidden; }
+.room-card-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.room-card-top > button { margin-left: auto; }
+.room-badge { color: #c3dbc9; font-size: 9px; font-weight: 700; letter-spacing: .08em; }
+.room-badge.live { color: #abf0c0; }
+.room-badge.live::before { content: ''; display: inline-block; width: 6px; height: 6px; margin-right: 6px; background: #8ae6ad; border-radius: 50%; }
+.room-card h4 { margin: 11px 0 3px; color: #f1faf4; font-size: 15px; overflow-wrap: anywhere; }
+#lc-studio .room-card p { margin: 0 0 7px; line-height: 1.4; overflow-wrap: anywhere; }
+#lc-studio .room-card .room-current { margin-top: auto; color: #e2f4e8; }
+.room-card .room-listeners { color: #a4c9b3; }
+.room-card-menu { margin-top: 8px; }
+.room-card-menu summary, .room-player-options summary { cursor: pointer; color: #c0ddca; font-size: 11px; }
+.room-invitation, .room-player-options { border-radius: 13px; border: 1px solid #a8d7ba24; padding: 12px; margin-bottom: 13px; background: #1b2b22; }
+.room-invitation { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.room-invitation > div { display: flex; align-items: center; gap: 6px; color: #d7f0df; font-size: 11px; }
+#lc-studio .room-invitation input { min-width: 155px; width: auto; flex: 1; }
+#lc-studio .room-player-options .lc-actions { margin: 9px 0; }
+.room-stage-bar { display: flex; align-items: center; gap: 9px; padding-bottom: 8px; }
+#lc-room-stage-status { flex: 1; color: #b6d4c1; font-size: 11px; }
+#lc-room-stage-content { flex: 1; min-height: 0; border: 1px solid #a5d8b52f; border-radius: 12px; overflow: hidden; background: #151f19; }
+#lc-room-stage-content webview { display: flex; width: 100%; height: 100%; }
+.room-stage-open .shell-player { visibility: hidden; }
+body.room-stage-open #lc-studio { height: auto; bottom: 18px; max-height: none; }
+body.room-stage-open #lc-studio .lc-studio-content, body.room-stage-open [data-pane=room], #lc-room-stage:not([hidden]) { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+body.room-stage-open #lc-studio .lc-studio-content { overflow: hidden; padding: 12px; }
+body.room-stage-open #lc-studio .lc-studio-footer { display: none; }
+body.room-stage-open .shell-sidebar { bottom: 0; }

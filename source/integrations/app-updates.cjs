@@ -14,7 +14,9 @@ class AppUpdates {
     this.value = { currentVersion: app.getVersion(), version: '', status: 'idle', percent: 0, error: '', supported: platform === 'win32' && app.isPackaged, legacy: this.legacy };
     if (this.value.supported) { this.startup = setTimeout(() => { void this.check(true); }, 15000); this.startup.unref(); this.timer = setInterval(() => { void this.check(true); }, 6 * 3600000); this.timer.unref(); }
   }
-  state() { return { ...this.value }; }
+  state() {
+    return { ...this.value, available: !!this.manifest && newer(this.manifest.version, this.value.currentVersion) };
+  }
   set(patch) { Object.assign(this.value, patch); this.onState(this.state()); }
   async check(quiet = false) {
     if (this.busy) return this.state(); if (!this.value.supported) { this.set({ status: 'unsupported', error: 'Обновление доступно в собранном приложении Windows.' }); return this.state(); }

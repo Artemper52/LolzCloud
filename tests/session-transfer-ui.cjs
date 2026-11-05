@@ -97,10 +97,11 @@ app.whenReady().then(async () => {
     const data = Buffer.concat([cipher.update(JSON.stringify({ cookies: [{ domain: '.soundcloud.com', name: 'oauth_token', value: 'fixture-encrypted-file-auth', path: '/', secure: true, httpOnly: true, session: true }] })), cipher.final(), cipher.getAuthTag()]);
     selected = path.join(directory, 'SoundCloud.lolzcloud-session'); fs.writeFileSync(selected, JSON.stringify({ format: 'lolzcloud-session-export', version: 1, kdf: 'PBKDF2-SHA256', iterations: 310000, salt: salt.toString('base64'), iv: iv.toString('base64'), data: data.toString('base64') }));
     await js('document.getElementById("sc-login-file").click()'); await until(() => js('document.getElementById("sc-login-unlock").hidden === false'), 'Encrypted exports did not ask for their file password');
-    await js('document.getElementById("sc-login-password").value="fixture-password-123";document.getElementById("sc-login-unlock").requestSubmit()');
+    await js('window.fixtureImportReload=new Promise(resolve=>document.getElementById("webview").addEventListener("did-finish-load",resolve,{once:true}));document.getElementById("sc-login-password").value="fixture-password-123";document.getElementById("sc-login-unlock").requestSubmit()');
     await until(async () => (await session.defaultSession.cookies.get({ url: 'https://soundcloud.com/', name: 'oauth_token' })).some(row => row.value === 'fixture-encrypted-file-auth'), 'The password-protected file did not import');
     assert.equal(await js('document.getElementById("sc-login-password").value'), '');
     const publicState = await js('require("electron").ipcRenderer.invoke("lolzteam:action",{type:"state"})'); assert.ok(!JSON.stringify(publicState).includes('fixture-encrypted-file-auth'));
+    await js('window.fixtureImportReload.then(()=>true)');
     await js('document.getElementById("sc-login-dialog").close();document.getElementById("webview").dispatchEvent(Object.assign(new Event("did-fail-load"),{errorCode:-105,isMainFrame:true}))');
     assert.equal(await js('document.getElementById("sc-connection").hidden'), false); await delay(200); fs.writeFileSync(path.join(root, '.build/soundcloud-recovery-ui.png'), (await host.webContents.capturePage()).toPNG());
     await js('document.getElementById("sc-connection-retry").click()'); await until(() => js('document.getElementById("sc-connection").hidden'), 'Retry did not recover the SoundCloud view');

@@ -58,7 +58,7 @@
     studio.querySelectorAll('[data-pane]').forEach(pane => { pane.hidden = pane.dataset.pane !== tab; });
     if (!studio.open) studio.show();
     document.body.classList.add('shell-studio-open'); window.lolzSelectNavigation?.(tab);
-    const titles = { share: 'Сейчас слушаю', wave: 'Моя волна', library: 'Моя музыка', community: 'Подборки', lyrics: 'Текст песни', audio: 'Звук и эффекты', room: 'Слушать вместе', private: 'Приватность', keys: 'Горячие клавиши', settings: 'Настройки', sources: 'Источники текста' };
+    const titles = { share: 'Сейчас слушаю', wave: 'Моя волна', library: 'Моя музыка', community: 'Подборки', lyrics: 'Текст песни', audio: 'Звук и эффекты', room: 'Комнаты', radar: 'Радар новинок', moments: 'Любимые моменты', versions: 'Другие версии', private: 'Приватность', keys: 'Горячие клавиши', settings: 'Настройки', sources: 'Источники текста' };
     el('studio-title').textContent = titles[tab] || 'LolzCloud'; render();
     if (tab === 'lyrics') void loadLyrics();
   }
@@ -114,7 +114,7 @@
     const changed = await action('wave-settings', { settings: { activity, mood } });
     if (changed && !changed.wave.active) await action('wave-start');
   };
-  for (const [id, key] of [['pref-follow', 'autoFollow'], ['pref-motion', 'reduceMotion'], ['pref-density', 'density'], ['pref-startup', 'startupView']]) el(id).onchange = () => action('preferences', { settings: { [key]: el(id).type === 'checkbox' ? el(id).checked : el(id).value } });
+  for (const [id, key] of [['pref-follow', 'autoFollow'], ['pref-motion', 'reduceMotion'], ['pref-density', 'density'], ['pref-startup', 'startupView'], ['pref-window', 'windowStyle']]) el(id).onchange = () => action('preferences', { settings: { [key]: el(id).type === 'checkbox' ? el(id).checked : el(id).value } });
   for (const [id, key] of [['pref-mini-lyrics', 'lyrics']]) el(id).onchange = () => action('mini-settings', { settings: { [key]: el(id).checked } });
   studio.querySelectorAll('[data-go]').forEach(button => { button.onclick = () => open(button.dataset.go); });
   studio.querySelectorAll('[data-tab]').forEach(button => { button.onclick = () => open(button.dataset.tab); });
@@ -254,7 +254,8 @@
     renderSources();
     lyricView.setAutoFollow(feature.preferences?.autoFollow !== false);
     if (feature.preferences) {
-      for (const [id, key] of [['pref-follow', 'autoFollow'], ['pref-motion', 'reduceMotion'], ['pref-density', 'density'], ['pref-startup', 'startupView']]) if (document.activeElement !== el(id)) { if (el(id).type === 'checkbox') el(id).checked = feature.preferences[key]; else el(id).value = feature.preferences[key]; }
+      document.body.dataset.windowStyle = feature.preferences.windowStyle || 'mac';
+      for (const [id, key] of [['pref-follow', 'autoFollow'], ['pref-motion', 'reduceMotion'], ['pref-density', 'density'], ['pref-startup', 'startupView'], ['pref-window', 'windowStyle']]) if (document.activeElement !== el(id)) { if (el(id).type === 'checkbox') el(id).checked = feature.preferences[key]; else el(id).value = feature.preferences[key]; }
       el('pref-mini-lyrics').checked = feature.mini.lyrics;
     }
     const wave = feature.wave;
@@ -335,13 +336,12 @@
     el('private-status').textContent = snapshot.private ? 'Сейчас музыка скрыта в публичных статусах и не записывается в историю.' : 'Текущий трек виден в включённых трансляциях.';
     el('exclude-current').disabled = !hasTrack;
     el('room-url').value = feature.room.url;
-    el('room-status').textContent = feature.room.error || (feature.room.connecting ? 'Подтверди подключение LolzCloud в открывшемся браузере' : feature.room.active ? 'Комната открыта · гостей: ' + feature.room.viewers : feature.room.authenticated ? 'Ты вошёл как ' + feature.room.user.name + '. Можно создать комнату.' : 'Войди через Lolzteam, чтобы открыть комнату');
+    el('room-status').textContent = feature.room.error || (feature.room.connecting ? 'Подтверди подключение LolzCloud в открывшемся браузере' : feature.room.hosting ? 'Основной плеер ведёт комнату · гостей: ' + feature.room.viewers : feature.room.authenticated ? 'Ты вошёл как ' + feature.room.user.name : 'Войди через Lolzteam, чтобы открыть комнату');
     el('room-code').hidden = !feature.room.connecting; el('room-code').textContent = feature.room.connecting ? 'Код подключения: ' + feature.room.code : '';
     for (const button of studio.querySelectorAll('[data-do="room-login"]')) button.hidden = feature.room.authenticated || feature.room.connecting;
-    for (const button of studio.querySelectorAll('[data-do="room-start"]')) { button.hidden = !feature.room.authenticated; button.disabled = feature.room.active; }
+    for (const button of studio.querySelectorAll('[data-do="room-claim"]')) button.disabled = !feature.room.authenticated || feature.room.hosting;
     for (const button of studio.querySelectorAll('[data-do="room-stop"],[data-do="room-copy"]')) button.disabled = !feature.room.active;
     for (const button of studio.querySelectorAll('[data-do="room-logout"]')) button.hidden = !feature.room.authenticated;
-    el('room-count').textContent = (feature.room.participants || []).length;
     const people = feature.room.participants || [], signature = JSON.stringify(people);
     if (el('room-participants').dataset.signature !== signature) {
       el('room-participants').dataset.signature = signature; el('room-participants').replaceChildren();

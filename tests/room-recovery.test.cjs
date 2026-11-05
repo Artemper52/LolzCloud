@@ -56,3 +56,28 @@ test('cancelling while a deferred room start is checking the session cannot revi
   assert.equal(room.wantStart, false);
   assert.equal(created, 0);
 });
+
+test('a slow room creation is shared and a room closed elsewhere stays closed', async t => {
+  let created = 0, finishCreate, closed = false;
+  const id = 'a'.repeat(32), state = { id, url: 'https://lolzcloud.com/room/' + id + '/' };
+  const room = new ListeningRoom(() => ({}), { fetcher: async (url, options) => {
+    if (url.endsWith('/api/rooms') && options.method === 'POST') {
+      created++;
+      return new Promise(resolve => { finishCreate = () => resolve(Response.json(state)); });
+    }
+    if (closed) return Response.json({ error: 'Комната закрыта' }, { status: 404 });
+    return Response.json(state);
+  } });
+  clearInterval(room.timer); t.after(() => room.dispose());
+  room.token = 't'.repeat(43); room.expires = Date.now() + 60000;
+  const first = room.start(), second = room.start();
+  await room.tick();
+  assert.equal(created, 1);
+  finishCreate();
+  await Promise.all([first, second]);
+  closed = true;
+  await room.tick();
+  await room.tick();
+  assert.equal(room.getState().active, false);
+  assert.equal(created, 1);
+});

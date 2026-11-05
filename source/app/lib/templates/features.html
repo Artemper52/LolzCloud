@@ -2,7 +2,7 @@
 <button id="lc-wave-launcher" type="button" title="Персональные рекомендации">◉ Моя волна</button>
 <dialog id="lc-studio" aria-labelledby="lc-studio-title"><canvas id="lc-studio-gradient" aria-hidden="true"></canvas>
   <header class="lc-studio-header"><div><small>LOLZCLOUD</small><h1 id="lc-studio-title">Твоя музыкальная студия</h1></div><div><button data-do="mini">Мини-плеер ↗</button><button id="lc-studio-close" aria-label="Закрыть Студия LolzCloud">✕</button></div></header>
-  <nav id="lc-tabs" aria-label="Возможности Студия LolzCloud"><button data-tab="share" class="selected">Сейчас слушаю</button><button data-tab="wave">Моя волна</button><button data-tab="library">Моя музыка</button><button data-tab="community">Подборки Lolzteam</button><button data-tab="private">Приватность</button><button data-tab="room">Слушать вместе</button><button data-tab="lyrics">Текст песни</button><button data-tab="audio">Звук</button><button data-tab="keys">Клавиши</button></nav>
+  <nav id="lc-tabs" aria-label="Возможности Студия LolzCloud"><button data-tab="share" class="selected">Сейчас слушаю</button><button data-tab="wave">Моя волна</button><button data-tab="library">Моя музыка</button><button data-tab="community">Подборки Lolzteam</button><button data-tab="private">Приватность</button><button data-tab="room">Комнаты</button><button data-tab="lyrics">Текст песни</button><button data-tab="audio">Звук</button><button data-tab="keys">Клавиши</button></nav>
   <div class="lc-studio-content">
     <section data-pane="share">
       <div id="lc-share-card"><div class="lc-card-brand">SOUNDCLOUD <span>× LOLZTEAM</span></div><div class="lc-card-track"><div class="lc-card-cover"><span>♫</span><img id="lc-card-cover" alt="Обложка трека" hidden></div><div class="lc-card-meta"><small>СЕЙЧАС СЛУШАЮ</small><h2 id="lc-card-title">Включи любимый трек</h2><p id="lc-card-artist">SoundCloud</p><div id="lc-card-time">0:00 / 0:00</div></div></div><div class="lc-card-progress"><span id="lc-card-progress"></span></div><footer><span id="lc-card-owner">Твой профиль</span><span id="lc-card-link">Музыка объединяет</span></footer></div>
@@ -31,7 +31,51 @@
       <h2>Исключения для отдельных треков</h2><p class="lc-hint">Эти треки всегда остаются приватными. Воспроизведение продолжается как обычно.</p><button id="lc-exclude-current">Скрывать текущий трек</button><div id="lc-exclusions" class="lc-list"></div><p id="lc-private-status" class="lc-status"></p>
     </section>
     <section data-pane="room" hidden>
-      <div class="lc-room-heading"><div><small>LOLZCLOUD.COM</small><h2>Одна музыка. Одна компания.</h2><p>Создай комнату и отправь ссылку друзьям. Вход — через Lolzteam, музыка следует за ведущим.</p></div><span class="lc-room-access">Только с аккаунтом Lolzteam</span></div><div class="lc-room-box"><p id="lc-room-status">Войди через Lolzteam, чтобы открыть комнату</p><p id="lc-room-code" hidden></p><input id="lc-room-url" readonly placeholder="Здесь появится ссылка lolzcloud.com/room/…" aria-label="Ссылка на комнату"><div class="lc-actions"><button data-do="room-login" class="primary">Войти через Lolzteam ↗</button><button data-do="room-start" class="primary">Создать комнату</button><button data-do="room-copy">Скопировать приглашение</button><button data-do="room-stop">Закрыть комнату</button><button data-do="room-logout">Выйти</button></div></div><div class="lc-section-heading"><h3>В комнате</h3><span id="lc-room-count">0</span></div><div id="lc-room-participants" class="lc-room-participants"></div><p class="lc-hint">Друзья подключаются на сайте из любой сети. У каждого виден подтверждённый профиль Lolzteam. Приложение ведущего должно оставаться открытым; в приватном режиме музыка не передаётся.</p>
+      <div id="lc-room-lobby">
+        <section class="room-hero" aria-labelledby="lc-room-heading">
+          <div class="room-hero-copy">
+            <div class="room-brands"><img src="lib/assets/logo.svg" alt="LolzCloud"><span>LolzCloud</span><span aria-hidden="true">×</span><svg aria-hidden="true"><use href="#lc-icon-soundcloud"/></svg><span>SoundCloud</span></div>
+            <h2 id="lc-room-heading">Комнаты для своих</h2>
+            <p>Слушайте один трек, собирайте очередь и общайтесь. Друзья могут зайти с любого устройства по приглашению.</p>
+            <div class="lc-actions">
+              <button type="button" id="lc-room-create" class="primary" hidden>Создать комнату</button>
+              <button type="button" data-do="room-login" class="primary">Войти через Lolzteam ↗</button>
+              <button type="button" data-do="room-logout" hidden>Выйти</button>
+            </div>
+            <p id="lc-room-status" role="status"></p><p id="lc-room-code" hidden></p>
+          </div>
+          <div class="room-hero-art" aria-hidden="true"><div class="room-orbit orbit-one"></div><div class="room-orbit orbit-two"></div><div class="room-orbit orbit-three"></div><img src="lib/assets/logo.svg" alt=""><span class="room-art-headphones"><svg><use href="#lc-icon-room"/></svg></span><span class="room-art-soundcloud"><svg><use href="#lc-icon-soundcloud"/></svg></span><span class="room-art-people"><svg><use href="#lc-icon-people"/></svg></span></div>
+        </section>
+        <section class="room-directory" aria-labelledby="lc-room-directory-title">
+          <div class="room-directory-header"><div><h3 id="lc-room-directory-title">Каталог комнат</h3><p>Открытые комнаты пользователей LolzCloud.</p></div><button id="lc-room-refresh" type="button" title="Обновить список" aria-label="Обновить список"><svg aria-hidden="true"><use href="#lc-icon-refresh"/></svg></button></div>
+          <div class="room-directory-tools">
+            <div class="room-filters" aria-label="Какие комнаты показать"><button type="button" data-room-filter="public" aria-pressed="true">Открытые</button><button type="button" data-room-filter="own" aria-pressed="false">Мои</button></div>
+            <label class="room-search"><svg aria-hidden="true"><use href="#lc-icon-search"/></svg><input id="lc-room-search" type="search" placeholder="Поиск по комнатам" aria-label="Поиск по комнатам"></label>
+          </div>
+          <p id="lc-room-directory-status" role="status"></p>
+          <div id="lc-room-cards" class="room-cards"></div>
+        </section>
+        <form id="lc-room-join-form" class="room-invitation">
+          <div><svg aria-hidden="true"><use href="#lc-icon-link"/></svg><label for="lc-room-invitation">Уже есть приглашение?</label></div>
+          <input id="lc-room-invitation" type="url" placeholder="https://lolzcloud.com/room/…" required>
+          <button type="submit">Войти по ссылке</button>
+        </form>
+        <details class="room-player-options"><summary>Вести из основного плеера</summary>
+          <p>Музыка из главного окна будет передаваться в твою комнату.</p>
+          <input id="lc-room-url" readonly placeholder="Ссылка на твою комнату" aria-label="Ссылка на свою комнату">
+          <div class="lc-actions"><button type="button" data-do="room-claim">Вести из основного плеера</button><button type="button" data-do="room-copy">Скопировать приглашение</button><button type="button" data-do="room-stop">Закрыть комнату</button></div>
+          <div id="lc-room-participants" class="lc-room-participants"></div>
+          <div id="xp-room-transport" hidden>
+            <p id="xp-room-controller"></p>
+            <div class="xp-heading"><h3>Очередь комнаты</h3><button id="xp-room-next" type="button">Следующий из очереди</button></div>
+            <div id="xp-room-queue" class="xp-list"></div>
+          </div>
+        </details>
+      </div>
+      <section id="lc-room-stage" hidden aria-label="Прослушивание в комнате">
+        <div class="room-stage-bar"><button id="lc-room-leave" type="button">← Выйти в каталог</button><span id="lc-room-stage-status" role="status"></span><button id="lc-room-reload" type="button" hidden>Повторить</button><button id="lc-room-copy-stage" type="button">Копировать приглашение</button></div>
+        <div id="lc-room-stage-content"></div>
+      </section>
     </section>
     
     <section data-pane="lyrics" hidden>
@@ -83,7 +127,7 @@
       <div class="lc-sound-save"><div><strong>Свой пресет</strong><span>Сохрани темп и все эффекты вместе.</span></div><input id="lc-eq-name" placeholder="Название моего пресета" aria-label="Название моего пресета" maxlength="32"><button id="lc-eq-save">Сохранить пресет</button></div>
     </section>
     <section data-pane="settings" hidden><div class="lc-settings-heading"><h2>Настройки</h2><p>Все основные параметры в одном месте.</p></div>
-<div class="lc-settings-group"><h3>Интерфейс</h3><label class="lc-settings-row"><span><strong>Размер интерфейса</strong><small>Больше пространства или больше информации</small></span><select id="lc-pref-density"><option value="comfortable">Комфортный</option><option value="compact">Компактный</option></select></label><label class="lc-settings-row"><span><strong>Уменьшить анимации</strong><small>Спокойные переходы без движения</small></span><input id="lc-pref-motion" type="checkbox"></label><label class="lc-settings-row"><span><strong>Начальный раздел</strong><small>Открывается при запуске, без автоматического включения музыки</small></span><select id="lc-pref-startup"><option value="browser">Обзор SoundCloud</option><option value="wave">Моя волна</option><option value="library">Моя музыка</option><option value="audio">Звук и эффекты</option></select></label></div>
+<div class="lc-settings-group"><h3>Интерфейс</h3><label class="lc-settings-row"><span><strong>Кнопки окна</strong><small>Windows справа, цветные macOS слева или контурный стиль LolzCloud</small></span><select id="lc-pref-window"><option value="windows">Windows</option><option value="mac">macOS</option><option value="studio">LolzCloud</option></select></label><label class="lc-settings-row"><span><strong>Размер интерфейса</strong><small>Больше пространства или больше информации</small></span><select id="lc-pref-density"><option value="comfortable">Комфортный</option><option value="compact">Компактный</option></select></label><label class="lc-settings-row"><span><strong>Уменьшить анимации</strong><small>Спокойные переходы без движения</small></span><input id="lc-pref-motion" type="checkbox"></label><label class="lc-settings-row"><span><strong>Начальный раздел</strong><small>Открывается при запуске, без автоматического включения музыки</small></span><select id="lc-pref-startup"><option value="browser">SoundCloud</option><option value="room">Комнаты</option><option value="wave">Моя волна</option><option value="library">Моя музыка</option><option value="audio">Звук и эффекты</option></select></label></div>
 <div class="lc-settings-group"><h3>Текст и мини-плеер</h3><label class="lc-settings-row"><span><strong>Автопрокрутка текста</strong><small>Возвращаться к текущей строке после ручного просмотра</small></span><input id="lc-pref-follow" type="checkbox" checked></label><label class="lc-settings-row"><span><strong>Текст в мини-плеере</strong><small>Показывать слова рядом с музыкой</small></span><input id="lc-pref-mini-lyrics" type="checkbox"></label><div class="lc-settings-row"><span><strong>Мини-плеер закреплён поверх окон</strong><small>Перетаскивай за шапку или обложку. Позиция и размер сохраняются.</small></span><span aria-hidden="true">↗</span></div></div>
 <div class="lc-settings-links"><button data-go="sources">Источники текста ↗</button><button data-go="keys">Горячие клавиши ↗</button><button data-go="private">Приватность ↗</button><button data-do="sound-reset">Вернуть исходный звук</button></div></section><section data-pane="keys" hidden><h2>Музыка под рукой</h2><p class="lc-hint">Сочетания работают и в других приложениях. Формат: Control+Alt+Space, Control+Alt+Right или Control+Shift+K. Пустое поле отключает действие.</p><form id="lc-keys-form"><div id="lc-key-fields" class="lc-key-fields"></div><button type="submit" class="primary">Применить сочетания</button></form><p id="lc-key-errors" class="lc-status"></p></section>
   </div><footer class="lc-studio-footer"><span id="lc-studio-message" role="status" aria-live="polite">Студия LolzCloud · слушай в своём ритме</span><span>Твои профили · твоя музыка</span></footer>

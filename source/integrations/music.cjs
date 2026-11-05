@@ -6,7 +6,9 @@ const { clean, clock, normalizePlayback } = require('./lolzteam/status.cjs');
 const { profileLinks } = require('./profiles.cjs');
 const { SOUND_PRESETS, validGains, validateSoundPatch, normalizeSound, presetSound } = require('./sound-settings.cjs');
 const { normalizeProtection, validateProtection } = require('./sound-protection.cjs');
-const DEFAULT_PREFERENCES = Object.freeze({ autoFollow: true, reduceMotion: false, density: 'comfortable', startupView: 'browser' });
+const WINDOW_STYLES = Object.freeze(['mac', 'windows', 'studio']);
+const STARTUP_VIEWS = Object.freeze(['browser', 'wave', 'library', 'audio', 'room']);
+const DEFAULT_PREFERENCES = Object.freeze({ autoFollow: true, reduceMotion: false, density: 'comfortable', startupView: 'browser', windowStyle: 'mac' });
 
 const PRESETS = Object.freeze({
   'Ровный': [0, 0, 0, 0, 0], 'Бас': [6, 3, 0, -1, 0],
@@ -78,7 +80,8 @@ class MusicFeatures {
       if (Number.isFinite(saved.player?.volume)) this.data.player.volume = Math.max(0, Math.min(1, saved.player.volume));
       for (const key of ['autoFollow', 'reduceMotion']) if (typeof saved.preferences?.[key] === 'boolean') this.data.preferences[key] = saved.preferences[key];
       if (['comfortable', 'compact'].includes(saved.preferences?.density)) this.data.preferences.density = saved.preferences.density;
-      if (['browser', 'wave', 'library', 'audio'].includes(saved.preferences?.startupView)) this.data.preferences.startupView = saved.preferences.startupView;
+      if (STARTUP_VIEWS.includes(saved.preferences?.startupView)) this.data.preferences.startupView = saved.preferences.startupView;
+      if (WINDOW_STYLES.includes(saved.preferences?.windowStyle)) this.data.preferences.windowStyle = saved.preferences.windowStyle;
       for (const [action, key] of Object.entries(saved.hotkeys || {})) if (Object.hasOwn(DEFAULT_KEYS, action) && validateKey(key)) this.data.hotkeys[action] = canonicalKey(key);
     } catch { /* First launch. */ }
   }
@@ -170,7 +173,8 @@ class MusicFeatures {
     for (const [key, value] of Object.entries(patch)) {
       if (['autoFollow', 'reduceMotion'].includes(key)) { if (typeof value !== 'boolean') throw new Error('Некорректный переключатель.'); }
       else if (key === 'density') { if (!['comfortable', 'compact'].includes(value)) throw new Error('Неизвестный размер интерфейса.'); }
-      else if (key === 'startupView') { if (!['browser', 'wave', 'library', 'audio'].includes(value)) throw new Error('Неизвестный начальный раздел.'); }
+      else if (key === 'startupView') { if (!STARTUP_VIEWS.includes(value)) throw new Error('Неизвестный начальный раздел.'); }
+      else if (key === 'windowStyle') { if (!WINDOW_STYLES.includes(value)) throw new Error('Неизвестный стиль кнопок окна.'); }
       else throw new Error('Неизвестная настройка интерфейса.');
       next[key] = value;
     }
@@ -198,4 +202,4 @@ class MusicFeatures {
     this.data.collections = next.slice(0, 100); this.dirty = true; this.save(true);
   }
 }
-module.exports = { MusicFeatures, PRESETS, DEFAULT_KEYS, validateKey, scUrl, forumUrl, shareText, parseLrc, lyricIndex, getLyrics };
+module.exports = { WINDOW_STYLES, STARTUP_VIEWS, MusicFeatures, PRESETS, DEFAULT_KEYS, validateKey, scUrl, forumUrl, shareText, parseLrc, lyricIndex, getLyrics };

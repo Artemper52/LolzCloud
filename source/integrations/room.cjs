@@ -44,7 +44,7 @@ class ListeningRoom {
     const raw = await response.text(); if (raw.length > 2_000_000) throw new Error('Слишком большой ответ сервера.');
     let result; try { result = JSON.parse(raw); } catch { throw new Error('Сервер LolzCloud временно недоступен.'); }
     if (!response.ok) {
-      if (response.status === 401 && this.token) { this.token = ''; this.user = null; this.room = null; this.spicyAvailable = false; this.persist(); }
+      if (response.status === 401 && this.token) { this.token = ''; this.user = null; this.room = null; this.lease = ''; this.spicyAvailable = false; this.persist(); }
       const error = new Error(result.error || 'Не удалось подключиться к LolzCloud.'); error.status = response.status; throw error;
     }
     return result;
@@ -63,13 +63,21 @@ class ListeningRoom {
     return this.getState();
   }
   async start() {
+    if (this.starting) return this.starting;
+    this.starting = this.startOnce();
+    try { return await this.starting; }
+    finally { this.starting = null; }
+  }
+  async startOnce() {
+    if (this.room) return this.getState();
     this.wantStart = true;
     if (!this.token || this.expires <= Date.now()) { await this.login(); return this.getState(); }
-    if (this.room) return this.getState();
     const version = this.version, room = await this.request('/api/rooms', { method: 'POST', body: {} });
     if (version !== this.version || this.closed) { await this.request('/api/rooms/' + room.id, { method: 'DELETE' }).catch(() => {}); return this.getState(); }
     if (!/^[a-f0-9]{32}$/.test(room.id || '') || room.url !== this.origin + '/room/' + room.id + '/') throw new Error('Сервер вернул некорректную комнату.');
-    this.room = room; this.error = ''; if (room.protocol === 2) await this.claim(); await this.publish(); return this.getState();
+    this.room = room; this.wantStart = false; this.error = '';
+    if (room.protocol === 2) await this.claim();
+    await this.publish(); return this.getState();
   }
   async claim() { if (!this.room) throw new Error('Сначала создай комнату.'); const result = await this.request('/api/rooms/' + this.room.id + '/control', { method: 'POST', body: { type: 'claim', connection: this.connection, force: true, name: 'Приложение · основной плеер' } }); this.lease = result.lease; this.sequence = 0; this.room = result.room; }
   async release() { const lease = this.lease; this.lease = ''; if (this.room && lease) { const result = await this.request('/api/rooms/' + this.room.id + '/control', { method: 'POST', body: { type: 'release', connection: this.connection, lease } }); this.room = result.room; } }
@@ -112,7 +120,7 @@ class ListeningRoom {
           if (this.wantStart) await this.start();
         }
       } else if (this.room) { await this.publish(); this.error = ''; }
-      else if (this.wantStart && this.token && this.expires > Date.now()) {
+      else if (this.wantStart && !this.starting && this.token && this.expires > Date.now()) {
         // Pairing may have completed before a temporary save/session request
         // failure. Preserve the user's create-room intent and retry it here.
         const version = this.version, session = await this.request('/api/session');
@@ -120,14 +128,14 @@ class ListeningRoom {
         this.spicyAvailable = session.spicyAvailable === true;
         await this.start();
       }
-    } catch (error) { this.error = error.message || 'Нет соединения с комнатой.'; if (error.status === 404) this.room = null; }
+    } catch (error) { this.error = error.message || 'Нет соединения с комнатой.'; if (error.status === 404) { this.room = null; this.lease = ''; } }
     finally { this.busy = false; }
   }
   async stop({ close = true } = {}) {
     clearTimeout(this.eventPublish); this.eventPublish = null;
     if (!close) await this.release().catch(() => {});
     this.version++; this.wantStart = false; this.pair = null;
-    const room = this.room; this.room = null;
+    const room = this.room; this.room = null; this.lease = '';
     if (close && room && this.token) await this.request('/api/rooms/' + room.id, { method: 'DELETE' });
   }
   async logout() { await this.stop().catch(() => {}); if (this.token) await this.request('/api/logout', { method: 'POST', body: {} }).catch(() => {}); this.token = ''; this.user = null; this.expires = 0; this.spicyAvailable = false; this.storagePending = false; this.persist(); }

@@ -23,7 +23,11 @@ const calls = []; let waveActive = false, waveWaiting = false, waveReaction = ''
 const features = () => ({ ...music.getState(), transport: { repeat: repeatIntent.read(service.playback) }, visuals: { url: track.url, bpm: 120, source: 'SoundCloud', beatAt: null }, audio: { attached: 1, unavailable: false, mediaCount: 1, rate: 1, volume: 1 }, downloads: { directory: 'Test downloads', items: [{ id: 'retry-fixture', url: track.url, title: 'Failed download fixture', artist: 'Test artist', status: 'error', percent: 0, error: 'Temporary error', exists: false }] }, room: { active: false, url: '', viewers: 0 }, hotkeyErrors: [], communityResults: [], lyrics, lyricSettings: lyricSettings.state(), wave: { active: waveActive, loading: false, waiting: waveWaiting, canFeedback: waveActive && !waveWaiting, reaction: waveReaction, error: '', queue: [], current: null, likes: 2, learned: 3, adventurous: .35 } });
 const state = () => ({ ...service.getState(), features: features(), discord: { connected: false, activity: null, error: '' } });
 ipcMain.handle('lolzteam:action', () => ({ ok: true, state: state() }));
-ipcMain.handle('updates:action', () => ({ ok: true, state: { currentVersion: '0.9.0', supported: false, status: 'unsupported' } }));
+let updateAction = '';
+ipcMain.handle('updates:action', (_event, action) => {
+  updateAction = action.type;
+  return { ok: true, state: { currentVersion: '0.9.0', supported: true, status: action.type === 'install' ? 'downloading' : 'current', percent: 38 } };
+});
 ipcMain.handle('features:action', async (event, action) => {
   calls.push(action);
   if (settingsDelay && action.type === 'preferences') await delay(settingsDelay);
@@ -56,6 +60,21 @@ app.whenReady().then(async () => {
     host.webContents.on('will-attach-webview', (_event, preferences) => { preferences.preload = path.join(root, 'source/guest-preload.cjs'); preferences.nodeIntegration = false; preferences.contextIsolation = true; preferences.sandbox = true; });
     await host.loadFile(path.join(root, 'source/app/index.html')); await delay(800);
     await host.webContents.insertCSS('*{animation:none!important;transition:none!important}');
+    const updateState = { currentVersion: '0.9.0', supported: true, available: true, status: 'available', version: '0.9.5' };
+    host.webContents.send('updates:state', updateState);
+    const updateChip = await host.webContents.executeJavaScript(`(() => {
+      const button = document.getElementById('app-update-chip'), box = button.getBoundingClientRect();
+      return { visible: !button.hidden, label: button.textContent, left: box.left, right: box.right, top: box.top };
+    })()`);
+    assert.equal(updateChip.label, 'Есть обновление');
+    assert.ok(updateChip.visible && updateChip.left > 75 && updateChip.right < 224 && updateChip.top < 32);
+    await delay(150);
+    fs.writeFileSync(path.join(root, '.build/update-notice-095.png'), (await host.webContents.capturePage()).toPNG());
+    await host.webContents.executeJavaScript('document.getElementById("app-update-chip").click()');
+    await delay(80);
+    assert.equal(updateAction, 'install');
+    assert.equal(await host.webContents.executeJavaScript('document.getElementById("app-update-chip").textContent'), 'Загрузка 38%');
+    host.webContents.send('updates:state', { ...updateState, available: false, status: 'current' });
     const image = nativeImage.createFromBitmap(Buffer.from([80, 200, 130, 255]), { width: 1, height: 1 });
     await copyCard(image, { clipboard, ClipboardItem });
     const copied = await clipboard.read(); assert.ok(copied.some(item => item.types.includes('image/png')), 'Card PNG must reach the Windows clipboard.');
@@ -65,7 +84,8 @@ app.whenReady().then(async () => {
     const loaded = await host.webContents.executeJavaScript('({studio:typeof window.LolzCloudStudio?.open,account:typeof window.lolzShowAccount,oldThemes:!!document.querySelector("#themes, #customcss, #customjs"),players:document.querySelectorAll(".shell-player").length})');
     assert.deepEqual(loaded, { studio: 'function', account: 'function', oldThemes: false, players: 1 });
     assert.deepEqual(lastUpcoming, ['https://soundcloud.com/test/next', 'https://soundcloud.com/test/after']);
-    assert.equal(await host.webContents.executeJavaScript('document.querySelector("#player-lyrics svg,[data-view=lyrics] svg")'), null);
+    assert.equal(await host.webContents.executeJavaScript('document.querySelector("#player-lyrics svg")'), null);
+    assert.equal(await host.webContents.executeJavaScript('document.querySelector("[data-view=lyrics] use").getAttribute("href")'), '#lc-icon-lyrics');
     const palette = await host.webContents.executeJavaScript('window.LolzCloudVisuals.palette'); assert.ok(palette[0][0] > palette[0][2] * 1.5, 'The real cover pixels must colour the background.');
     const coverRace = await host.webContents.executeJavaScript(`(async()=>{const visual=new window.LolzCloudVisuals.constructor(),playback={url:'https://soundcloud.com/test/palette',title:'Palette fixture',artist:'Test',position:0,playing:false,rate:1};visual.update({playback:{...playback,cover:'https://example.test/slow-blue.png'}});visual.update({playback:{...playback,cover:'https://example.test/fast-red.png'}});await new Promise(r=>setTimeout(r,420));const latest=visual.palette[0][0]>visual.palette[0][2]*1.5;visual.update({playback:{...playback,cover:'https://example.test/slow-blue.png'}});await new Promise(r=>setTimeout(r,20));return{latest,cached:visual.palette[0][2]>visual.palette[0][0]*1.5}})()`);
     assert.deepEqual(coverRace, { latest: true, cached: true });
