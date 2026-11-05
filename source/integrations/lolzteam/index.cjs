@@ -14,6 +14,7 @@ const { readSessionProfile } = require('../sc-profile.cjs');
 const { soundcloudProfile } = require('../profiles.cjs');
 const { SoundCloudSession } = require('../soundcloud-session.cjs');
 const { BrowserSessionTransfer, MAX_BYTES } = require('../browser-session.cjs');
+const { createBrowserIdentity } = require('../browser-session-identity.cjs');
 
 function registerLolzteam(app, getWindow) {
   const service = new LolzteamService({
@@ -35,7 +36,7 @@ function registerLolzteam(app, getWindow) {
     const window = getWindow(); if (window && !window.isDestroyed()) { window.webContents.send('soundcloud:session-imported'); window.show(); window.focus(); }
     void readSessionProfile(session.defaultSession).then(profile => { if (revision !== sessionRevision) return; if (profile) service.setProfile(profile, { replaceManual: true }); loginImport = { ...result, verified: !!profile, verification: profile ? 'confirmed' : 'unconfirmed' }; notifyState(); }).catch(() => { if (revision === sessionRevision) { loginImport = { ...result, verified: false, verification: 'offline' }; notifyState(); } });
   }
-  const browserSession = new BrowserSessionTransfer({ target: session.defaultSession, onChange: notifyState, onImported: finishSessionImport });
+  const browserSession = new BrowserSessionTransfer({ target: session.defaultSession, identity: createBrowserIdentity({ filename: path.join(app.getPath('userData'), 'browser-pairing.json'), safeStorage }), onChange: notifyState, onImported: finishSessionImport });
   const getState = () => ({ ...studio.snapshot(service.getState()), soundcloudSession: soundcloudSession.state(), browserSession: browserSession.state(), discord: discord.getState(), features: studio.getState(), loginImport, importing });
   function notifyState() { const window = getWindow(); if (window && !window.isDestroyed()) window.webContents.send('lolzcloud:state', getState()); }
   const expected = pathToFileURL(path.resolve(__dirname, '../../app/index.html')).href;

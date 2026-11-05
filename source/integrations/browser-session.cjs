@@ -2,6 +2,7 @@
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http'), crypto = require('node:crypto');
 const { promisify } = require('node:util');
 const { transferable, cookieDetails } = require('./session-import.cjs');
+const { createBrowserIdentity, signTransfer } = require('./browser-session-identity.cjs');
 const MAX_BYTES = 256 * 1024, FORMAT = 'lolzcloud-session', EXPORT_FORMAT = 'lolzcloud-session-export';
 const assets = path.join(__dirname, '../app/session-transfer');
 function normalizeCookies(input, now = Date.now()) {
@@ -91,9 +92,9 @@ function bookmarklet(context, file = false) {
 }
 function escapeHtml(text) { return String(text).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]); }
 class BrowserSessionTransfer {
-  constructor({ target, onImported = async () => {}, onChange = () => {}, now = Date.now, lifetime = 5 * 60000 }) {
-    Object.assign(this, { target, onImported, onChange, now, lifetime }); this.context = null;
-    this.value = { active: false, busy: false, imported: false, expiresAt: 0, count: 0, source: '', error: '' };
+  constructor({ target, onImported = async () => {}, onChange = () => {}, now = Date.now, lifetime = 5 * 60000, identity = createBrowserIdentity() }) {
+    Object.assign(this, { target, onImported, onChange, now, lifetime, identity }); this.context = null;
+    this.value = { active: false, busy: false, imported: false, expiresAt: 0, count: 0, source: '', error: '', pairingCode: identity.pairingCode, persistentPairing: identity.persistent };
   }
   state() { return { ...this.value }; }
   set(patch) { Object.assign(this.value, patch); this.onChange(); }
@@ -108,7 +109,9 @@ class BrowserSessionTransfer {
     await new Promise((resolve, reject) => { server.once('error', reject); server.listen(0, '127.0.0.1', resolve); });
     context.origin = 'http://127.0.0.1:' + server.address().port;
     context.base = '/transfer/' + context.id + '/'; context.url = context.origin + context.base;
-    this.set({ active: true, busy: false, imported: false, expiresAt: this.now() + this.lifetime, count: 0, source: '', error: '' });
+    const expiresAt = this.now() + this.lifetime;
+    context.request = signTransfer(this.identity, context, expiresAt);
+    this.set({ active: true, busy: false, imported: false, expiresAt, count: 0, source: '', error: '' });
     context.timer = setTimeout(() => { if (this.context === context) this.stop(); }, this.lifetime); context.timer.unref?.(); server.unref();
     return context.url;
   }
@@ -149,11 +152,11 @@ class BrowserSessionTransfer {
     if (request.headers.origin && request.headers.origin !== context.origin) return send(403, { ok: false });
     if (request.method === 'GET' && request.url === context.base + 'status') return send(200, this.state());
     if (!this.value.active || this.now() >= this.value.expiresAt) return send(410, { ok: false, error: this.value.imported ? 'Сессия уже перенесена. Вернись в LolzCloud.' : 'Время переноса истекло. Открой его заново в LolzCloud.' });
-    if (request.method === 'GET' && request.url === context.base + 'helper.zip') { response.writeHead(200, { ...headers, 'Content-Type': 'application/zip', 'Content-Disposition': 'attachment; filename="LolzCloud-browser-helper.zip"' }); return response.end(fs.readFileSync(path.join(assets, 'helper.zip'))); }
+    if (request.method === 'GET' && [context.base + 'helper.zip', context.base + 'helper-firefox.zip'].includes(request.url)) { const firefox = request.url.endsWith('helper-firefox.zip'); response.writeHead(200, { ...headers, 'Content-Type': 'application/zip', 'Content-Disposition': 'attachment; filename="LolzCloud-browser-helper' + (firefox ? '-firefox' : '') + '.zip"' }); return response.end(fs.readFileSync(path.join(assets, firefox ? 'helper-firefox.zip' : 'helper.zip'))); }
     if (request.method === 'GET' && [context.base, context.base + 'receive'].includes(request.url)) {
       const receiver = request.url.endsWith('/receive'), nonce = crypto.randomBytes(16).toString('base64');
       let html = fs.readFileSync(path.join(assets, receiver ? 'receive.html' : 'index.html'), 'utf8');
-      html = html.replaceAll('{{NONCE}}', nonce).replace('{{STYLE}}', fs.readFileSync(path.join(assets, 'style.css'), 'utf8')).replace('{{BOOKMARK}}', escapeHtml(bookmarklet(context))).replace('{{FILE_BOOKMARK}}', escapeHtml(bookmarklet(context, true)));
+      html = html.replaceAll('{{NONCE}}', nonce).replace('{{STYLE}}', fs.readFileSync(path.join(assets, 'style.css'), 'utf8')).replace('{{REQUEST}}', escapeHtml(JSON.stringify(context.request))).replace('{{PAIRING_CODE}}', escapeHtml(this.identity.pairingCode)).replace('{{BOOKMARK}}', escapeHtml(bookmarklet(context))).replace('{{FILE_BOOKMARK}}', escapeHtml(bookmarklet(context, true)));
       response.writeHead(200, { ...headers, 'Content-Type': 'text/html; charset=utf-8', 'Content-Security-Policy': "default-src 'none'; style-src 'nonce-" + nonce + "'; script-src 'nonce-" + nonce + "'; connect-src 'self'; img-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'none'" }); return response.end(html);
     }
     if (request.method !== 'POST' || request.url !== context.base + 'import' || request.headers.origin !== context.origin || request.headers['content-type'] !== 'application/json') return send(403, { ok: false });

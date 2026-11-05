@@ -43,11 +43,11 @@ test('the actual browser bookmark encrypts its session, imports once and rejects
 });
 test('the browser helper exports HttpOnly login with a password and the app decrypts it without plaintext files', async () => {
   const controls = { password: { value: 'fixture-password-123' }, export: { disabled: false }, status: { textContent: '' } }; let handler, blob;
-  const document = { querySelector: () => ({ addEventListener: (_type, value) => { handler = value; } }), getElementById: id => controls[id], createElement: () => ({ click() {}, remove() {} }), body: { appendChild() {} } };
-  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../source/app/session-transfer/helper/popup.js'), 'utf8'), { document, browser: { cookies: { getAll: async () => [cookie('new-fixture'), { ...cookie('other-secret'), domain: '.example.org' }] } }, crypto: crypto.webcrypto, TextEncoder, Uint8Array, Date, Set, JSON, btoa, Blob, URL: { createObjectURL: value => { blob = value; return 'blob:test'; }, revokeObjectURL() {} }, setTimeout: () => {} });
+  const document = { querySelector: () => ({ addEventListener: (_type, value) => { handler = value; } }), getElementById: id => controls[id] ||= {}, createElement: () => ({ click() {}, remove() {} }), body: { appendChild() {} } };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../source/app/session-transfer/helper/popup.js'), 'utf8'), { document, browser: { runtime: { sendMessage: async () => ({ ok: false, error: 'No active fixture transfer' }) }, cookies: { getAll: async () => [cookie('new-fixture'), { ...cookie('other-secret'), domain: '.example.org' }] } }, crypto: crypto.webcrypto, TextEncoder, Uint8Array, Date, Set, JSON, btoa, Blob, URL: { createObjectURL: value => { blob = value; return 'blob:test'; }, revokeObjectURL() {} }, setTimeout: () => {} });
   await handler({ preventDefault() {} }); assert.ok(blob); const text = await blob.text(); assert.ok(!text.includes('new-fixture')); assert.ok(!text.includes('other-secret')); assert.equal(controls.password.value, '');
   assert.equal((await readExport(text, 'fixture-password-123'))[0].value, 'new-fixture');
   await assert.rejects(readExport(text), error => error.code === 'SESSION_PASSWORD_REQUIRED'); await assert.rejects(readExport(text, 'wrong-password'), /Пароль/);
   const manifest = JSON.parse(fs.readFileSync(path.join(__dirname, '../source/app/session-transfer/helper/manifest.json')));
-  assert.deepEqual(manifest.permissions, ['cookies']); assert.ok(manifest.host_permissions.every(value => /^https:\/\/(?:\*\.)?soundcloud\.com\//.test(value)));
+  assert.deepEqual(manifest.permissions, ['cookies', 'storage', 'activeTab']); assert.ok(manifest.host_permissions.every(value => /^https:\/\/(?:\*\.)?soundcloud\.com\//.test(value) || value === 'http://127.0.0.1/*'));
 });

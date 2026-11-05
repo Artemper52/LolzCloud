@@ -1,4 +1,26 @@
 'use strict';
+const extension = typeof browser === 'undefined' ? chrome : browser;
+const message = value => typeof browser !== 'undefined' ? extension.runtime.sendMessage(value) : new Promise((resolve, reject) => extension.runtime.sendMessage(value, result => { if (chrome.runtime.lastError) reject(Error('Помощник не отвечает.')); else resolve(result); }));
+let pairingFingerprint = '';
+async function loadPairing() {
+  try {
+    const info = await message({ type: 'pair-info' }); if (!info?.ok) throw Error(info?.error || 'Не найдена страница переноса.');
+    pairingFingerprint = info.fingerprint;
+    document.getElementById('pair-code').textContent = info.code;
+    document.getElementById('pairing').hidden = info.paired;
+    document.getElementById('pair-status').textContent = info.paired ? 'Этот LolzCloud уже подключён. Вход передаётся при открытии страницы переноса из приложения.' : 'Разреши передачу в эту установку LolzCloud один раз.';
+  } catch (error) { document.getElementById('pair-status').textContent = error.message; }
+}
+document.getElementById('pair').onclick = async () => {
+  const button = document.getElementById('pair'); button.disabled = true;
+  try {
+    const result = await message({ type: 'pair', fingerprint: pairingFingerprint }); if (!result?.ok) throw Error(result?.error || 'Не удалось подключить приложение.');
+    document.getElementById('pairing').hidden = true; document.getElementById('pair-status').textContent = 'Готово. Передаём вход. Дальше нажимай «Войти через браузер» в LolzCloud — помощник подхватит сессию сам.';
+  } catch (error) { document.getElementById('pair-status').textContent = error.message; }
+  finally { button.disabled = false; }
+};
+document.getElementById('forget').onclick = async () => { const result = await message({ type: 'forget' }).catch(() => null); document.getElementById('pair-status').textContent = result?.ok ? 'Автоматический вход отключён. Для нового подключения снова сверь код с приложением.' : 'Не удалось отключить вход. Открой помощник снова.'; document.getElementById('pairing').hidden = true; };
+void loadPairing();
 document.querySelector('form').addEventListener('submit', async event => {
   event.preventDefault(); const button = document.getElementById('export'), status = document.getElementById('status'), input = document.getElementById('password');
   if (button.disabled || input.value.length < 10) return;

@@ -1,7 +1,7 @@
 {
   "name": "lolzcloud",
   "productName": "LolzCloud",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "SoundCloud player with Lolzteam music status, Discord presence and a local music studio",
   "main": "source/main.js",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "test:ui": "node tools/prepare.cjs && node tools/test-ui.cjs",
     "check": "node tools/check.cjs",
     "build": "node tools/build.cjs",
-    "source:zip": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/source-archive.ps1",
+    "source:zip": "node tools/source-archive.cjs",
     "shortcut": "powershell -NoProfile -ExecutionPolicy Bypass -File tools/desktop-shortcut.ps1",
     "diagnose": "node tools/diagnose.cjs",
     "test:persistence": "node tools/test-persistence.cjs",

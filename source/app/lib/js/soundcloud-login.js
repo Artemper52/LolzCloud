@@ -30,8 +30,8 @@
   function render() {
     const transfer = state?.browserSession || {}, busy = pending || transfer.busy;
     dialog.querySelectorAll('button:not(#sc-login-close)').forEach(button => { button.disabled = busy; });
-    el('cancel').hidden = !transfer.active; el('status').classList.toggle('is-error', !!error);
-    el('status').textContent = error || hint || (transfer.imported ? state?.loginImport?.verified ? 'Готово. Аккаунт SoundCloud подключён.' : state?.loginImport?.verification === 'unconfirmed' ? 'Сессия перенесена, но SoundCloud не подтвердил вход. Проверь аккаунт в браузере или повтори перенос после подключения.' : 'Сессия сохранена. SoundCloud проверит вход, когда подключение будет доступно.' : transfer.active ? 'Ждём твой браузер. Передача открыта на 5 минут.' : '');
+    el('cancel').hidden = !transfer.active; el('pairing').hidden = !transfer.active; el('pairing-code').textContent = transfer.pairingCode || ''; el('status').classList.toggle('is-error', !!error);
+    el('status').textContent = error || hint || (transfer.imported ? state?.loginImport?.verified ? 'Готово. Аккаунт SoundCloud подключён.' : state?.loginImport?.verification === 'unconfirmed' ? 'Сессия перенесена, но SoundCloud не подтвердил вход. Проверь аккаунт в браузере или повтори перенос после подключения.' : 'Сессия сохранена. SoundCloud проверит вход, когда подключение будет доступно.' : transfer.active ? 'Ждём браузер. Подключённый помощник перенесёт вход автоматически. Передача открыта на 5 минут.' : '');
     const banner = document.getElementById('sc-signin-banner');
     banner.hidden = !!state?.soundcloudSession?.saved || transfer.imported || sessionStorage.getItem('lc:signin-dismissed') === '1' || !connection.hidden;
   }
