@@ -14,8 +14,8 @@ async function main() {
     const filename = path.join(releaseRoot, 'LolzCloud-' + version + (legacy ? '-win7-legacy-x64.zip' : '-win-x64.zip')); if (fs.existsSync(filename)) throw new Error('Portable archive already exists; choose a clean release output.'); await require('./windows-artifacts.cjs').archive(appDirectory, filename);
   }
   const helper = path.join(root, 'source/app/session-transfer');
-  fs.copyFileSync(path.join(helper, 'helper.zip'), path.join(releaseRoot, 'LolzCloud-browser-helper-1.1.0-chromium.zip'));
-  fs.copyFileSync(path.join(helper, 'helper-firefox.zip'), path.join(releaseRoot, 'LolzCloud-browser-helper-1.1.0-firefox.zip'));
+  fs.copyFileSync(path.join(helper, 'helper.zip'), path.join(releaseRoot, 'LolzCloud-browser-helper-1.2.0-chromium.zip'));
+  fs.copyFileSync(path.join(helper, 'helper-firefox.zip'), path.join(releaseRoot, 'LolzCloud-browser-helper-1.2.0-firefox.zip'));
   await node('update-manifests.cjs', [releaseRoot]); console.log('Windows release is ready: ' + releaseRoot);
 }
 main().catch(error => { console.error(error.stack || error.message); process.exitCode = 1; });

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "LolzCloud В· РїРµСЂРµРЅРѕСЃ SoundCloud",
-  "version": "1.1.0",
-  "description": "РџРµСЂРµРґР°С‘С‚ РІС…РѕРґ SoundCloud РІ РІР°С€ LolzCloud Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРё РїРѕСЃР»Рµ РїРµСЂРІРѕРіРѕ СЂР°Р·СЂРµС€РµРЅРёСЏ.",
+  "version": "1.2.0",
+  "description": "Показывает ваш аккаунт SoundCloud для выбора и входа в LolzCloud без файла и повторного пароля.",
   "permissions": [
     "cookies",
     "storage",

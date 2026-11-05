@@ -15,18 +15,19 @@ function authCookie(cookie, now = Date.now()) {
 class SoundCloudSession {
   constructor({ session, safeStorage, filename, now = Date.now, onRestored = () => {}, onCleared = () => {} }) {
     Object.assign(this, { session, safeStorage, filename, now, onRestored, onCleared });
-    this.closed = false; this.restoring = false; this.pendingRestore = false; this.busy = null; this.changedAt = 0; this.signature = '';
+    this.closed = false; this.restoring = false; this.pendingRestore = false; this.busy = null; this.changedAt = 0; this.signature = ''; this.hasLogin = false; this.explicitlyCleared = false; this.source = '';
     this.status = { saved: false, restored: false, recovering: false, error: '' };
     this.changed = (_event, cookie, cause, removed) => {
       if (this.restoring || !authCookie({ ...cookie, value: 'scope-check', session: true }, this.now())) return;
       if (cookie.name === 'oauth_token' && (removed && ['explicit', 'expired', 'expired-overwrite'].includes(cause) || !removed && !authCookie(cookie, this.now()))) {
-        this.changedAt++; this.signature = ''; this.pendingRestore = false; this.status = { saved: false, restored: false, recovering: false, error: '' };
+        this.changedAt++; this.signature = ''; this.pendingRestore = false; this.hasLogin = false; this.explicitlyCleared = true; this.status = { saved: false, restored: false, recovering: false, error: '' };
         try { writeJson(this.filename, { version: 1, cleared: true, expires: 0, encryptedCookies: '' }); } catch { this.status.error = 'Не удалось сохранить выход из SoundCloud.'; }
         this.onCleared();
       } else this.schedule();
     };
   }
-  state() { return { ...this.status }; }
+  state() { return { ...this.status, hasLogin: this.hasLogin, explicitlyCleared: this.explicitlyCleared, source: this.source }; }
+  canRecoverLegacy() { return !this.hasLogin && !this.pendingRestore && !this.explicitlyCleared; }
   async start() {
     this.session.cookies.on('changed', this.changed);
     await this.restore();
@@ -38,10 +39,11 @@ class SoundCloudSession {
     this.restoring = true;
     try {
       const existing = (await this.session.cookies.get({ domain: 'soundcloud.com' })).filter(cookie => authCookie(cookie, this.now()));
-      if (existing.some(cookie => cookie.name === 'oauth_token')) { this.pendingRestore = false; this.status.recovering = false; this.status.error = ''; return; }
+      if (existing.some(cookie => cookie.name === 'oauth_token')) { this.hasLogin = true; this.source = 'existing'; this.pendingRestore = false; this.status.recovering = false; this.status.error = ''; return; }
       if (!fs.existsSync(this.filename)) { this.pendingRestore = false; this.status.recovering = false; this.status.error = ''; return; }
       const saved = JSON.parse(fs.readFileSync(this.filename, 'utf8'));
       if (saved.version !== 1) throw new Error();
+      this.explicitlyCleared = saved.cleared === true;
       if (saved.cleared || saved.expires <= this.now() || !saved.encryptedCookies) { this.pendingRestore = false; this.status = { saved: false, restored: false, recovering: false, error: '' }; return; }
       if (!storageAvailable(this.safeStorage)) throw new Error();
       const cookies = JSON.parse(this.safeStorage.decryptString(Buffer.from(saved.encryptedCookies, 'base64')));
@@ -51,6 +53,7 @@ class SoundCloudSession {
       await this.session.cookies.flushStore();
       this.session.flushStorageData();
       this.pendingRestore = false; this.status = { saved: true, restored: true, recovering: false, error: '' };
+      this.hasLogin = true; this.source = 'saved';
       this.onRestored();
     } catch {
       this.pendingRestore = true; this.status.recovering = true;
@@ -59,7 +62,7 @@ class SoundCloudSession {
   }
   schedule() { clearTimeout(this.debounce); this.debounce = setTimeout(() => { void this.flush(); }, 500); this.debounce.unref?.(); }
   async acceptImported() {
-    await this.busy; this.changedAt++; this.pendingRestore = false; this.signature = '';
+    await this.busy; this.changedAt++; this.pendingRestore = false; this.signature = ''; this.explicitlyCleared = false;
     this.status = { saved: false, restored: false, recovering: false, error: '' };
     await this.flush();
   }
@@ -73,6 +76,7 @@ class SoundCloudSession {
     const revision = this.changedAt;
     const rows = (await this.session.cookies.get({ domain: 'soundcloud.com' })).filter(cookie => authCookie(cookie, this.now()));
     if (revision !== this.changedAt) return;
+    this.hasLogin = rows.some(cookie => cookie.name === 'oauth_token');
     if (rows.some(cookie => cookie.name === 'oauth_token')) {
       const payload = JSON.stringify(rows), signature = createHash('sha256').update(payload).digest('hex');
       if (signature !== this.signature) {

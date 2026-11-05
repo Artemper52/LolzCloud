@@ -210,8 +210,8 @@
     } catch { localError = 'Не удалось получить настройки Lolzteam.'; }
     finally { polling = false; render(); }
   }
-  lztWebview.addEventListener('did-start-loading', () => {
-    lztIpc.send('lolzteam:playback', {});
+  lztWebview.addEventListener('did-start-navigation', event => {
+    if (event.isMainFrame && !event.isInPlace) lztIpc.send('lolzteam:playback', {});
   });
   lztWebview.addEventListener('dom-ready', () => {
     void applyTheme();

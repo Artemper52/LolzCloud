@@ -10,11 +10,13 @@ const { LolzteamService } = require('./service.cjs');
 const { DiscordPresence } = require('../discord.cjs');
 const { importFromInstalled } = require('../session-import.cjs');
 const { createStudio } = require('../studio.cjs');
-const { readSessionProfile } = require('../sc-profile.cjs');
+const { readSessionProfile, previewSessionProfile } = require('../sc-profile.cjs');
 const { soundcloudProfile } = require('../profiles.cjs');
 const { SoundCloudSession } = require('../soundcloud-session.cjs');
 const { BrowserSessionTransfer, MAX_BYTES } = require('../browser-session.cjs');
 const { createBrowserIdentity } = require('../browser-session-identity.cjs');
+const { BrowserProfiles } = require('../browser-profiles.cjs');
+const { recoverPreviousSession } = require('../session-recovery.cjs');
 
 function registerLolzteam(app, getWindow) {
   const service = new LolzteamService({
@@ -25,19 +27,20 @@ function registerLolzteam(app, getWindow) {
   const studio = createStudio({ app, service, getWindow, trusted, onStateChange: notifyState });
   let sessionRevision = 0;
   const soundcloudSession = new SoundCloudSession({ session: session.defaultSession, safeStorage, filename: path.join(app.getPath('userData'), 'soundcloud-session.json'), onRestored: () => { const window = getWindow(); if (window && !window.isDestroyed()) window.webContents.send('soundcloud:session-imported'); }, onCleared: () => { sessionRevision++; service.setProfile(null); notifyState(); } });
-  const ready = soundcloudSession.start();
+  const ready = recoverPreviousSession({ app, target: session.defaultSession, saved: soundcloudSession });
   let loginImport = null;
   let importing = false;
   let pendingSessionFile = '';
   async function finishSessionImport(result) {
     const revision = ++sessionRevision;
     await soundcloudSession.acceptImported(); loginImport = { ...result, verified: false };
-    service.setProfile(null, { replaceManual: true });
+    service.setProfile(result.profile || null, { replaceManual: true });
     const window = getWindow(); if (window && !window.isDestroyed()) { window.webContents.send('soundcloud:session-imported'); window.show(); window.focus(); }
     void readSessionProfile(session.defaultSession).then(profile => { if (revision !== sessionRevision) return; if (profile) service.setProfile(profile, { replaceManual: true }); loginImport = { ...result, verified: !!profile, verification: profile ? 'confirmed' : 'unconfirmed' }; notifyState(); }).catch(() => { if (revision === sessionRevision) { loginImport = { ...result, verified: false, verification: 'offline' }; notifyState(); } });
   }
-  const browserSession = new BrowserSessionTransfer({ target: session.defaultSession, identity: createBrowserIdentity({ filename: path.join(app.getPath('userData'), 'browser-pairing.json'), safeStorage }), onChange: notifyState, onImported: finishSessionImport });
-  const getState = () => ({ ...studio.snapshot(service.getState()), soundcloudSession: soundcloudSession.state(), browserSession: browserSession.state(), discord: discord.getState(), features: studio.getState(), loginImport, importing });
+  const browserProfiles = new BrowserProfiles(); let profileList = [], firstSignIn = false;
+  const browserSession = new BrowserSessionTransfer({ target: session.defaultSession, identity: createBrowserIdentity({ filename: path.join(app.getPath('userData'), 'browser-pairing.json'), safeStorage }), onChange: notifyState, onImported: finishSessionImport, onPreview: cookies => previewSessionProfile(session.defaultSession, cookies) });
+  const getState = () => ({ ...studio.snapshot(service.getState()), soundcloudSession: soundcloudSession.state(), browserSession: browserSession.state(), browserProfiles: profileList, firstSignIn, discord: discord.getState(), features: studio.getState(), loginImport, importing });
   function notifyState() { const window = getWindow(); if (window && !window.isDestroyed()) window.webContents.send('lolzcloud:state', getState()); }
   const expected = pathToFileURL(path.resolve(__dirname, '../../app/index.html')).href;
   function trusted(event) {
@@ -46,13 +49,21 @@ function registerLolzteam(app, getWindow) {
     if (event.senderFrame !== event.sender.mainFrame) return false;
     return event.senderFrame.url.split(/[?#]/)[0] === expected;
   }
-  ready.then(async () => { const revision = sessionRevision, profile = await readSessionProfile(session.defaultSession); if (profile && revision === sessionRevision) service.setProfile(profile); }).catch(() => {});
+  ready.then(async () => {
+    const marker = path.join(app.getPath('userData'), 'soundcloud-onboarding.json');
+    firstSignIn = !fs.existsSync(marker) && !soundcloudSession.state().hasLogin && !soundcloudSession.state().recovering && !soundcloudSession.state().explicitlyCleared;
+    fs.mkdirSync(path.dirname(marker), { recursive: true }); fs.writeFileSync(marker, '{"version":1}'); notifyState();
+    const revision = sessionRevision, profile = await readSessionProfile(session.defaultSession); if (profile && revision === sessionRevision) service.setProfile(profile);
+  }).catch(() => {});
   ipcMain.handle('soundcloud:action', async (event, action) => {
     if (!trusted(event)) return { ok: false, error: 'Запрос из недоверенного окна отклонён.' };
     try {
       await ready;
-      if (action?.type === 'start') await shell.openExternal(await browserSession.start());
-      else if (action?.type === 'copy-link') clipboard.writeText(await browserSession.start());
+      if (action?.type === 'start') { firstSignIn = false; profileList = browserProfiles.list(); await shell.openExternal(await browserSession.start({ choose: true })); }
+      else if (action?.type === 'browser-list') profileList = browserProfiles.list(true);
+      else if (action?.type === 'start-browser') { firstSignIn = false; if (!profileList.length) profileList = browserProfiles.list(); await browserProfiles.open(action.id, await browserSession.start({ choose: true })); }
+      else if (action?.type === 'choose-account') { firstSignIn = false; await browserSession.select(action.id); }
+      else if (action?.type === 'copy-link') clipboard.writeText(await browserSession.start({ choose: true }));
       else if (action?.type === 'open-browser') await shell.openExternal('https://soundcloud.com/you');
       else if (action?.type === 'cancel') { if (browserSession.state().busy) throw new Error('Сначала дождись завершения переноса.'); browserSession.stop(); pendingSessionFile = ''; }
       else if (action?.type === 'import-file' || action?.type === 'unlock-file') {

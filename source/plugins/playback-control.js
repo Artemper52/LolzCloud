@@ -29,13 +29,27 @@
   }
   function media(value, duration) {
     const target = canonical(value);
-    const rows = documents().filter(root => canonical(root.location.href) === target).flatMap(root => [...root.querySelectorAll('audio')])
-      .filter(node => Number.isFinite(node.duration) && node.duration > 1 && (!duration || Math.abs(node.duration - duration) < 3));
-    return rows.find(node => !node.paused && !node.ended) || (rows.length === 1 ? rows[0] : null);
+    if (!target) return null;
+    const rows = new Set(); let current = null;
+    for (const root of documents()) {
+      const active = canonical(root.querySelector?.('.playbackSoundBadge__titleLink')?.href);
+      if (active ? active !== target : canonical(root.location.href) !== target) continue;
+      for (const node of root.querySelectorAll('audio')) rows.add(node);
+      // SoundCloud creates Audio objects without adding them to the document.
+      // They are registered by our Audio/Web Audio hooks at playback time.
+      const state = root.defaultView?.__lolzcloudAudioFX || (root === document ? window.__lolzcloudAudioFX : null);
+      if (state?.audio) for (const node of state.audio) rows.add(node);
+      if (state?.currentMedia) current = state.currentMedia;
+    }
+    const matches = [...rows].filter(node => !node.error && Number.isFinite(node.duration) && node.duration > 1 && (!duration || Math.abs(node.duration - duration) < 3));
+    if (matches.includes(current)) return current;
+    const playing = matches.filter(node => !node.paused && !node.ended);
+    return playing.length === 1 ? playing[0] : matches.length === 1 ? matches[0] : null;
   }
   function seek(value) {
     const link = document.querySelector('.playbackSoundBadge__titleLink'), duration = document.querySelector('.playbackTimeline__duration');
-    const seconds = String(duration?.textContent || '').trim().split(':').reduce((total, value) => total * 60 + (Number(value) || 0), 0);
+    const label = duration?.querySelector?.('[aria-hidden="true"]') || duration;
+    const seconds = String(label?.textContent || '').trim().split(':').reduce((total, value) => total * 60 + (Number(value) || 0), 0);
     const node = media(link?.href || location.href, seconds);
     if (!node || !Number.isFinite(value)) return false;
     node.currentTime = Math.max(0, Math.min(node.duration, value)); window.__lolzcloudSnapshot?.(); return true;

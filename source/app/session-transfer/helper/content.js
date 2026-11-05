@@ -17,7 +17,7 @@
       status('Помощник передаёт вход в LolzCloud…', 'busy');
       const response = await fetch('import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(result.envelope), credentials: 'omit', cache: 'no-store' });
       const value = await response.json(); if (!value.ok) throw Error(value.error || 'Не удалось передать вход.');
-      done = true; status('Готово. Вход передан автоматически — возвращайся в LolzCloud.', 'done');
+      done = true; status(value.pendingChoice ? 'Аккаунт добавлен в список. Выбери его в LolzCloud, чтобы войти. Можно добавить аккаунты из других браузеров.' : 'Готово. Вход передан автоматически — возвращайся в LolzCloud.', 'done');
     } catch (error) { status(error.message || 'Перезапусти перенос в LolzCloud и проверь помощник.', 'error'); }
     finally { running = false; }
   }

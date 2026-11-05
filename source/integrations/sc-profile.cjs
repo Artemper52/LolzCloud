@@ -35,4 +35,13 @@ async function readSessionProfile(session) {
   const user = await me.json();
   return soundcloudProfile({ id: user.id, name: user.username, url: user.permalink_url });
 }
-module.exports = { profileFromHtml, readSessionProfile };
+async function previewSessionProfile(session, cookies) {
+  const token = cookies.find(row => row.name === 'oauth_token' && ['soundcloud.com', '.soundcloud.com'].includes(row.domain) && row.path === '/');
+  if (!token) return null;
+  // Inspect only the offered account, without replacing the app's current
+  // cookies. Neither the token nor the private /me response reaches the UI.
+  const reply = await session.fetch('https://api.soundcloud.com/me', { credentials: 'omit', cache: 'no-store', headers: { Authorization: 'OAuth ' + token.value }, signal: AbortSignal.timeout(8000) });
+  if (!reply.ok) return null;
+  const user = await reply.json(); return soundcloudProfile({ id: user.id, name: user.username, url: user.permalink_url });
+}
+module.exports = { profileFromHtml, readSessionProfile, previewSessionProfile };

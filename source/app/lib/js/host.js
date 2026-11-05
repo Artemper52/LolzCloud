@@ -107,8 +107,9 @@
       }
     } catch { /* Ignore incomplete navigation snapshots. */ }
   });
-  view.addEventListener('did-start-loading', () => el('browser-loading').classList.remove('is-ready'));
+  view.addEventListener('did-start-navigation', event => { if (event.isMainFrame && !event.isInPlace) el('browser-loading').classList.remove('is-ready'); });
   view.addEventListener('dom-ready', async () => {
+    el('browser-loading').classList.add('is-ready');
     try { await view.insertCSS(fs.readFileSync(path.join(__dirname, '../themes/lolzcloud.css'), 'utf8')); } catch { /* A navigation may still be committing. */ }
     try { await view.executeJavaScript(fs.readFileSync(path.join(__dirname, '../plugins/promotions.js'), 'utf8')); } catch { /* A navigation may still be committing. */ }
   });

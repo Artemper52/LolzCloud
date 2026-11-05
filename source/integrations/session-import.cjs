@@ -28,12 +28,12 @@ function createSnapshot(app) {
   const original = findLegacyProfile(app.getPath('appData'));
   if (!original) throw new Error('Сохранённый вход в прежней версии не найден.');
   const database = path.join(original, 'Network/Cookies');
-  if (!fs.existsSync(database)) throw new Error('Сохранённый вход в прежней версии не найден.');
+  if (!fs.existsSync(database) && !fs.existsSync(path.join(original, 'soundcloud-session.json'))) throw new Error('Сохранённый вход в прежней версии не найден.');
   const base = path.join(app.getPath('temp'), 'LolzCloud-session-import');
   fs.mkdirSync(base, { recursive: true });
   const directory = fs.mkdtempSync(path.join(base, 'session-'));
   fs.mkdirSync(path.join(directory, 'Network'));
-  for (const name of ['Local State', 'Network/Cookies', 'Network/Cookies-journal', 'Network/Cookies-wal', 'Network/Cookies-shm']) {
+  for (const name of ['Local State', 'soundcloud-session.json', 'Network/Cookies', 'Network/Cookies-journal', 'Network/Cookies-wal', 'Network/Cookies-shm']) {
     const source = path.join(original, name);
     if (fs.existsSync(source)) fs.copyFileSync(source, path.join(directory, name));
   }
@@ -86,8 +86,12 @@ function runImportChild(app, { preview = false } = {}) {
   app.setPath('userData', directory);
   app.whenReady().then(async () => {
     try {
-      const { session } = require('electron');
-      const cookies = (await session.defaultSession.cookies.get({ domain: 'soundcloud.com' })).filter(transferable);
+      const { session, safeStorage } = require('electron');
+      let cookies = (await session.defaultSession.cookies.get({ domain: 'soundcloud.com' })).filter(transferable);
+      if (!cookies.some(cookie => cookie.name === 'oauth_token')) {
+        const saved = new (require('./soundcloud-session.cjs').SoundCloudSession)({ session: session.defaultSession, safeStorage, filename: path.join(directory, 'soundcloud-session.json') });
+        await saved.restore(); cookies = (await session.defaultSession.cookies.get({ domain: 'soundcloud.com' })).filter(transferable);
+      }
       if (preview) process.stdout.write(JSON.stringify({ count: cookies.length, hasLogin: cookies.some(cookie => cookie.name === 'oauth_token') }));
       else { process.stdout.write(JSON.stringify({ cookies }), () => app.exit(0)); return; }
       app.exit(0);

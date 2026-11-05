@@ -5,6 +5,7 @@ const directory = process.env.LOLZCLOUD_SESSION_TEST_PROFILE, root = path.resolv
 if (!directory || !path.basename(directory).startsWith('LolzCloud-session-ui-')) throw Error('An isolated fixture profile is required');
 app.setPath('userData', directory); app.setPath('downloads', directory); app.disableHardwareAcceleration();
 require('../source/integrations/audio-ducker.cjs').AudioDucker.prototype.start = () => {};
+require('../source/integrations/browser-profiles.cjs').BrowserProfiles.prototype.list = () => [{ id: 'fixture-browser', family: 'chrome', name: 'Тестовый браузер', detail: 'Музыкальный профиль' }];
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function until(predicate, label) { const end = Date.now() + 9000; while (!await predicate()) { if (Date.now() > end) throw Error(label); await delay(70); } }
 app.whenReady().then(async () => {
@@ -27,7 +28,9 @@ app.whenReady().then(async () => {
     ipcMain.handle('updates:action', () => ({ ok: true, state: { currentVersion: '0.9.1', supported: false, status: 'unsupported' } }));
     await host.loadFile(path.join(root, 'source/app/index.html')); const js = code => host.webContents.executeJavaScript(code);
     await until(() => js('!!window.LolzCloudSignIn && document.getElementById("sc-signin-banner").hidden === false'), 'Clean installation did not offer browser sign-in');
-    await js('document.getElementById("browser-sign-in").click();document.getElementById("sc-login-start").click()');
+    await js('document.getElementById("browser-sign-in").click()');
+    await until(() => js('!document.getElementById("sc-login-start").disabled'), 'Browser profile discovery did not complete');
+    await js('document.getElementById("sc-login-start").click()');
     await until(() => external.startsWith('http://127.0.0.1:'), 'Native sign-in did not open a local browser transfer');
     assert.equal(await js('document.getElementById("sc-login-dialog").open'), true);
     const welcome = await fetch(external), html = await welcome.text();
@@ -37,6 +40,10 @@ app.whenReady().then(async () => {
     browser = new BrowserWindow({ show: false, webPreferences: { session: browserStore, nodeIntegration: false, contextIsolation: true, sandbox: true, offscreen: true } });
     await browser.loadURL('https://soundcloud.com/you');
     await browser.webContents.executeJavaScript(rawBookmark.replace(/^javascript:/, ''), true).catch(() => {});
+    await until(() => js('document.querySelectorAll("#sc-login-account-list button").length===1'), 'The browser account did not appear in the chooser');
+    await delay(250); fs.writeFileSync(path.join(root, '.build/browser-account-picker-093.png'), (await host.webContents.capturePage()).toPNG());
+    assert.equal((await session.defaultSession.cookies.get({ url: 'https://soundcloud.com/', name: 'oauth_token' })).some(row => row.value === 'fixture-browser-auth'), false, 'An offered account must not be imported before selection');
+    await js('document.querySelector("#sc-login-account-list button").click()');
     await until(async () => (await session.defaultSession.cookies.get({ url: 'https://soundcloud.com/', name: 'oauth_token' })).some(row => row.value === 'fixture-browser-auth'), 'The browser navigation did not decrypt and transfer its session');
     await until(() => js('document.getElementById("sc-login-status").textContent.includes("Готово")'), 'The application did not confirm the imported account');
     const saved = fs.readFileSync(path.join(directory, 'soundcloud-session.json'), 'utf8'); assert.ok(!saved.includes('fixture-browser-auth')); assert.ok(saved.includes('encryptedCookies'));
@@ -77,6 +84,8 @@ app.whenReady().then(async () => {
     // paired helper's automatic content-script path runs without any clicks.
     await popup.webContents.executeJavaScript('document.getElementById("pair").click()'); await until(() => !!stored.pairedApps?.length, 'Popup approval did not persist');
     await browser.loadURL(external); await injectHelper();
+    await until(() => js('document.querySelectorAll("#sc-login-account-list button").length===1'), 'The paired helper did not offer its HttpOnly account');
+    await js('document.querySelector("#sc-login-account-list button").click()');
     await until(async () => (await session.defaultSession.cookies.get({ url: 'https://soundcloud.com/', name: 'oauth_token' })).some(row => row.value === 'fixture-automatic-httponly-auth'), 'The paired helper did not transfer HttpOnly cookies automatically');
     await until(() => browser.webContents.executeJavaScript('document.getElementById("helper-status").dataset.mode === "done"'), 'The browser did not confirm automatic sign-in');
     assert.ok(!await browser.webContents.executeJavaScript('document.documentElement.outerHTML.includes("fixture-automatic-httponly-auth")'));

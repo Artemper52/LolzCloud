@@ -43,10 +43,17 @@
     el('dislike').hidden = !inWave; el('dislike').disabled = state.transitioning || pending.has('reaction') || !wave?.canFeedback;
     const repeat = shown('repeat', state.transport?.repeat?.mode || track.repeat || 'off', track.url);
     el('repeat').dataset.mode = repeat; el('repeat').disabled = !track.title || state.fresh === false || state.transitioning;
+    el('repeat-label').textContent = { off: 'Повтор', all: 'Очередь', one: 'Трек' }[repeat];
     el('repeat').setAttribute('aria-pressed', String(repeat !== 'off'));
     el('repeat').setAttribute('aria-busy', String(pending.has('repeat')));
     el('repeat').setAttribute('aria-label', { off: 'Повтор выключен', one: 'Повтор трека', all: 'Повтор очереди' }[repeat]);
     el('repeat').title = { off: 'Повтор выключен · нажми для повтора очереди', all: 'Повтор очереди · нажми для повтора трека', one: 'Повтор трека · нажми, чтобы выключить' }[repeat];
+    const download = state.downloads?.items?.find(item => item.url === track.url), downloading = download && ['queued', 'downloading', 'converting'].includes(download.status), completed = download?.status === 'complete' && download.exists;
+    el('download').disabled = pending.has('download') || state.local || state.transitioning || !track.title || state.fresh === false || downloading;
+    el('download').setAttribute('aria-busy', String(!!downloading || pending.has('download')));
+    el('download').dataset.status = completed ? 'complete' : downloading ? 'busy' : 'idle';
+    const downloadCaption = completed ? 'MP3 сохранён · показать файл' : downloading ? (download.status === 'converting' ? 'Готовим MP3' : 'Скачиваем') + (download.percent === null ? '…' : ' · ' + Math.floor(download.percent) + '%') : download?.status === 'error' ? 'Скачать ещё раз · ' + download.error : 'Скачать песню в MP3';
+    el('download').title = downloadCaption; el('download').setAttribute('aria-label', downloadCaption);
     window.lolzArtwork(el('cover'), track.cover);
     if (document.activeElement !== el('volume')) el('volume').value = Math.round((state.volume ?? 1) * 100);
     el('volume-label').textContent = el('volume').value + '%';
@@ -66,10 +73,11 @@
   }
   async function refresh(action = 'state') {
     const request = ++serial;
+    if (action !== 'state') el('action-status').textContent = '';
     try {
       const state = await ipcRenderer.invoke('mini:action', action);
       if (state && request >= applied) { applied = request; render(state); }
-    } catch { /* The main player is closing. */ }
+    } catch (error) { el('action-status').textContent = String(error.message || 'Не удалось выполнить действие.').replace(/^Error invoking remote method[^:]*:\s*(?:Error:\s*)?/, ''); return false; }
   }
   for (const id of ['open', 'close', 'previous', 'next', 'playPause']) el(id).onclick = () => refresh(id);
   async function trackAction(type, group) {
@@ -83,6 +91,13 @@
   el('like').onclick = () => trackAction(current?.wave?.active ? 'wave-love' : 'like', 'reaction');
   el('dislike').onclick = () => trackAction('wave-ban', 'reaction');
   el('repeat').onclick = () => trackAction('repeat', 'repeat');
+  el('download').onclick = async () => {
+    if (!current || pending.has('download')) return;
+    const track = current.displayPlayback || current.playback, item = current.downloads?.items?.find(row => row.url === track.url), complete = item?.status === 'complete' && item.exists;
+    el('action-status').textContent = ''; pending.add('download'); render(current);
+    try { await refresh(complete ? { type: 'download-reveal', id: item.id } : { type: 'download-current', url: track.url }); }
+    finally { pending.delete('download'); if (current) render(current); }
+  };
   const volumeControl = el('mini-volume-control'), volumeToggle = el('volume-toggle');
   const closeVolume = () => { volumeControl.classList.remove('is-open'); volumeToggle.setAttribute('aria-expanded', 'false'); };
   volumeControl.addEventListener('pointerenter', () => volumeToggle.setAttribute('aria-expanded', 'true'));

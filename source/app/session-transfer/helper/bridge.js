@@ -29,9 +29,9 @@
     if (!cookies.some(cookie => cookie.name === 'oauth_token' && ['soundcloud.com', '.soundcloud.com'].includes(cookie.domain) && (cookie.path || '/') === '/')) throw Error('Войди в SoundCloud в обычном окне этого профиля браузера, затем вернись на страницу переноса и обнови её.');
     return cookies;
   }
-  async function encrypt(request, cookies) {
+  async function encrypt(request, cookies, info) {
     const key = await crypto.subtle.importKey('raw', bytes(request.key), 'AES-GCM', false, ['encrypt']), iv = crypto.getRandomValues(new Uint8Array(12));
-    const data = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: new TextEncoder().encode(FORMAT + ':1:' + request.id) }, key, new TextEncoder().encode(JSON.stringify({ cookies })));
+    const data = await crypto.subtle.encrypt({ name: 'AES-GCM', iv, additionalData: new TextEncoder().encode(FORMAT + ':1:' + request.id) }, key, new TextEncoder().encode(JSON.stringify({ cookies, ...(info ? { info } : {}) })));
     return { format: FORMAT, version: 1, id: request.id, iv: base64(iv), data: base64(data) };
   }
   const api = { transferUrl, verify, selectCookies, encrypt };

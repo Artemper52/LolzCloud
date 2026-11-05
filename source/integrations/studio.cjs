@@ -119,6 +119,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
       case 'wave-select': await wave.select(scUrl(action.url)); break;
       case 'download-current': {
         const snapshot = service.getState(); if (!snapshot.fresh) throw new Error('Сначала выбери трек SoundCloud.');
+        if (action.url && action.url !== snapshot.playback.url) throw new Error('Трек уже сменился. Нажми скачать ещё раз.');
         downloads.enqueue(snapshot.playback); break;
       }
       case 'downloads-folder': fs.mkdirSync(downloads.directory, { recursive: true }); { const error = await shell.openPath(downloads.directory); if (error) throw new Error('Не удалось открыть папку загрузок.'); } break;
@@ -234,13 +235,15 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
     else if (type === 'font') music.configureMini({ fontScale: Number(action.value) });
     else if (type === 'reload-lyrics') void lyrics.load(shownTrack(), true);
     else if (type === 'credit') await openCredit(action.url);
+    else if (type === 'download-current') await act({ type, url: action.url });
+    else if (type === 'download-reveal') shell.showItemInFolder(downloads.file(action.id));
     else if (type === 'volume') { const volume = Math.max(0, Math.min(1, Number(action.value) || 0)); if (action.commit) music.configurePlayer({ volume }); await media('volume', volume); }
     else if (type === 'seek') await media('seek', Math.min(shownTrack().duration || 604800, Math.max(0, Number(action.value) || 0)));
     else if (type === 'wave-love' || type === 'wave-ban') await wave.react(type === 'wave-love' ? 'love' : 'ban', action.url);
     else if (['like', 'repeat'].includes(type)) { if (!action.url || action.url === shownTrack().url) await media(type, type === 'repeat' ? action.mode : undefined); }
     else if (['playPause', 'previous', 'next', 'volumeUp', 'volumeDown'].includes(type)) await media(type);
     if (music.data.mini.lyrics) void lyrics.load(shownTrack());
-    return { ...experience.snapshot(), transport: experience.snapshot().local ? { repeat: { mode: experience.current().repeat } } : { repeat: repeat.read(service.playback) }, wave: wave.state(), visuals: visuals.state(service.getState(), audio), mini: { ...music.data.mini }, preferences: { ...music.data.preferences }, volume: music.data.player.volume ?? audio.volume ?? 1, lyrics: music.data.mini.lyrics ? lyrics.state(shownTrack()) : null };
+    return { ...experience.snapshot(), transport: experience.snapshot().local ? { repeat: { mode: experience.current().repeat } } : { repeat: repeat.read(service.playback) }, downloads: downloads.state(), wave: wave.state(), visuals: visuals.state(service.getState(), audio), mini: { ...music.data.mini }, preferences: { ...music.data.preferences }, volume: music.data.player.volume ?? audio.volume ?? 1, lyrics: music.data.mini.lyrics ? lyrics.state(shownTrack()) : null };
   });
   registerKeys();
   ducker.start();

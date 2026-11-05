@@ -77,7 +77,7 @@
             node.classList.add('has-words');
             for (const word of line.words) { const span = document.createElement('span'); span.className = 'lc-word'; span.textContent = word.text; node.append(span); }
           } else node.textContent = line.text || '•••';
-          if (this.lines.length) { node.type = 'button'; node.title = 'Слушать с этой строки'; node.onclick = () => { this.seek(line.time); this.onSeek(line.time); }; }
+          if (this.lines.length) { node.type = 'button'; node.title = 'Слушать с этой строки'; node.onclick = () => { this.setFollow(true); void this.onSeek(line.time); }; }
           this.nodes.push(node); this.stage.append(node);
         });
       }

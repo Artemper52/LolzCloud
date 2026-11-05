@@ -276,12 +276,12 @@
   };
   let transportRequest = 0;
   window.__lolzcloudMediaCommand = (command, value) => {
-      if (command === 'seek' && window.__lolzcloudPlayback?.seek(value)) return;
-    if (command === 'like') { document.querySelector('.playbackSoundBadge__like, .playControls .sc-button-like')?.click(); setTimeout(() => window.__lolzcloudSnapshot?.(), 80); return; }
-    if (command === 'repeat') return window.__lolzcloudRepeat?.set(value);
+    if (command === 'seek') return window.__lolzcloudPlayback?.seek(value) === true;
+    if (command === 'like') { const like = document.querySelector('.playbackSoundBadge__like, .playControls .sc-button-like'); like?.click(); setTimeout(() => window.__lolzcloudSnapshot?.(), 80); return !!like; }
+    if (command === 'repeat') return window.__lolzcloudRepeat?.set(value) || false;
     const button = document.querySelector('.playControls__elements .playControl, .playControls__play');
-    if (command === 'playPause') { button?.click(); return; }
-    if (command === 'next') { transportRequest++; document.querySelector('.playControls__next')?.click(); return; }
+    if (command === 'playPause') { button?.click(); return !!button; }
+    if (command === 'next') { transportRequest++; const next = document.querySelector('.playControls__next'); next?.click(); return !!next; }
     if (command === 'previous') {
       const request = ++transportRequest, previous = document.querySelector('.playControls__prev'), badge = document.querySelector('.playbackSoundBadge__titleLink')?.href;
       const media = [...audio].find(node => !node.paused) || [...audio].at(-1), position = media?.currentTime || 0;
@@ -289,13 +289,12 @@
       // SoundCloud treats the first previous click after a few seconds as
       // restart. Only repeat it if that exact recording actually reset to 0.
       setTimeout(() => { if (request === transportRequest && position > 3 && media?.currentTime < 1 && document.querySelector('.playbackSoundBadge__titleLink')?.href === badge) previous?.click(); }, 160);
-      return;
+      return !!previous;
     }
-    if (command === 'play' || command === 'pause') { if (button && button.classList.contains('playing') !== (command === 'play')) button.click(); return; }
+    if (command === 'play' || command === 'pause') { if (button && button.classList.contains('playing') !== (command === 'play')) button.click(); return !!button; }
     const candidates = [...audio].filter(media => Number.isFinite(media.duration) && media.duration > 0);
     const active = candidates.find(media => !media.paused) || candidates.at(-1);
     if (command === 'volume') { desiredVolume = Math.min(1, Math.max(0, Number(value) || 0)); for (const media of audio) media.volume = desiredVolume; return; }
-    if (command === 'seek') { if (active) active.currentTime = Math.min(active.duration, Math.max(0, Number(value) || 0)); return; }
     if (active && ['volumeUp', 'volumeDown'].includes(command)) active.volume = Math.min(1, Math.max(0, active.volume + (command === 'volumeUp' ? .05 : -.05)));
   };
   window.__lolzcloudGetAudioState = () => {

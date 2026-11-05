@@ -29,7 +29,15 @@ async function handle(message, sender) {
   const request = message.request, identity = await bridge.verify(request, sender.url), saved = await call('storage.local', 'get', 'pairedApps');
   if (!(saved.pairedApps || []).includes(identity.fingerprint)) return { ok: true, needsPairing: true, code: identity.code };
   const cookies = bridge.selectCookies(await call('cookies', 'getAll', { domain: 'soundcloud.com' }));
-  return { ok: true, envelope: await bridge.encrypt(request, cookies) };
+  let profile = null;
+  try {
+    const token = cookies.find(row => row.name === 'oauth_token' && ['soundcloud.com', '.soundcloud.com'].includes(row.domain) && (row.path || '/') === '/');
+    const reply = await fetch('https://api.soundcloud.com/me', { headers: { Authorization: 'OAuth ' + token.value }, cache: 'no-store', signal: AbortSignal.timeout(8000) });
+    if (reply.ok) { const user = await reply.json(); if (user.id && typeof user.username === 'string' && /^https:\/\/soundcloud\.com\/[\w-]+\/?$/.test(user.permalink_url)) profile = { id: user.id, name: user.username.slice(0, 100), url: user.permalink_url }; }
+  } catch { /* The app can verify a session when the browser API is unavailable. */ }
+  const agent = typeof navigator === 'undefined' ? '' : navigator.userAgent;
+  const browserName = /Edg\//.test(agent) ? 'Microsoft Edge' : /YaBrowser\//.test(agent) ? 'Яндекс Браузер' : /OPR\//.test(agent) ? 'Opera' : /Firefox\//.test(agent) ? 'Firefox' : /Vivaldi\//.test(agent) ? 'Vivaldi' : /Chrome\//.test(agent) ? 'Chrome / Chromium' : 'Браузер';
+  return { ok: true, envelope: await bridge.encrypt(request, cookies, { profile, browser: browserName }) };
 }
 // Serialize pairing writes without holding unrelated transfer requests open.
 web.runtime.onMessage.addListener((message, sender, respond) => {

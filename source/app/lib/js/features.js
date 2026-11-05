@@ -14,7 +14,7 @@
   let dspApplied = '', soundDraft = null, keysDirty = false, lastLists = '', lastPresets = '', playRequest = 0, lyricsFont = 1, waveApplied = null, waveListSignature = '';
   let playerApplied = null;
   let guestReady = false;
-  view.addEventListener('did-start-loading', () => { guestReady = false; });
+  view.addEventListener('did-start-navigation', event => { if (event.isMainFrame && !event.isInPlace) guestReady = false; });
   let safetyApplied = '', safetyRevision = -1, latestSafety = null;
   let sourceSignature = '';
   let sourceIdentityKey = '';
@@ -449,9 +449,12 @@
   }
   window.addEventListener('lolzcloud:state', event => { snapshot = event.detail; if (snapshot.features) feature = snapshot.features; render(); });
   async function media(command, value) {
-    if (!guestReady) return;
     const data = JSON.stringify([command, value]);
-    await view.executeJavaScript(`window.__lolzcloudMediaCommand && window.__lolzcloudMediaCommand(...${data})`, true).catch(() => {});
+    try {
+      const result = await view.executeJavaScript(`(async()=>{if(typeof window.__lolzcloudMediaCommand!=='function')return false;const result=await window.__lolzcloudMediaCommand(...${data});return result!==false&&result?.applied!==false;})()`, true);
+      if (result === false) message('Плеер SoundCloud ещё не готов. Подожди загрузки трека и повтори.', true);
+      return result;
+    } catch { message('Не удалось передать команду в SoundCloud. Повтори после загрузки трека.', true); return false; }
   }
   ipcRenderer.on('lolzcloud:media', (_, data) => media(data.command, data.value));
   ipcRenderer.on('lolzcloud:dsp', (_, config) => { dspApplied = ''; void applyDsp(config); });

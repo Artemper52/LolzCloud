@@ -12,8 +12,8 @@
   const text = (tag, value, className) => { const node = document.createElement(tag); node.textContent = value; if (className) node.className = className; return node; };
   const current = () => snapshot?.displayPlayback || snapshot?.playback || {};
   let guestReady = false;
-  function guest(code) { if (!guestReady || typeof view.executeJavaScript !== 'function') return Promise.resolve(null); try { return Promise.resolve(view.executeJavaScript(code)).catch(() => null); } catch { return Promise.resolve(null); } }
-  view.addEventListener('did-start-loading', () => { guestReady = false; });
+  function guest(code) { if (typeof view.executeJavaScript !== 'function') return Promise.resolve(null); try { return Promise.resolve(view.executeJavaScript(code)).catch(() => null); } catch { return Promise.resolve(null); } }
+  view.addEventListener('did-start-navigation', event => { if (event.isMainFrame && !event.isInPlace) guestReady = false; });
   function toast(value, error = false) { el('toast').textContent = value; el('toast').classList.toggle('error', error); el('toast').hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el('toast').hidden = true; }, error ? 7000 : 3500); }
   function open(name) { window.LolzCloudStudio.open(name); if (['radar', 'moments', 'versions'].includes(name)) { const title = { radar: 'Радар новинок', moments: 'Любимые моменты', versions: 'Другие версии' }[name]; document.getElementById('lc-studio-title').textContent = title; document.getElementById('page-title').textContent = title; document.body.dataset.view = name; } void refresh(); }
   async function action(type, values = {}, quiet = false) { try { const reply = await ipcRenderer.invoke('player-tools:action', { type, ...values }); if (!reply.ok) throw new Error(reply.error); if (reply.state) tools = reply.state; render(); if (!quiet && type !== 'state' && type !== 'search') toast('Готово'); return reply; } catch (error) { if (!quiet) toast(error.message || 'Не удалось выполнить действие.', true); throw error; } }

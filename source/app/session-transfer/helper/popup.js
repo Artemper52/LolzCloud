@@ -8,14 +8,14 @@ async function loadPairing() {
     pairingFingerprint = info.fingerprint;
     document.getElementById('pair-code').textContent = info.code;
     document.getElementById('pairing').hidden = info.paired;
-    document.getElementById('pair-status').textContent = info.paired ? 'Этот LolzCloud уже подключён. Вход передаётся при открытии страницы переноса из приложения.' : 'Разреши передачу в эту установку LolzCloud один раз.';
+    document.getElementById('pair-status').textContent = info.paired ? 'Этот LolzCloud уже подключён. Аккаунт появляется для выбора при открытии страницы переноса из приложения.' : 'Разреши передачу в эту установку LolzCloud один раз.';
   } catch (error) { document.getElementById('pair-status').textContent = error.message; }
 }
 document.getElementById('pair').onclick = async () => {
   const button = document.getElementById('pair'); button.disabled = true;
   try {
     const result = await message({ type: 'pair', fingerprint: pairingFingerprint }); if (!result?.ok) throw Error(result?.error || 'Не удалось подключить приложение.');
-    document.getElementById('pairing').hidden = true; document.getElementById('pair-status').textContent = 'Готово. Передаём вход. Дальше нажимай «Войти через браузер» в LolzCloud — помощник подхватит сессию сам.';
+    document.getElementById('pairing').hidden = true; document.getElementById('pair-status').textContent = 'Готово. Аккаунт будет показан в LolzCloud. Выбери его в приложении, чтобы войти.';
   } catch (error) { document.getElementById('pair-status').textContent = error.message; }
   finally { button.disabled = false; }
 };

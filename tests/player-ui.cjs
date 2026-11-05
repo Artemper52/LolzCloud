@@ -1,6 +1,6 @@
 'use strict';
 require('../source/integrations/legacy-runtime.cjs').install();
-const { app, BrowserWindow, ipcMain, session, dialog } = require('electron'), fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
+const { app, BrowserWindow, ipcMain, session, dialog, webContents } = require('electron'), fs = require('node:fs'), path = require('node:path'), assert = require('node:assert/strict');
 const { LolzteamService } = require('../source/integrations/lolzteam/service.cjs');
 const { AudioDucker } = require('../source/integrations/audio-ducker.cjs');
 const { lyricKey } = require('../source/integrations/lyrics.cjs');
@@ -17,8 +17,9 @@ app.whenReady().then(async () => {
   try {
     const fixture = { title: 'Fixture original song', artist: 'Fixture artist', url: 'https://soundcloud.com/fixture/original', duration: 100, position: 23, playing: false };
     const service = new LolzteamService({ store: { load: () => null, save() {} }, api: {} }); service.setPlayback(fixture);
+    service.setProfile({ id: 42, name: 'Fixture listener', url: 'https://soundcloud.com/fixture-listener' });
     const wav = wave(), audioFile = path.join(temporary, 'Fixture artist - Offline fixture.wav'); fs.writeFileSync(audioFile, wav);
-    const fixtureHtml = '<html><body style="background:#102017;color:white"><div class="playControls"><button class="playControl">Play</button><div class="playbackSoundBadge"><a class="playbackSoundBadge__titleLink" href="' + fixture.url + '">' + fixture.title + '</a><a class="playbackSoundBadge__lightLink">' + fixture.artist + '</a></div><div class="playbackTimeline__timePassed">0:23</div><div class="playbackTimeline__duration">1:40</div></div><audio src="data:audio/wav;base64,' + wav.toString('base64') + '"></audio></body></html>';
+    const fixtureHtml = '<html><body style="background:#102017;color:white"><div class="playControls"><div class="playControls__elements"><button class="playControl">Play</button></div><div class="playbackSoundBadge"><a class="playbackSoundBadge__titleLink" href="' + fixture.url + '">' + fixture.title + '</a><a class="playbackSoundBadge__lightLink">' + fixture.artist + '</a></div><div class="playbackTimeline__timePassed">0:23</div><div class="playbackTimeline__duration">1:40</div></div><audio src="data:audio/wav;base64,' + wav.toString('base64') + '"></audio></body></html>';
     if (session.defaultSession.protocol.handle) await session.defaultSession.protocol.handle('https', () => new Response(fixtureHtml, { headers: { 'Content-Type': 'text/html' } }));
     else session.defaultSession.protocol.interceptBufferProtocol('https', (_request, done) => done({ mimeType: 'text/html', data: Buffer.from(fixtureHtml) }));
     host = new BrowserWindow({ show: false, width: 1366, height: 850, frame: false, webPreferences: { nodeIntegration: true, contextIsolation: false, webviewTag: true, backgroundThrottling: false, offscreen: true } });
@@ -28,11 +29,25 @@ app.whenReady().then(async () => {
     studio = require('../source/integrations/studio.cjs').createStudio({ app, service, getWindow: () => host, trusted: event => event.sender === host.webContents && event.senderFrame === event.sender.mainFrame, onStateChange: notify });
     ipcMain.handle('lolzteam:action', () => ({ ok: true, state: { ...studio.snapshot(service.getState()), features: studio.getState(), discord: { connected: false } } }));
     ipcMain.handle('updates:action', () => ({ ok: true, state: { currentVersion: '0.9.0', supported: false, status: 'unsupported' } }));
-    ipcMain.on('lolzteam:playback', () => {});
+    ipcMain.on('lolzteam:playback', (event, playback) => { if (event.sender === host.webContents && studio.acceptSoundCloud(playback) !== false) service.setPlayback(playback); });
     dialog.showSaveDialog = async () => ({ canceled: false, filePath: path.join(temporary, 'exported-profile.json') });
     await host.loadFile(path.join(root, 'source/app/index.html')); timer = setInterval(() => { studio.observe(); notify(); }, 500); notify();
     const js = code => host.webContents.executeJavaScript(code);
     await until(() => js('typeof window.LolzCloudPlayerTools?.palette === "function"'), 'New tools did not initialize');
+    await until(() => js('document.getElementById("webview").getWebContentsId() > 0'), 'SoundCloud fixture did not attach');
+    const remote = webContents.fromId(await js('document.getElementById("webview").getWebContentsId()'));
+    await until(() => remote.executeJavaScript('!!window.__lolzcloudMediaCommand && document.querySelector("audio")?.readyState >= 2'), 'SoundCloud audio hooks did not initialize');
+    await remote.executeJavaScript('window.fixtureAudio=new Audio(document.querySelector("audio").src);document.querySelector("audio").remove();const button=document.querySelector(".playControl");button.onclick=()=>{if(fixtureAudio.paused){button.classList.add("playing");void fixtureAudio.play()}else{button.classList.remove("playing");fixtureAudio.pause()}};void fixtureAudio.play()', true);
+    await until(() => remote.executeJavaScript('!fixtureAudio.paused && window.__lolzcloudAudioFX.currentMedia===fixtureAudio'), 'Detached SoundCloud audio did not start');
+    await js('const guest=document.getElementById("webview");guest.dispatchEvent(new Event("did-start-loading"));guest.dispatchEvent(Object.assign(new Event("did-start-navigation"),{isMainFrame:false,isInPlace:false}));document.getElementById("player-playPause").click()');
+    await until(() => remote.executeJavaScript('fixtureAudio.paused'), 'An iframe load swallowed the footer pause command');
+    await js('document.getElementById("player-volume").value="43";document.getElementById("player-volume").dispatchEvent(new Event("input"))');
+    await until(() => remote.executeJavaScript('Math.abs(fixtureAudio.volume-.43)<.01'), 'An iframe load swallowed the footer volume command');
+    await js('require("electron").ipcRenderer.invoke("features:action",{type:"media",command:"seek",value:42})');
+    await until(() => remote.executeJavaScript('Math.abs(fixtureAudio.currentTime-42)<.1'), 'SoundCloud did not seek its actual detached audio');
+    assert.equal(await remote.executeJavaScript('fixtureAudio.paused'), true, 'Seeking a paused track must keep it paused');
+    await js('document.getElementById("player-playPause").click()'); await until(() => remote.executeJavaScript('!fixtureAudio.paused'), 'Footer playback did not resume after an iframe load');
+    await remote.executeJavaScript('fixtureAudio.pause()');
     await js('document.dispatchEvent(new KeyboardEvent("keydown",{key:"k",ctrlKey:true,bubbles:true}))'); assert.equal(await js('document.getElementById("xp-palette").open'), true);
     await until(() => js('document.querySelectorAll("#xp-results [role=option]").length > 0'), 'Command palette returned no commands');
     await js('document.getElementById("xp-search").value="Сохранить момент";document.getElementById("xp-search").dispatchEvent(new Event("input"))'); await delay(200);
@@ -45,6 +60,24 @@ app.whenReady().then(async () => {
     await js('(()=>{const inputs=[...document.querySelectorAll("#xp-timing-lines .xp-timing-row>input:first-child")];for(let i=0;i<inputs.length;i++){inputs[i].value=String(1.25+i*2.25);inputs[i].dispatchEvent(new Event("change"));}})()');
     await delay(180); fs.writeFileSync(path.join(root, '.build/player-timing-test.png'), (await host.webContents.capturePage()).toPNG()); await js('document.getElementById("xp-timing-save").click()');
     await until(() => fs.existsSync(path.join(temporary, 'lyric-timing.json')), 'Edited timings were not saved'); assert.equal(JSON.parse(fs.readFileSync(path.join(temporary, 'lyric-timing.json')))[lyricKey(fixture)].lines[1].time, 3.5);
+    await js('window.LolzCloudStudio.open("lyrics")');
+    await until(() => js('document.querySelectorAll("#lc-lyrics .lc-lyric").length===2'), 'Saved lyrics did not appear');
+    await js('document.querySelector("#lc-lyrics .lc-lyric").click()'); await until(() => remote.executeJavaScript('Math.abs(fixtureAudio.currentTime-1.25)<.15'), 'A full-player lyric click did not seek the audio');
+    await studio.act({ type: 'mini-lyrics' });
+    const mini = BrowserWindow.getAllWindows().find(window => window !== host); assert.ok(mini); mini.show = () => {}; mini.showInactive = () => {}; mini.focus = () => {};
+    const miniJs = code => mini.webContents.executeJavaScript(code);
+    await until(() => miniJs('document.querySelectorAll("#lyrics .lc-lyric").length===2'), 'Mini lyrics did not render');
+    await miniJs('document.querySelectorAll("#lyrics .lc-lyric")[1].click()'); await until(() => remote.executeJavaScript('Math.abs(fixtureAudio.currentTime-3.5)<.15'), 'A mini-player lyric click did not seek the audio');
+    await remote.executeJavaScript('const nativeRepeat=document.createElement("button");nativeRepeat.className="repeatControl";nativeRepeat.onclick=()=>{const value=(Number(nativeRepeat.dataset.mode||0)+1)%3;nativeRepeat.dataset.mode=value;nativeRepeat.classList.toggle("m-one",value===1);nativeRepeat.classList.toggle("m-all",value===2)};document.querySelector(".playControls__elements").append(nativeRepeat)');
+    await miniJs('document.getElementById("repeat").click()'); await until(() => remote.executeJavaScript('document.querySelector(".repeatControl").classList.contains("m-all")'), 'Mini repeat queue mode did not reach SoundCloud');
+    await until(() => miniJs('document.getElementById("repeat-label").textContent==="Очередь"'), 'Mini repeat did not display queue mode');
+    await miniJs('document.getElementById("repeat").click()'); await until(() => remote.executeJavaScript('document.querySelector(".repeatControl").classList.contains("m-one")'), 'Mini repeat track mode did not reach SoundCloud');
+    await miniJs('document.getElementById("repeat").click()'); await until(() => remote.executeJavaScript('!document.querySelector(".repeatControl").classList.contains("m-one")&&!document.querySelector(".repeatControl").classList.contains("m-all")'), 'Mini repeat did not turn off');
+    require('../source/integrations/audio-download.cjs').SoundCloudAudioSource.prototype.save = async (_url, filename) => { fs.writeFileSync(filename, wav); return { track: fixture, mp3: false }; };
+    await miniJs('document.getElementById("download").click()'); await until(() => studio.getState().downloads.items[0]?.status === 'complete', 'Mini download did not save an MP3', 12000);
+    await until(() => miniJs('document.getElementById("download").dataset.status==="complete"'), 'Mini did not show download completion');
+    const savedDownload = studio.getState().downloads.items[0]; assert.ok(fs.statSync(path.join(temporary, 'LolzCloud', savedDownload.file)).size > 1000);
+    fs.writeFileSync(path.join(root, '.build/mini-transport-093.png'), (await mini.webContents.capturePage()).toPNG()); mini.close();
     const imported = await js('(async()=>{const {ipcRenderer}=require("electron");return ipcRenderer.invoke("player-tools:action",{type:"local-files",files:[' + JSON.stringify(audioFile) + ']})})()'); assert.equal(imported.ok, true); const local = imported.state.library.tracks[0];
     await js('(async()=>{const {ipcRenderer}=require("electron");return ipcRenderer.invoke("player-tools:action",{type:"local-play",id:' + JSON.stringify(local.id) + '})})()');
     await until(() => studio.snapshot().local && studio.snapshot().playback.playing && studio.snapshot().playback.position > .2, 'Offline audio did not start', 12000);
@@ -53,7 +86,7 @@ app.whenReady().then(async () => {
     await js('document.getElementById("player-repeat").click()'); await until(() => studio.getState().transport.repeat.mode === 'one', 'Local repeat was not selected');
     await js('window.LolzCloudPlayerTools.open("library")'); await delay(100); fs.writeFileSync(path.join(root, '.build/player-offline-test.png'), (await host.webContents.capturePage()).toPNG());
     await js('(async()=>{const {ipcRenderer}=require("electron");await ipcRenderer.invoke("player-tools:action",{type:"profile-export"})})()'); const exported = JSON.parse(fs.readFileSync(path.join(temporary, 'exported-profile.json'))); assert.equal(exported.format, 'lolzcloud-profile'); assert.ok(!JSON.stringify(exported).includes(audioFile));
-    assert.deepEqual(errors, []); console.log('Player UI passed: Ctrl+K, safe exact bookmarks, persisted timing editor, real offline audio, footer transport/repeat, portable profile.');
+    assert.deepEqual(errors, []); console.log('Player UI passed: actual detached SoundCloud pause/seek/volume/resume survive iframe loading, main/mini lyric clicks seek audio, mini repeat cycles all/one/off and saves a real MP3, Ctrl+K, bookmarks, timings, offline audio and profile.');
   } catch (error) { console.error(error.stack); process.exitCode = 1; }
   finally { clearInterval(timer); if (host && !host.isDestroyed()) { await host.webContents.executeJavaScript('window.LolzCloudLocal?.shutdown()').catch(() => {}); await delay(80); } if (studio) await studio.shutdown(); if (host && !host.isDestroyed()) host.destroy(); app.exit(process.exitCode || 0); }
 });

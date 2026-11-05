@@ -2,11 +2,11 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const legacyNames = require('../legacy-profiles.json');
-const PROFILE_ITEMS = ['Local State', 'Preferences', 'lolzteam.json', 'music-library.json', 'Network', 'Local Storage', 'Session Storage', 'IndexedDB', 'WebStorage'];
+const PROFILE_ITEMS = ['Local State', 'Preferences', 'lolzteam.json', 'music-library.json', 'soundcloud-session.json', 'Network', 'Local Storage', 'Session Storage', 'IndexedDB', 'WebStorage'];
 
 function findLegacyProfile(appData) {
   return legacyNames.map(name => path.join(appData, name))
-    .find(folder => fs.existsSync(path.join(folder, 'Network/Cookies')) || fs.existsSync(path.join(folder, 'lolzteam.json'))) || null;
+    .find(folder => fs.existsSync(path.join(folder, 'Network/Cookies')) || fs.existsSync(path.join(folder, 'soundcloud-session.json')) || fs.existsSync(path.join(folder, 'lolzteam.json'))) || null;
 }
 
 function migrateProfile(appData) {

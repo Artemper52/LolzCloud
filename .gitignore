@@ -32,6 +32,7 @@ sessions.json
 credentials.env
 soundcloud-session.json
 browser-pairing.json
+soundcloud-onboarding.json
 player-tools.json
 local-library.json
 release-radar.json
