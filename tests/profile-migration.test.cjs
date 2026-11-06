@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { migrateProfile } = require('../source/integrations/profile-migration.cjs');
+const { PROFILE_ITEMS, migrateProfile } = require('../source/integrations/profile-migration.cjs');
 const { createSnapshot, cleanSnapshot } = require('../source/integrations/session-import.cjs');
 const legacy = require('../source/legacy-profiles.json');
 
@@ -32,6 +32,20 @@ test('a clean installation never invents an account', t => {
   const result = migrateProfile(appData);
   assert.equal(result.migrated, false);
   assert.equal(fs.existsSync(result.path), false);
+});
+
+test('migration includes every application store and recovers an empty destination directory', t => {
+  const appData = fs.mkdtempSync(path.join(os.tmpdir(), 'lolzcloud-profile-test-'));
+  t.after(() => fs.rmSync(appData, { recursive: true, force: true }));
+  const original = path.join(appData, legacy[0]);
+  fs.mkdirSync(original); fs.mkdirSync(path.join(appData, 'LolzCloud'));
+  for (const file of PROFILE_ITEMS.filter(name => name.endsWith('.json'))) fs.writeFileSync(path.join(original, file), JSON.stringify({ fixture: file }));
+  const result = migrateProfile(appData);
+  assert.equal(result.migrated, true);
+  for (const file of PROFILE_ITEMS.filter(name => name.endsWith('.json'))) assert.deepEqual(fs.readFileSync(path.join(result.path, file)), fs.readFileSync(path.join(original, file)));
+  fs.writeFileSync(path.join(result.path, 'soundcloud-session.json'), '{"signedOut":true}');
+  assert.equal(migrateProfile(appData).migrated, false);
+  assert.equal(fs.readFileSync(path.join(result.path, 'soundcloud-session.json'), 'utf8'), '{"signedOut":true}');
 });
 
 test('an encrypted old session can migrate and be imported even without a Chromium cookie database', t => {

@@ -2,16 +2,25 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const legacyNames = require('../legacy-profiles.json');
-const PROFILE_ITEMS = ['Local State', 'Preferences', 'lolzteam.json', 'music-library.json', 'soundcloud-session.json', 'Network', 'Local Storage', 'Session Storage', 'IndexedDB', 'WebStorage'];
+const PROFILE_ITEMS = [
+  'Local State', 'Preferences', 'Network', 'Cookies', 'Cookies-journal',
+  'Local Storage', 'Session Storage', 'IndexedDB', 'WebStorage',
+  'lolzteam.json', 'music-library.json', 'soundcloud-session.json',
+  'wave-library.json', 'player-tools.json', 'local-library.json',
+  'lyric-sources.json', 'lyric-timing.json', 'downloads.json',
+  'release-radar.json', 'mini-window.json', 'browser-pairing.json',
+  'cloud-session.json', 'soundcloud-onboarding.json',
+];
 
 function findLegacyProfile(appData) {
-  return legacyNames.map(name => path.join(appData, name))
-    .find(folder => fs.existsSync(path.join(folder, 'Network/Cookies')) || fs.existsSync(path.join(folder, 'soundcloud-session.json')) || fs.existsSync(path.join(folder, 'lolzteam.json'))) || null;
+  const folders = legacyNames.map(name => path.join(appData, name));
+  return folders.find(folder => ['Network/Cookies', 'Cookies', 'soundcloud-session.json', 'lolzteam.json'].some(name => fs.existsSync(path.join(folder, name))))
+    || folders.find(folder => PROFILE_ITEMS.filter(name => name.endsWith('.json')).some(name => fs.existsSync(path.join(folder, name)))) || null;
 }
 
 function migrateProfile(appData) {
   const target = path.join(appData, 'LolzCloud');
-  if (fs.existsSync(target)) return { path: target, migrated: false };
+  if (fs.existsSync(target) && fs.readdirSync(target).length) return { path: target, migrated: false };
   const source = findLegacyProfile(appData);
   if (!source) return { path: target, migrated: false };
   const temporary = fs.mkdtempSync(path.join(appData, 'LolzCloud-migration-'));
@@ -20,6 +29,7 @@ function migrateProfile(appData) {
       const file = path.join(source, name);
       if (fs.existsSync(file)) fs.cpSync(file, path.join(temporary, name), { recursive: true, errorOnExist: true, force: false });
     }
+    if (fs.existsSync(target)) fs.rmdirSync(target);
     fs.renameSync(temporary, target);
     return { path: target, migrated: true };
   } finally {
@@ -42,4 +52,4 @@ function configureProfile(app) {
   app.setPath('sessionData', result.path);
   return result;
 }
-module.exports = { findLegacyProfile, migrateProfile, configureProfile };
+module.exports = { PROFILE_ITEMS, findLegacyProfile, migrateProfile, configureProfile };
