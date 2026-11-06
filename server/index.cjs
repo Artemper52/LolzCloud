@@ -1,9 +1,13 @@
 'use strict';
 const http = require('node:http'), fs = require('node:fs'), path = require('node:path');
+const { createHash } = require('node:crypto');
+const { version } = require('./package.json');
 const { CloudStore, HttpError, profile, safeNext, hash } = require('./core.cjs');
 const { PlayerServices } = require('./player-services.cjs');
 const { RoomEngine } = require('./room-engine.cjs');
 const ROOT = path.join(__dirname, 'public');
+const publicFile = name => fs.readFileSync(path.join(ROOT, name), 'utf8');
+const inlineHash = value => "'sha256-" + createHash('sha256').update(value).digest('base64') + "'";
 const cookies = req => Object.fromEntries(String(req.headers.cookie || '').split(';').map(row => row.trim().split(/=(.*)/s).slice(0, 2)).filter(row => row.length === 2));
 function createServer({ origin = 'https://lolzcloud.com', clientId = process.env.LOLZ_CLIENT_ID, redirectMode = process.env.LOLZ_REDIRECT_MODE ?? 'explicit', spicyKey = process.env.SPICY_LYRICS_SECRET_KEY, store = new CloudStore({ filename: path.join(process.env.LOLZCLOUD_STATE || '/var/lib/lolzcloud', 'sessions.json'), origin }), fetcher = fetch, verifyProfile = null } = {}) {
   if (!['explicit', 'registered'].includes(redirectMode)) throw new Error('LOLZ_REDIRECT_MODE must be explicit or registered.');
@@ -27,7 +31,10 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
     return { status: response.status, value, retry: response.headers.get('retry-after') };
   }
   const checkProfile = verifyProfile || (async accessToken => {
-    const response = await apiJson('https://api.lolz.team/users/me', { headers: { Authorization: 'Bearer ' + accessToken, Accept: 'application/json', 'User-Agent': 'LolzCloud/0.8.0' } });
+    let response;
+    try { response = await apiJson('https://api.lolz.team/users/me', { headers: { Authorization: 'Bearer ' + accessToken, Accept: 'application/json', 'User-Agent': 'LolzCloud' } }); }
+    catch { throw new HttpError(502, 'Сейчас не удалось связаться с Lolzteam. Открой вход заново.'); }
+    if (response.status === 429 || response.status >= 500) throw new HttpError(503, 'Lolzteam временно недоступен. Попробуй войти чуть позже.');
     if (response.status !== 200 || !response.value.user) throw new HttpError(401, 'Lolzteam не подтвердил вход. Повтори авторизацию.');
     return profile(response.value.user);
   });
@@ -49,13 +56,24 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
   function redirect(res, url) { res.writeHead(303, { Location: url }); res.end(); }
   function cookie(name, value, age) { return name + '=' + value + '; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=' + age; }
   function page(res, name, room = false) { headers(res, room); res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(fs.readFileSync(path.join(ROOT, name))); }
+  function callback(res) {
+    const style = publicFile('callback.css').replace(/\r\n/g, '\n');
+    const script = publicFile('callback.js').replace(/\r\n/g, '\n');
+    const html = publicFile('callback.html').replace('<!-- callback-style -->', () => '<style>' + style + '</style>')
+      .replace('<!-- callback-script -->', () => '<script>' + script + '</script>');
+    res.setHeader('Content-Security-Policy', res.getHeader('Content-Security-Policy')
+      .replace("script-src 'self'", 'script-src ' + inlineHash(script))
+      .replace("style-src 'self'", 'style-src ' + inlineHash(style)));
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(html);
+  }
   const server = http.createServer(async (req, res) => {
     headers(res);
     try {
       const url = new URL(req.url, origin), method = req.method;
       if (!['GET', 'POST', 'PUT', 'DELETE'].includes(method)) throw new HttpError(405, 'Метод не поддерживается.');
       const peer = String(req.headers['x-real-ip'] || req.socket.remoteAddress).slice(0, 100);
-      if (url.pathname === '/api/health' && method === 'GET') return send(res, { ok: true, version: '0.9.0', roomProtocol: 2, oauthConfigured: !!clientId, spicyConfigured: !!spicyKey });
+      if (url.pathname === '/api/health' && method === 'GET') return send(res, { ok: true, version, roomProtocol: 2, oauthConfigured: !!clientId, spicyConfigured: !!spicyKey });
       if (url.pathname === '/auth/lolz' && method === 'GET') {
         if (!clientId || !/^[a-zA-Z0-9_-]{5,100}$/.test(clientId)) throw new HttpError(503, 'Вход временно недоступен.');
         limit('login:' + peer, 20);
@@ -66,7 +84,7 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
         if (redirectMode === 'explicit') destination.searchParams.set('redirect_uri', origin + '/auth/lolz/callback');
         return redirect(res, destination.href);
       }
-      if (url.pathname === '/auth/lolz/callback' && method === 'GET') return page(res, 'callback.html');
+      if (url.pathname === '/auth/lolz/callback' && method === 'GET') return callback(res);
       if (url.pathname === '/api/auth/complete' && method === 'POST') {
         if (req.headers.origin !== origin) throw new HttpError(403, 'Недоверенный запрос входа.');
         limit('auth:' + peer, 20);

@@ -3,6 +3,27 @@ const test = require('node:test'), assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), os = require('node:os');
 const { ListeningRoom } = require('../source/integrations/room.cjs');
 
+test('pairing recovers from a network timeout and clears an expired attempt', async t => {
+  let result = new DOMException('The operation was aborted due to timeout', 'TimeoutError');
+  const room = new ListeningRoom(() => ({}), { fetcher: async () => {
+    if (result instanceof Error) throw result;
+    return Response.json(result.body, { status: result.status });
+  } });
+  clearInterval(room.timer); t.after(() => room.dispose());
+  const pair = room.pair = { expires: Date.now() + 60000, code: 'fixture-code', deviceCode: 'd'.repeat(43) };
+  await room.tick();
+  assert.match(room.getState().error, /Повторяем подключение автоматически/);
+  assert.equal(room.getState().connecting, true);
+  result = { body: { pending: true }, status: 200 }; pair.nextPoll = 0;
+  await room.tick();
+  assert.equal(room.getState().error, '');
+  result = { body: { error: 'Подключение истекло.' }, status: 410 }; pair.nextPoll = 0;
+  await room.tick();
+  assert.equal(room.getState().connecting, false);
+  assert.equal(room.getState().code, '');
+  assert.equal(room.getState().error, 'Подключение истекло.');
+});
+
 for (const failure of ['storage', 'session']) test('a paired desktop resumes room creation after a temporary ' + failure + ' failure', async t => {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'lolzcloud-room-recovery-'));
   let available = failure !== 'storage', sessionFailures = failure === 'session' ? 1 : 0, created = 0, opened = 0;

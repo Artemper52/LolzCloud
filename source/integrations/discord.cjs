@@ -10,14 +10,18 @@ function buildActivity(snapshot, now = Date.now()) {
   if (snapshot.private) return null;
   const hasTrack = snapshot.fresh && !!track?.title;
   const playing = hasTrack && track.playing;
-  const profiles = profileLinks(snapshot.user, snapshot.soundcloudProfile);
+  const profiles = profileLinks(
+    snapshot.settings?.discordLolzteam === false ? null : snapshot.user,
+    snapshot.settings?.discordSoundcloud === false ? null : snapshot.soundcloudProfile,
+  );
   const buttons = [];
   if (profiles.lolzteam) buttons.push({ label: 'Lolzteam', url: profiles.lolzteam.url });
   if (profiles.soundcloud) buttons.push({ label: 'SoundCloud', url: profiles.soundcloud.url });
   const activity = {
     type: playing ? 2 : 0,
+    status_display_type: hasTrack ? 2 : 0,
     details: hasTrack ? truncate(clean(track.title), 128) : 'В LolzCloud',
-    state: playing ? truncate([clean(track.artist), profiles.lolzteam?.name].filter(Boolean).join(' · '), 128) || 'SoundCloud'
+    state: playing ? truncate(clean(track.artist), 128) || 'SoundCloud'
       : truncate([hasTrack ? 'На паузе' : 'Выбирает музыку', hasTrack ? clean(track.artist) : profiles.lolzteam?.name].filter(Boolean).join(' · '), 128),
     assets: {
       ...(hasTrack && track.cover ? { large_image: track.cover } : {}),
@@ -135,7 +139,9 @@ class DiscordPresence {
         return;
       }
       const modeChanged = activity.type !== this.activity?.type;
-      if (this.now() < this.nextUpdateAt && !(modeChanged && this.now() - this.lastPublishedAt >= 5000)) return;
+      const profileVisibility = [latest.settings.discordSoundcloud !== false, latest.settings.discordLolzteam !== false].join(':');
+      const profilesChanged = this.profileVisibility !== undefined && profileVisibility !== this.profileVisibility;
+      if (this.now() < this.nextUpdateAt && !profilesChanged && !(modeChanged && this.now() - this.lastPublishedAt >= 5000)) return;
       this.nextUpdateAt = this.now() + UPDATE_MS;
       // discord-rpc v4's setActivity omits type and URL fields. Send the documented RPC payload.
       const reply = await deadline(this.client.request('SET_ACTIVITY', { pid: process.pid, activity }));
@@ -144,6 +150,7 @@ class DiscordPresence {
         url: typeof button === 'string' ? reply.metadata?.button_urls?.[index] || null : button.url,
       })) : null;
       this.activity = activity;
+      this.profileVisibility = profileVisibility;
       this.lastPublishedAt = this.now();
       this.error = '';
     } catch {

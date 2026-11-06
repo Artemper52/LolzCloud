@@ -8,6 +8,10 @@ Some existing interface SVG glyphs are from Google Material Symbols, distributed
 
 Electron and npm dependencies retain their respective licenses. Electron's runtime license files are included in the packaged distribution; dependency license files remain alongside the bundled modules.
 
+Inter 4.1 by Rasmus Andersson is bundled locally under the SIL Open Font License 1.1. The license and copyright notice are preserved in `licenses/Inter-OFL.txt`. Font source and releases are available at https://github.com/rsms/inter.
+
+Selected duotone and solid interface icons were extracted from the Untitled UI SVG sheets supplied by the project owner. Untitled UI retains the rights to those icons. They are excluded from this repository's MIT license.
+
 SoundCloud, Lolzteam and Discord names identify the services integrated with this application. Their service names and marks are not licensed by this repository's MIT license.
 
 FFmpeg is bundled as a separate, unmodified command-line executable via `ffmpeg-static` 5.3.0. The Windows x64 executable is Gyan 6.1.1-essentials, licensed under GPL v3. The application invokes it on local temporary audio files; it is not linked into the JavaScript program. Its GPL license and original build information are included in `licenses/FFmpeg-GPL-3.0.txt` and `licenses/FFmpeg-Windows-build.txt`; the wrapper license is in `licenses/ffmpeg-static-GPL-3.0.txt`. Source for this exact FFmpeg revision: https://github.com/FFmpeg/FFmpeg/tree/e38092ef93. Original binary/build provider: https://www.gyan.dev/ffmpeg/builds/. Distribution scripts and dependency build references: https://github.com/eugeneware/ffmpeg-static/tree/b6.1.1. The independent LolzCloud JavaScript source retains its MIT license.

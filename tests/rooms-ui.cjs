@@ -12,13 +12,37 @@ app.whenReady().then(async () => {
   let server, desktop, desktopTimer; const windows = [], errors = [], measurements = [];
   try {
     const reserve = net.createServer(); await new Promise(resolve => reserve.listen(0, '127.0.0.1', resolve)); const port = reserve.address().port; await new Promise(resolve => reserve.close(resolve)); const origin = 'http://127.0.0.1:' + port;
-    const store = new CloudStore({ origin }), owner = store.login({ id: 501, name: 'Fixture owner' }), guest = store.login({ id: 502, name: 'Fixture guest' }), listener = store.login({ id: 503, name: 'Fixture listener' }); server = createServer({ origin, store, clientId: 'fixture-id' }); await new Promise(resolve => server.listen(port, '127.0.0.1', resolve)); const room = store.createRoom(owner.user);
+    const store = new CloudStore({ origin }), owner = store.login({ id: 501, name: 'Fixture owner' }), guest = store.login({ id: 502, name: 'Fixture guest' }), listener = store.login({ id: 503, name: 'Fixture listener' }); server = createServer({ origin, store, clientId: 'fixture-id', verifyProfile: async () => listener.user }); await new Promise(resolve => server.listen(port, '127.0.0.1', resolve)); const room = store.createRoom(owner.user);
+    const authSession = session.fromPartition('rooms-test-auth');
+    const auth = new BrowserWindow({ show: false, webPreferences: { session: authSession, sandbox: true, offscreen: true } });
+    windows.push(auth);
+    await auth.loadURL(origin + '/auth/lolz/callback');
+    assert.match(await auth.webContents.executeJavaScript('document.getElementById("status").textContent'), /Вход не подтверждён/);
+    assert.equal(await auth.webContents.executeJavaScript('getComputedStyle(document.documentElement).backgroundColor'), 'rgb(17, 16, 26)');
+    const pair = store.beginDevice(), state = store.beginLogin('/connect?code=' + pair.code);
+    await authSession.cookies.set({ url: origin, name: '__Host-lc_login', value: state, secure: true, httpOnly: true, path: '/' });
+    await auth.loadURL('about:blank');
+    await auth.loadURL(origin + '/auth/lolz/callback#access_token=fixture-token&state=' + state);
+    await until(() => auth.webContents.executeJavaScript('location.pathname === "/connect" && !!window.LolzCloudSession'), 'OAuth callback did not finish browser pairing');
+    await auth.webContents.executeJavaScript('document.getElementById("approve").click()');
+    await until(() => auth.webContents.executeJavaScript('document.getElementById("status").textContent.includes("Готово")'), 'Browser did not approve desktop pairing');
+    assert.equal(store.pollDevice(pair.deviceCode).user.id, listener.user.id);
     async function client(secret, name, width = 1366, lag = 20) { const ses = session.fromPartition('rooms-test-' + name); ses.webRequest.onBeforeSendHeaders({ urls: [origin + '/*'] }, (details, callback) => { callback({ requestHeaders: { ...details.requestHeaders, Authorization: 'Bearer ' + secret } }); }); await ses.protocol.handle('https', request => new Response(request.url.includes('/player/api.js') ? fakeWidget : '<html><body style="background:#13241a;color:#b8e9c7;font:18px sans-serif;padding:35px">SoundCloud · deterministic synchronization fixture</body></html>', { headers: { 'Content-Type': request.url.includes('/player/api.js') ? 'text/javascript' : 'text/html' } })); const window = new BrowserWindow({ show: false, width, height: 900, webPreferences: { session: ses, contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false, offscreen: true } }); windows.push(window); window.webContents.on('console-message', (_event, ...args) => { const value = args[1]; if (typeof value === 'string' && /Uncaught|TypeError|SyntaxError/.test(value)) errors.push(name + ': ' + value); }); await window.loadURL(origin + '/room/' + room.id + '/?lag=' + lag); await until(() => window.webContents.executeJavaScript('!!window.LolzCloudSession'), name + ' did not authenticate'); return window; }
     const host = await client(owner.secret, 'owner'), one = await client(guest.secret, 'guest', 1366, 60), two = await client(listener.secret, 'mobile', 420, 100);
     const js = (window, code) => window.webContents.executeJavaScript(code);
+    let rejectedWidget = false;
+    await two.webContents.session.protocol.unhandle('https');
+    await two.webContents.session.protocol.handle('https', request => {
+      if (!request.url.includes('/player/api.js')) return new Response('<html><body>SoundCloud fixture</body></html>', { headers: { 'Content-Type': 'text/html' } });
+      if (!rejectedWidget) { rejectedWidget = true; return new Response('', { status: 503 }); }
+      return new Response(fakeWidget, { headers: { 'Content-Type': 'text/javascript' } });
+    });
     await js(host, 'document.getElementById("claim-host").click()'); await until(() => js(host, '!document.getElementById("host-controls").hidden'), 'Browser could not become the host');
     await js(host, 'document.getElementById("host-track").value="https://soundcloud.com/fixture/synchronized";document.getElementById("host-track-form").requestSubmit()'); await until(() => js(host, 'window.__fakeWidget?.playing()'), 'Host did not start the track');
-    await until(() => js(one, '!!window.__fakeWidget'), 'Guest did not preload the track'); await until(() => js(two, '!!window.__fakeWidget'), 'Mobile guest did not preload the track'); await js(one, 'document.getElementById("join").click()'); await js(two, 'document.getElementById("join").click()'); await delay(3500);
+    await until(() => js(two, '!document.getElementById("retry-player").hidden'), 'Missing SoundCloud did not show a recovery button');
+    assert.equal(await js(two, 'document.getElementById("chat-input").disabled'), false);
+    await js(two, 'document.getElementById("retry-player").click()');
+    await until(() => js(one, '!!window.__fakeWidget'), 'Guest did not preload the track'); await until(() => js(two, '!!window.__fakeWidget'), 'Mobile guest could not retry the track'); await js(one, 'document.getElementById("join").click()'); await js(two, 'document.getElementById("join").click()'); await delay(3500);
     async function positions(label) { const values = await Promise.all([host, one, two].map(window => js(window, 'window.__fakeWidget.position()'))); const spread = Math.max(...values) - Math.min(...values); measurements.push({ label, spreadMs: Math.round(spread * 1000) }); assert.ok(spread < .45, label + ': spread=' + spread + 's'); return values; }
     await positions('playing'); await js(host, 'document.getElementById("host-play").click()'); await until(async () => (await Promise.all([host, one, two].map(window => js(window, '!window.__fakeWidget.playing()')))).every(Boolean), 'Shared pause was not applied'); await positions('paused');
     await js(host, 'document.getElementById("host-seek").value="37";document.getElementById("host-seek").dispatchEvent(new Event("change"))'); await delay(1500); const paused = await positions('seek'); assert.ok(paused.every(value => Math.abs(value - 37) < .4));

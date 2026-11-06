@@ -83,6 +83,7 @@
     enabled: 'enabled', 'show-time': 'showTime',
     'show-duration': 'showDuration', format: 'format', pause: 'pauseBehavior', prefix: 'prefix',
     'discord-enabled': 'discordEnabled',
+    'discord-soundcloud': 'discordSoundcloud', 'discord-lolzteam': 'discordLolzteam',
   };
   for (const [id, setting] of Object.entries(settingsFields)) {
     const control = element(id);

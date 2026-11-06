@@ -31,7 +31,11 @@ function tasteProfile(history, likes = [], feedback = {}, now = Date.now()) {
     track.weight += bonus - penalty;
     const artist = norm(track.artist); if (artist) artists.set(artist, (artists.get(artist) || 0) + bonus - Math.min(9, penalty));
   }
-  return { tracks, artists, genres };
+  const recordings = new Set([...tracks.values()].flatMap(fingerprints));
+  return { tracks, artists, genres, recordings };
+}
+function familiar(track, profile) {
+  return profile.tracks.has(track.url) || fingerprints(track).some(key => profile.recordings?.has(key));
 }
 function rankCandidates(candidates, profile, { feedback = {}, recent = [], current = '', adventurous = .35, random = Math.random, played24h = {}, now = Date.now(), settings = DEFAULTS, context = null, blockedArtists = [], omit = new Set(), request = null } = {}) {
   const recentUrls = new Set(recent.map(row => typeof row === 'string' ? row : row.url));
@@ -43,23 +47,26 @@ function rankCandidates(candidates, profile, { feedback = {}, recent = [], curre
     const intent = requestMatch(track, request); if (!intent.eligible) continue;
     const signals = feedback[track.url] || {}, personal = profile.tracks.get(track.url)?.weight || 0;
     if ((signals.skips || 0) >= 3 && (signals.loves || 0) === 0 && now - (signals.lastSkippedAt || now) < DAY) continue;
-    if (settings.character === 'discover' && profile.tracks.has(track.url) || settings.character === 'familiar' && personal <= 0) continue;
+    const known = familiar(track, profile);
+    if ((settings.character === 'discover' || settings.character !== 'familiar' && adventurous >= .99) && known || settings.character === 'familiar' && personal <= 0) continue;
     const artist = norm(track.artist), artistWeight = profile.artists.get(artist) || 0, genreWeight = profile.genres.get(norm(track.genre)) || 0;
     const affinity = Math.sign(artistWeight) * Math.log1p(Math.abs(artistWeight)) * 2;
-    const novelty = profile.tracks.has(track.url) ? 0 : 1.5 + adventurous * 4;
+    const novelty = known ? 0 : 1.5 + adventurous * 16;
     const preference = preferenceScore(track, settings, context);
     const skips = (signals.skips || 0) * Math.exp(-Math.max(0, now - (signals.lastSkippedAt || now)) / (7 * DAY));
-    const score = 3 + Math.min(10, personal * .7) + affinity + Math.min(3, genreWeight * .15) + novelty + Math.log1p(Math.max(0, item.seedWeight || 0)) + preference.score + intent.score
+    const score = 3 + Math.min(10, personal * .7) * (1 - adventurous) + affinity + Math.min(3, genreWeight * .15) + novelty + Math.log1p(Math.max(0, item.seedWeight || 0)) + preference.score + intent.score
       - skips * 4 - lastArtists.filter(value => value === artist).length * 3.5 + random() * (1 + adventurous * 3);
     const reason = intent.reason || (preference.score >= 3 && preference.reason ? preference.reason : (signals.loves || 0) > 0 ? 'Ты отметил этот трек' : artistWeight > 3 ? 'Часто слушаешь ' + track.artist
       : item.seedTitle ? 'Похож на «' + item.seedTitle + '»' : personal > 0 ? 'Тебе нравилось это звучание' : 'Новое в твоём настроении');
     const value = { ...track, score, reason, seedTitle: item.seedTitle || '', seedWeight: item.seedWeight || 0 }, key = track.id ? 'id:' + track.id : track.url;
     if (!unique.has(key) || unique.get(key).score < score) unique.set(key, value);
   }
-  const remaining = [...unique.values()], result = [];
+  const remaining = [...unique.values()], result = [], chosen = new Set();
   while (remaining.length && result.length < 40) {
     remaining.sort((a, b) => b.score - a.score);
-    const next = remaining.shift(); result.push(next);
+    const next = remaining.shift(), keys = fingerprints(next);
+    if (keys.some(key => chosen.has(key))) continue;
+    result.push(next); keys.forEach(key => chosen.add(key));
     for (const row of remaining) if (norm(row.artist) === norm(next.artist)) row.score -= 3;
   }
   return result;
@@ -71,7 +78,6 @@ class PersonalWave {
     this.request = null; this.requestPage = 0;
     this.data = { likes: [], feedback: {}, adventurous: .35, preferences: { ...DEFAULTS }, blockedArtists: [], played24h: {}, lastLikesAt: 0 };
     Object.assign(this, { active: false, loading: false, refilling: false, error: '', queue: [], current: null, recent: [], waitingUntil: 0, previous: null, busy: null, fillBusy: null, lastSeedUrls: [], generation: 0, queueVersion: 0, seedCursor: 0, anchor: null, disposed: false, nextWarmAt: 0 });
-    let migrate = true;
     try {
       const saved = JSON.parse(fs.readFileSync(filename, 'utf8'));
       this.data.likes = Array.isArray(saved.likes) ? saved.likes.map(normalizeTrack).filter(Boolean) : [];
@@ -83,11 +89,11 @@ class PersonalWave {
       this.data.lastLikesAt = Number(saved.lastLikesAt) || 0;
       this.data.preferences = normalizePreferences(saved.preferences);
       this.data.blockedArtists = Array.isArray(saved.blockedArtists) ? [...new Set(saved.blockedArtists.map(value => clean(value, 100)).filter(Boolean))].slice(0, 100) : [];
-      this.data.played24h = prunePlayed(saved.played24h, this.now()); migrate = !saved.played24h;
+      this.data.played24h = prunePlayed(saved.played24h, this.now());
     } catch { /* First run. */ }
     // Existing local history seeds the first day's deduplication cache. Only hashes
     // and timestamps are copied, without titles or public profile information.
-    if (migrate) for (const row of this.getHistory()) if (Number.isFinite(row.playedAt) && row.playedAt > this.now() - DAY && row.playedAt <= this.now()) markPlayed(row, this.data.played24h, row.playedAt);
+    for (const row of this.getHistory()) if (Number.isFinite(row.playedAt) && row.playedAt > this.now() - DAY && row.playedAt <= this.now()) markPlayed(row, this.data.played24h, row.playedAt);
   }
   save() {
     this.data.played24h = prunePlayed(this.data.played24h, this.now());
@@ -104,9 +110,9 @@ class PersonalWave {
   allowed(track, profile = null) {
     if (this.isDuplicate?.(track, this.data.played24h, this.now())) return false;
     if (playedRecently(track, this.data.played24h, this.now()) || this.data.feedback[track.url]?.banned || this.data.blockedArtists.some(name => norm(name) === norm(track.artist)) || !requestMatch(track, this.request).eligible) return false;
-    const mode = this.settings().character; if (mode === 'mixed') return true;
-    const known = (profile || this.profile()).tracks.get(track.url);
-    return !(mode === 'discover' && known || mode === 'familiar' && !(known?.weight > 0));
+    const mode = this.settings().character, taste = profile || this.profile();
+    if (mode === 'familiar') return (taste.tracks.get(track.url)?.weight || 0) > 0;
+    return !(mode === 'discover' || this.data.adventurous >= .99) || !familiar(track, taste);
   }
   state() {
     const snapshot = this.getSnapshot(), track = snapshot.playback, feedback = this.data.feedback[track?.url], profile = this.profile();
@@ -159,13 +165,13 @@ class PersonalWave {
       for (const result of results) if (result.status === 'fulfilled') pool.push(...result.value);
       if (version !== this.queueVersion || this.disposed) return;
       if (this.rank(pool, omit).length < 8 && this.data.preferences.character !== 'familiar') {
-        const neighbours = pool.filter(row => row.url && !selected.some(seed => seed.url === row.url)), at = this.seedCursor % Math.max(1, neighbours.length);
-        const secondSeeds = neighbours.slice(at).concat(neighbours.slice(0, at)).slice(0, 2);
+        const neighbours = this.rank(pool, omit).filter(row => !selected.some(seed => seed.url === row.url));
+        const secondSeeds = neighbours.slice(0, 3);
         const expansion = await Promise.allSettled(secondSeeds.map(async seed => (await this.provider.related(seed)).map(track => ({ ...track, seedTitle: seed.title, seedWeight: 1 }))));
         for (const result of expansion) if (result.status === 'fulfilled') pool.push(...result.value);
         if (this.rank(pool, omit).length < 8 && typeof this.provider.search === 'function') {
           const query = hint || selected[this.seedCursor % Math.max(1, selected.length)]?.artist;
-          if (query) { try { pool.push(...await this.provider.search(query)); } catch { /* Keep available related tracks. */ } }
+          if (query) { try { pool.push(...await this.provider.search(query, { offset: (this.requestPage++ % 6) * 50 })); } catch { /* Keep available related tracks. */ } }
         }
       }
       if (version !== this.queueVersion || this.disposed) return;
@@ -265,7 +271,7 @@ class PersonalWave {
     this.waitingUntil = this.now() + 25_000; this.play(track.url, track);
   }
   observe(snapshot) {
-    if (!this.active || this.disposed) return;
+    if (!this.active || this.disposed || this.verificationRequired) return;
     const track = snapshot.playback;
     if (this.current && track.url === this.current.url && snapshot.fresh) {
       this.waitingUntil = 0;

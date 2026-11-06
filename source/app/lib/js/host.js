@@ -2,6 +2,8 @@
   'use strict';
   const { ipcRenderer } = require('electron');
   const fs = require('node:fs'), path = require('node:path');
+  const interFont = fs.readFileSync(path.join(__dirname, 'lib/assets/fonts/InterVariable.woff2')).toString('base64');
+  const soundCloudFont = "@font-face{font-family:Inter;font-style:normal;font-weight:100 900;src:url(data:font/woff2;base64," + interFont + ") format('woff2')}html,body,button,input,select,textarea{font-family:Inter,Arial,sans-serif!important}.soundTitle__title,.soundTitle__username,.soundList__item .soundTitle__title,.playbackSoundBadge__title{font-family:Inter,Arial,sans-serif!important;font-size:14px!important}";
   const { normalizePlayback, clock } = require('../integrations/lolzteam/status.cjs');
   const { soundcloudProfile } = require('../integrations/profiles.cjs');
   const { scUrl } = require('../integrations/music.cjs');
@@ -121,7 +123,7 @@
   view.addEventListener('did-start-navigation', event => { if (event.isMainFrame && !event.isInPlace) el('browser-loading').classList.remove('is-ready'); });
   view.addEventListener('dom-ready', async () => {
     el('browser-loading').classList.add('is-ready');
-    try { await view.insertCSS(fs.readFileSync(path.join(__dirname, '../themes/lolzcloud.css'), 'utf8')); } catch { /* A navigation may still be committing. */ }
+    try { await view.insertCSS(soundCloudFont + fs.readFileSync(path.join(__dirname, '../themes/lolzcloud.css'), 'utf8')); } catch { /* A navigation may still be committing. */ }
     try { await view.executeJavaScript(fs.readFileSync(path.join(__dirname, '../plugins/promotions.js'), 'utf8')); } catch { /* A navigation may still be committing. */ }
   });
   view.addEventListener('did-stop-loading', () => {

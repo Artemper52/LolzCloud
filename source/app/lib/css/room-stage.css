@@ -12,6 +12,7 @@ body[data-page=room] > header {
   border-bottom: 1px solid #b5e8c62b;
 }
 body[data-page=room] > header .brand { pointer-events: none; }
+body[data-page=room] .room-back { display: none; }
 body[data-page=room] #logout { display: none; }
 body[data-page=room] .room-layout {
   width: auto;
@@ -19,8 +20,8 @@ body[data-page=room] .room-layout {
   padding: 13px;
   gap: 12px;
 }
-body[data-page=room] .room-layout > section,
-body[data-page=room] .room-layout .people {
+body[data-page=room]:not(.room-shell) .room-layout > section,
+body[data-page=room]:not(.room-shell) .room-layout .people {
   background: #1c2c24;
   border-color: #a6e5bb2e;
   border-radius: 15px;

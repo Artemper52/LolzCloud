@@ -73,6 +73,8 @@ app.whenReady().then(async () => {
     await until(() => js('typeof window.LolzCloudPlayerTools?.palette === "function"'), 'New tools did not initialize');
     await js('document.querySelector("[data-view=room]").click()');
     await until(() => js('document.querySelector("#lc-room-cards h4")?.textContent==="Вечерний эфир"'), 'Public room did not appear in the application catalog');
+    assert.equal(await js('getComputedStyle(document.querySelector(".shell-sidebar nav button")).fontSize'), '14px');
+    assert.equal(await js('document.fonts.check("14px Inter")'), true);
     assert.equal(await js('document.querySelectorAll("#lc-room-cards article").length'), 1);
     await delay(400);
     fs.writeFileSync(path.join(root, '.build/room-lobby.png'), (await host.webContents.capturePage()).toPNG());

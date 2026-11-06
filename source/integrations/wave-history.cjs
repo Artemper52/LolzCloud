@@ -2,10 +2,19 @@
 const { createHash } = require('node:crypto');
 const { scUrl } = require('./music.cjs');
 const DAY = 24 * 60 * 60 * 1000;
+function recordingKey(track) {
+  const artist = String(track?.artist || track?.user?.username || '').normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  const title = String(track?.title || '').normalize('NFKC').toLowerCase()
+    .replace(/\b(?:official|audio|video|lyrics?|visualizer|hd|hq)\b/giu, '')
+    .replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+  return artist && title ? 'recording:' + artist + ':' + title : '';
+}
 function fingerprints(track) {
   const values = [], url = scUrl(track?.url || track?.permalink_url), id = Number(track?.id);
   if (url) values.push('url:' + url);
   if (Number.isSafeInteger(id) && id > 0) values.push('id:' + id);
+  const recording = recordingKey(track);
+  if (recording) values.push(recording);
   return values.map(value => createHash('sha256').update(value).digest('hex'));
 }
 function prunePlayed(value, now) {

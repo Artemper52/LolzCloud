@@ -124,6 +124,9 @@ function registerLolzteam(app, getWindow) {
       return { ok: false, error: error.message || 'Не удалось выполнить действие.', state: getState() };
     }
   });
+  ipcMain.on('lolzteam:verification', (event, active) => {
+    if (trusted(event) && typeof active === 'boolean') studio.setVerificationRequired(active);
+  });
   ipcMain.on('lolzteam:playback', (event, playback) => {
     if (!trusted(event)) return;
     if (studio.acceptSoundCloud(playback) === false) return;

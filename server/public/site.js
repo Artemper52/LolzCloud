@@ -6,10 +6,22 @@
     if (user.avatar) { const image = document.createElement('img'); image.alt = ''; image.src = user.avatar; image.onerror = () => { image.hidden = true; }; tile.append(image); }
     return tile;
   }
-  async function request(url, body) {
-    const response = await fetch(url, { credentials: 'same-origin', ...(body ? { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.LolzCloudSession?.csrf || '' }, body: JSON.stringify(body) } : {}) });
-    const value = await response.json();
-    if (!response.ok) { if (response.status === 401) location.replace('/login?next=' + encodeURIComponent(location.pathname + location.search)); throw new Error(value.error || 'Не удалось выполнить запрос.'); }
+  async function request(url, body, method = body ? 'POST' : 'GET') {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    let response, value;
+    try {
+      response = await fetch(url, { method, credentials: 'same-origin', signal: controller.signal, ...(body ? { headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.LolzCloudSession?.csrf || '' }, body: JSON.stringify(body) } : {}) });
+      value = await response.json();
+    } catch {
+      throw new Error(controller.signal.aborted ? 'Сервер долго отвечает. Попробуй ещё раз.' : 'Не удалось связаться с LolzCloud. Проверь интернет.');
+    } finally { clearTimeout(timeout); }
+    if (!response.ok) {
+      if (response.status === 401) location.replace('/login?next=' + encodeURIComponent(location.pathname + location.search));
+      const error = new Error(value.error || 'Не удалось выполнить запрос.');
+      error.status = response.status;
+      throw error;
+    }
     return value;
   }
   window.LolzCloudSite = { request, avatar };
@@ -34,9 +46,12 @@
   }
   if (page === 'rooms') window.LolzCloudSessionReady.then(async session => {
     if (!session) return;
+    if (el('create-room')) {
+      el('create-room').disabled = false;
+      el('create-room').onclick = async () => { el('create-room').disabled = true; try { const room = await request('/api/rooms', {}); location.assign(room.url); } catch (error) { el('status').textContent = error.message; el('create-room').disabled = false; } };
+    }
     const data = await request('/api/rooms');
     for (const room of data.rooms) { const link = document.createElement('a'), title = document.createElement('strong'), detail = document.createElement('small'); link.href = room.url; link.className = 'room-card'; title.textContent = room.settings?.name || 'Комната ' + room.owner.name; detail.textContent = room.participants.length + ' слушателей · ' + (room.playback.title || 'Выбирают музыку'); link.append(title, detail); el('my-rooms').append(link); }
     if (!data.rooms.length) el('my-rooms').textContent = 'Сейчас нет открытых комнат. Пригласи друзей в свою.';
-    if (el('create-room')) el('create-room').onclick = async () => { el('create-room').disabled = true; try { const room = await request('/api/rooms', {}); location.assign(room.url); } catch (error) { el('status').textContent = error.message; el('create-room').disabled = false; } };
   }).catch(error => { el('status').textContent = error.message; });
 })();

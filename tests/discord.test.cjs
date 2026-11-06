@@ -18,6 +18,8 @@ test('Discord sends the listener profiles instead of the artist or project links
   const activity = buildActivity(snapshot(), 1_700_000_000_000);
   assert.equal(activity.type, 2);
   assert.equal(activity.details, 'Track | live');
+  assert.equal(activity.status_display_type, 2);
+  assert.equal(activity.state, 'Artist');
   assert.deepEqual(activity.buttons, [
     { label: 'Lolzteam', url: 'https://lolz.live/members/123/' },
     { label: 'SoundCloud', url: 'https://soundcloud.com/my-account' },
@@ -26,6 +28,21 @@ test('Discord sends the listener profiles instead of the artist or project links
   assert.equal(activity.timestamps.start, 1_700_000_000 - 83);
   assert.equal(activity.state_url, 'https://soundcloud.com/my-account');
   assert.equal(activity.details_url, 'https://soundcloud.com/artist/track');
+});
+
+test('Discord profile switches remove every link and nickname for the disabled service', () => {
+  const state = snapshot();
+  state.settings.discordLolzteam = false;
+  let activity = buildActivity(state);
+  assert.deepEqual(activity.buttons.map(row => row.label), ['SoundCloud']);
+  assert.equal(activity.assets.small_url, undefined);
+  assert.ok(!JSON.stringify(activity).includes('Listener'));
+  state.settings.discordSoundcloud = false;
+  activity = buildActivity(state);
+  assert.equal(activity.buttons, undefined);
+  assert.equal(activity.state_url, undefined);
+  assert.equal(activity.assets.large_url, undefined);
+  assert.equal(activity.details_url, state.playback.url);
 });
 
 test('Discord timestamps account for speed changes', () => {

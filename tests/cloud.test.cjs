@@ -80,12 +80,16 @@ test('neither OAuth redirect mode can complete login with a mismatched browser s
     assert.equal(verified, 1);
   }
 });
-test('desktop pairing needs an authenticated approval and can only be redeemed once', async t => {
-  const { call, a } = await setup(t), pair = await (await call('/api/desktop/start', { method: 'POST', secret: null, body: {} })).json();
+test('desktop pairing needs an authenticated approval and retries return the same session briefly', async t => {
+  const { call, a, b, advance } = await setup(t), pair = await (await call('/api/desktop/start', { method: 'POST', secret: null, body: {} })).json();
   assert.equal((await (await call('/api/desktop/poll', { method: 'POST', secret: null, body: { deviceCode: pair.deviceCode } })).json()).pending, true);
   assert.equal((await call('/api/desktop/approve', { method: 'POST', secret: null, body: { code: pair.code } })).status, 401);
   assert.equal((await call('/api/desktop/approve', { method: 'POST', body: { code: pair.code } })).status, 200);
   const granted = await (await call('/api/desktop/poll', { method: 'POST', secret: null, body: { deviceCode: pair.deviceCode } })).json(); assert.equal(granted.user.id, a.user.id); assert.match(granted.token, /^[\w-]{43}$/);
+  assert.equal((await call('/api/desktop/approve', { method: 'POST', body: { code: pair.code } })).status, 200);
+  assert.equal((await call('/api/desktop/approve', { method: 'POST', secret: b.secret, body: { code: pair.code } })).status, 404);
+  assert.deepEqual(await (await call('/api/desktop/poll', { method: 'POST', secret: null, body: { deviceCode: pair.deviceCode } })).json(), granted);
+  advance(60001);
   assert.equal((await call('/api/desktop/poll', { method: 'POST', secret: null, body: { deviceCode: pair.deviceCode } })).status, 410);
 });
 test('shared Spicy requests require login, preserve attribution and cache without revealing the key', async t => {

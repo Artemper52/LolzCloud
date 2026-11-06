@@ -112,6 +112,10 @@ app.whenReady().then(async () => {
     await js('document.getElementById("player-previous").click()'); await until(() => js('document.getElementById("player-title").textContent === "Song 2"'), 'Previous restarted the current song instead of changing it');
     await js('document.getElementById("player-previous").click()'); await until(() => js('document.getElementById("player-title").textContent === "Song 1"'), 'A second previous did not go back again');
     await js('document.getElementById("player-next").click()'); await until(() => js('document.getElementById("player-title").textContent === "Song 2"'), 'Next did not return forward after going back');
+    await js('window.LolzCloudStudio.open("wave");document.getElementById("webview").executeJavaScript(\'document.title="Verification Required";document.body.insertAdjacentHTML("afterbegin","<h1 id=fixture-challenge>Verification Required</h1>")\')');
+    await until(() => js('!document.getElementById("sc-verification").hidden && !document.getElementById("lc-studio").open'), 'Verification was not revealed inside the app');
+    await js('document.getElementById("webview").executeJavaScript(\'document.title="SoundCloud";document.getElementById("fixture-challenge").remove()\')');
+    await until(() => js('document.getElementById("sc-verification").hidden'), 'Verification notice did not clear after completion');
     console.log('Session and transport UI passed: clean-PC prompt, browser WebCrypto handoff, actual helper content/worker/popup with HttpOnly cookies and one-time approval, automatic direct transfer, encrypted persistence, password file fallback, failure recovery and previous/previous/next.');
   } catch (error) { console.error(error.stack); process.exitCode = 1; }
   finally { ipcMain.removeHandler('fixture:helper'); if (integration) await integration.shutdown(); if (popup && !popup.isDestroyed()) popup.destroy(); if (browser && !browser.isDestroyed()) browser.destroy(); if (host && !host.isDestroyed()) host.destroy(); app.exit(process.exitCode || 0); }

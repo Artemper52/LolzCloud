@@ -64,16 +64,24 @@ class CloudStore {
     return { deviceCode: secret, code, verificationUrl: this.origin + '/connect?code=' + code, expiresIn: 600 };
   }
   approveDevice(code, user) {
-    const row = [...this.devices.values()].find(value => value.code === code && value.expires > this.now() && !value.user);
-    if (!row) throw new HttpError(404, 'Код подключения истёк или уже использован. Запусти вход в приложении ещё раз.');
-    row.user = user; row.code = ''; return true;
+    const row = [...this.devices.values()].find(value => value.code === code && value.expires > this.now());
+    if (!row || row.user && row.user.id !== user.id) throw new HttpError(404, 'Код подключения истёк или уже использован. Запусти вход в приложении ещё раз.');
+    row.user ||= user;
+    return true;
   }
   pollDevice(secret) {
     const key = hash(secret), row = this.devices.get(key);
     if (!row || row.expires <= this.now()) throw new HttpError(410, 'Подключение истекло. Открой вход заново.');
+    if (row.grant) {
+      if (!this.session(row.grant.token)) throw new HttpError(410, 'Подключение истекло. Открой вход заново.');
+      return row.grant;
+    }
     if (!row.user) return { pending: true };
-    this.devices.delete(key); const session = this.login(row.user);
-    return { pending: false, token: session.secret, user: session.user, expires: session.expires };
+    const session = this.login(row.user);
+    // A lost HTTP response can be retried with the same device secret, briefly.
+    row.expires = Math.min(row.expires, this.now() + 60000);
+    row.grant = { pending: false, token: session.secret, user: session.user, expires: session.expires };
+    return row.grant;
   }
   createRoom(user) {
     this.prune();

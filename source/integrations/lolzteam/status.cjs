@@ -7,6 +7,8 @@ const MAX_TITLE_LENGTH = 50;
 const DEFAULT_SETTINGS = Object.freeze({
   enabled: false,
   discordEnabled: true,
+  discordSoundcloud: true,
+  discordLolzteam: true,
   privateMode: false,
   excludedTracks: [],
   theme: true,
@@ -84,7 +86,7 @@ function validateSettings(patch, current = DEFAULT_SETTINGS) {
   if (!patch || typeof patch !== 'object' || Array.isArray(patch)) throw new Error('Некорректные настройки.');
   const next = { ...current };
   for (const [key, value] of Object.entries(patch)) {
-    if (['enabled', 'discordEnabled', 'privateMode', 'theme', 'showTime', 'showDuration'].includes(key)) {
+    if (['enabled', 'discordEnabled', 'discordSoundcloud', 'discordLolzteam', 'privateMode', 'theme', 'showTime', 'showDuration'].includes(key)) {
       if (typeof value !== 'boolean') throw new Error('Некорректное значение переключателя.');
     } else if (key === 'excludedTracks') {
       if (!Array.isArray(value) || value.length > 200 || value.some(item => typeof item !== 'string' || item.length > 512 || !/^https:\/\/soundcloud\.com\/[\w-]+\/[\w-]+$/.test(item))) throw new Error('Список исключений содержит неверную ссылку на трек.');

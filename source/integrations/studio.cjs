@@ -272,6 +272,10 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
   ducker.start();
   if (miniController.saved.open) openMini();
   return {
+    setVerificationRequired(active) {
+      wave.verificationRequired = active;
+      if (!active && wave.waitingUntil) wave.waitingUntil = Date.now() + 25000;
+    },
     getState: () => ({ ...getState(), tools: experience.state(), ...(experience.snapshot().local ? { transport: { repeat: { mode: experience.current().repeat } } } : {}) }), snapshot: base => experience.snapshot(base), acceptSoundCloud(playback) { if (!playbackHistory.observe(playback)) return false; experience.acceptSoundCloud(playback); room.observePlayback(playback); return true; }, act, openMini, setUpcoming: urls => prefetch.setUpcoming(urls),
     observe() {
       experience.observe();

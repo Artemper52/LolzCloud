@@ -39,9 +39,19 @@ class ListeningRoom {
     return { active: !!this.room, hosting: !!this.lease || !!this.room && this.room.protocol !== 2, controller: this.room?.controller || null, settings: this.room?.settings || {}, url: this.room?.url || '', viewers: this.room?.viewers || 0, participants: this.room?.participants || [], queue: this.room?.queue || [], authenticated: !!this.token && this.expires > Date.now(), user: this.user, connecting: !!this.pair, recovering: this.storagePending, code: this.pair?.code || '', spicyAvailable: !!this.token && this.spicyAvailable, error: this.error, localNetwork: false };
   }
   async request(endpoint, { method = 'GET', body, signal } = {}) {
-    const response = await this.fetcher(this.origin + endpoint, { method, redirect: 'error', headers: { Accept: 'application/json', ...(body ? { 'Content-Type': 'application/json' } : {}), ...(this.token ? { Authorization: 'Bearer ' + this.token } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}), signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(8000)]) : AbortSignal.timeout(8000) });
-    if (Number(response.headers.get('content-length')) > 2_000_000) throw new Error('Слишком большой ответ сервера.');
-    const raw = await response.text(); if (raw.length > 2_000_000) throw new Error('Слишком большой ответ сервера.');
+    const timeout = AbortSignal.timeout(8000);
+    let response, raw;
+    try {
+      response = await this.fetcher(this.origin + endpoint, { method, redirect: 'error', headers: { Accept: 'application/json', ...(body ? { 'Content-Type': 'application/json' } : {}), ...(this.token ? { Authorization: 'Bearer ' + this.token } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}), signal: signal ? AbortSignal.any([signal, timeout]) : timeout });
+      if (Number(response.headers.get('content-length')) > 2_000_000) throw new Error('Слишком большой ответ сервера.');
+      raw = await response.text();
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      if (timeout.aborted || error.name === 'TimeoutError') throw new Error('Сервер комнат долго отвечает.');
+      if (error instanceof TypeError) throw new Error('Нет связи с сервером комнат. Проверь интернет.');
+      throw error;
+    }
+    if (raw.length > 2_000_000) throw new Error('Слишком большой ответ сервера.');
     let result; try { result = JSON.parse(raw); } catch { throw new Error('Сервер LolzCloud временно недоступен.'); }
     if (!response.ok) {
       if (response.status === 401 && this.token) { this.token = ''; this.user = null; this.room = null; this.lease = ''; this.spicyAvailable = false; this.persist(); }
@@ -111,8 +121,18 @@ class ListeningRoom {
       if (this.pair) {
         const pair = this.pair, version = this.version;
         if (Date.now() >= pair.expires) { this.pair = null; throw new Error('Время входа истекло. Нажми «Войти через Lolzteam» ещё раз.'); }
-        const result = await this.request('/api/desktop/poll', { method: 'POST', body: { deviceCode: pair.deviceCode } });
+        if (Date.now() < (pair.nextPoll || 0)) return;
+        pair.nextPoll = Date.now() + 2500;
+        let result;
+        try { result = await this.request('/api/desktop/poll', { method: 'POST', body: { deviceCode: pair.deviceCode } }); }
+        catch (error) {
+          if (version !== this.version || this.closed) return;
+          if (error.status === 410) { this.pair = null; throw error; }
+          if (error.status === 429) pair.nextPoll = Date.now() + 60000;
+          throw new Error(error.message + ' Повторяем подключение автоматически.');
+        }
         if (version !== this.version || this.closed) return;
+        this.error = '';
         if (!result.pending) {
           if (!/^[\w-]{43}$/.test(result.token || '')) throw new Error('Сервер не подтвердил подключение.');
           this.pair = null; this.token = result.token; this.expires = result.expires; this.user = result.user; this.error = ''; this.persist();

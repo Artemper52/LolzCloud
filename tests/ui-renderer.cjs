@@ -139,6 +139,9 @@ app.whenReady().then(async () => {
     const still = await host.webContents.executeJavaScript(`(async()=>{document.documentElement.dataset.motion='reduced';await new Promise(r=>setTimeout(r,50));const c=document.getElementById('lc-wave-canvas'),a=c.toDataURL();await new Promise(r=>setTimeout(r,120));return a===c.toDataURL()})()`);
     assert.equal(still, true, 'Reduced-motion preference must stop the wave renderer.');
     fs.writeFileSync(path.join(root, '.build/wave-test.png'), (await host.webContents.capturePage()).toPNG());
+    await host.webContents.executeJavaScript('document.getElementById("lc-wave-config-toggle").click()');
+    await delay(300);
+    fs.writeFileSync(path.join(root, '.build/wave-tuning-test.png'), (await host.webContents.capturePage()).toPNG());
     music.configurePreferences({ reduceMotion: false });
     await host.webContents.executeJavaScript('document.querySelector("[data-view=settings]").click();document.getElementById("lc-pref-density").value="compact";document.getElementById("lc-pref-density").dispatchEvent(new Event("change"))'); await delay(150);
     assert.equal(music.data.preferences.density, 'compact');

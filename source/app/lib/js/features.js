@@ -71,6 +71,12 @@
   el('wave-next').onclick = () => action('wave-next');
   el('wave-love').onclick = () => action('wave-love', { url: snapshot?.playback.url });
   el('wave-ban').onclick = () => action('wave-ban', { url: snapshot?.playback.url });
+  function waveBalanceLabel(value) {
+    const mode = Number(value) >= 99 ? 'Только незнакомые треки' : Number(value) >= 65 ? 'Больше открытий' : Number(value) >= 25 ? 'Знакомое и новое' : 'Ближе к любимому';
+    el('wave-balance-value').textContent = mode + ' · ' + Math.round(value) + '%';
+    el('wave-balance').setAttribute('aria-valuetext', mode);
+  }
+  el('wave-balance').oninput = () => waveBalanceLabel(el('wave-balance').value);
   el('wave-balance').onchange = () => action('wave-balance', { value: Number(el('wave-balance').value) / 100 });
   el('wave-shake').onclick = () => action('wave-shake');
   el('wave-from-track').onclick = () => action('wave-from-track');
@@ -295,8 +301,9 @@
       el('wave-current-reason').textContent = wave.current?.reason || 'Начнём с твоих лайков и любимых исполнителей';
       el('wave-hero').classList.toggle('is-playing', wave.active && track.playing);
       waveView.setState(studio.open && tab === 'wave', hasTrack && track.playing);
-      if (document.activeElement !== el('wave-balance')) el('wave-balance').value = wave.adventurous * 100;
+      if (document.activeElement !== el('wave-balance')) { el('wave-balance').value = wave.adventurous * 100; waveBalanceLabel(el('wave-balance').value); }
       const settings = { ...waveDefaults, ...wave.preferences };
+      if (settings.character !== 'mixed') el('wave-balance-value').textContent = settings.character === 'discover' ? 'Только незнакомые треки' : 'Любимые записи';
       el('wave-balance').disabled = settings.character !== 'mixed';
       el('wave-balance').title = settings.character === 'mixed' ? 'Баланс знакомого и нового' : 'Баланс доступен в режиме «Мой микс»';
       for (const key of Object.keys(waveOptions)) if (document.activeElement !== el('wave-' + key)) el('wave-' + key).value = settings[key];

@@ -30,6 +30,14 @@ test('recommendations import only metadata and preserve the correct track durati
   assert.equal(normalizeTrack({ ...song('blocked'), policy: 'BLOCK' }), null);
   assert.equal(normalizeTrack({ ...song('bad'), url: 'https://evil.example/song' }), null);
 });
+test('maximum novelty excludes familiar recordings even under another upload URL', () => {
+  const heard = song('heard'), alias = { ...heard, url: song('reupload').url, title: heard.title + ' (Official Audio)' };
+  const fresh = song('new', heard.artist), profile = tasteProfile([], [heard]);
+  const rows = rankCandidates([heard, alias, fresh], profile, { adventurous: 1, random: () => 0 });
+  assert.deepEqual(rows.map(row => row.url), [fresh.url]);
+  const copies = rankCandidates([fresh, { ...fresh, url: song('second-upload').url, title: fresh.title + ' (Lyrics)' }], profile);
+  assert.equal(copies.length, 1);
+});
 test('a personal wave starts a queue, learns skip feedback and persists local choices', async t => {
   const filename = path.join(files(t), 'wave.json'), plays = [], seed = song('seed');
   let snapshot = { fresh: true, private: false, soundcloudProfile: { url: 'https://soundcloud.com/test' }, playback: { ...seed, position: 0, playing: true } };
