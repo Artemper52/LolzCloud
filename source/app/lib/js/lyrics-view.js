@@ -34,7 +34,7 @@
     }
     setAutoFollow(value) { if (this.autoFollow === value) return; this.autoFollow = value; this.setFollow(value); }
     setFontScale(value) {
-      const scale = Math.max(.8, Math.min(1.35, value)); if (this.fontScale === scale) return;
+      const scale = Math.max(.7, Math.min(2, Number(value) || 1)); if (this.fontScale === scale) return;
       this.fontScale = scale; this.container.style.setProperty('--lyrics-scale', String(scale));
       if (this.following) requestAnimationFrame(() => this.center());
     }

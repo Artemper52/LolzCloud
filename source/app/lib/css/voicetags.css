@@ -1,0 +1,13 @@
+.voicetag-panel { padding: 22px; margin: 24px 0; border: 1px solid #d1a2ed35; border-radius: 18px; background: linear-gradient(120deg,#32253e88,#201f2966); }
+.voicetag-heading,.voicetag-footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+#lc-studio .voicetag-heading small { color: #dcb6f3; letter-spacing: .12em; font-size: 11px !important; }
+.voicetag-heading h3 { font-size: 26px; margin: 7px 0; }
+.voicetag-heading p { margin: 0; color: #bbaac7; }
+.voicetag-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; margin: 20px 0; }
+#lc-studio .voicetag-grid button { min-height: 85px; padding: 17px; border: 1px solid #e9c6ff33; background: #a575ca14; text-align: left; }
+.voicetag-grid strong,.voicetag-grid small { display: block; }
+.voicetag-grid small { color: #b6a1c6; margin-top: 7px; }
+#lc-studio .voicetag-grid button[aria-pressed=true] { background: #b47ce944; border-color: #d6b0f6; }
+.voicetag-footer label { display: flex; align-items: center; gap: 12px; flex: 1; }
+.voicetag-footer input { min-width: 60px; max-width: 160px; }
+#voicetag-status { min-height: 20px; margin: 10px 0 0; color: #d9bbeb; }

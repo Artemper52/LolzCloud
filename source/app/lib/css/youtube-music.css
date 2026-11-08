@@ -1,0 +1,12 @@
+#youtube-surface { position: absolute; inset: 0; background: #0b0b0c; display: flex; flex-direction: column; }
+#youtube-search { display: flex; align-items: center; gap: 16px; padding: 14px 22px; background: #171719; border-bottom: 1px solid #ffffff12; }
+#youtube-search label { display: flex; align-items: center; gap: 12px; flex: 1; }
+#youtube-query { min-width: 120px; flex: 1; background: #ffffff09; border: 1px solid #ffffff20; color: #fff; border-radius: 12px; padding: 11px 15px; font: inherit; }
+#youtube-search button { background: #ff354c; color: white; padding: 11px 20px; border-radius: 12px; font-weight: 650; }
+#youtube-status { padding: 8px 22px; margin: 0; font-size: 12px; color: #b7abb0; }
+.shell-browser #youtube-webview { position: relative; inset: auto; height: auto; flex: 1; min-height: 0; }
+[data-source=youtube] .shell-player,[data-source=youtube] #webview,[data-source=youtube] #browser-loading,[data-source=youtube] #browser-sign-in,[data-source=youtube] #artist-pro,[data-source=youtube] #sc-signin-banner,[data-source=youtube] #sc-connection,[data-source=youtube] #sc-verification { display: none !important; }
+[data-source=youtube] .shell-browser,[data-source=youtube] .shell-sidebar { bottom: 0; }
+.shell-sidebar nav button[data-view=youtube].selected { background: #fa304729; color: #ffabb6; }
+.shell-sidebar nav button[data-view=youtube]>span { color: #ff566b; }
+#youtube-surface[hidden] { display: none; }

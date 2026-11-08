@@ -28,6 +28,9 @@
     words.setAutoFollow(state.preferences?.autoFollow !== false);
     document.documentElement.dataset.motion = state.preferences?.reduceMotion ? 'reduced' : 'full';
     document.body.classList.toggle('with-lyrics', enabled);
+    document.body.classList.toggle('lyrics-only', state.mini.lyricsOnly === true);
+    el('lyricsOnly').setAttribute('aria-pressed', String(state.mini.lyricsOnly === true));
+    el('lyricsBack').hidden = state.mini.lyricsOnly !== true;
     el('lyricsToggle').setAttribute('aria-pressed', String(enabled));
     el('title').textContent = track.title || 'Включи любимый трек';
     el('artist').textContent = track.artist || 'SoundCloud';
@@ -119,6 +122,9 @@
     render(current); void refresh({ type: 'set-lyrics', enabled });
   };
   el('follow').onclick = () => words.setFollow(true);
+  el('lyricsOnly').onclick = () => refresh({ type: 'lyrics-only', enabled: true });
+  el('lyricsBack').onclick = () => refresh({ type: 'lyrics-only', enabled: false });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape' && current?.mini.lyricsOnly) void refresh({ type: 'lyrics-only', enabled: false }); });
   el('fontDown').onclick = () => refresh({ type: 'font', value: (current?.mini.fontScale || 1) - .1 });
   el('fontUp').onclick = () => refresh({ type: 'font', value: (current?.mini.fontScale || 1) + .1 });
   el('reloadLyrics').onclick = () => refresh('reload-lyrics');

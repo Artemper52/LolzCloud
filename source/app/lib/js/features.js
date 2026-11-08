@@ -13,6 +13,8 @@
   let snapshot = null, feature = null, tab = 'share', lyricTrack = '', lyrics = null, lyricLoading = '';
   let dspApplied = '', soundDraft = null, keysDirty = false, lastLists = '', lastPresets = '', playRequest = 0, lyricsFont = 1, waveApplied = null, waveListSignature = '';
   let playerApplied = null;
+  let repeatApplied = null, repeatApplying = false;
+  let uiScale = 1;
   let guestReady = false;
   view.addEventListener('did-start-navigation', event => { if (event.isMainFrame && !event.isInPlace) guestReady = false; });
   let safetyApplied = '', safetyRevision = -1, latestSafety = null;
@@ -64,7 +66,7 @@
   }
   el('studio-launcher').onclick = () => open(); el('studio-close').onclick = () => studio.close();
   window.LolzCloudStudio = { open, notify: message };
-  studio.addEventListener('close', () => { document.body.classList.remove('shell-studio-open'); window.lolzSelectNavigation?.('browser'); waveView.setState(false, false); lyricBackground.setState(false, false); studioBackground.setState(false, false); });
+  studio.addEventListener('close', () => { document.body.classList.remove('shell-studio-open'); if (!window.LolzCloudYouTube?.active) window.lolzSelectNavigation?.('browser'); waveView.setState(false, false); lyricBackground.setState(false, false); studioBackground.setState(false, false); });
   el('wave-launcher').onclick = () => open('wave');
   el('wave-start').onclick = () => feature?.wave.active ? action('media', { command: 'playPause' }) : action('wave-start');
   el('wave-stop').onclick = () => action('wave-stop');
@@ -211,8 +213,20 @@
   studio.querySelectorAll('[data-remove-key]').forEach(button => { button.onclick = () => action('lyrics-settings', { settings: { remove: [button.dataset.removeKey] } }); });
   el('source-remove-spotify').onclick = () => action('lyrics-settings', { settings: { remove: ['spotifyId', 'spotifySecret'] } });
   el('lyric-follow').onclick = () => lyricView.setFollow(true);
-  el('lyric-smaller').onclick = () => { lyricsFont = Math.max(.8, lyricsFont - .1); lyricView.setFontScale(lyricsFont); lyricView.center(); };
-  el('lyric-larger').onclick = () => { lyricsFont = Math.min(1.35, lyricsFont + .1); lyricView.setFontScale(lyricsFont); lyricView.center(); };
+  const resizeInterface = value => action('preferences', { settings: { uiScale: Math.max(.85, Math.min(1.5, Math.round(value * 100) / 100)) } });
+  el('pref-scale').oninput = () => { el('pref-scale-value').textContent = el('pref-scale').value + '%'; };
+  el('pref-scale').onchange = () => resizeInterface(Number(el('pref-scale').value) / 100);
+  el('pref-scale-reset').onclick = () => resizeInterface(1);
+  ipcRenderer.on('lolzcloud:zoom', (_event, key) => resizeInterface(key === '0' ? 1 : uiScale + (key === '-' ? -.05 : .05)));
+  function resizeLyrics(delta) {
+    lyricsFont = Math.max(.7, Math.min(2, Math.round((lyricsFont + delta) * 10) / 10));
+    lyricView.setFontScale(lyricsFont); lyricView.center();
+    void action('preferences', { settings: { lyricsFontScale: lyricsFont } });
+  }
+  el('lyric-smaller').onclick = () => resizeLyrics(-.1);
+  el('lyric-larger').onclick = () => resizeLyrics(.1);
+  el('lyric-font-reset').onclick = () => resizeLyrics(1 - lyricsFont);
+  el('lyrics').addEventListener('wheel', event => { if (event.ctrlKey || event.metaKey) { event.preventDefault(); resizeLyrics(event.deltaY < 0 ? .1 : -.1); } }, { passive: false });
   el('lyric-expand').onclick = () => { const expanded = studio.classList.toggle('is-lyrics-focus'); el('lyric-expand').setAttribute('aria-pressed', String(expanded)); requestAnimationFrame(() => lyricView.center()); };
   studio.querySelectorAll('[data-lyric-media]').forEach(button => { button.onclick = () => action('media', { command: button.dataset.lyricMedia }); });
   function row(title, subtitle, buttons = []) {
@@ -260,6 +274,14 @@
     renderSources();
     lyricView.setAutoFollow(feature.preferences?.autoFollow !== false);
     if (feature.preferences) {
+      uiScale = feature.preferences.uiScale || 1;
+      const frame = require('electron').webFrame;
+      if (Math.abs(frame.getZoomFactor() - uiScale) > .001) frame.setZoomFactor(uiScale);
+      if (document.activeElement !== el('pref-scale')) el('pref-scale').value = Math.round(uiScale * 100);
+      el('pref-scale-value').textContent = Math.round(uiScale * 100) + '%';
+      lyricsFont = feature.preferences.lyricsFontScale || 1; lyricView.setFontScale(lyricsFont);
+      el('lyric-font-reset').textContent = Math.round(lyricsFont * 100) + '%';
+      el('lyric-smaller').disabled = lyricsFont <= .7; el('lyric-larger').disabled = lyricsFont >= 2;
       document.body.dataset.windowStyle = feature.preferences.windowStyle || 'mac';
       for (const [id, key] of [['pref-follow', 'autoFollow'], ['pref-motion', 'reduceMotion'], ['pref-density', 'density'], ['pref-startup', 'startupView'], ['pref-window', 'windowStyle']]) if (document.activeElement !== el(id)) { if (el(id).type === 'checkbox') el(id).checked = feature.preferences[key]; else el(id).value = feature.preferences[key]; }
       el('pref-mini-lyrics').checked = feature.mini.lyrics;
@@ -267,6 +289,7 @@
     const wave = feature.wave;
     const downloads = feature.downloads;
     for (const button of studio.querySelectorAll('[data-do="download-current"]')) button.disabled = !hasTrack;
+    for (const button of studio.querySelectorAll('[data-do="open-current-track"]')) button.disabled = !hasTrack || !scUrl(track.url);
     if (downloads) {
       el('downloads-directory').textContent = downloads.directory;
       const signature = JSON.stringify(downloads.items.map(item => ({ ...item, percent: item.percent === null ? null : Math.floor(item.percent) })));
@@ -402,7 +425,11 @@
     }
     window.LolzCloudRanges.update(studio);
     if (!soundDraft) void applyDsp(feature.dsp);
-    if (Number.isFinite(feature.player?.volume) && playerApplied !== feature.player.volume) { const volume = feature.player.volume; media('volume', volume).then(() => { playerApplied = volume; }); }
+    if (!window.LolzCloudYouTube?.active && Number.isFinite(feature.player?.volume) && playerApplied !== feature.player.volume) { const volume = feature.player.volume; media('volume', volume).then(() => { playerApplied = volume; }); }
+    if (guestReady && !snapshot.local && !window.LolzCloudYouTube?.active && ['off', 'all', 'one'].includes(feature.player?.repeat) && repeatApplied !== feature.player.repeat && !repeatApplying) {
+      const mode = feature.player.repeat; repeatApplying = true;
+      media('repeat', mode).then(applied => { if (applied) repeatApplied = mode; }).finally(() => { repeatApplying = false; });
+    }
   }
   function setLyrics(data) {
     lyrics = data; lyricView.setData(data);
@@ -456,6 +483,7 @@
   }
   window.addEventListener('lolzcloud:state', event => { snapshot = event.detail; if (snapshot.features) feature = snapshot.features; render(); });
   async function media(command, value) {
+    if (window.LolzCloudYouTube?.active) return window.LolzCloudYouTube.media(command, value);
     const data = JSON.stringify([command, value]);
     try {
       const result = await view.executeJavaScript(`(async()=>{if(typeof window.__lolzcloudMediaCommand!=='function')return false;const result=await window.__lolzcloudMediaCommand(...${data});return result!==false&&result?.applied!==false;})()`, true);
@@ -475,6 +503,7 @@
   }
   ipcRenderer.on('lolzcloud:safety', (_, config) => { void applySafety(config); });
   ipcRenderer.on('lolzcloud:play-url', async (_, value) => {
+    window.LolzCloudYouTube?.leave();
     const url = scUrl(typeof value === 'string' ? value : value?.url); if (!url) return;
     const id = ++playRequest;
     document.getElementById('lzt-dialog')?.close();
@@ -493,6 +522,7 @@
     safetyApplied = '';
     waveApplied = null;
     playerApplied = null;
+    repeatApplied = null;
     const code = fs.readFileSync(path.join(__dirname, '../plugins/sound-effects.js'), 'utf8');
     await view.executeJavaScript(code).catch(() => {});
     if (feature) await applyDsp(feature.dsp);

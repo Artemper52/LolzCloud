@@ -1,6 +1,7 @@
 const { app, globalShortcut, shell, ipcMain, BrowserWindow, Tray, Menu, nativeImage, screen, session} = require('electron')
 const path = require('node:path')
 const { ROOM_PARTITION, roomGuestPreferences, protectRoomGuest } = require('./integrations/room-view.cjs');
+const { YOUTUBE_PARTITION, youtubeGuestPreferences, protectYouTubeGuest } = require('./integrations/youtube-music.cjs');
 require('./integrations/legacy-runtime.cjs').install();
 if (process.argv.includes('--self-test')) { require('./integrations/self-test.cjs').run(app); return; }
 if (process.argv.includes('--import-soundcloud-session')) {
@@ -43,14 +44,19 @@ function createWindow () {
 
   mainWindow.setMenuBarVisibility(false)
   const paletteKey = (event, input) => { if (input.type === 'keyDown' && (input.control || input.meta) && !input.alt && String(input.key).toLowerCase() === 'k') { event.preventDefault(); mainWindow.webContents.send('lolzcloud:palette'); } };
+  const zoomKey = (event, input) => { if (input.type === 'keyDown' && (input.control || input.meta) && !input.alt && ['+', '=', '-', '0'].includes(input.key)) { event.preventDefault(); mainWindow.webContents.send('lolzcloud:zoom', input.key); } };
   mainWindow.webContents.on('before-input-event', paletteKey);
+  mainWindow.webContents.on('before-input-event', zoomKey);
   mainWindow.webContents.on('did-attach-webview', (_event, contents) => {
     contents.on('before-input-event', paletteKey);
+    contents.on('before-input-event', zoomKey);
     if (contents.session === session.fromPartition(ROOM_PARTITION)) protectRoomGuest(contents);
+    if (contents.session === session.fromPartition(YOUTUBE_PARTITION)) protectYouTubeGuest(contents);
   });
   mainWindow.webContents.on('will-attach-webview', (event, preferences, params) => {
     // SoundCloud plugins only use DOM APIs. Remote pages never need Node or the token.
     if (roomGuestPreferences(event, preferences, params)) return;
+    if (youtubeGuestPreferences(event, preferences, params)) return;
     preferences.preload = path.join(__dirname, 'guest-preload.cjs');
     preferences.nodeIntegration = false;
     preferences.contextIsolation = true;

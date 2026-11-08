@@ -17,6 +17,8 @@ function normalizeProfile(value) {
   if (['comfortable', 'compact'].includes(input.preferences?.density)) preferences.density = input.preferences.density;
   if (STARTUP_VIEWS.includes(input.preferences?.startupView)) preferences.startupView = input.preferences.startupView;
   if (WINDOW_STYLES.includes(input.preferences?.windowStyle)) preferences.windowStyle = input.preferences.windowStyle;
+  if (Number.isFinite(input.preferences?.lyricsFontScale)) preferences.lyricsFontScale = Math.max(.7, Math.min(2, input.preferences.lyricsFontScale));
+  if (Number.isFinite(input.preferences?.uiScale)) preferences.uiScale = Math.max(.85, Math.min(1.5, input.preferences.uiScale));
   const collections = (Array.isArray(input.collections) ? input.collections : []).slice(0, 100).map(row => ({ id: crypto.randomUUID(), title: text(row.title, 100), url: scUrl(row.url), addedAt: Date.now() })).filter(row => row.url);
   const customEffects = Object.create(null); for (const [name, sound] of Object.entries(input.customEffects || {}).slice(0, 100)) if (name && !['__proto__', 'constructor', 'prototype'].includes(name)) customEffects[text(name, 32)] = normalizeSound(sound);
   const wave = value.wave || {}, feedback = Object.create(null);

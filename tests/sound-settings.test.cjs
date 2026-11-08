@@ -31,7 +31,7 @@ test('a personal preset and mini-player lyrics survive restarting the app', t =>
   value.configureMini({ lyrics: true, fontScale: 1.2 });
   const reopened = new MusicFeatures(file); reopened.configureDsp({ preset: 'Original' }); reopened.configureDsp({ preset: 'Вечер' });
   assert.equal(reopened.data.dsp.rate, .75); assert.equal(reopened.data.dsp.reverb, .3); assert.equal(reopened.data.dsp.echo, .2); assert.equal(reopened.data.dsp.preservesPitch, true);
-  assert.deepEqual(reopened.data.mini, { lyrics: true, fontScale: 1.2, alwaysOnTop: true });
+  assert.deepEqual(reopened.data.mini, { lyrics: true, lyricsOnly: false, fontScale: 1.2, alwaysOnTop: true });
 });
 test('invalid sound changes cannot partially update or corrupt the saved settings', t => {
   const { value } = model(t); value.configureDsp({ preset: 'Speed Up' });
@@ -70,4 +70,16 @@ test('volume and interface settings persist without changing the single visual t
   assert.equal(reopened.data.player.volume, .37); assert.equal(reopened.data.preferences.density, 'compact'); assert.equal(reopened.data.preferences.startupView, 'wave'); assert.equal(reopened.data.mini.alwaysOnTop, true);
   assert.throws(() => reopened.configurePlayer({ volume: 2 })); assert.throws(() => reopened.configurePreferences({ theme: 'another-theme' }));
   assert.equal(reopened.data.player.volume, .37);
+});
+
+test('lyrics-only, enlarged lyrics, interface zoom and repeat survive app restart', t => {
+  const { value, file } = model(t);
+  value.configureMini({ lyricsOnly: true, fontScale: 1.8 });
+  value.configurePreferences({ lyricsFontScale: 1.6, uiScale: 1.2 });
+  value.configurePlayer({ repeat: 'one' });
+  const restored = new MusicFeatures(file);
+  assert.equal(restored.data.mini.lyricsOnly, true); assert.equal(restored.data.mini.lyrics, true);
+  assert.equal(restored.data.preferences.lyricsFontScale, 1.6); assert.equal(restored.data.preferences.uiScale, 1.2);
+  assert.equal(restored.data.player.repeat, 'one');
+  restored.configureMini({ lyrics: false }); assert.equal(restored.data.mini.lyricsOnly, false);
 });

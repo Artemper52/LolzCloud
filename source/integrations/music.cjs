@@ -8,7 +8,7 @@ const { SOUND_PRESETS, validGains, validateSoundPatch, normalizeSound, presetSou
 const { normalizeProtection, validateProtection } = require('./sound-protection.cjs');
 const WINDOW_STYLES = Object.freeze(['mac', 'windows', 'studio']);
 const STARTUP_VIEWS = Object.freeze(['browser', 'wave', 'library', 'audio', 'room']);
-const DEFAULT_PREFERENCES = Object.freeze({ autoFollow: true, reduceMotion: false, density: 'comfortable', startupView: 'browser', windowStyle: 'mac' });
+const DEFAULT_PREFERENCES = Object.freeze({ autoFollow: true, reduceMotion: false, density: 'comfortable', startupView: 'browser', windowStyle: 'mac', lyricsFontScale: 1, uiScale: 1 });
 
 const PRESETS = Object.freeze({
   'Ровный': [0, 0, 0, 0, 0], 'Бас': [6, 3, 0, -1, 0],
@@ -63,7 +63,7 @@ const { parseLrc, lyricIndex, getLyrics } = require('./lyric-source.cjs');
 class MusicFeatures {
   constructor(filename, now = Date.now) {
     this.filename = filename; this.now = now;
-    this.data = { history: [], collections: [], customPresets: {}, customEffects: {}, dsp: normalizeSound(), protection: normalizeProtection(), mini: { lyrics: false, fontScale: 1, alwaysOnTop: true }, player: { volume: null }, preferences: { ...DEFAULT_PREFERENCES }, hotkeys: { ...DEFAULT_KEYS } };
+    this.data = { history: [], collections: [], customPresets: {}, customEffects: {}, dsp: normalizeSound(), protection: normalizeProtection(), mini: { lyrics: false, lyricsOnly: false, fontScale: 1, alwaysOnTop: true }, player: { volume: null }, preferences: { ...DEFAULT_PREFERENCES }, hotkeys: { ...DEFAULT_KEYS } };
     this.previous = null; this.currentEntry = null; this.dirty = false; this.lastSaved = 0;
     try {
       const saved = JSON.parse(fs.readFileSync(filename, 'utf8'));
@@ -76,8 +76,13 @@ class MusicFeatures {
       this.data.protection = normalizeProtection(saved.protection);
       for (const [name, value] of Object.entries(saved.customEffects || {})) if (!['__proto__', 'constructor', 'prototype'].includes(name)) this.data.customEffects[clean(name, 32)] = normalizeSound(value);
       if (typeof saved.mini?.lyrics === 'boolean') this.data.mini.lyrics = saved.mini.lyrics;
-      if (Number.isFinite(saved.mini?.fontScale)) this.data.mini.fontScale = Math.max(.8, Math.min(1.35, saved.mini.fontScale));
+      if (typeof saved.mini?.lyricsOnly === 'boolean') this.data.mini.lyricsOnly = saved.mini.lyricsOnly;
+      if (this.data.mini.lyricsOnly) this.data.mini.lyrics = true;
+      if (Number.isFinite(saved.mini?.fontScale)) this.data.mini.fontScale = Math.max(.7, Math.min(2, saved.mini.fontScale));
+      if (Number.isFinite(saved.preferences?.lyricsFontScale)) this.data.preferences.lyricsFontScale = Math.max(.7, Math.min(2, saved.preferences.lyricsFontScale));
+      if (Number.isFinite(saved.preferences?.uiScale)) this.data.preferences.uiScale = Math.max(.85, Math.min(1.5, saved.preferences.uiScale));
       if (Number.isFinite(saved.player?.volume)) this.data.player.volume = Math.max(0, Math.min(1, saved.player.volume));
+      if (['off', 'all', 'one'].includes(saved.player?.repeat)) this.data.player.repeat = saved.player.repeat;
       for (const key of ['autoFollow', 'reduceMotion']) if (typeof saved.preferences?.[key] === 'boolean') this.data.preferences[key] = saved.preferences[key];
       if (['comfortable', 'compact'].includes(saved.preferences?.density)) this.data.preferences.density = saved.preferences.density;
       if (STARTUP_VIEWS.includes(saved.preferences?.startupView)) this.data.preferences.startupView = saved.preferences.startupView;
@@ -155,8 +160,11 @@ class MusicFeatures {
   }
   configureMini(patch) {
     if (typeof patch?.lyrics === 'boolean') this.data.mini.lyrics = patch.lyrics;
+    if (typeof patch?.lyricsOnly === 'boolean') this.data.mini.lyricsOnly = patch.lyricsOnly;
+    if (patch?.lyrics === false) this.data.mini.lyricsOnly = false;
+    if (this.data.mini.lyricsOnly) this.data.mini.lyrics = true;
     this.data.mini.alwaysOnTop = true;
-    if (Number.isFinite(patch?.fontScale)) this.data.mini.fontScale = Math.max(.8, Math.min(1.35, patch.fontScale));
+    if (Number.isFinite(patch?.fontScale)) this.data.mini.fontScale = Math.max(.7, Math.min(2, patch.fontScale));
     this.dirty = true; this.save(true);
   }
   configureProtection(patch) {
@@ -164,8 +172,12 @@ class MusicFeatures {
     this.dirty = true; this.save(true);
   }
   configurePlayer(patch) {
-    if (!Number.isFinite(patch?.volume) || patch.volume < 0 || patch.volume > 1) throw new Error('Громкость должна быть от 0 до 100%.');
-    this.data.player.volume = patch.volume; this.dirty = true; this.save(true);
+    if (Object.hasOwn(patch || {}, 'volume') && (!Number.isFinite(patch.volume) || patch.volume < 0 || patch.volume > 1)) throw new Error('Громкость должна быть от 0 до 100%.');
+    if (Object.hasOwn(patch || {}, 'repeat') && !['off', 'all', 'one'].includes(patch.repeat)) throw new Error('Неизвестный режим повтора.');
+    if (!Object.hasOwn(patch || {}, 'volume') && !Object.hasOwn(patch || {}, 'repeat')) throw new Error('Нет настроек плеера.');
+    if (Object.hasOwn(patch, 'volume')) this.data.player.volume = patch.volume;
+    if (Object.hasOwn(patch, 'repeat')) this.data.player.repeat = patch.repeat;
+    this.dirty = true; this.save(true);
   }
   configurePreferences(patch) {
     if (!patch || typeof patch !== 'object') throw new Error('Некорректные настройки интерфейса.');
@@ -175,6 +187,8 @@ class MusicFeatures {
       else if (key === 'density') { if (!['comfortable', 'compact'].includes(value)) throw new Error('Неизвестный размер интерфейса.'); }
       else if (key === 'startupView') { if (!STARTUP_VIEWS.includes(value)) throw new Error('Неизвестный начальный раздел.'); }
       else if (key === 'windowStyle') { if (!WINDOW_STYLES.includes(value)) throw new Error('Неизвестный стиль кнопок окна.'); }
+      else if (key === 'lyricsFontScale') { if (!Number.isFinite(value) || value < .7 || value > 2) throw new Error('Размер текста: от 70% до 200%.'); }
+      else if (key === 'uiScale') { if (!Number.isFinite(value) || value < .85 || value > 1.5) throw new Error('Масштаб интерфейса: от 85% до 150%.'); }
       else throw new Error('Неизвестная настройка интерфейса.');
       next[key] = value;
     }

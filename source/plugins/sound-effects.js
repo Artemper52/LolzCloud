@@ -212,6 +212,7 @@
   function add(media) {
     if (audio.has(media)) return media;
     audio.add(media); status.mediaCount = audio.size;
+    window.__lolzcloudRepeat?.bind(media);
     media.addEventListener('playing', () => { mediaTracks.set(media, document.querySelector('.playbackSoundBadge__titleLink')?.href || location.href); wantedPlayback.add(media); status.currentMedia = media; setTempo(media); attach(media); window.__lolzcloudSnapshot?.(); });
     media.addEventListener('loadedmetadata', () => { setTempo(media); attach(media); });
     media.addEventListener('canplay', () => { setTempo(media); attach(media); });

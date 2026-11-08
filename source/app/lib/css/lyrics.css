@@ -18,3 +18,12 @@
 .lc-lyrics-credits[hidden]{display:none}
 @media(prefers-reduced-motion:reduce){.lc-lyrics-view .lc-lyric,.lc-word{transition:none!important;transform:none!important;filter:none!important}}
 [data-motion=reduced] .lc-lyric,[data-motion=reduced] .lc-word{transition:none!important;transform:none!important;filter:none!important}
+
+#lc-studio #lc-lyrics .lc-lyric { font-size: calc(clamp(28px, 2.8vw, 42px) * var(--lyrics-scale)) !important; line-height: 1.32; }
+#lc-studio #lc-lyrics { padding: 0 30px; max-height: none; }
+#lc-studio #lc-lyric-ambience { inset: -30px; opacity: .95; filter: blur(28px); pointer-events: none; }
+#lc-lyric-gradient { display: block; width: 100%; height: 100%; }
+#lc-studio .lc-lyrics-scene { background: #161b20; }
+#lc-studio .lc-lyrics-scene:before { background: linear-gradient(135deg,#10121948,#10121980); pointer-events: none; }
+#lc-studio .lc-lyric-tools { gap: 6px; }
+#lc-studio .lc-lyric-tools button { min-height: 34px; font-size: 13px !important; }

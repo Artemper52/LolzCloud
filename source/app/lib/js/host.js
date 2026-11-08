@@ -10,7 +10,7 @@
   const view = document.getElementById('webview'), el = id => document.getElementById(id);
   const footerBackground = new window.LolzCloudWaveView(el('player-gradient'), { ambient: true, fps: 24 });
   const headerBackground = new window.LolzCloudWaveView(el('titlebar-gradient'), { ambient: true, fps: 15 });
-  const labels = { browser: 'SoundCloud', wave: 'Моя волна', share: 'Сейчас слушаю', library: 'Моя музыка', community: 'Подборки', lyrics: 'Текст песни', audio: 'Звук и эффекты', room: 'Комнаты', radar: 'Радар новинок', moments: 'Любимые моменты', versions: 'Другие версии', private: 'Приватность', keys: 'Горячие клавиши', settings: 'Настройки', sources: 'Источники текста' };
+  const labels = { browser: 'SoundCloud', youtube: 'YouTube Music', wave: 'Моя волна', share: 'Сейчас слушаю', library: 'Моя музыка', community: 'Подборки', lyrics: 'Текст песни', audio: 'Звук и эффекты', room: 'Комнаты', radar: 'Радар новинок', moments: 'Любимые моменты', versions: 'Другие версии', private: 'Приватность', keys: 'Горячие клавиши', settings: 'Настройки', sources: 'Источники текста' };
   let startupApplied = false, userNavigated = false;
   let downloadItem = null;
   window.showsongshowcase = () => window.LolzCloudStudio?.open('share');
@@ -22,6 +22,7 @@
   };
   document.querySelectorAll('[data-view]').forEach(button => { button.onclick = () => {
     userNavigated = true;
+    if (button.dataset.view === 'youtube') { void window.LolzCloudYouTube?.open(); return; }
     if (button.dataset.view === 'browser') { document.getElementById('lc-studio')?.close(); window.lolzSelectNavigation('browser'); }
     else window.LolzCloudStudio?.open(button.dataset.view);
   }; });
@@ -53,9 +54,10 @@
     full.setAttribute('aria-label', full.title); full.setAttribute('aria-pressed', String(!!fullscreen));
   });
   el('titlebar').ondblclick = event => { if (!event.target.closest('button')) ipcRenderer.send('appReqToggleWindowMaximize'); };
-  el('browser-back').onclick = () => { if (view.canGoBack()) view.goBack(); };
-  el('browser-forward').onclick = () => { if (view.canGoForward()) view.goForward(); };
-  el('browser-reload').onclick = () => view.reload();
+  const browserView = () => window.LolzCloudYouTube?.active ? window.LolzCloudYouTube.view : view;
+  el('browser-back').onclick = () => { const target = browserView(); if (target?.canGoBack()) target.goBack(); };
+  el('browser-forward').onclick = () => { const target = browserView(); if (target?.canGoForward()) target.goForward(); };
+  el('browser-reload').onclick = () => browserView()?.reload();
   el('artist-pro').onclick = () => ipcRenderer.invoke('lolzteam:action', { type: 'open-artist-pro' }).catch(() => {});
   el('player-seek').oninput = () => { el('player-position').textContent = clock(Number(el('player-seek').value)); };
   el('player-seek').onchange = () => media('seek', Number(el('player-seek').value));
@@ -121,6 +123,12 @@
     } catch { /* Ignore incomplete navigation snapshots. */ }
   });
   view.addEventListener('did-start-navigation', event => { if (event.isMainFrame && !event.isInPlace) el('browser-loading').classList.remove('is-ready'); });
+  ipcRenderer.on('lolzcloud:show-track', async (_event, url) => {
+    if (!scUrl(url)) return;
+    document.getElementById('lc-studio')?.close(); window.lolzSelectNavigation('browser');
+    if (scUrl(view.getURL()) !== url) await view.loadURL(url).catch(() => {});
+    view.focus();
+  });
   view.addEventListener('dom-ready', async () => {
     el('browser-loading').classList.add('is-ready');
     try { await view.insertCSS(soundCloudFont + fs.readFileSync(path.join(__dirname, '../themes/lolzcloud.css'), 'utf8')); } catch { /* A navigation may still be committing. */ }

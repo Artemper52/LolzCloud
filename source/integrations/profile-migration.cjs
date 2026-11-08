@@ -10,6 +10,7 @@ const PROFILE_ITEMS = [
   'lyric-sources.json', 'lyric-timing.json', 'downloads.json',
   'release-radar.json', 'mini-window.json', 'browser-pairing.json',
   'cloud-session.json', 'soundcloud-onboarding.json',
+  'voicetags',
 ];
 
 function findLegacyProfile(appData) {

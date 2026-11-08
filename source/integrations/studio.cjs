@@ -20,9 +20,12 @@ const { Downloads } = require('./downloads.cjs');
 const { SoundCloudAudioSource } = require('./audio-download.cjs');
 const { createPlayerExperience } = require('./player-experience.cjs');
 const { PlaybackHistory } = require('./playback-history.cjs');
+const { Voicetags, CATALOG: VOICETAGS } = require('./voicetags.cjs');
 
 function createStudio({ app, service, getWindow, trusted, onStateChange = () => {} }) {
   const music = new MusicFeatures(path.join(app.getPath('userData'), 'music-library.json'));
+  const voicetags = new Voicetags(path.join(app.getPath('userData'), 'voicetags'));
+  let playbackSource = 'soundcloud', voicetagRevision = 0;
   const repeat = new RepeatIntent();
   const playbackHistory = new PlaybackHistory();
   const room = new ListeningRoom(() => service.getState(), { filename: path.join(app.getPath('userData'), 'cloud-session.json'), safeStorage, openExternal: url => shell.openExternal(url), onControlLost: () => getWindow()?.webContents.send('lolzcloud:media', { command: 'pause' }) });
@@ -72,6 +75,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
     await shell.openExternal(url);
   }
   async function media(command, value) {
+    if (playbackSource === 'youtube') { getWindow()?.webContents.send('lolzcloud:media', { command, value }); return; }
     if (command === 'volumeUp' || command === 'volumeDown') {
       const current = music.data.player.volume ?? audio.volume ?? 1;
       value = Math.max(0, Math.min(1, Math.round((current + (command === 'volumeUp' ? .05 : -.05)) * 100) / 100));
@@ -89,7 +93,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
       }
     }
     if (command === 'next' && wave.active) { await wave.next('skip'); return; }
-    if (command === 'repeat') value = repeat.choose(service.playback, value);
+    if (command === 'repeat') { value = repeat.choose(service.playback, value); music.configurePlayer({ repeat: value }); }
     getWindow()?.webContents.send('lolzcloud:media', { command, value });
   }
   function sizeMini() {
@@ -113,6 +117,25 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
   async function act(action) {
     if (/^wave-/.test(action?.type || '') || action?.type === 'play-url') experience.stopLocal();
     switch (action?.type) {
+      case 'playback-source':
+        if (!['soundcloud', 'youtube'].includes(action.source)) throw new Error('Неизвестный источник.');
+        playbackSource = action.source; if (playbackSource === 'youtube' && mini && !mini.isDestroyed()) mini.close(); break;
+      case 'voicetag-preload': await Promise.all(VOICETAGS.map(row => voicetags.prepare(row.id))); break;
+      case 'voicetag-volume': voicetags.volume(action.value); getWindow()?.webContents.send('lolzcloud:voicetag-volume', action.value); break;
+      case 'voicetag-stop': voicetagRevision++; getWindow()?.webContents.send('lolzcloud:voicetag-stop'); break;
+      case 'voicetag-play': {
+        const revision = ++voicetagRevision;
+        const filename = await voicetags.prepare(action.id);
+        if (revision === voicetagRevision) getWindow()?.webContents.send('lolzcloud:voicetag', { id: action.id, url: require('node:url').pathToFileURL(filename).href, volume: voicetags.data.volume }); break;
+      }
+      case 'voicetag-import': {
+        const result = await dialog.showOpenDialog(getWindow(), { title: 'Добавить свой voicetag · до 15 секунд', filters: [{ name: 'Звук', extensions: ['mp3', 'wav', 'ogg', 'flac', 'm4a', 'aac'] }], properties: ['openFile'] });
+        if (!result.canceled && result.filePaths[0]) await voicetags.import(result.filePaths[0]); break;
+      }
+      case 'open-current-track': {
+        const url = scUrl(shownTrack().url); if (!url) throw new Error('Сначала включи трек SoundCloud.');
+        getWindow()?.webContents.send('lolzcloud:show-track', url); break;
+      }
       case 'state': break;
       case 'wave-start': await wave.start(); break;
       case 'wave-request': await wave.start({ prompt: action.text }); break;
@@ -255,6 +278,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
     else if (type === 'open') { getWindow()?.show(); getWindow()?.webContents.send('lolzcloud:studio'); }
     else if (type === 'toggle-lyrics') { music.configureMini({ lyrics: !music.data.mini.lyrics }); sizeMini(); }
     else if (type === 'set-lyrics' && typeof action.enabled === 'boolean') { music.configureMini({ lyrics: action.enabled }); sizeMini(); }
+    else if (type === 'lyrics-only' && typeof action.enabled === 'boolean') { music.configureMini({ lyricsOnly: action.enabled }); sizeMini(); }
     else if (type === 'font') music.configureMini({ fontScale: Number(action.value) });
     else if (type === 'reload-lyrics') void lyrics.load(shownTrack(), true);
     else if (type === 'credit') await openCredit(action.url);
@@ -276,7 +300,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
       wave.verificationRequired = active;
       if (!active && wave.waitingUntil) wave.waitingUntil = Date.now() + 25000;
     },
-    getState: () => ({ ...getState(), tools: experience.state(), ...(experience.snapshot().local ? { transport: { repeat: { mode: experience.current().repeat } } } : {}) }), snapshot: base => experience.snapshot(base), acceptSoundCloud(playback) { if (!playbackHistory.observe(playback)) return false; experience.acceptSoundCloud(playback); room.observePlayback(playback); return true; }, act, openMini, setUpcoming: urls => prefetch.setUpcoming(urls),
+    getState: () => ({ ...getState(), voicetags: voicetags.state(), tools: experience.state(), ...(experience.snapshot().local ? { transport: { repeat: { mode: experience.current().repeat } } } : {}) }), snapshot: base => experience.snapshot(base), acceptSoundCloud(playback) { if (!playbackHistory.observe(playback)) return false; experience.acceptSoundCloud(playback); room.observePlayback(playback); return true; }, act, openMini, setUpcoming: urls => prefetch.setUpcoming(urls),
     observe() {
       experience.observe();
       const snapshot = service.getState();
