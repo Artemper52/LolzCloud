@@ -3,11 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#110f1b">
+  <meta name="theme-color" content="#111813">
   <title>Слушаем вместе · LolzCloud</title>
   <link rel="stylesheet" href="/cloud/room.css">
   <script src="/cloud/site.js" defer></script>
   <script src="/cloud/room-sync.js" defer></script>
+  <script src="/cloud/media-source.js" defer></script>
+  <script src="/cloud/room-players.js" defer></script>
   <script src="/cloud/room.js" defer></script>
 </head>
 <body data-page="room" class="room-shell">
@@ -32,13 +34,13 @@
         <div><span class="eyebrow" id="playback-label">СЦЕНА</span><h2 id="track-title">Входим в комнату…</h2><p id="track-artist"></p></div>
       </div>
       <div class="room-player">
-        <iframe id="player" title="SoundCloud-плеер комнаты" allow="autoplay" referrerpolicy="no-referrer"></iframe>
-        <div id="empty-player"><p id="player-placeholder">Ведущий скоро включит музыку</p><button id="retry-player" class="button" hidden>Повторить загрузку звука</button></div>
+        <iframe id="player" title="Плеер комнаты" allow="autoplay; encrypted-media; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+        <div id="empty-player"><p id="player-placeholder">Ведущий скоро включит музыку</p><button id="retry-player" class="button" hidden>Повторить</button></div>
       </div>
       <div class="listening-controls">
         <button id="join" class="button primary" disabled>Слушать вместе</button>
         <button id="resync" class="button" disabled>Выровнять со всеми</button>
-        <button id="copy-invite" class="button">Пригласить ↗</button>
+        <button id="copy-invite" class="button">Пригласить</button>
         <label class="local-volume">Громкость <input id="volume" type="range" min="0" max="100" value="80" aria-label="Моя громкость"></label>
       </div>
       <p id="room-status" role="status"></p>
@@ -46,7 +48,7 @@
     </article>
     <aside class="room-social">
       <section class="people chat-panel">
-        <div class="people-heading"><h2>Чат комнаты</h2><span class="social-tag">Вместе</span></div>
+        <div class="people-heading"><h2>Чат</h2></div>
         <div id="chat-messages" role="log" aria-label="Сообщения комнаты"></div>
         <div id="reactions" aria-live="polite"></div>
         <div class="reaction-buttons" aria-label="Реакции">
@@ -68,17 +70,17 @@
         <p id="controller-info">Управляй комнатой из приложения или браузера.</p>
         <div id="host-controls" hidden>
           <form id="host-track-form">
-            <label>Трек SoundCloud<input id="host-track" type="url" required placeholder="https://soundcloud.com/артист/трек"></label>
-            <button class="button">Открыть трек</button>
+            <label>Ссылка на трек<input id="host-track" type="url" required placeholder="SoundCloud или YouTube Music"></label>
+            <button class="button">Включить всем</button>
           </form>
-          <div class="listening-controls"><button id="host-play" class="button primary">Пуск / пауза у всех</button><button id="host-next" class="button">Следующий из очереди</button></div>
+          <div class="listening-controls"><button id="host-play" class="button primary">Пуск / пауза у всех</button><button id="host-next" class="button">Следующий трек</button></div>
           <label>Перемотать у всех<input id="host-seek" type="range" min="0" max="1" value="0" step="1"></label>
         </div>
       </section>
       <section>
         <div class="section-title"><h2>Общая очередь</h2><span id="queue-count"></span></div>
-        <form id="queue-form">
-          <input id="queue-url" type="url" required placeholder="Ссылка на песню SoundCloud" aria-label="Ссылка на песню для очереди" disabled>
+        <form id="room-search-form"><input id="room-search-query" type="search" minlength="2" maxlength="120" required placeholder="Название песни или исполнитель" aria-label="Поиск музыки для комнаты"><button class="button">Найти</button></form><p id="room-search-status" role="status"></p><div id="room-search-results"></div><form id="queue-form">
+          <input id="queue-url" type="url" required placeholder="Ссылка SoundCloud или YouTube Music" aria-label="Ссылка на песню для очереди" disabled>
           <button class="button" disabled>Предложить</button>
         </form>
         <div id="queue-list" class="queue-list"></div>
@@ -88,16 +90,16 @@
         <form id="settings-form">
           <label>Название<input id="settings-name" maxlength="80" required></label>
           <label>Описание<input id="settings-description" maxlength="240"></label>
-          <label><input id="settings-public" type="checkbox"> Показывать в списке комнат</label>
-          <label><input id="settings-chat" type="checkbox" checked> Чат</label>
-          <label><input id="settings-auto" type="checkbox" checked> Автоматически продолжать очередь</label>
-          <label>Участников<input id="settings-capacity" type="number" min="2" max="200" value="50"></label>
+          <label class="room-toggle"><span><strong>Открытая комната</strong><small>Видна в каталоге. Иначе — по приглашению.</small></span><input id="settings-public" type="checkbox" role="switch" checked><span class="room-toggle-track" aria-hidden="true"></span></label>
+          <label class="room-toggle"><span><strong>Чат</strong></span><input id="settings-chat" type="checkbox" role="switch" checked><span class="room-toggle-track" aria-hidden="true"></span></label>
+          <label class="room-toggle"><span><strong>Автопереход</strong><small>Следующий одобренный трек запускается для всех.</small></span><input id="settings-auto" type="checkbox" role="switch" checked><span class="room-toggle-track" aria-hidden="true"></span></label>
+          <label>Мест в комнате<input id="settings-capacity" type="number" min="2" max="200" value="50"></label>
           <button class="button">Сохранить</button>
         </form>
       </details>
       <details><summary>Что звучало</summary><div id="room-history"></div></details>
     </div>
   </main>
-  <footer>Музыка через SoundCloud · Синхронизация на скорости 1×</footer>
+  <footer>SoundCloud и YouTube Music · Общий трек и позиция · Скорость 1×</footer>
 </body>
 </html>

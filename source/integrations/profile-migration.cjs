@@ -4,7 +4,7 @@ const path = require('node:path');
 const legacyNames = require('../legacy-profiles.json');
 const PROFILE_ITEMS = [
   'Local State', 'Preferences', 'Network', 'Cookies', 'Cookies-journal',
-  'Local Storage', 'Session Storage', 'IndexedDB', 'WebStorage',
+  'Local Storage', 'Session Storage', 'IndexedDB', 'WebStorage', 'Partitions',
   'lolzteam.json', 'music-library.json', 'soundcloud-session.json',
   'wave-library.json', 'player-tools.json', 'local-library.json',
   'lyric-sources.json', 'lyric-timing.json', 'downloads.json',

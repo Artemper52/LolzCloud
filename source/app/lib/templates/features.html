@@ -1,12 +1,12 @@
 <button id="lc-studio-launcher" type="button" title="Студия LolzCloud · музыкальная студия">Студия LolzCloud <span>Возможности</span></button>
 <button id="lc-wave-launcher" type="button" title="Персональные рекомендации">◉ Моя волна</button>
 <dialog id="lc-studio" aria-labelledby="lc-studio-title"><canvas id="lc-studio-gradient" aria-hidden="true"></canvas>
-  <header class="lc-studio-header"><div><small>LOLZCLOUD</small><h1 id="lc-studio-title">Твоя музыкальная студия</h1></div><div><button data-do="mini">Мини-плеер ↗</button><button id="lc-studio-close" aria-label="Закрыть Студия LolzCloud">✕</button></div></header>
+  <header class="lc-studio-header"><div><small>LOLZCLOUD</small><h1 id="lc-studio-title">Твоя музыкальная студия</h1></div><div><button id="lc-room-return" type="button" hidden>В комнату</button><button data-do="mini">Мини-плеер ↗</button><button id="lc-studio-close" aria-label="Закрыть панель">✕</button></div></header>
   <nav id="lc-tabs" aria-label="Возможности Студия LolzCloud"><button data-tab="share" class="selected">Сейчас слушаю</button><button data-tab="wave">Моя волна</button><button data-tab="library">Моя музыка</button><button data-tab="community">Подборки Lolzteam</button><button data-tab="private">Приватность</button><button data-tab="room">Комнаты</button><button data-tab="lyrics">Текст песни</button><button data-tab="audio">Звук</button><button data-tab="keys">Клавиши</button></nav>
   <div class="lc-studio-content">
     <section data-pane="share">
-      <div id="lc-share-card"><div class="lc-card-brand">SOUNDCLOUD <span>× LOLZTEAM</span></div><div class="lc-card-track"><div class="lc-card-cover"><span>♫</span><img id="lc-card-cover" alt="Обложка трека" hidden></div><div class="lc-card-meta"><small>СЕЙЧАС СЛУШАЮ</small><h2 id="lc-card-title">Включи любимый трек</h2><p id="lc-card-artist">SoundCloud</p><div id="lc-card-time">0:00 / 0:00</div></div></div><div class="lc-card-progress"><span id="lc-card-progress"></span></div><footer><span id="lc-card-owner">Твой профиль</span><span id="lc-card-link">Музыка объединяет</span></footer></div>
-      <div class="lc-actions"><button data-do="open-current-track" class="lc-open-track">Открыть трек в SoundCloud ↗</button><button data-do="download-current" class="primary" title="Сохранить песню на компьютер в MP3">Установить песню</button><button data-do="downloads-folder">Открыть папку MP3 ↗</button><button data-do="copy-bbcode">Скопировать BBCode для форума</button><button data-do="card-copy">Скопировать карточку</button><button data-do="card-save">Сохранить PNG</button></div>
+      <div id="lc-share-card"><div class="lc-card-brand"><b id="lc-card-source">SOUNDCLOUD</b> <span>× LOLZTEAM</span></div><div class="lc-card-track"><div class="lc-card-cover"><span>♫</span><img id="lc-card-cover" alt="Обложка трека" hidden></div><div class="lc-card-meta"><small>СЕЙЧАС СЛУШАЮ</small><h2 id="lc-card-title">Включи любимый трек</h2><p id="lc-card-artist">SoundCloud</p><div id="lc-card-time">0:00 / 0:00</div></div></div><div class="lc-card-progress"><span id="lc-card-progress"></span></div><footer><span id="lc-card-owner">Твой профиль</span><span id="lc-card-link">Музыка объединяет</span></footer></div>
+      <div class="lc-actions"><button data-do="room-broadcast" title="Создать комнату и включить текущую песню для всех">Слушать вместе ↗</button><button data-do="open-current-track" class="lc-open-track">Открыть трек в SoundCloud ↗</button><button data-do="download-current" class="primary" title="Сохранить песню на компьютер в MP3">Установить песню</button><button data-do="downloads-folder">Открыть папку MP3 ↗</button><button data-do="copy-bbcode">Скопировать BBCode для форума</button><button data-do="card-copy">Скопировать карточку</button><button data-do="card-save">Сохранить PNG</button></div>
       <p class="lc-hint">BBCode содержит трек, тайм-код, обложку и твои профили. Вставь его в сообщение на форуме.</p>
     </section>
     <section data-pane="wave" hidden>
@@ -23,7 +23,7 @@
     </section>
     <section data-pane="community" hidden>
       <div class="lc-section-heading"><div><h2>Музыка от сообщества</h2><p class="lc-hint">Найди ссылки SoundCloud в темах Lolzteam и сохрани понравившиеся подборки.</p></div><button data-do="community-search" class="primary">Найти на Lolzteam</button></div><div id="lc-community-results" class="lc-list"></div>
-      <h2>Мои сохранённые подборки</h2><form id="lc-add-collection" class="lc-form-grid"><input id="lc-collection-title" placeholder="Название подборки" maxlength="100" aria-label="Название подборки"><input id="lc-collection-url" type="url" placeholder="Ссылка SoundCloud на трек или плейлист" required aria-label="Ссылка SoundCloud"><input id="lc-collection-source" type="url" placeholder="Тема Lolzteam — необязательно" aria-label="Источник на форуме"><button type="submit">Сохранить</button></form><div id="lc-collections" class="lc-list"></div>
+      <h2>Мои сохранённые подборки</h2><form id="lc-add-collection" class="lc-form-grid"><input id="lc-collection-title" placeholder="Название подборки" maxlength="100" aria-label="Название подборки"><input id="lc-collection-url" type="url" placeholder="Ссылка SoundCloud или YouTube Music" required aria-label="Ссылка на музыку"><input id="lc-collection-source" type="url" placeholder="Тема Lolzteam — необязательно" aria-label="Источник на форуме"><button type="submit">Сохранить</button></form><div id="lc-collections" class="lc-list"></div>
       <details><summary>Обменяться подборками</summary><p class="lc-hint">Скопируй список, передай его другу или вставь полученный список в поле.</p><textarea id="lc-collection-json" rows="4" placeholder="Список подборок JSON" aria-label="Список подборок для импорта"></textarea><div class="lc-actions"><button data-do="copy-collections">Скопировать мои подборки</button><button id="lc-import-collections">Импортировать список</button></div></details>
     </section>
     <section data-pane="private" hidden>
@@ -38,7 +38,7 @@
             <h2 id="lc-room-heading">Комнаты для своих</h2>
             <p>Слушайте один трек, собирайте очередь и общайтесь. Друзья могут зайти с любого устройства по приглашению.</p>
             <div class="lc-actions">
-              <button type="button" id="lc-room-create" class="primary" hidden>Создать комнату</button>
+              <button type="button" id="lc-room-broadcast" class="primary" disabled>Включить текущую песню для всех</button><button type="button" id="lc-room-create" class="primary" hidden>Создать комнату</button>
               <button type="button" data-do="room-login" class="primary">Войти через Lolzteam ↗</button>
               <button type="button" data-do="room-logout" hidden>Выйти</button>
             </div>

@@ -11,6 +11,16 @@
   let rooms = [], filter = 'public', authenticated = false, ready = false;
   let listing = false, pending = false, listError = '', actionError = '', lastList = 0;
   let guest = null, activeUrl = '', navigation = 0, cardsSignature = '';
+  function sessionChanged() {
+    document.body.classList.toggle('room-stage-open', !!activeUrl && document.body.dataset.view === 'room');
+    const button = document.querySelector('[data-view=room]');
+    if (button) {
+      button.dataset.connected = String(!!activeUrl);
+      button.title = activeUrl ? 'Комната подключена · вернуться' : 'Комнаты';
+    }
+    window.dispatchEvent(new CustomEvent('lolzcloud:room-session', { detail: { active: !!activeUrl } }));
+  }
+  window.LolzCloudRooms = { get active() { return !!activeUrl; }, leave: () => leave() };
 
   async function request(type, url) {
     const reply = await ipcRenderer.invoke('rooms:action', { type, url });
@@ -91,6 +101,7 @@
     if (!guest) return;
     const view = guest;
     guest = null;
+    view.removeAttribute('id');
     view.hidden = true;
     // Navigating away gives the shared room client time to send its leave request.
     try { Promise.resolve(view.loadURL('about:blank')).catch(() => {}).finally(() => view.remove()); }
@@ -102,6 +113,7 @@
     el('stage-status').textContent = 'Подключаемся к комнате…';
     el('reload').hidden = true;
     const view = document.createElement('webview');
+    view.id = 'lc-room-webview';
     view.setAttribute('partition', ROOM_PARTITION);
     view.setAttribute('aria-label', 'Комната LolzCloud');
     view.src = url;
@@ -123,12 +135,17 @@
     guest = view; content.append(view);
   }
 
-  function leave() {
+  function leave(notify = true) {
     navigation++;
     detach();
     activeUrl = ''; stage.hidden = true; lobby.hidden = false;
-    document.body.classList.remove('room-stage-open');
+    sessionChanged();
+    if (notify) void ipcRenderer.invoke('rooms:action',{type:'leave-local'}).catch(()=>{});
   }
+  ipcRenderer.on('lolzcloud:room-media',(_event,{command,value})=>{if(guest)void guest.executeJavaScript('window.LolzCloudRoomPlayback?.command('+JSON.stringify(command)+','+JSON.stringify(value ?? null)+')',true).catch(()=>{});});
+  window.addEventListener('lolzcloud:pause-room',()=>{if(guest)void guest.executeJavaScript('window.LolzCloudRoomPlayback?.command("pause")',true).catch(()=>{});});
+  ipcRenderer.on('lolzcloud:room-ended', (_event, url) => { if (activeUrl && url === activeUrl && !pending) leave(false); });
+  ipcRenderer.on('lolzcloud:local-play', () => { if (activeUrl) leave(); });
 
   async function change(type, url) {
     if (pending || !authenticated) return;
@@ -136,16 +153,18 @@
     pending = true; actionError = ''; render();
     try {
       const result = await request(type, url);
-      if (type === 'close') { await refresh(); return; }
-      if (revision !== navigation || !authenticated || document.body.dataset.view !== 'room') return;
+      if (type === 'close') { if (url === activeUrl) leave(false); await refresh(); return; }
+      if (revision !== navigation || !authenticated) return;
       activeUrl = result; lobby.hidden = true; stage.hidden = false;
-      document.body.classList.add('room-stage-open');
-      connect(result); el('leave').focus();
+      sessionChanged();
+      connect(result); if (document.body.dataset.view === 'room') el('leave').focus();
     } catch (error) { actionError = error.message; }
     finally { pending = false; render(); }
   }
 
   el('create').onclick = () => change('create');
+  el('broadcast').onclick = () => change('broadcast');
+  ipcRenderer.on('lolzcloud:open-room', (_event,url) => { window.LolzCloudStudio.open('room'); void change('open',url); });
   el('refresh').onclick = () => { actionError = ''; void refresh(); };
   el('search').oninput = render;
   for (const button of filters) button.onclick = () => { filter = button.dataset.roomFilter; render(); };
@@ -158,16 +177,19 @@
   };
   window.addEventListener('lolzcloud:navigation', event => {
     if (event.detail === 'room') { if (!activeUrl) void refresh(); }
-    else leave();
+    // The room session outlives its screen: hidden guests keep their audio,
+    // connection, host lease and drafts until an explicit leave action.
+    sessionChanged();
   });
   window.addEventListener('lolzcloud:state', event => {
     const state = event.detail.features?.room;
     if (!state) return;
+    el('broadcast').disabled = !state.authenticated || !event.detail.fresh || event.detail.private || !event.detail.playback?.url;
     const changed = authenticated !== !!state.authenticated;
     authenticated = !!state.authenticated;
     if (ready && !changed) return;
     ready = true; actionError = '';
-    if (!authenticated) { rooms = []; listError = ''; leave(); }
+    if (!authenticated) { rooms = []; listError = ''; if (activeUrl || pending) leave(); }
     render();
     if (authenticated && document.body.dataset.view === 'room') void refresh();
   });

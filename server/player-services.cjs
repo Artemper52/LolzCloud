@@ -1,8 +1,9 @@
 'use strict';
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
 const { HttpError, playback } = require('./core.cjs');
+const { mediaUrl } = require('./public/media-source.js');
 const clean = (value, length = 180) => typeof value === 'string' ? value.replace(/[\p{Cc}\p{Cf}]/gu, ' ').trim().slice(0, length) : '';
-function track(value) { let url; try { url = new URL(value?.url); } catch { throw new HttpError(400, 'Нужна ссылка на трек SoundCloud.'); } if (url.protocol !== 'https:' || !['soundcloud.com', 'www.soundcloud.com'].includes(url.hostname) || url.username || url.password || !/^\/[\w-]+\/[\w-]+\/?$/.test(url.pathname)) throw new HttpError(400, 'Нужна ссылка на трек SoundCloud.'); return { url: 'https://soundcloud.com' + url.pathname.replace(/\/$/, ''), title: clean(value.title) || url.pathname.split('/').pop(), artist: clean(value.artist, 100) }; }
+function track(value) { const url = mediaUrl(value?.url); if (!url) throw new HttpError(400, 'Нужна ссылка на трек SoundCloud или YouTube Music.'); return { url, title: clean(value.title) || (url.includes('youtube.com') ? 'YouTube Music' : url.split('/').pop()), artist: clean(value.artist,100) }; }
 class PlayerServices {
   constructor(store, rooms = null) {
     this.rooms = rooms;

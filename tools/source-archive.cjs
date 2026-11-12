@@ -2,6 +2,13 @@
 const fs = require('node:fs'), path = require('node:path'), { execFileSync } = require('node:child_process'), yazl = require('yazl');
 const roots = ['.gitattributes', '.gitignore', '.github', 'package.json', 'package-lock.json', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'CONTRIBUTING.md', 'source', 'tests', 'tools', 'config', 'docs', 'licenses', 'server'];
 async function sourceArchive({ root = path.resolve(__dirname, '..'), filename = process.env.LOLZCLOUD_SOURCE_OUTPUT || path.join(root, 'dist/LolzCloud-source.zip') } = {}) {
+  const ref=process.env.LOLZCLOUD_SOURCE_REF;
+  if(ref){
+    if(!/^[a-f0-9]{40}$/.test(ref))throw Error('A source snapshot requires a full commit SHA.');
+    fs.mkdirSync(path.dirname(filename),{recursive:true});
+    execFileSync('git',['archive','--format=zip','--output',filename+'.tmp',ref,'--',...roots],{cwd:root});
+    fs.renameSync(filename+'.tmp',filename);return filename;
+  }
   const files = [...new Set(execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', ...roots], { cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }).split('\0').filter(Boolean))].sort();
   if (!files.includes('package.json') || !files.includes('source/main.js')) throw Error('Expected the LolzCloud source repository.');
   const archive = new yazl.ZipFile();

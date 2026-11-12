@@ -16,9 +16,11 @@ test('profile migration preserves encrypted credentials and cookies without repl
   fs.writeFileSync(path.join(original, 'Network/Cookies'), 'encrypted cookie fixture');
   fs.writeFileSync(path.join(original, 'Local State'), 'encrypted key fixture');
   fs.writeFileSync(path.join(original, 'lolzteam.json'), '{"encryptedToken":"opaque-fixture"}');
+  fs.mkdirSync(path.join(original,'Partitions/lolzcloud-youtube-music/Network'),{recursive:true});
+  fs.writeFileSync(path.join(original,'Partitions/lolzcloud-youtube-music/Network/Cookies'),'opaque YouTube cookie fixture');
   const result = migrateProfile(appData);
   assert.equal(result.migrated, true);
-  for (const file of ['Network/Cookies', 'Local State', 'lolzteam.json']) {
+  for (const file of ['Network/Cookies', 'Local State', 'lolzteam.json','Partitions/lolzcloud-youtube-music/Network/Cookies']) {
     assert.deepEqual(fs.readFileSync(path.join(result.path, file)), fs.readFileSync(path.join(original, file)));
   }
   fs.writeFileSync(path.join(result.path, 'lolzteam.json'), 'new settings');

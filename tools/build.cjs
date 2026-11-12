@@ -29,7 +29,7 @@ async function main() {
     appCopyright: 'Copyright (c) 2026 Artemper (artemper_lzt) and LolzCloud contributors. See LICENSE and THIRD_PARTY_NOTICES.md.',
     icon: path.join(root, 'source/app/lib/assets', platform === 'linux' ? 'logo.png' : 'icon.ico'),
     win32metadata: { CompanyName: 'Artemper (artemper_lzt)', FileDescription: 'LolzCloud', ProductName: 'LolzCloud', OriginalFilename: 'LolzCloud.exe' },
-    ignore: [/^\/(dist|\.build|\.git|tests|tools|docs|server|\.github|backups|portable|\.diagnostic)(\/|$)/,
+    ignore: [/^\/(dist|\.build|\.git|tests|tools|docs|server|android|\.github|backups|portable|\.diagnostic)(\/|$)/,
       /\.lnk$/, /\.log$/, /^\/source\/Downloads(\/|$)/],
   });
   for (const directory of directories) {

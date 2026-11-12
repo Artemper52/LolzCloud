@@ -72,9 +72,12 @@
 #lc-room-stage-status { flex: 1; color: #b6d4c1; font-size: 11px; }
 #lc-room-stage-content { flex: 1; min-height: 0; border: 1px solid #a5d8b52f; border-radius: 12px; overflow: hidden; background: #151f19; }
 #lc-room-stage-content webview { display: flex; width: 100%; height: 100%; }
-.room-stage-open .shell-player { visibility: hidden; }
-body.room-stage-open #lc-studio { height: auto; bottom: 18px; max-height: none; }
+.room-stage-open .shell-player { visibility: visible; }
+body.room-stage-open #lc-studio { height: auto; bottom: 110px; max-height: none; }
 body.room-stage-open #lc-studio .lc-studio-content, body.room-stage-open [data-pane=room], #lc-room-stage:not([hidden]) { display: flex; flex-direction: column; flex: 1; min-height: 0; }
 body.room-stage-open #lc-studio .lc-studio-content { overflow: hidden; padding: 12px; }
 body.room-stage-open #lc-studio .lc-studio-footer { display: none; }
-body.room-stage-open .shell-sidebar { bottom: 0; }
+body.room-stage-open .shell-sidebar { bottom: 96px; }
+#lc-studio .lc-studio-header #lc-room-return { min-height: 36px; padding: 7px 12px; background: #b5e5c615; border-color: #b5e5c640; color: #d9efdf; white-space: nowrap; }
+#lc-studio .lc-studio-header #lc-room-return:hover { background: #b5e5c628; }
+[data-view=room][data-connected=true]::after { content: ''; width: 6px; height: 6px; flex-shrink: 0; margin-left: auto; border-radius: 50%; background: #b5e5c6; }

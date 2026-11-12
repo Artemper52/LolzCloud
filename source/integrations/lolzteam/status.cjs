@@ -1,4 +1,5 @@
 'use strict';
+const { mediaUrl } = require('../../app/lib/js/media-source.js');
 
 const INTERVAL_MS = 60_000;
 const STALE_MS = 15_000;
@@ -69,7 +70,7 @@ function normalizePlayback(value) {
   return {
     title: clean(data.title),
     artist: clean(data.artist),
-    url: soundcloudUrl(data.url || ''),
+    url: mediaUrl(data.url || ''),
     cover: typeof data.cover === 'string' && /^https:\/\/[^\s]+$/u.test(data.cover) ? data.cover.slice(0, 2048) : '',
     position: duration > 0 ? Math.min(typeof data.position === 'number' && Number.isFinite(data.position) ? Math.max(0, data.position) : seconds(data.position), duration) : seconds(data.position),
     duration,
@@ -89,7 +90,7 @@ function validateSettings(patch, current = DEFAULT_SETTINGS) {
     if (['enabled', 'discordEnabled', 'discordSoundcloud', 'discordLolzteam', 'privateMode', 'theme', 'showTime', 'showDuration'].includes(key)) {
       if (typeof value !== 'boolean') throw new Error('Некорректное значение переключателя.');
     } else if (key === 'excludedTracks') {
-      if (!Array.isArray(value) || value.length > 200 || value.some(item => typeof item !== 'string' || item.length > 512 || !/^https:\/\/soundcloud\.com\/[\w-]+\/[\w-]+$/.test(item))) throw new Error('Список исключений содержит неверную ссылку на трек.');
+      if (!Array.isArray(value) || value.length > 200 || value.some(item => typeof item !== 'string' || item.length > 512 || mediaUrl(item)!==item)) throw new Error('Список исключений содержит неверную ссылку на трек.');
     } else if (key === 'format') {
       if (!['artist-title', 'title-artist', 'title'].includes(value)) throw new Error('Неизвестный формат статуса.');
     } else if (key === 'pauseBehavior') {

@@ -1,7 +1,7 @@
 {
   "name": "lolzcloud",
   "productName": "LolzCloud",
-  "version": "0.9.9",
+  "version": "0.9.12",
   "description": "SoundCloud player with Lolzteam music status, Discord presence and a local music studio",
   "main": "source/main.js",
   "license": "MIT",
@@ -27,7 +27,7 @@
     "test:persistence": "node tools/test-persistence.cjs",
     "build:linux": "node tools/build-linux.cjs",
     "build:appimage": "node tools/build-appimage.cjs",
-    "test:player": "node tools/prepare.cjs && node tools/test-player-ui.cjs",
+    "test:player": "node tools/prepare.cjs && node tools/test-player-ui.cjs && node tools/test-youtube-ui.cjs",
     "test:rooms": "node tools/test-rooms-ui.cjs",
     "test:updates": "node tools/test-portable-update.cjs",
     "test:signin": "node tools/prepare.cjs && node tools/test-session-transfer-ui.cjs",

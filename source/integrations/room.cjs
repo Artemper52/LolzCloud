@@ -39,10 +39,10 @@ class ListeningRoom {
     return { active: !!this.room, hosting: !!this.lease || !!this.room && this.room.protocol !== 2, controller: this.room?.controller || null, settings: this.room?.settings || {}, url: this.room?.url || '', viewers: this.room?.viewers || 0, participants: this.room?.participants || [], queue: this.room?.queue || [], authenticated: !!this.token && this.expires > Date.now(), user: this.user, connecting: !!this.pair, recovering: this.storagePending, code: this.pair?.code || '', spicyAvailable: !!this.token && this.spicyAvailable, error: this.error, localNetwork: false };
   }
   async request(endpoint, { method = 'GET', body, signal } = {}) {
-    const timeout = AbortSignal.timeout(8000);
+    const timeout = AbortSignal.timeout(8000), token = this.token;
     let response, raw;
     try {
-      response = await this.fetcher(this.origin + endpoint, { method, redirect: 'error', headers: { Accept: 'application/json', ...(body ? { 'Content-Type': 'application/json' } : {}), ...(this.token ? { Authorization: 'Bearer ' + this.token } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}), signal: signal ? AbortSignal.any([signal, timeout]) : timeout });
+      response = await this.fetcher(this.origin + endpoint, { method, redirect: 'error', headers: { Accept: 'application/json', ...(body ? { 'Content-Type': 'application/json' } : {}), ...(token ? { Authorization: 'Bearer ' + token } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}), signal: signal ? AbortSignal.any([signal, timeout]) : timeout });
       if (Number(response.headers.get('content-length')) > 2_000_000) throw new Error('Слишком большой ответ сервера.');
       raw = await response.text();
     } catch (error) {
@@ -54,7 +54,7 @@ class ListeningRoom {
     if (raw.length > 2_000_000) throw new Error('Слишком большой ответ сервера.');
     let result; try { result = JSON.parse(raw); } catch { throw new Error('Сервер LolzCloud временно недоступен.'); }
     if (!response.ok) {
-      if (response.status === 401 && this.token) { this.token = ''; this.user = null; this.room = null; this.lease = ''; this.spicyAvailable = false; this.persist(); }
+      if (response.status === 401 && token && this.token === token) { this.token = ''; this.user = null; this.room = null; this.lease = ''; this.spicyAvailable = false; this.persist(); }
       const error = new Error(result.error || 'Не удалось подключиться к LolzCloud.'); error.status = response.status; throw error;
     }
     return result;
@@ -89,8 +89,26 @@ class ListeningRoom {
     if (room.protocol === 2) await this.claim();
     await this.publish(); return this.getState();
   }
-  async claim() { if (!this.room) throw new Error('Сначала создай комнату.'); const result = await this.request('/api/rooms/' + this.room.id + '/control', { method: 'POST', body: { type: 'claim', connection: this.connection, force: true, name: 'Приложение · основной плеер' } }); this.lease = result.lease; this.sequence = 0; this.room = result.room; }
-  async release() { const lease = this.lease; this.lease = ''; if (this.room && lease) { const result = await this.request('/api/rooms/' + this.room.id + '/control', { method: 'POST', body: { type: 'release', connection: this.connection, lease } }); this.room = result.room; } }
+  async claim() {
+    if (!this.room) throw new Error('Сначала создай комнату.');
+    const id = this.room.id, version = this.version;
+    const result = await this.request('/api/rooms/' + id + '/control', { method: 'POST', body: { type: 'claim', connection: this.connection, force: true, name: 'Приложение · основной плеер' } });
+    if (version !== this.version || this.room?.id !== id) {
+      await this.request('/api/rooms/' + id + '/control', { method: 'POST', body: { type: 'release', connection: this.connection, lease: result.lease } }).catch(() => {});
+      throw new Error('Подключение к комнате отменено.');
+    }
+    this.lease = result.lease; this.sequence = 0; this.room = result.room;
+  }
+  async attach(url) {
+    const id = new URL(url).pathname.split('/')[2], version = this.version;
+    if (!/^[a-f0-9]{32}$/.test(id || '')) throw new Error('Неверная комната.');
+    const next = await this.request('/api/rooms/' + id);
+    if (version !== this.version || this.closed) throw new Error('Подключение к комнате отменено.');
+    if (!next.canControl) throw new Error('Вести комнату может владелец или диджей.');
+    if (this.room?.id !== id) { await this.release(); if (version !== this.version || this.closed) throw new Error('Подключение к комнате отменено.'); this.room = next; }
+    await this.claim();
+  }
+  async release() { const lease = this.lease, id = this.room?.id, version = this.version; this.lease = ''; if (id && lease) { const result = await this.request('/api/rooms/' + id + '/control', { method: 'POST', body: { type: 'release', connection: this.connection, lease } }); if (version === this.version && this.room?.id === id && !this.lease) this.room = result.room; } }
   observePlayback(value) {
     const previous = this.observed, now = Date.now(), track = value || {};
     const position = Number(track.position) || 0, playing = track.playing === true, expected = previous ? previous.position + (previous.playing ? (now - previous.at) / 1000 : 0) : position;
@@ -103,17 +121,27 @@ class ListeningRoom {
   }
   async publish() {
     if (!this.room) return;
-    const id = this.room.id, version = this.version, source = this.getSnapshot(), current = source.playback || {};
-    if (this.room.protocol === 2 && !this.lease) { this.room = await this.request('/api/rooms/' + id); return; }
+    const id = this.room.id, version = this.version, lease = this.lease, source = this.getSnapshot(), current = source.playback || {};
+    const currentSession = () => version === this.version && this.room?.id === id && this.lease === lease;
+    if (this.room.protocol === 2 && !lease) { const next = await this.request('/api/rooms/' + id); if (currentSession()) this.room = next; return; }
     const playback = source.fresh && !source.private ? Object.fromEntries(['url', 'title', 'artist', 'duration', 'position', 'playing', 'rate'].map(key => [key, current[key]])) : {};
     if (playback.url && Math.abs((playback.rate || 1) - 1) > .001) throw new Error('Для общей комнаты верни обычную скорость 1×.');
     let value;
     try { value = await this.request('/api/rooms/' + id + '/state', { method: 'PUT', body: { fresh: source.fresh === true, private: source.private === true, playback, ...(this.room.protocol === 2 ? { lease: this.lease, connection: this.connection, sequence: ++this.sequence, sampleAgeMs: source.sampledAt ? Math.max(0, Math.min(3000, Date.now() - source.sampledAt)) : 0 } : {}) } }); }
-    catch (error) { if (error.status === 409) { this.lease = ''; this.room = await this.request('/api/rooms/' + id); this.onControlLost(); return; } throw error; }
-    if (version === this.version && this.room?.id === id) this.room = value;
+    catch (error) {
+      if (!currentSession()) return;
+      if (error.status === 409) {
+        const next = await this.request('/api/rooms/' + id);
+        if (currentSession()) { this.lease = ''; this.room = next; this.onControlLost(); }
+        return;
+      }
+      throw error;
+    }
+    if (currentSession()) this.room = value;
   }
   async tick() {
     if (this.closed || this.busy) return; this.busy = true;
+    const tickVersion = this.version, tickRoom = this.room?.id, tickLease = this.lease;
     try {
       if (this.storagePending && Date.now() >= this.storageRetryAt) this.loadSession();
       if (this.storagePending) return;
@@ -148,15 +176,17 @@ class ListeningRoom {
         this.spicyAvailable = session.spicyAvailable === true;
         await this.start();
       }
-    } catch (error) { this.error = error.message || 'Нет соединения с комнатой.'; if (error.status === 404) { this.room = null; this.lease = ''; } }
+    } catch (error) { if (tickVersion !== this.version || tickRoom && (this.room?.id !== tickRoom || this.lease !== tickLease)) return; this.error = error.message || 'Нет соединения с комнатой.'; if (error.status === 404) { this.room = null; this.lease = ''; } }
     finally { this.busy = false; }
   }
   async stop({ close = true } = {}) {
     clearTimeout(this.eventPublish); this.eventPublish = null;
-    if (!close) await this.release().catch(() => {});
+    const room = this.room, lease = this.lease;
+    const canClose=close && (!room?.owner || room.owner.id===this.user?.id);
     this.version++; this.wantStart = false; this.pair = null;
-    const room = this.room; this.room = null; this.lease = '';
-    if (close && room && this.token) await this.request('/api/rooms/' + room.id, { method: 'DELETE' });
+    this.room = null; this.lease = '';
+    if (!canClose && room && lease) await this.request('/api/rooms/' + room.id + '/control', { method: 'POST', body: { type: 'release', connection: this.connection, lease } }).catch(() => {});
+    if (canClose && room && this.token) await this.request('/api/rooms/' + room.id, { method: 'DELETE' });
   }
   async logout() { await this.stop().catch(() => {}); if (this.token) await this.request('/api/logout', { method: 'POST', body: {} }).catch(() => {}); this.token = ''; this.user = null; this.expires = 0; this.spicyAvailable = false; this.storagePending = false; this.persist(); }
   async getSpicy(id, signal) { if (!this.getState().authenticated) return null; try { return await this.request('/api/lyrics/' + id, { signal }); } catch (error) { if (error.status === 404) return null; throw error; } }

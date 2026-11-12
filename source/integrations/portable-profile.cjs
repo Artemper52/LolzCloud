@@ -7,6 +7,7 @@ const { normalizePreferences } = require('./wave-preferences.cjs');
 const { normalizeTrack } = require('./discovery.cjs');
 const { normalizeTools, text } = require('./player-tools.cjs');
 const { prunePlayed } = require('./wave-history.cjs');
+const { mediaUrl } = require('../app/lib/js/media-source.js');
 const MAX_BYTES = 750000;
 function normalizeProfile(value) {
   if (!value || value.format !== 'lolzcloud-profile' || value.version !== 1) throw new Error('Это не профиль LolzCloud поддерживаемой версии.');
@@ -19,11 +20,11 @@ function normalizeProfile(value) {
   if (WINDOW_STYLES.includes(input.preferences?.windowStyle)) preferences.windowStyle = input.preferences.windowStyle;
   if (Number.isFinite(input.preferences?.lyricsFontScale)) preferences.lyricsFontScale = Math.max(.7, Math.min(2, input.preferences.lyricsFontScale));
   if (Number.isFinite(input.preferences?.uiScale)) preferences.uiScale = Math.max(.85, Math.min(1.5, input.preferences.uiScale));
-  const collections = (Array.isArray(input.collections) ? input.collections : []).slice(0, 100).map(row => ({ id: crypto.randomUUID(), title: text(row.title, 100), url: scUrl(row.url), addedAt: Date.now() })).filter(row => row.url);
+  const collections = (Array.isArray(input.collections) ? input.collections : []).slice(0, 100).map(row => ({ id: crypto.randomUUID(), title: text(row.title, 100), url: mediaUrl(row.url) || scUrl(row.url), addedAt: Date.now() })).filter(row => row.url);
   const customEffects = Object.create(null); for (const [name, sound] of Object.entries(input.customEffects || {}).slice(0, 100)) if (name && !['__proto__', 'constructor', 'prototype'].includes(name)) customEffects[text(name, 32)] = normalizeSound(sound);
   const wave = value.wave || {}, feedback = Object.create(null);
   for (const [url, row] of Object.entries(wave.feedback || {}).slice(0, 2000)) { const track = normalizeTrack(row?.track); if (track && track.url === url) feedback[url] = { track, skips: Math.max(0, Math.min(20, Number(row.skips) || 0)), loves: Math.max(0, Math.min(10, Number(row.loves) || 0)), banned: row.banned === true, lastSkippedAt: Math.min(Date.now(), Math.max(0, Number(row.lastSkippedAt) || 0)) }; }
-  const tools = normalizeTools(value.tools); tools.bookmarks = tools.bookmarks.filter(row => scUrl(row.url)); tools.gains = {};
+  const tools = normalizeTools(value.tools); tools.bookmarks = tools.bookmarks.filter(row => mediaUrl(row.url)); tools.gains = {};
   return { format: 'lolzcloud-profile', version: 1, exportedAt: Date.now(), music: { preferences, collections, dsp: normalizeSound(input.dsp), customEffects }, wave: { likes: (Array.isArray(wave.likes) ? wave.likes : []).slice(0, 2000).map(normalizeTrack).filter(Boolean), feedback, adventurous: Math.max(0, Math.min(1, Number(wave.adventurous) || 0)), preferences: normalizePreferences(wave.preferences), blockedArtists: (Array.isArray(wave.blockedArtists) ? wave.blockedArtists : []).slice(0, 100).map(name => text(name, 100)).filter(Boolean), played24h: prunePlayed(wave.played24h, Date.now()) }, tools };
 }
 function exportProfile(music, wave, tools) { return normalizeProfile({ format: 'lolzcloud-profile', version: 1, music: music.data, wave: wave.data, tools: tools.data }); }

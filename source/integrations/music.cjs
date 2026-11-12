@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { randomUUID } = require('node:crypto');
 const { clean, clock, normalizePlayback } = require('./lolzteam/status.cjs');
+const { mediaUrl } = require('../app/lib/js/media-source.js');
 const { profileLinks } = require('./profiles.cjs');
 const { SOUND_PRESETS, validGains, validateSoundPatch, normalizeSound, presetSound } = require('./sound-settings.cjs');
 const { normalizeProtection, validateProtection } = require('./sound-protection.cjs');
@@ -42,14 +43,14 @@ function canonicalKey(value) {
   return [...['Control', 'Alt', 'Shift'].filter(modifier => parts.includes(modifier)), key].join('+');
 }
 function collectionRow(value, addedAt) {
-  const url = scUrl(value?.url); if (!url) throw new Error('Нужна ссылка на трек или плейлист SoundCloud.');
+  const url = mediaUrl(value?.url) || scUrl(value?.url); if (!url) throw new Error('Нужна ссылка на трек YouTube Music или трек / плейлист SoundCloud.');
   const source = value.source ? forumUrl(value.source) : ''; if (value.source && !source) throw new Error('Источник: ссылка на тему Lolzteam.');
   return { id: randomUUID(), title: clean(value.title, 100) || url.split('/').slice(3).join(' / '), url, source, addedAt };
 }
 function bbText(value) { return clean(value).replace(/\[/g, '［').replace(/\]/g, '］'); }
 function shareText(snapshot, withCover = true) {
   const track = normalizePlayback(snapshot.playback);
-  if (!track.title || !scUrl(track.url)) throw new Error('Сначала включи трек.');
+  if (!track.title || !mediaUrl(track.url)) throw new Error('Сначала включи трек.');
   const profiles = profileLinks(snapshot.user, snapshot.soundcloudProfile);
   const lines = ['[CENTER][B]Сейчас слушаю[/B]', `[URL="${track.url}"]${bbText(track.artist)} — ${bbText(track.title)}[/URL]`, `${clock(track.position)} / ${clock(track.duration)}`];
   if (withCover && /^https:\/\/(?:[^/]+\.)?sndcdn\.com\//.test(track.cover)) lines.push(`[IMG]${track.cover}[/IMG]`);
@@ -67,8 +68,8 @@ class MusicFeatures {
     this.previous = null; this.currentEntry = null; this.dirty = false; this.lastSaved = 0;
     try {
       const saved = JSON.parse(fs.readFileSync(filename, 'utf8'));
-      if (Array.isArray(saved.history)) this.data.history = saved.history.filter(row => scUrl(row.url)).slice(0, 1000);
-      if (Array.isArray(saved.collections)) this.data.collections = saved.collections.filter(row => scUrl(row.url)).slice(0, 100);
+      if (Array.isArray(saved.history)) this.data.history = saved.history.filter(row => mediaUrl(row.url)).slice(0, 1000);
+      if (Array.isArray(saved.collections)) this.data.collections = saved.collections.filter(row => mediaUrl(row.url) || scUrl(row.url)).slice(0, 100);
       if (saved.customPresets && typeof saved.customPresets === 'object') {
         for (const [name, gains] of Object.entries(saved.customPresets)) if (this.validGains(gains)) this.data.customPresets[clean(name, 32)] = gains;
       }
@@ -101,7 +102,7 @@ class MusicFeatures {
   observe(snapshot) {
     const time = this.now(); const track = normalizePlayback(snapshot.playback);
     const hidden = snapshot.private === true;
-    const active = snapshot.fresh && track.playing && track.title && scUrl(track.url) && !hidden;
+    const active = snapshot.fresh && track.playing && track.title && mediaUrl(track.url) && !hidden;
     if (!hidden && snapshot.fresh && this.previous?.active && this.previous.url !== track.url && this.currentEntry && this.currentEntry.seconds < 12 && this.previous.position < 15) {
       this.currentEntry.quickSkip = true; this.dirty = true;
     }

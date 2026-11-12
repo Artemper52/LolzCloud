@@ -5,6 +5,7 @@ const { LocalLibrary } = require('./local-library.cjs');
 const { ReleaseRadar } = require('./release-radar.cjs');
 const { exportProfile, normalizeProfile, encryptProfile, decryptProfile, MAX_BYTES } = require('./portable-profile.cjs');
 const { scUrl } = require('./music.cjs');
+const { mediaUrl } = require('../app/lib/js/media-source.js');
 const { prunePlayed } = require('./wave-history.cjs');
 const { writeJson } = require('./durable-json.cjs');
 function createPlayerExperience({ app, service, music, wave, lyrics, room, discovery, downloads, media, play, getWindow, notify, dialog, clipboard }) {
@@ -76,7 +77,7 @@ function createPlayerExperience({ app, service, music, wave, lyrics, room, disco
       case 'versions': await lookup(current()); break;
       case 'versions-confirm': if (versions.source?.url !== action.source || !versions.candidates.some(row => row.url === action.url)) throw new Error('Результаты поиска сменились. Повтори поиск.'); tools.group(action.source, action.url); break;
       case 'versions-ungroup': tools.ungroup(action.url); break;
-      case 'play-url': stopLocal(); await play(scUrl(action.url)); break;
+      case 'play-url': stopLocal(); await play(mediaUrl(action.url) || scUrl(action.url)); break;
       case 'radar-follow': { let url = action.url; if (!url && scUrl(current().url)) { const value = await discovery.resolve(current().url); url = value.user?.permalink_url; } await radar.follow(url); await radar.refresh(); break; }
       case 'radar-unfollow': radar.unfollow(action.url); break;
       case 'radar-refresh': await radar.refresh(); break;

@@ -1,16 +1,17 @@
 'use strict';
 const { normalizePlayback } = require('./lolzteam/status.cjs');
 const { scUrl } = require('./music.cjs');
+const { mediaUrl } = require('../app/lib/js/media-source.js');
 
 // In-memory transport history also works in private mode without saving it.
 class PlaybackHistory {
   constructor(now = Date.now) { this.now = now; this.entries = []; this.index = -1; this.pending = null; }
   request(value) {
-    const url = scUrl(value?.url);
+    const url = mediaUrl(value?.url);
     if (url && this.pending?.url !== url) this.pending = { url, until: this.now() + 30000 };
   }
   observe(value) {
-    const track = normalizePlayback(value), url = scUrl(track.url);
+    const track = normalizePlayback(value), url = mediaUrl(track.url);
     if (!url || !track.title) return true;
     if (this.pending && this.pending.until <= this.now()) this.pending = null;
     if (this.pending && url !== this.pending.url) return false;

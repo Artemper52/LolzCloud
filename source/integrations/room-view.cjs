@@ -30,7 +30,7 @@ function roomCard(room, origin) {
 function roomGuestPreferences(event, preferences, params) {
   if (params.partition !== ROOM_PARTITION) return false;
   if (!roomUrl(params.src)) { event.preventDefault(); return true; }
-  delete preferences.preload;
+  preferences.preload = require('node:path').join(__dirname, '../room-preload.cjs');
   Object.assign(preferences, {
     nodeIntegration: false, nodeIntegrationInSubFrames: false, contextIsolation: true,
     sandbox: true, webSecurity: true, backgroundThrottling: false,

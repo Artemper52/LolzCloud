@@ -15,12 +15,24 @@ test('rooms require verified sessions and only their owner can publish or close 
   const { call, b } = await setup(t);
   assert.equal((await call('/api/rooms', { method: 'POST', secret: null, body: {} })).status, 401);
   const made = await call('/api/rooms', { method: 'POST', body: { user: bob } }), room = await made.json(); assert.equal(made.status, 201); assert.equal(room.owner.id, 1); assert.match(room.url, /^https:\/\/lolzcloud\.com\/room\/[a-f0-9]{32}\/$/);
+  assert.equal(room.settings.public,true,'New rooms should appear in the public directory by default');
+  assert.equal((await(await call('/api/rooms',{secret:b.secret})).json()).rooms[0].id,room.id);
   const active = { fresh: true, private: false, playback: { title: 'Fixture song', artist: 'Test', url: 'https://soundcloud.com/fixture/song', playing: true, position: 12, duration: 100 } };
   assert.equal((await call('/api/rooms/' + room.id + '/state', { method: 'PUT', body: active, secret: b.secret })).status, 403);
   assert.equal((await call('/api/rooms/' + room.id, { method: 'DELETE', secret: b.secret })).status, 403);
   const response = await call('/api/rooms/' + room.id + '/state', { method: 'PUT', body: active }); assert.equal((await response.json()).playback.title, 'Fixture song');
   const anonymous = await call('/api/rooms/' + room.id, { secret: null }); assert.equal(anonymous.status, 401); assert.ok(!(await anonymous.text()).includes('Fixture song'));
   assert.equal((await call('/room/' + room.id + '/', { secret: null })).status, 303);
+});
+test('room music search requires authentication and keeps the scoped player policy',async t=>{
+  const {call}=await setup(t,{fetcher:async url=>url==='https://soundcloud.com/'?new Response('<script>let client_id="'+'a'.repeat(32)+'"</script>'):Response.json({collection:[{title:'Search result',permalink_url:'https://soundcloud.com/fixture/result',user:{username:'Artist'},duration:200000}]})});
+  assert.equal((await call('/api/music/search?q=Song',{secret:null})).status,401);
+  const search=await call('/api/music/search?q=Song');assert.equal(search.status,200);assert.equal((await search.json()).tracks[0].title,'Search result');
+  for(let i=0;i<29;i++)assert.equal((await call('/api/music/search?q=Song')).status,200);
+  assert.equal((await call('/api/music/search?q=Song')).status,429);
+  const room=await(await call('/api/rooms',{method:'POST',body:{}})).json();
+  assert.match((await call('/room/'+room.id+'/')).headers.get('content-security-policy'),/www\.youtube-nocookie\.com/);
+  assert.ok(!(await call('/login')).headers.get('content-security-policy').includes('www.youtube.com'));
 });
 test('participants use server-verified identities, deduplicate tabs, expire and hide stale/private music', async t => {
   const { call, b, advance } = await setup(t), room = await (await call('/api/rooms', { method: 'POST', body: {} })).json();

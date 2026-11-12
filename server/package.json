@@ -1,8 +1,12 @@
 {
   "name": "lolzcloud-server",
-  "version": "0.9.6",
+  "version": "0.9.11",
   "private": true,
   "license": "MIT",
-  "engines": { "node": ">=20.19.0" },
-  "scripts": { "start": "node index.cjs" }
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "start": "node index.cjs"
+  }
 }

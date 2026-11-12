@@ -135,6 +135,10 @@ function registerLolzteam(app, getWindow) {
     if (playback && Object.hasOwn(playback, 'account') && (playback.account !== null || !soundcloudSession.state().saved && !soundcloudSession.state().recovering)) service.setProfile(playback.account);
     notifyState();
   });
+  ipcMain.on('youtube:playback', (event, playback) => {
+    if (!trusted(event) || studio.acceptYouTube(playback) === false) return;
+    service.setPlayback(playback); notifyState();
+  });
   const diagnosticFile = process.argv.includes('--diagnostics') ? path.join(app.getPath('userData'), 'integration-state.json') : null;
   const timer = setInterval(() => {
     service.tick().catch(() => {});

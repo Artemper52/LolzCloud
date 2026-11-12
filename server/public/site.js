@@ -50,8 +50,23 @@
       el('create-room').disabled = false;
       el('create-room').onclick = async () => { el('create-room').disabled = true; try { const room = await request('/api/rooms', {}); location.assign(room.url); } catch (error) { el('status').textContent = error.message; el('create-room').disabled = false; } };
     }
-    const data = await request('/api/rooms');
-    for (const room of data.rooms) { const link = document.createElement('a'), title = document.createElement('strong'), detail = document.createElement('small'); link.href = room.url; link.className = 'room-card'; title.textContent = room.settings?.name || 'Комната ' + room.owner.name; detail.textContent = room.participants.length + ' слушателей · ' + (room.playback.title || 'Выбирают музыку'); link.append(title, detail); el('my-rooms').append(link); }
-    if (!data.rooms.length) el('my-rooms').textContent = 'Сейчас нет открытых комнат. Пригласи друзей в свою.';
+    let pending=false,signature='';
+    async function refresh(){
+      if(pending)return;pending=true;
+      try{
+        const data=await request('/api/rooms');data.rooms.sort((a,b)=>Number(b.playback.playing)-Number(a.playback.playing)||b.viewers-a.viewers);
+        const next=JSON.stringify(data.rooms);if(next===signature)return;signature=next;
+        const cards=data.rooms.map(room=>{
+          const link=document.createElement('a'),top=document.createElement('div'),title=document.createElement('strong'),detail=document.createElement('small'),badge=document.createElement('span'),track=document.createElement('p');
+          link.href=room.url;link.className='room-card';top.className='directory-card-top';badge.className='directory-badge';badge.dataset.live=String(room.playback.playing);
+          badge.textContent=room.playback.playing?'В ЭФИРЕ':room.settings.public?'ОТКРЫТА':'ПО ССЫЛКЕ';top.append(avatar(room.owner),badge);
+          title.textContent=room.settings?.name||'Комната '+room.owner.name;detail.textContent=room.participants.filter(person=>person.online).length+' слушают · '+room.owner.name;
+          track.textContent=[room.playback.artist,room.playback.title].filter(Boolean).join(' — ')||'Выбирают первую песню';link.append(top,title,detail,track);return link;
+        });
+        el('my-rooms').replaceChildren(...cards);if(!cards.length)el('my-rooms').textContent='Пока тихо. Создай открытую комнату и включи музыку всем.';
+        if(el('rooms-count'))el('rooms-count').textContent=data.rooms.length;
+      }catch(error){el('status').textContent=error.message;}finally{pending=false;}
+    }
+    await refresh();setInterval(()=>{if(!document.hidden)void refresh();},10000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)void refresh();});
   }).catch(error => { el('status').textContent = error.message; });
 })();

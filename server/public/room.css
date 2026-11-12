@@ -108,3 +108,33 @@ body[data-page=room].room-shell {
   .room-shell .listening-controls .button { width: auto; }
   .room-shell .local-volume { flex-basis: 100%; margin-top: 4px; }
 }
+
+#room-search-form{display:flex;gap:10px;margin:14px 0 8px}#room-search-query{flex:1;min-width:0}#room-search-status{font-size:13px;color:#aeabbf}#room-search-results{display:grid;gap:8px;max-height:340px;overflow:auto;margin:10px 0 18px}.room-search-result{display:flex;gap:10px;align-items:center;border:1px solid #ffffff14;border-radius:12px;padding:12px;background:#ffffff05}.room-search-result>div{flex:1;min-width:0}.room-search-result strong,.room-search-result small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.room-search-result small{margin-top:4px;color:#aaa4bb}.room-search-result button{flex-shrink:0;font-size:12px;padding:8px 11px}@media(max-width:600px){.room-search-result{flex-wrap:wrap}.room-search-result>div{flex-basis:100%}}
+.room-player[data-provider=youtube] iframe{height:280px;min-height:200px;min-width:200px}.room-player[data-provider=desktop]{min-height:88px}.room-player[data-provider=desktop]::after{content:"Играет в основном плеере LolzCloud";display:block;padding:30px;color:#b8e9c7;font-size:14px}
+
+label.room-toggle { position: relative; display: flex !important; align-items: center; gap: 18px; min-height: 64px; padding: 12px 0 !important; border: 0; border-radius: 0; background: transparent; cursor: pointer; }
+label.room-toggle > span:first-child { flex: 1; min-width: 0; }
+label.room-toggle strong, label.room-toggle small { display: block; }
+label.room-toggle strong { font-size: 14px; color: #edf4ef; }
+label.room-toggle small { margin-top: 4px; line-height: 1.5; color: var(--muted); font-size: 12px; }
+label.room-toggle input[type=checkbox] { position: absolute !important; right: 0; top: 50%; width: 48px !important; height: 32px; margin: 0 !important; transform: translateY(-50%); opacity: 0; cursor: pointer; z-index: 2; }
+.room-toggle-track { position: relative; display: block; width: 48px; height: 28px; flex-shrink: 0; border: 1px solid #ffffff29; border-radius: 20px; background: #36473b; transition: background .18s; }
+.room-toggle-track::before { content: ''; position: absolute; left: 3px; top: 3px; width: 20px; height: 20px; background: #c4d1c8; border-radius: 50%; transition: transform .18s, background .18s; }
+.room-toggle input:checked + .room-toggle-track { background: var(--mint); border-color: var(--mint); }
+.room-toggle input:checked + .room-toggle-track::before { transform: translateX(20px); background: #183723; }
+.room-toggle input:focus-visible + .room-toggle-track { outline: 2px solid var(--mint); outline-offset: 4px; }
+.room-toggle input:disabled + .room-toggle-track { opacity: .5; }
+main.rooms-directory { max-width: 1220px; margin: 28px auto 0; padding-inline: 24px; }
+.directory-heading { display: flex; align-items: center; gap: 12px; margin: 28px 0 18px; }
+.directory-heading h2 { font-size: 24px; margin: 0; }
+.directory-heading > span { color: var(--muted); font-size: 13px; }
+#my-rooms { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 16px; }
+#my-rooms .room-card { margin: 0; border: 1px solid #ffffff14; background: #19231c; transition: border-color .18s; }
+#my-rooms .room-card:hover { border-color: #b5e5c665; }
+#my-rooms .room-card strong { font-size: 20px; color: #edf4ef; overflow-wrap: anywhere; }
+#my-rooms .room-card p { font-size: 13px; margin: 12px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.directory-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+.directory-badge { font-size: 11px; font-weight: 600; color: var(--muted); }
+.directory-badge[data-live=true] { color: var(--mint); }
+.directory-badge[data-live=true]::before { content: ''; display: inline-block; width: 6px; height: 6px; background: currentColor; border-radius: 50%; margin-right: 6px; }
+@media (prefers-reduced-motion: reduce) { .room-toggle-track, .room-toggle-track::before { transition: none !important; } }

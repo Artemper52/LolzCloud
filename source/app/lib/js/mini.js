@@ -2,6 +2,7 @@
   'use strict';
   const { ipcRenderer } = require('electron');
   const { clock } = require('../integrations/lolzteam/status.cjs');
+  const { provider, label: sourceLabel } = require('./lib/js/media-source.js');
   const el = id => document.getElementById(id);
   let current = null, serial = 0, applied = 0, polling = false;
   const pending = new Set();
@@ -14,7 +15,7 @@
   }
   const background = new window.LolzCloudWaveView(el('mini-gradient'), { ambient: true });
   const words = new window.LolzCloudLyricsView(el('lyrics'), {
-    onSeek: value => refresh({ type: 'seek', value }),
+    onSeek: value => { if(current?.capabilities?.seek !== false)return refresh({ type: 'seek', value }); },
     onFollowChange: value => el('follow').setAttribute('aria-pressed', String(value)),
     onCredit: url => refresh({ type: 'credit', url }),
   });
@@ -26,6 +27,7 @@
     el('mini-tempo').textContent = window.LolzCloudVisuals.caption(); el('mini-tempo').hidden = !el('mini-tempo').textContent;
     el('mini-tempo').title = window.LolzCloudVisuals.tempo.source === 'analysis' ? 'Примерный темп по звучанию' : 'Темп трека';
     words.setAutoFollow(state.preferences?.autoFollow !== false);
+    words.setCanSeek(state.capabilities?.seek!==false);
     document.documentElement.dataset.motion = state.preferences?.reduceMotion ? 'reduced' : 'full';
     document.body.classList.toggle('with-lyrics', enabled);
     document.body.classList.toggle('lyrics-only', state.mini.lyricsOnly === true);
@@ -33,37 +35,39 @@
     el('lyricsBack').hidden = state.mini.lyricsOnly !== true;
     el('lyricsToggle').setAttribute('aria-pressed', String(enabled));
     el('title').textContent = track.title || 'Включи любимый трек';
-    el('artist').textContent = track.artist || 'SoundCloud';
+    el('artist').textContent = track.artist || sourceLabel(track.url);
     const wave = state.wave, inWave = wave?.active === true;
     document.body.classList.toggle('is-wave', inWave);
     const liked = inWave ? wave.reaction === 'love' : shown('like', track.liked === true, track.url);
-    el('like').disabled = state.transitioning || pending.has('reaction') || (inWave ? !wave.canFeedback : !track.title || !state.soundcloudProfile?.url || state.fresh === false);
+    el('like').disabled = state.capabilities?.like === false || state.transitioning || pending.has('reaction') || (inWave ? !wave.canFeedback : !track.title || provider(track.url) !== 'youtube' && !state.soundcloudProfile?.url || state.fresh === false);
     el('like').setAttribute('aria-pressed', String(liked));
     el('like').setAttribute('aria-busy', String(pending.has('reaction')));
     el('like-label').textContent = liked && !inWave ? 'В любимых' : 'Нравится';
-    el('like').setAttribute('aria-label', inWave ? liked ? 'Убрать отметку «Нравится» в Моей волне' : 'Больше такого в Моей волне' : liked ? 'Убрать из понравившихся SoundCloud' : 'Добавить в понравившиеся SoundCloud');
-    el('like').title = inWave ? liked ? 'Волна учитывает твой выбор · нажми, чтобы отменить' : 'Больше похожей музыки в Моей волне' : !state.soundcloudProfile?.url ? 'Войди в SoundCloud, чтобы сохранять лайки' : liked ? 'Убрать из понравившихся SoundCloud' : 'Добавить в понравившиеся SoundCloud';
+    const likeLabel=(liked?'Убрать из понравившихся в ':'Добавить в понравившиеся в ')+sourceLabel(track.url);
+    el('like').setAttribute('aria-label', inWave ? liked ? 'Убрать отметку «Нравится» в Моей волне' : 'Больше такого в Моей волне' : likeLabel);
+    el('like').title = inWave ? liked ? 'Волна учитывает твой выбор · нажми, чтобы отменить' : 'Больше похожей музыки в Моей волне' : provider(track.url) !== 'youtube' && !state.soundcloudProfile?.url ? 'Войди в SoundCloud, чтобы сохранять лайки' : likeLabel;
     el('dislike').hidden = !inWave; el('dislike').disabled = state.transitioning || pending.has('reaction') || !wave?.canFeedback;
     const repeat = shown('repeat', state.transport?.repeat?.mode || track.repeat || 'off', track.url);
-    el('repeat').dataset.mode = repeat; el('repeat').disabled = !track.title || state.fresh === false || state.transitioning;
+    el('repeat').dataset.mode = repeat; el('repeat').disabled = state.capabilities?.transport === false || !track.title || state.fresh === false || state.transitioning;
     el('repeat-label').textContent = { off: 'Повтор', all: 'Очередь', one: 'Трек' }[repeat];
     el('repeat').setAttribute('aria-pressed', String(repeat !== 'off'));
     el('repeat').setAttribute('aria-busy', String(pending.has('repeat')));
     el('repeat').setAttribute('aria-label', { off: 'Повтор выключен', one: 'Повтор трека', all: 'Повтор очереди' }[repeat]);
     el('repeat').title = { off: 'Повтор выключен · нажми для повтора очереди', all: 'Повтор очереди · нажми для повтора трека', one: 'Повтор трека · нажми, чтобы выключить' }[repeat];
     const download = state.downloads?.items?.find(item => item.url === track.url), downloading = download && ['queued', 'downloading', 'converting'].includes(download.status), completed = download?.status === 'complete' && download.exists;
-    el('download').disabled = pending.has('download') || state.local || state.transitioning || !track.title || state.fresh === false || downloading;
+    el('download').disabled = state.capabilities?.download === false || pending.has('download') || state.local || state.transitioning || !track.title || state.fresh === false || downloading;
     el('download').setAttribute('aria-busy', String(!!downloading || pending.has('download')));
     el('download').dataset.status = completed ? 'complete' : downloading ? 'busy' : 'idle';
-    const downloadCaption = completed ? 'MP3 сохранён · показать файл' : downloading ? (download.status === 'converting' ? 'Готовим MP3' : 'Скачиваем') + (download.percent === null ? '…' : ' · ' + Math.floor(download.percent) + '%') : download?.status === 'error' ? 'Скачать ещё раз · ' + download.error : 'Скачать песню в MP3';
+    const downloadCaption = state.capabilities?.download === false ? 'YouTube Music не предоставляет MP3 для сохранения' : completed ? 'MP3 сохранён · показать файл' : downloading ? (download.status === 'converting' ? 'Готовим MP3' : 'Скачиваем') + (download.percent === null ? '…' : ' · ' + Math.floor(download.percent) + '%') : download?.status === 'error' ? 'Скачать ещё раз · ' + download.error : 'Скачать песню в MP3';
     el('download').title = downloadCaption; el('download').setAttribute('aria-label', downloadCaption);
     window.lolzArtwork(el('cover'), track.cover);
     if (document.activeElement !== el('volume')) el('volume').value = Math.round((state.volume ?? 1) * 100);
     el('volume-label').textContent = el('volume').value + '%';
     el('play-icon').setAttribute('d', track.playing ? 'M7 5h4v14H7zm6 0h4v14h-4z' : 'm8 5 11 7-11 7z');
     el('playPause').setAttribute('aria-label', track.playing ? 'Пауза' : 'Продолжить');
+    for(const name of ['previous','next'])el(name).disabled=state.capabilities?.transport===false;
     el('position').textContent = clock(track.position); el('duration').textContent = clock(track.duration);
-    el('seek').max = track.duration || 1; el('seek').disabled = !track.duration;
+    el('seek').max = track.duration || 1; el('seek').disabled = state.capabilities?.seek === false || !track.duration;
     if (document.activeElement !== el('seek')) el('seek').value = track.position;
     el('volume-toggle').title = 'Громкость · ' + el('volume').value + '%';
     window.LolzCloudRanges.update();

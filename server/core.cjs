@@ -1,5 +1,6 @@
 'use strict';
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto');
+const { mediaUrl } = require('./public/media-source.js');
 const DAY = 86400000, hash = value => crypto.createHash('sha256').update(String(value)).digest('hex'), token = () => crypto.randomBytes(32).toString('base64url');
 class HttpError extends Error { constructor(status, message) { super(message); this.status = status; } }
 const text = (value, length = 180) => typeof value === 'string' ? value.replace(/[\p{Cc}\p{Cf}]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, length) : '';
@@ -11,7 +12,7 @@ function profile(value) {
 }
 function playback(value) {
   const hidden = !value?.fresh || value.private;
-  let url = ''; try { const parsed = new URL(value?.playback?.url); if (parsed.protocol === 'https:' && ['soundcloud.com', 'www.soundcloud.com'].includes(parsed.hostname) && /^\/[\w-]+\/[\w-]+\/?$/.test(parsed.pathname)) url = 'https://soundcloud.com' + parsed.pathname.replace(/\/$/, ''); } catch { /* No track. */ }
+  const url = mediaUrl(value?.playback?.url);
   const track = value?.playback || {}, duration = Math.max(0, Math.min(4 * 3600, Number(track.duration) || 0));
   return hidden || !url ? { title: 'Музыка пока не передаётся', artist: '', url: '', playing: false, position: 0, duration: 0, rate: 1 } : {
     title: text(track.title), artist: text(track.artist, 100), url, playing: track.playing === true, duration,

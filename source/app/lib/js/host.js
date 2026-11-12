@@ -7,6 +7,7 @@
   const { normalizePlayback, clock } = require('../integrations/lolzteam/status.cjs');
   const { soundcloudProfile } = require('../integrations/profiles.cjs');
   const { scUrl } = require('../integrations/music.cjs');
+  const { provider } = require('./lib/js/media-source.js');
   const view = document.getElementById('webview'), el = id => document.getElementById(id);
   const footerBackground = new window.LolzCloudWaveView(el('player-gradient'), { ambient: true, fps: 24 });
   const headerBackground = new window.LolzCloudWaveView(el('titlebar-gradient'), { ambient: true, fps: 15 });
@@ -69,9 +70,9 @@
     const track = state.displayPlayback || state.playback;
     document.querySelector('.shell-player').setAttribute('aria-busy', String(state.transitioning === true));
     downloadItem = state.features?.downloads?.items.find(item => item.url === track.url && item.status !== 'cancelled' && item.status !== 'error') || null;
-    el('player-download').disabled = state.local || !track.title || state.fresh === false || state.transitioning;
+    el('player-download').disabled = state.features?.capabilities?.download === false || state.local || !track.title || state.fresh === false || state.transitioning;
     el('player-download').dataset.status = downloadItem?.status || '';
-    el('player-download').title = downloadItem?.exists ? 'MP3 сохранён · показать файл' : downloadItem && ['queued', 'downloading', 'converting'].includes(downloadItem.status) ? 'Скачивание · открыть очередь' : 'Установить песню · сохранить MP3';
+    el('player-download').title = state.features?.capabilities?.download === false ? 'YouTube Music не предоставляет MP3 для сохранения' : downloadItem?.exists ? 'MP3 сохранён · показать файл' : downloadItem && ['queued', 'downloading', 'converting'].includes(downloadItem.status) ? 'Скачивание · открыть очередь' : 'Установить песню · сохранить MP3';
     footerBackground.setState(true, track.playing && state.fresh !== false); headerBackground.setState(true, track.playing && state.fresh !== false);
     const preferences = state.features?.preferences;
     if (preferences) {
@@ -81,19 +82,20 @@
     el('player-title').textContent = track.title || 'Выбери свой ритм'; el('player-artist').textContent = track.artist || 'Твоя музыка в LolzCloud';
     el('player-play-icon').setAttribute('d', track.playing ? 'M7 5h4v14H7zm6 0h4v14h-4z' : 'm8 5 11 7-11 7z');
     el('player-playPause').setAttribute('aria-label', track.playing ? 'Пауза' : 'Продолжить');
-    const canLike = !state.local && !!track.title && !!state.soundcloudProfile?.url && !state.transitioning;
+    const canLike = state.features?.capabilities?.like !== false && !state.local && !!track.title && (provider(track.url) === 'youtube' || !!state.soundcloudProfile?.url) && !state.transitioning;
     el('player-like').disabled = !canLike;
     el('player-like').setAttribute('aria-pressed', String(track.liked));
     el('player-like').setAttribute('aria-label', track.liked ? 'Убрать лайк' : 'Лайк');
     el('player-like').title = !canLike ? 'Войди в SoundCloud и включи трек' : track.liked ? 'Убрать из понравившихся' : 'Добавить в понравившиеся';
+    for(const name of ['previous','next'])el('player-'+name).disabled=state.features?.capabilities?.transport===false;
     const repeat = state.features?.transport?.repeat?.mode || track.repeat || 'off';
-    el('player-repeat').disabled = !track.title || state.transitioning;
+    el('player-repeat').disabled = state.features?.capabilities?.transport === false || !track.title || state.transitioning;
     el('player-repeat').dataset.mode = repeat;
     el('player-repeat').setAttribute('aria-pressed', String(repeat !== 'off'));
     el('player-repeat').setAttribute('aria-label', { off: 'Повтор выключен', all: 'Повтор очереди', one: 'Повтор трека' }[repeat]);
     el('player-repeat').title = { off: 'Повтор выключен · нажми для повтора очереди', all: 'Повтор очереди · нажми для повтора трека', one: 'Повтор трека · нажми, чтобы выключить' }[repeat];
     el('player-position').textContent = clock(track.position); el('player-duration').textContent = clock(track.duration);
-    el('player-seek').max = track.duration || 1; el('player-seek').disabled = !track.duration;
+    el('player-seek').max = track.duration || 1; el('player-seek').disabled = state.features?.capabilities?.seek === false || !track.duration;
     if (document.activeElement !== el('player-seek')) el('player-seek').value = track.position;
     const volume = state.features?.player?.volume ?? state.features?.audio?.volume ?? 1;
     if (document.activeElement !== el('player-volume')) el('player-volume').value = Math.round(volume * 100);

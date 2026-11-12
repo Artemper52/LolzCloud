@@ -33,6 +33,10 @@
       if (value) this.center();
     }
     setAutoFollow(value) { if (this.autoFollow === value) return; this.autoFollow = value; this.setFollow(value); }
+    setCanSeek(value) {
+      this.canSeek=value;
+      for(const node of this.nodes)if(node.tagName==='BUTTON'){node.disabled=!value;node.title=value?'Слушать с этой строки':'Позицию выбирает ведущий комнаты';}
+    }
     setFontScale(value) {
       const scale = Math.max(.7, Math.min(2, Number(value) || 1)); if (this.fontScale === scale) return;
       this.fontScale = scale; this.container.style.setProperty('--lyrics-scale', String(scale));
@@ -77,7 +81,7 @@
             node.classList.add('has-words');
             for (const word of line.words) { const span = document.createElement('span'); span.className = 'lc-word'; span.textContent = word.text; node.append(span); }
           } else node.textContent = line.text || '•••';
-          if (this.lines.length) { node.type = 'button'; node.title = 'Слушать с этой строки'; node.onclick = () => { this.setFollow(true); void this.onSeek(line.time); }; }
+          if (this.lines.length) { node.type = 'button'; node.disabled=this.canSeek===false; node.title = node.disabled?'Позицию выбирает ведущий комнаты':'Слушать с этой строки'; node.onclick = () => { this.setFollow(true); void this.onSeek(line.time); }; }
           this.nodes.push(node); this.stage.append(node);
         });
       }

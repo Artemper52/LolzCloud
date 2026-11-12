@@ -23,7 +23,6 @@
   element('close').addEventListener('click', () => lztDialog.close());
   lztDialog.addEventListener('click', event => { if (event.target === lztDialog) lztDialog.close(); });
   lztIpc.on('lolzteam:open', showPanel);
-  lztIpc.on('appReqEsc', () => { if (lztDialog.open) lztDialog.close(); });
   lztIpc.on('soundcloud:session-imported', () => { lztWebview.reloadIgnoringCache(); });
   document.addEventListener('keydown', event => {
     if (event.ctrlKey && event.shiftKey && event.code === 'KeyL') {

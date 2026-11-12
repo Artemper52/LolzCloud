@@ -5,8 +5,13 @@
 #youtube-search button { background: #ff354c; color: white; padding: 11px 20px; border-radius: 12px; font-weight: 650; }
 #youtube-status { padding: 8px 22px; margin: 0; font-size: 12px; color: #b7abb0; }
 .shell-browser #youtube-webview { position: relative; inset: auto; height: auto; flex: 1; min-height: 0; }
-[data-source=youtube] .shell-player,[data-source=youtube] #webview,[data-source=youtube] #browser-loading,[data-source=youtube] #browser-sign-in,[data-source=youtube] #artist-pro,[data-source=youtube] #sc-signin-banner,[data-source=youtube] #sc-connection,[data-source=youtube] #sc-verification { display: none !important; }
-[data-source=youtube] .shell-browser,[data-source=youtube] .shell-sidebar { bottom: 0; }
+[data-source=youtube] #webview,[data-source=youtube] #browser-loading,[data-source=youtube] #browser-sign-in,[data-source=youtube] #artist-pro,[data-source=youtube] #sc-signin-banner,[data-source=youtube] #sc-connection,[data-source=youtube] #sc-verification { display: none !important; }
+
 .shell-sidebar nav button[data-view=youtube].selected { background: #fa304729; color: #ffabb6; }
 .shell-sidebar nav button[data-view=youtube]>span { color: #ff566b; }
 #youtube-surface[hidden] { display: none; }
+body[data-source=youtube] > .shell-player { display: grid !important; visibility: visible !important; position: fixed !important; inset: auto 0 0 !important; z-index: 1000; transform: none !important; }
+body[data-source=youtube] .shell-browser { bottom: 96px; }
+#youtube-tools { display:flex;gap:8px;flex-shrink:0; }
+#youtube-tools button { padding:10px 12px;background:#ffffff09;border:1px solid #ffffff20;color:#f2dfe3;white-space:nowrap; }
+@media(max-width:1100px){#youtube-search{flex-wrap:wrap;gap:10px}#youtube-tools{margin-left:auto}#youtube-search label{flex-basis:75%}}

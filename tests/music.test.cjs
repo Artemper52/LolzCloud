@@ -14,6 +14,15 @@ function fixture(t) {
 function snapshot(patch = {}) {
   return { fresh: true, private: false, user: { id: 123, name: 'Listener' }, soundcloudProfile: { name: 'Listener SC', url: 'https://soundcloud.com/listener' }, playback: { title: 'Song [test]', artist: 'Artist', position: 0, duration: 200, playing: true, url: 'https://soundcloud.com/artist/song', cover: 'https://i1.sndcdn.com/cover.jpg' }, ...patch };
 }
+test('YouTube history, saved links and bookmarks survive reopening and portable export',t=>{
+  const {model,filename}=fixture(t),url='https://music.youtube.com/watch?v=p-LBiCtzXu0';
+  model.addCollection({title:'YouTube favourite',url});
+  model.observe(snapshot({playback:{title:'YouTube song',artist:'Artist',url,duration:200,position:12,playing:true}}));model.save(true);
+  const reopened=new MusicFeatures(filename);assert.equal(reopened.data.collections[0].url,url);assert.equal(reopened.data.history[0].url,url);
+  const {normalizeProfile}=require('../source/integrations/portable-profile.cjs');
+  const exported=normalizeProfile({format:'lolzcloud-profile',version:1,music:reopened.data,tools:{bookmarks:[{id:'a'.repeat(36),url,title:'YouTube song',position:12}]}});
+  assert.equal(exported.music.collections[0].url,url);
+});
 test('forum BBCode includes the actual profiles, time and cover and neutralizes injected tags', () => {
   const result = shareText(snapshot());
   assert.ok(result.includes('Song ［test］')); assert.ok(!result.includes('Song [test]'));

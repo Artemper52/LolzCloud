@@ -7,7 +7,7 @@ function youtubeUrl(value) {
 function youtubeGuestPreferences(event, preferences, params) {
   if (params.partition !== YOUTUBE_PARTITION) return false;
   if (!youtubeUrl(params.src)) { event.preventDefault(); return true; }
-  delete preferences.preload;
+  preferences.preload = require('node:path').join(__dirname, '../youtube-preload.cjs');
   Object.assign(preferences, { nodeIntegration: false, nodeIntegrationInSubFrames: false, contextIsolation: true, sandbox: true, webSecurity: true, backgroundThrottling: false });
   return true;
 }

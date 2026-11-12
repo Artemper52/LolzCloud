@@ -96,6 +96,5 @@
   view.addEventListener('did-fail-load', event => { if (event.isMainFrame === false || event.errorCode === -3) return; failed = true; clearTimeout(slowTimer); problem(false); });
   view.addEventListener('did-finish-load', () => { clearTimeout(slowTimer); if (!failed) { connection.hidden = true; render(); } });
   view.addEventListener('dom-ready', () => { clearTimeout(slowTimer); failed = false; connection.hidden = true; render(); });
-  ipcRenderer.on('appReqEsc', () => { if (dialog.open) dialog.close(); });
   ipcRenderer.on('soundcloud:session-imported', () => { failed = false; connection.hidden = true; hint = ''; });
 })();

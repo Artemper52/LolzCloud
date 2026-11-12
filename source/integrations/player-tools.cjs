@@ -3,10 +3,11 @@ const fs = require('node:fs');
 const { randomUUID } = require('node:crypto');
 const { writeJson } = require('./durable-json.cjs');
 const { scUrl } = require('./music.cjs');
+const { mediaUrl } = require('../app/lib/js/media-source.js');
 const { playedRecently } = require('./wave-history.cjs');
 const text = (value, limit = 180) => typeof value === 'string' ? value.replace(/[\p{Cc}\p{Cf}]/gu, ' ').trim().slice(0, limit) : '';
 const localUrl = value => typeof value === 'string' && /^lolzcloud-local:\/\/[a-f0-9]{32}$/.test(value) ? value : '';
-const trackUrl = value => scUrl(value) || localUrl(value);
+const trackUrl = value => mediaUrl(value) || localUrl(value);
 function bookmark(value) {
   const url = trackUrl(value?.url), position = Number(value?.position);
   if (!url || !Number.isFinite(position) || position < 0 || position > 14400) throw new Error('Некорректная закладка трека.');

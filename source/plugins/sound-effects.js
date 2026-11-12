@@ -3,6 +3,8 @@
   const audio = new Set(), graphs = new WeakMap(), sources = new WeakMap(), sourceNodes = new WeakMap(), settling = new WeakSet(), impulses = new WeakMap(), corsManaged = new WeakSet(), corsFallback = new WeakSet(), wantedPlayback = new WeakSet();
   const mediaTracks = new WeakMap();
   const selectActive = () => [...audio].find(media => !media.paused) || [...audio].at(-1);
+  const mediaSelector=window.__lolzcloudYouTube?'audio,video':'audio';
+  const isMusicMedia=media=>media?.tagName==='AUDIO'||!!window.__lolzcloudYouTube&&media?.tagName==='VIDEO';
   const defaults = { enabled: false, gains: [0, 0, 0, 0, 0], rate: 1, preservesPitch: false, reverb: 0, echo: 0 };
   const status = window.__lolzcloudAudioFX = { config: { ...defaults }, attached: 0, unavailable: false, reason: '', rate: 1, mediaCount: 0, audio };
   const safety = { limiter: true, ceilingDb: -3, duckGain: 1 };
@@ -22,7 +24,7 @@
   };
   function rhythmFrame(media, record, time, energy) {
     if (!tracker || rhythmMedia() !== media || !Number.isFinite(time) || !Number.isFinite(energy)) return;
-    const url = document.querySelector('.playbackSoundBadge__titleLink')?.href || '', rate = media.playbackRate || 1, key = url + '\n' + (media.currentSrc || media.src);
+    const url = window.__lolzcloudCurrentTrackUrl?.() || document.querySelector('.playbackSoundBadge__titleLink')?.href || '', rate = media.playbackRate || 1, key = url + '\n' + (media.currentSrc || media.src);
     if (key !== rhythm.key || rate !== rhythm.rate || time - rhythm.lastAt > 3) tracker.reset();
     Object.assign(rhythm, { key, url, record, available: true, lastAt: time, position: media.currentTime, rate });
     tracker.push(time, energy);
@@ -213,7 +215,7 @@
     if (audio.has(media)) return media;
     audio.add(media); status.mediaCount = audio.size;
     window.__lolzcloudRepeat?.bind(media);
-    media.addEventListener('playing', () => { mediaTracks.set(media, document.querySelector('.playbackSoundBadge__titleLink')?.href || location.href); wantedPlayback.add(media); status.currentMedia = media; setTempo(media); attach(media); window.__lolzcloudSnapshot?.(); });
+    media.addEventListener('playing', () => { mediaTracks.set(media, window.__lolzcloudCurrentTrackUrl?.() || document.querySelector('.playbackSoundBadge__titleLink')?.href || location.href); wantedPlayback.add(media); status.currentMedia = media; setTempo(media); attach(media); window.__lolzcloudSnapshot?.(); });
     media.addEventListener('loadedmetadata', () => { setTempo(media); attach(media); });
     media.addEventListener('canplay', () => { setTempo(media); attach(media); });
     media.addEventListener('ratechange', () => setTempo(media));
@@ -249,7 +251,7 @@
   }
   const nativePlay = HTMLMediaElement.prototype.play;
   HTMLMediaElement.prototype.play = function(...args) {
-    if (this.tagName?.toLowerCase() === 'audio') { wantedPlayback.add(this); add(this); setTempo(this); attach(this); }
+    if (isMusicMedia(this)) { wantedPlayback.add(this); add(this); setTempo(this); attach(this); }
     return Reflect.apply(nativePlay, this, args);
   };
   const sourceProperty = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'src');
@@ -259,14 +261,14 @@
   const NativeAudio = window.Audio;
   window.Audio = new Proxy(NativeAudio, { construct(target, args, newTarget) { const media = add(Reflect.construct(target, [], newTarget)); if (args[0] !== undefined) { prepareCors(media, args[0]); media.src = args[0]; } return media; } });
   const create = document.createElement.bind(document);
-  document.createElement = function(name, options) { const node = create(name, options); return String(name).toLowerCase() === 'audio' ? add(node) : node; };
+  document.createElement = function(name, options) { const node = create(name, options); return isMusicMedia(node) ? add(node) : node; };
   const observer = new MutationObserver(records => {
     for (const record of records) for (const node of record.addedNodes) {
-      if (node.nodeName === 'AUDIO') add(node);
-      node.querySelectorAll?.('audio').forEach(add);
+      if (isMusicMedia(node)) add(node);
+      node.querySelectorAll?.(mediaSelector).forEach(add);
     }
   });
-  const watchDocument = () => { observer.observe(document.documentElement, { subtree: true, childList: true }); document.querySelectorAll('audio').forEach(add); };
+  const watchDocument = () => { observer.observe(document.documentElement, { subtree: true, childList: true }); document.querySelectorAll(mediaSelector).forEach(add); };
   if (document.documentElement) watchDocument(); else document.addEventListener('DOMContentLoaded', watchDocument, { once: true });
   window.__lolzcloudSetAudioFX = config => {
     const valid = config && Array.isArray(config.gains) && config.gains.length === 5 && config.gains.every(value => Number.isFinite(value) && Math.abs(value) <= 12);
@@ -284,12 +286,12 @@
     if (command === 'playPause') { button?.click(); return !!button; }
     if (command === 'next') { transportRequest++; const next = document.querySelector('.playControls__next'); next?.click(); return !!next; }
     if (command === 'previous') {
-      const request = ++transportRequest, previous = document.querySelector('.playControls__prev'), badge = document.querySelector('.playbackSoundBadge__titleLink')?.href;
+      const request = ++transportRequest, previous = document.querySelector('.playControls__prev'), badge = window.__lolzcloudCurrentTrackUrl?.() || document.querySelector('.playbackSoundBadge__titleLink')?.href;
       const media = [...audio].find(node => !node.paused) || [...audio].at(-1), position = media?.currentTime || 0;
       previous?.click();
       // SoundCloud treats the first previous click after a few seconds as
       // restart. Only repeat it if that exact recording actually reset to 0.
-      setTimeout(() => { if (request === transportRequest && position > 3 && media?.currentTime < 1 && document.querySelector('.playbackSoundBadge__titleLink')?.href === badge) previous?.click(); }, 160);
+      setTimeout(() => { if (request === transportRequest && position > 3 && media?.currentTime < 1 && (window.__lolzcloudCurrentTrackUrl?.() || document.querySelector('.playbackSoundBadge__titleLink')?.href) === badge) previous?.click(); }, 160);
       return !!previous;
     }
     if (command === 'play' || command === 'pause') { if (button && button.classList.contains('playing') !== (command === 'play')) button.click(); return !!button; }
@@ -325,7 +327,7 @@
       rhythmFrame(media, record, record.context.currentTime, low / (lowCount || 1) + .22 * mid / (midCount || 1));
     } catch { /* An unavailable analyser does not affect music playback. */ }
   }, 33);
-  document.querySelectorAll('audio').forEach(add);
+  document.querySelectorAll(mediaSelector).forEach(add);
   document.addEventListener('click', event => {
     if (window.__lolzcloudWaveActive && event.target.closest?.('.playControls__next')) { event.preventDefault(); event.stopImmediatePropagation(); console.log('LolzCloudReceive|WaveNext'); }
   }, true);

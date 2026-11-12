@@ -1,9 +1,14 @@
 (() => {
   'use strict';
   const { request, avatar } = window.LolzCloudSite, { RoomClock, DriftCorrection } = window.LolzCloudRoomSync, el = id => document.getElementById(id), id = location.pathname.match(/\/room\/([a-f0-9]{32})/)?.[1];
+  const desktop = window.LolzCloudDesktopRoom, media = window.LolzCloudMedia;
+  let desktopState = null, playerKind = '', nativeRevision=0;
+  const nativeHost = () => desktopState?.hosting && state?.controller?.connection === desktopState.connection;
   const connection = crypto.randomUUID(), clock = new RoomClock(), correction = new DriftCorrection();
   let state = null, widget = null, widgetScript = null, playerTimeout, loaded = '', ready = false, started = false, stopped = false, lease = '', sequence = 0, publishing = null, pendingPublish = null, lastApplied = 0, lastHeartbeat = 0, busyJoin = false, eventStream = null, lastStateAt = 0, queueSignature = '', peopleSignature = '', chatSignature = '', historySignature = '', reactionSignature = '', generation = 0, settingsFilled = false;
-  const health = { status: 'autoplay', driftMs: null }, isController = () => !!lease && state?.controller?.connection === connection, target = () => clock.position(state) * 1000;
+  const health = { status: 'autoplay', driftMs: null }, isController = () => nativeHost() || !!lease && state?.controller?.connection === connection, target = () => clock.position(state) * 1000;
+  const pendingToggles = new Set();
+  let autoplayBlocked = false;
   const message = error => { el('status').textContent = error instanceof Error ? error.message : String(error || ''); };
   const node = (tag, value, className) => { const result = document.createElement(tag); result.textContent = value; if (className) result.className = className; return result; };
   const button = (label, handler) => { const result = node('button', label); result.type = 'button'; result.onclick = () => Promise.resolve(handler()).catch(message); return result; };
@@ -26,6 +31,7 @@
     if (!loaded) return badge('В комнате');
     if (health.status === 'error') return badge('Звук недоступен', true);
     if (!ready) return badge('Загружаем трек', true);
+    if (autoplayBlocked) return badge('Нажми Play в плеере', true);
     if (!started) return badge('Звук выключен у тебя');
     const drift = Math.abs(health.driftMs || 0);
     badge(drift < 350 ? 'Вместе · синхронно' : 'Выравниваем · ' + (drift / 1000).toFixed(1) + ' с', drift >= 350);
@@ -34,10 +40,12 @@
   function seekNow(position) { if (!widget || !ready) return; lastApplied = performance.now(); widget.seekTo(position); }
   function sync(force = false) {
     if (stopped || !widget || !ready || !state || !loaded) return;
+    if (nativeHost()) { health.status = 'ready'; health.driftMs = 0; updateBadge(); return; }
+    if (lastStateAt && performance.now() - lastStateAt > 15000) { widget.pause(); health.status = 'buffering'; updateBadge(); return; }
     if (!started) { lastApplied = performance.now(); widget.pause(); health.status = 'autoplay'; health.driftMs = null; updateBadge(); return; }
     const source = loaded, token = generation;
     widget.isPaused(paused => { if (stopped || !started || token !== generation || source !== loaded) return; if (state.playback.playing === paused) { lastApplied = performance.now(); state.playback.playing ? widget.play() : widget.pause(); } });
-    widget.getPosition(position => { if (stopped || !started || token !== generation || state.playback.url !== source) return; const decision = correction.decide(position, target(), performance.now(), source, force); health.driftMs = Math.round(decision.drift); if (decision.seek) seekNow(Math.max(0, decision.position)); health.status = 'ready'; updateBadge(); });
+    widget.getPosition(position => { if (stopped || !started || token !== generation || state.playback.url !== source) return; const decision = correction.decide(position, target(), performance.now(), source, force); health.driftMs = Math.round(decision.drift); if (decision.seek) seekNow(Math.max(0, decision.position)); health.status = autoplayBlocked ? 'autoplay' : 'ready'; updateBadge(); });
   }
   function widgetReady(token) {
     if (token !== generation || stopped || health.status === 'error') return;
@@ -47,7 +55,7 @@
     widget.setVolume(Number(el('volume').value));
     widget.getCurrentSound(sound => {
       const artwork = sound?.artwork_url || sound?.user?.avatar_url;
-      if (token !== generation || stopped || !/^https:\/\/[a-z0-9-]+\.sndcdn\.com\//i.test(artwork || '')) return;
+      if (token !== generation || stopped || !/^https:\/\/(?:[a-z0-9-]+\.sndcdn\.com|i\.ytimg\.com|lh3\.googleusercontent\.com)\//i.test(artwork || '')) return;
       const image = el('track-art');
       image.onload = () => { if (token === generation) image.hidden = false; };
       image.onerror = () => { image.hidden = true; };
@@ -75,25 +83,37 @@
     ready = false; health.status = 'error';
     widget?.pause();
     el('player').parentElement.classList.remove('has-track');
-    el('player-placeholder').textContent = 'SoundCloud не открыл трек. Чат и очередь доступны.';
+    el('player-placeholder').textContent = 'Источник не открыл трек. Попробуй другую запись; чат и очередь доступны.';
     el('retry-player').hidden = false;
     updateBadge();
   }
   async function load(track, retry = false) {
-    const url = track.url;
-    if (url === loaded && !retry) return;
+    const url = track.url, kind = nativeHost() ? 'desktop' : media.provider(url);
+    if (url === loaded && kind === playerKind && !retry) return;
+    if (widget && (kind !== playerKind || kind === 'youtube')) { const old=el('player'), parent=old?.parentElement;widget.pause();widget.destroy?.();widget=null;const replacement=document.createElement('iframe');replacement.id='player';replacement.title='Плеер комнаты';replacement.allow='autoplay; encrypted-media; fullscreen';if(old?.isConnected)old.replaceWith(replacement);else parent?.append(replacement); }
+    playerKind = kind;
     const token = ++generation;
-    loaded = url; ready = false; health.status = url ? 'buffering' : 'autoplay'; health.driftMs = null;
+    loaded = url; ready = false; autoplayBlocked = false; health.status = url ? 'buffering' : 'autoplay'; health.driftMs = null;
     clearTimeout(playerTimeout);
     const frame = el('player');
+    frame.parentElement.dataset.provider=kind;
     el('track-art').hidden = true;
     el('track-art').removeAttribute('src');
     frame.parentElement.classList.remove('has-track');
     el('retry-player').hidden = true;
-    el('player-placeholder').textContent = url ? 'Загружаем звук SoundCloud…' : 'Ведущий скоро включит музыку';
+    el('player-placeholder').textContent = url ? 'Загружаем звук ' + media.label(url) + '…' : 'Ведущий скоро включит музыку';
     updateBadge();
     if (!url) { widget?.pause(); return; }
     try {
+      if (kind === 'desktop') { frame.hidden = true; widget = window.LolzCloudRoomPlayers.desktop(desktop,{ready:()=>widgetReady(token)}); return; }
+      frame.hidden = false;
+      if (kind === 'youtube') {
+        widget?.destroy?.();
+        playerTimeout = setTimeout(()=>playerFailed(token),18000);
+        const next = await window.LolzCloudRoomPlayers.youtube(frame,track,{ready:()=>widgetReady(token),changed:playing=>{if(token!==generation)return;if(playing)autoplayBlocked=false;nativeUpdate();},ended:()=>{if(isController()&&state.settings.autoNext)void nextTrack().catch(message)},error:()=>playerFailed(token),blocked:()=>{if(token!==generation)return;autoplayBlocked=true;health.status='autoplay';updateBadge();message('Нажми Play в плеере YouTube, чтобы разрешить звук.');}});
+        if(token!==generation){next.destroy?.();return;} widget=next;
+        if(token!==generation)widget.destroy?.(); return;
+      }
       const Widget = await soundCloudWidget();
       if (token !== generation || stopped) return;
       playerTimeout = setTimeout(() => playerFailed(token), 12000);
@@ -127,6 +147,7 @@
   }
   function render(value) {
     if (stopped || state && (value.epoch < state.epoch || value.epoch === state.epoch && value.revision < state.revision)) return; state = value;
+    if(nativeHost())started=true;
     if (lease && value.controller?.connection !== connection) { lease = ''; pendingPublish = null; if (value.controller) message('Ведущий теперь на другом устройстве. Здесь можно продолжить слушать.'); }
     el('room-name').textContent = value.settings.name; el('room-description').textContent = value.settings.description; document.title = value.settings.name + ' · LolzCloud';
     el('track-title').textContent = value.playback.url ? value.playback.title || 'Трек SoundCloud' : 'Выбираем первую песню'; el('track-artist').textContent = value.playback.artist;
@@ -136,6 +157,7 @@
     updateControls();
     el('host-seek').max = value.playback.duration || 1; if (document.activeElement !== el('host-seek')) el('host-seek').value = clock.position(value); el('room-settings').hidden = !value.host;
     if (!settingsFilled && value.host) { settingsFilled = true; el('settings-name').value = value.settings.name; el('settings-description').value = value.settings.description; el('settings-public').checked = value.settings.public; el('settings-chat').checked = value.settings.chat; el('settings-auto').checked = value.settings.autoNext; el('settings-capacity').value = value.settings.capacity; }
+    for(const [key,id]of [['public','settings-public'],['chat','settings-chat'],['autoNext','settings-auto']])if(!pendingToggles.has(key))el(id).checked=value.settings[key]===true;
     void load(value.playback); renderQueue(); renderPeople(); renderConversation(); updateBadge(); sync();
   }
   function updateControls() {
@@ -144,8 +166,15 @@
     el('queue-url').disabled = el('queue-form').querySelector('button').disabled = stopped || !state;
     document.querySelectorAll('[data-reaction]').forEach(button => { button.disabled = stopped || !state; });
   }
-  async function control(data) { const result = await call('control', data); if (result.lease) { lease = result.lease; sequence = 0; started = true; } render(result.room); return result; }
+  async function control(data) { if(desktop && ['claim','release'].includes(data.type)){if(data.type==='claim'&&!nativeHost())widget?.pause();desktopState=await desktop[data.type]();await poll();return {room:state};} const result = await call('control', data); if (result.lease) { lease = result.lease; sequence = 0; started = true; } render(result.room); return result; }
   function publish(patch) {
+    if (nativeHost()) { const revision=++nativeRevision;
+      if(typeof patch.playing==='boolean'){state.playback={...state.playback,playing:patch.playing};updateControls();}
+      return (async()=>{
+      if(patch.url)desktopState=await desktop.play(patch.url);
+      else {if(Number.isFinite(patch.position))desktopState=await desktop.media('seek',patch.position);if(typeof patch.playing==='boolean')desktopState=await desktop.media(patch.playing?'play':'pause');}
+      if(revision===nativeRevision&&desktopState?.room)render(desktopState.room);return true;
+    })().catch(error=>{message(error);return false;}); }
     if (stopped || !isController()) return Promise.resolve(false);
     pendingPublish = { ...pendingPublish, ...patch };
     if (!publishing) publishing = (async () => {
@@ -167,11 +196,11 @@
     return publishing;
   }
   async function queue(data) { const value = await call('queue', { ...data, lease, connection }); render(value.room); return value; }
-  async function nextTrack() { if (!isController()) return; const value = await queue({ type: 'next' }); if (value.track) await openTrack(value.track.url); else await publish({ playing: false }); }
+  async function nextTrack() { if (!isController()) return; if(nativeHost()){desktopState=await desktop.next();if(desktopState?.room)render(desktopState.room);return;} const value = await queue({ type: 'next' }); if (value.track) await openTrack(value.track.url); else await publish({ playing: false }); }
   async function openTrack(url) {
-    if (!isController()) throw new Error('Сначала нажми «Вести здесь».'); let parsed; try { parsed = new URL(url); } catch { throw new Error('Нужна ссылка SoundCloud.'); }
-    if (parsed.protocol !== 'https:' || !['soundcloud.com', 'www.soundcloud.com'].includes(parsed.hostname) || !/^\/[\w-]+\/[\w-]+\/?$/.test(parsed.pathname)) throw new Error('Нужна ссылка на один трек SoundCloud.');
-    url = 'https://soundcloud.com' + parsed.pathname.replace(/\/$/, '');
+    if (!isController()) throw new Error('Сначала нажми «Вести здесь».');
+    url = media.mediaUrl(url); if(!url)throw new Error('Нужна ссылка SoundCloud или YouTube Music.');
+    if(nativeHost()){desktopState=await desktop.play(url);if(desktopState?.room)render(desktopState.room);return;}
     if (!await publish({ url, title: url.split('/').pop(), artist: '', duration: 0, position: 0, playing: false }) || state.playback.url !== url) return;
     const token = generation, deadline = performance.now() + 23000;
     await new Promise((resolve, reject) => { const timer = setInterval(() => { if (token !== generation || stopped || !isController()) { clearInterval(timer); reject(new Error('Трек или ведущий сменился.')); } else if (ready) { clearInterval(timer); resolve(); } else if (health.status === 'error' || performance.now() > deadline) { clearInterval(timer); reject(new Error('SoundCloud не открыл трек. Попробуй загрузить звук ещё раз.')); } }, 100); });
@@ -195,6 +224,7 @@
     busyJoin = true;
     try {
       if (!await window.LolzCloudSessionReady) return;
+      if(desktop)desktopState=await desktop.state();
       const value = await call('join', { connection, health });
       lastStateAt = performance.now(); render(value);
       if (!eventStream) stream();
@@ -204,7 +234,7 @@
     } finally { busyJoin = false; }
   }
   el('join').onclick = () => {
-    if (isController()) { started = true; void publish({ playing: !state.playback.playing }); return; }
+    if (isController()) { started = true; if(!state.playback.playing && ready)widget?.play(); void publish({ playing: !state.playback.playing }); return; }
     started = !started; updateControls();
     if (started && ready && state.playback.playing) { lastApplied = performance.now(); widget.play(); }
     sync(started); void poll();
@@ -218,13 +248,38 @@
     catch { message('Ссылка для приглашения: ' + invite); }
   };
   el('claim-host').onclick = () => control({ type: 'claim', connection, force: state?.host === true, name: 'Браузер' }).catch(message); el('release-host').onclick = () => control({ type: 'release', connection, lease }).then(() => { lease = ''; }).catch(message);
-  el('host-track-form').onsubmit = event => { event.preventDefault(); void openTrack(el('host-track').value.trim()).catch(message); }; el('host-play').onclick = () => publish({ playing: !state.playback.playing }); el('host-next').onclick = () => nextTrack().catch(message); el('host-seek').onchange = () => publish({ position: Number(el('host-seek').value) });
+  el('host-track-form').onsubmit = event => { event.preventDefault(); void openTrack(el('host-track').value.trim()).catch(message); }; el('host-play').onclick = () => { if(!state.playback.playing && ready)widget?.play();return publish({ playing: !state.playback.playing }); }; el('host-next').onclick = () => nextTrack().catch(message); el('host-seek').onchange = () => publish({ position: Number(el('host-seek').value) });
+  let searchRevision = 0;
+  el('room-search-form').onsubmit = async event => {
+    event.preventDefault();const revision=++searchRevision,query=el('room-search-query').value.trim();el('room-search-status').textContent='Ищем музыку…';
+    try {
+      const result=await request('/api/music/search?q='+encodeURIComponent(query));if(revision!==searchRevision)return;
+      el('room-search-results').replaceChildren();el('room-search-status').textContent=result.tracks.length?'Выбери песню для общей очереди':'Ничего не найдено. Можно вставить ссылку SoundCloud или YouTube.';
+      for(const track of result.tracks){const row=node('article','','room-search-result'),info=node('div','');info.append(node('strong',track.title),node('small',track.artist));row.append(info);
+        if(isController())row.append(button('Включить всем',()=>openTrack(track.url)));
+        row.append(button(isController()?'В очередь':'Предложить',()=>queue({type:'add',track})));el('room-search-results').append(row);
+      }
+    } catch(error){if(revision===searchRevision)el('room-search-status').textContent=error.message;}
+  };
   el('queue-form').onsubmit = async event => { event.preventDefault(); try { await queue({ type: 'add', track: { url: el('queue-url').value } }); el('queue-url').value = ''; } catch (error) { message(error); } };
   el('chat-form').onsubmit = async event => { event.preventDefault(); try { render(await call('message', { text: el('chat-input').value })); el('chat-input').value = ''; } catch (error) { message(error); } }; document.querySelectorAll('[data-reaction]').forEach(button => { button.onclick = () => call('message', { type: 'reaction', emoji: button.dataset.reaction }).then(render).catch(message); });
   el('settings-form').onsubmit = event => { event.preventDefault(); void control({ type: 'settings', settings: { name: el('settings-name').value, description: el('settings-description').value, public: el('settings-public').checked, chat: el('settings-chat').checked, autoNext: el('settings-auto').checked, capacity: Number(el('settings-capacity').value) } }).catch(message); };
+  for(const [key,id]of [['public','settings-public'],['chat','settings-chat'],['autoNext','settings-auto']])el(id).onchange=async()=>{
+    const input=el(id);pendingToggles.add(key);input.disabled=true;
+    try{await control({type:'settings',settings:{[key]:input.checked}});message('Сохранено');}
+    catch(error){message(error);}
+    finally{pendingToggles.delete(key);input.disabled=false;if(state)input.checked=state.settings[key]===true;}
+  };
   window.addEventListener('online', () => { void calibrate(); void poll(); }); document.addEventListener('visibilitychange', () => { if (!document.hidden) { void calibrate(); void poll(); sync(true); } });
   window.addEventListener('pagehide', () => { eventStream?.close(); const csrf = window.LolzCloudSession?.csrf; if (csrf) { if (lease) void fetch('/api/rooms/' + id + '/control', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf }, body: JSON.stringify({ type: 'release', connection, lease }), keepalive: true }); void fetch('/api/rooms/' + id + '/leave', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf }, body: JSON.stringify({ connection }), keepalive: true }); } });
-  setInterval(() => { if (stopped) return; updateBadge(); sync(); if (isController() && performance.now() - lastHeartbeat > 4000) { lastHeartbeat = performance.now(); const token = generation, revision = state.revision; if (ready && widget) widget.getPosition(position => { if (token === generation && revision === state.revision && isController()) void publish({ position: position / 1000 }); }); else void publish({}); } }, 1000);
+  setInterval(() => { if (stopped) return; updateBadge(); sync(); if (isController() && !nativeHost() && performance.now() - lastHeartbeat > 4000) { lastHeartbeat = performance.now(); const token = generation, revision = state.revision; if (ready && widget) widget.getPosition(position => { if (token === generation && revision === state.revision && isController()) void publish({ position: position / 1000 }); }); else void publish({}); } }, 1000);
+  window.LolzCloudRoomPlayback={command(type,value){
+    if(!widget||!ready)return false;
+    if(type==='volume'||type==='volumeUp'||type==='volumeDown'){const control=el('volume');control.value=Math.max(0,Math.min(100,type==='volume'?Number(value)*100:Number(control.value)+(type==='volumeUp'?5:-5)));widget.setVolume(Number(control.value));return true;}
+    if(type==='playPause')started=!started;else if(type==='pause')started=false;else if(type==='play')started=true;else return false;
+    if(started)widget.play();else widget.pause();updateControls();sync(started);return true;
+  }};
+  if(desktop)setInterval(()=>{if(stopped||nativeHost()||!ready||!widget||!state?.playback.url)return;const token=generation;widget.getPosition(position=>widget.isPaused(paused=>{if(token!==generation)return;desktop.listen({...state.playback,position:position/1000,playing:started&&!paused,rate:1});}));},400);
   updateControls();
   setInterval(poll, 8000); setInterval(() => { if (!stopped) void calibrate(); }, 30000);
   window.LolzCloudSessionReady.then(session => { if (!session) return; void calibrate(); void poll(); });

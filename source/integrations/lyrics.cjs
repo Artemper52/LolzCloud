@@ -4,13 +4,14 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { parseLrc } = require('./lyric-source.cjs');
 const { writeJson } = require('./durable-json.cjs');
+const {mediaUrl}=require('../app/lib/js/media-source.js');
 const lyricKey = track => [track?.artist || '', track?.title || '', track?.duration || 0].join('\n');
 class LyricsLibrary {
   constructor(fetcher = getLyrics, filename = null, now = Date.now) {
     this.now = now;
     this.fetcher = fetcher; this.filename = filename; this.cache = new Map(); this.pending = new Map(); this.overrides = new Map(); this.revision = 0; this.controllers = new Map(); this.matches = new Map(); this.tracks = new Map(); this.background = new Set();
     this.identities = new Map(); this.matchesFilename = filename ? path.join(path.dirname(filename), 'lyric-matches.json') : null;
-    if (this.matchesFilename) { try { const saved = JSON.parse(fs.readFileSync(this.matchesFilename, 'utf8')); for (const [url, value] of Object.entries(saved.tracks || {}).slice(-200)) if (/^https:\/\/soundcloud\.com\/[\w-]+\/[\w-]+$/.test(url) && typeof value.title === 'string' && value.title.length <= 180 && typeof value.artist === 'string' && value.artist.length <= 100) this.identities.set(url, { title: value.title, artist: value.artist }); } catch { /* No manual track matches yet. */ } }
+    if (this.matchesFilename) { try { const saved = JSON.parse(fs.readFileSync(this.matchesFilename, 'utf8')); for (const [url, value] of Object.entries(saved.tracks || {}).slice(-200)) if (mediaUrl(url) && typeof value.title === 'string' && value.title.length <= 180 && typeof value.artist === 'string' && value.artist.length <= 100) this.identities.set(url, { title: value.title, artist: value.artist }); } catch { /* No manual track matches yet. */ } }
     if (filename) { try { for (const [key, value] of Object.entries(JSON.parse(fs.readFileSync(filename, 'utf8')))) if (Array.isArray(value.lines) && value.lines.every(row => Number.isFinite(row.time) && row.time >= 0 && typeof row.text === 'string')) this.overrides.set(key, { ...value, key, revision: ++this.revision, loading: false, source: 'Локальный LRC' }); } catch { /* No personal timings yet. */ } }
   }
   state(track) {
@@ -67,7 +68,7 @@ class LyricsLibrary {
     this.matches.set(lyricKey(track), match[1]); this.invalidate();
   }
   setIdentity(track, value) {
-    if (!/^https:\/\/soundcloud\.com\/[\w-]+\/[\w-]+$/.test(track?.url || '')) throw new Error('Сначала выбери трек SoundCloud.');
+    if (!mediaUrl(track?.url)) throw new Error('Сначала выбери трек SoundCloud или YouTube Music.');
     if (value === null) this.identities.delete(track.url);
     else {
       const title = typeof value?.title === 'string' ? value.title.trim() : '', artist = typeof value?.artist === 'string' ? value.artist.trim() : '';

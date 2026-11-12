@@ -20,6 +20,6 @@ async function main() {
     const deadline = Date.now() + 5000; while (!fs.existsSync(path.join(target, 'restarted.txt')) && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 100));
     assert.equal(fs.readFileSync(path.join(target, 'restarted.txt'), 'utf8'), 'new process');
     console.log('Portable update passed: parent exit, guarded folder replacement, retained previous version and actual process restart.');
-  } finally { const resolved = path.resolve(root); if (path.dirname(resolved) === path.resolve(os.tmpdir()) && path.basename(resolved).startsWith('LolzCloud-portable-helper-test-')) fs.rmSync(resolved, { recursive: true, force: true, maxRetries: 6, retryDelay: 150 }); }
+  } finally { const resolved = path.resolve(root); if(process.env.LOLZCLOUD_KEEP_UPDATE_FIXTURE==='1')console.log('Retained isolated update fixture: '+resolved);else if (path.dirname(resolved) === path.resolve(os.tmpdir()) && path.basename(resolved).startsWith('LolzCloud-portable-helper-test-')) fs.rmSync(resolved, { recursive: true, force: true, maxRetries: 6, retryDelay: 150 }); }
 }
 main().catch(error => { console.error(error.stack || error.message); process.exitCode = 1; });

@@ -4,6 +4,8 @@
   const fs = require('node:fs'), path = require('node:path');
   const { clock } = require('../integrations/lolzteam/status.cjs');
   const { scUrl } = require('../integrations/music.cjs');
+  const { mediaUrl, provider, label: sourceLabel } = require('./lib/js/media-source.js');
+  const activeView = () => window.LolzCloudYouTube?.active ? window.LolzCloudYouTube.view : document.getElementById('webview');
   const { lyricKey } = require('../integrations/lyrics.cjs');
   const { OPTIONS: waveOptions, DEFAULTS: waveDefaults } = require('../integrations/wave-preferences.cjs');
   const { parseRequest } = require('../integrations/wave-request.cjs');
@@ -25,7 +27,7 @@
   let waveArtistSignature = '', waveBlockedSignature = '';
   let requestDraftTouched = false, requestSubmitting = false;
   let downloadSignature = '';
-  const lyricView = new window.LolzCloudLyricsView(el('lyrics'), { onSeek: value => action('media', { command: 'seek', value }), onFollowChange: value => el('lyric-follow').setAttribute('aria-pressed', String(value)) });
+  const lyricView = new window.LolzCloudLyricsView(el('lyrics'), { onSeek: value => { if(feature?.capabilities?.seek !== false) return action('media', { command: 'seek', value }); }, onFollowChange: value => el('lyric-follow').setAttribute('aria-pressed', String(value)) });
   const waveView = new window.LolzCloudWaveView(el('wave-canvas'));
   const lyricBackground = new window.LolzCloudWaveView(el('lyric-gradient'), { ambient: true });
   const studioBackground = new window.LolzCloudWaveView(el('studio-gradient'), { ambient: true, fps: 20 });
@@ -64,9 +66,15 @@
     el('studio-title').textContent = titles[tab] || 'LolzCloud'; render();
     if (tab === 'lyrics') void loadLyrics();
   }
-  el('studio-launcher').onclick = () => open(); el('studio-close').onclick = () => studio.close();
+  function closePanel() {
+    if (window.LolzCloudRooms?.active && tab !== 'room') open('room');
+    else studio.close();
+  }
+  el('studio-launcher').onclick = () => open(); el('studio-close').onclick = closePanel;
+  el('room-return').onclick = () => open('room');
+  window.addEventListener('lolzcloud:room-session', () => render());
   window.LolzCloudStudio = { open, notify: message };
-  studio.addEventListener('close', () => { document.body.classList.remove('shell-studio-open'); if (!window.LolzCloudYouTube?.active) window.lolzSelectNavigation?.('browser'); waveView.setState(false, false); lyricBackground.setState(false, false); studioBackground.setState(false, false); });
+  studio.addEventListener('close', () => { document.body.classList.remove('shell-studio-open'); window.lolzSelectNavigation?.(window.LolzCloudYouTube?.active ? 'youtube' : 'browser'); waveView.setState(false, false); lyricBackground.setState(false, false); studioBackground.setState(false, false); });
   el('wave-launcher').onclick = () => open('wave');
   el('wave-start').onclick = () => feature?.wave.active ? action('media', { command: 'playPause' }) : action('wave-start');
   el('wave-stop').onclick = () => action('wave-stop');
@@ -126,9 +134,14 @@
   for (const [id, key] of [['pref-mini-lyrics', 'lyrics']]) el(id).onchange = () => action('mini-settings', { settings: { [key]: el(id).checked } });
   studio.querySelectorAll('[data-go]').forEach(button => { button.onclick = () => open(button.dataset.go); });
   studio.querySelectorAll('[data-tab]').forEach(button => { button.onclick = () => open(button.dataset.tab); });
-  studio.addEventListener('click', event => { if (event.target === studio) studio.close(); });
+  studio.addEventListener('click', event => { if (event.target === studio) closePanel(); });
   ipcRenderer.on('lolzcloud:studio', () => open());
-  ipcRenderer.on('appReqEsc', () => { if (document.querySelector('.xp-modal[open]')) return; if (studio.open) studio.close(); });
+  ipcRenderer.on('appReqEsc', () => {
+    const focused = document.activeElement?.closest('dialog:modal');
+    const modal = focused || [...document.querySelectorAll('dialog:modal')].at(-1);
+    if (modal && modal !== studio) { modal.close(); return; }
+    if (studio.open) closePanel();
+  });
   window.showsongshowcase = () => open('share');
   window.updatelyricshowcase = () => open('lyrics');
   studio.querySelectorAll('[data-do]').forEach(button => {
@@ -259,12 +272,16 @@
     }]]));
   }
   async function applyDsp(config) {
+    if (feature?.room?.hosting || feature?.source === 'room') config = { ...config, rate: 1 };
     const serialized = JSON.stringify(config);
     if (serialized === dspApplied) return;
-    try { await view.executeJavaScript(`window.__lolzcloudSetAudioFX && window.__lolzcloudSetAudioFX(${serialized})`); dspApplied = serialized; }
+    try { await activeView().executeJavaScript(`window.__lolzcloudSetAudioFX && window.__lolzcloudSetAudioFX(${serialized})`); dspApplied = serialized; }
     catch { dspApplied = ''; }
   }
   function render() {
+    const inRoom = window.LolzCloudRooms?.active === true;
+    el('room-return').hidden = !inRoom || tab === 'room';
+    el('studio-close').setAttribute('aria-label', inRoom && tab !== 'room' ? 'Вернуться в комнату' : 'Закрыть панель');
     if (!snapshot || !feature) return;
     const track = snapshot.displayPlayback || snapshot.playback, hasTrack = snapshot.fresh && !!track.title;
     lyricBackground.setState(studio.open && tab === 'lyrics', hasTrack && track.playing);
@@ -288,8 +305,9 @@
     }
     const wave = feature.wave;
     const downloads = feature.downloads;
-    for (const button of studio.querySelectorAll('[data-do="download-current"]')) button.disabled = !hasTrack;
-    for (const button of studio.querySelectorAll('[data-do="open-current-track"]')) button.disabled = !hasTrack || !scUrl(track.url);
+    for (const button of studio.querySelectorAll('[data-do="download-current"]')) { button.disabled = !hasTrack || feature.capabilities?.download === false; if (feature.capabilities?.download === false) button.title = 'YouTube Music не предоставляет MP3 для сохранения'; }
+    for (const button of studio.querySelectorAll('[data-do="open-current-track"]')) button.textContent = 'Открыть трек в ' + sourceLabel(track.url) + ' ↗';
+    for (const button of studio.querySelectorAll('[data-do="open-current-track"]')) button.disabled = !hasTrack || !mediaUrl(track.url);
     if (downloads) {
       el('downloads-directory').textContent = downloads.directory;
       const signature = JSON.stringify(downloads.items.map(item => ({ ...item, percent: item.percent === null ? null : Math.floor(item.percent) })));
@@ -356,6 +374,7 @@
       if (guestReady && waveApplied !== wave.active) { const active = wave.active; view.executeJavaScript('window.__lolzcloudWaveActive = ' + JSON.stringify(active)).then(() => { waveApplied = active; }).catch(() => {}); }
     }
     el('card-title').textContent = hasTrack ? track.title : 'Включи любимый трек';
+    el('card-source').textContent = sourceLabel(track.url).toUpperCase();
     el('card-artist').textContent = hasTrack ? track.artist : 'SoundCloud';
     el('card-time').textContent = clock(track.position) + ' / ' + clock(track.duration);
     window.lolzArtwork(el('card-cover'), hasTrack ? track.cover : '');
@@ -397,6 +416,10 @@
       if (document.activeElement !== el(name)) el(name).value = value;
       el(name + '-caption').textContent = soundCaption[name](value);
     }
+    const sharedSpeed = feature.room.hosting || feature.source === 'room';
+    el('speed').disabled = sharedSpeed;
+    el('speed').title = sharedSpeed ? 'В общей комнате используется скорость 1×' : 'Темп музыки';
+    if (sharedSpeed) { el('speed').value = 100; el('speed-caption').textContent = 'В комнате · 1×'; }
     el('preserve-pitch').checked = sound.preservesPitch;
     feature.dsp.gains.forEach((gain, index) => { const input = document.getElementById('lc-band-' + index); if (document.activeElement !== input) { input.value = gain; input.nextElementSibling.textContent = gain + ' дБ'; } });
     el('audio-state').textContent = !feature.dsp.enabled ? 'Оригинальное звучание · эффекты выключены' : feature.audio.unavailable ? 'Темп меняется. Для этого потока пространственные эффекты недоступны.' : feature.audio.attached ? 'Твоё звучание активно · эффекты применяются сразу' : feature.audio.mediaCount ? 'Темп настроен · пространственные эффекты включатся с музыкой' : 'Настройки готовы. Если трек уже играл, нажми паузу и продолжи.';
@@ -424,9 +447,10 @@
       lyricView.setPlayback(track, snapshot.fresh);
     }
     window.LolzCloudRanges.update(studio);
+    lyricView.setCanSeek(feature.capabilities?.seek!==false);
     if (!soundDraft) void applyDsp(feature.dsp);
-    if (!window.LolzCloudYouTube?.active && Number.isFinite(feature.player?.volume) && playerApplied !== feature.player.volume) { const volume = feature.player.volume; media('volume', volume).then(() => { playerApplied = volume; }); }
-    if (guestReady && !snapshot.local && !window.LolzCloudYouTube?.active && ['off', 'all', 'one'].includes(feature.player?.repeat) && repeatApplied !== feature.player.repeat && !repeatApplying) {
+    if (Number.isFinite(feature.player?.volume) && playerApplied !== feature.player.volume) { const volume = feature.player.volume; media('volume', volume).then(() => { playerApplied = volume; }); }
+    if (guestReady && !snapshot.local && ['off', 'all', 'one'].includes(feature.player?.repeat) && repeatApplied !== feature.player.repeat && !repeatApplying) {
       const mode = feature.player.repeat; repeatApplying = true;
       media('repeat', mode).then(applied => { if (applied) repeatApplied = mode; }).finally(() => { repeatApplying = false; });
     }
@@ -491,6 +515,7 @@
       return result;
     } catch { message('Не удалось передать команду в SoundCloud. Повтори после загрузки трека.', true); return false; }
   }
+  window.addEventListener('lolzcloud:provider-ready', () => { guestReady = true; dspApplied = ''; safetyApplied = ''; repeatApplied = null; playerApplied = null; if (feature) { void applyDsp(feature.dsp); if (latestSafety) void applySafety(latestSafety); } });
   ipcRenderer.on('lolzcloud:media', (_, data) => media(data.command, data.value));
   ipcRenderer.on('lolzcloud:dsp', (_, config) => { dspApplied = ''; void applyDsp(config); });
   async function applySafety(config) {
@@ -499,7 +524,7 @@
     safetyRevision = revision; latestSafety = config;
     if (!guestReady) return;
     const signature = JSON.stringify(config); if (signature === safetyApplied) return;
-    await view.executeJavaScript('window.__lolzcloudSetAudioSafety && window.__lolzcloudSetAudioSafety(' + signature + ')').then(() => { if (latestSafety === config) safetyApplied = signature; }).catch(() => {});
+    try { await activeView()?.executeJavaScript('window.__lolzcloudSetAudioSafety && window.__lolzcloudSetAudioSafety(' + signature + ')');if(latestSafety===config)safetyApplied=signature; } catch { /* Provider is still attaching or navigating. */ }
   }
   ipcRenderer.on('lolzcloud:safety', (_, config) => { void applySafety(config); });
   ipcRenderer.on('lolzcloud:play-url', async (_, value) => {
@@ -511,7 +536,7 @@
       await view.loadURL(url);
       for (let attempt = 0; attempt < 30 && id === playRequest; attempt++) {
         const started = await view.executeJavaScript(`window.__lolzcloudPlayback?.play(${JSON.stringify(url)}) === 'playing'`, true).catch(() => false);
-        if (started) return;
+        if (started) {if(value?.resume){await media('seek',value.resume.position);if(!value.resume.playing)await media('pause');}return;}
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
     } catch { if (id === playRequest) message('Не удалось открыть трек SoundCloud.', true); }
@@ -531,7 +556,7 @@
   setInterval(async () => {
     try {
       const status = await view.executeJavaScript('window.__lolzcloudGetAudioState ? window.__lolzcloudGetAudioState() : {attached:0,unavailable:false,mediaCount:0,rate:1,volume:1}');
-      ipcRenderer.send('features:audio', status);
+      if (!window.LolzCloudYouTube?.active) ipcRenderer.send('features:audio', { ...status, source: 'soundcloud' });
     } catch { /* SoundCloud is navigating. */ }
   }, 250);
   ipcRenderer.invoke('lolzteam:action', { type: 'state' }).then(result => { if (result.ok) { snapshot = result.state; feature = snapshot.features; render(); } });

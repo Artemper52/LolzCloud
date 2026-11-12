@@ -29,7 +29,7 @@ class RoomEngine {
     };
     store.closeRoom = (id, user) => { close(id, user); this.changed(id); };
   }
-  initialize(room) { room.roles ||= new Map(); room.bans ||= new Set(); room.health ||= new Map(); room.settings ||= { name: 'Комната ' + room.owner.name, description: '', public: false, capacity: 50, autoNext: true, chat: true }; room.chat ||= []; room.reactions ||= []; room.history ||= []; room.epoch ||= 0; }
+  initialize(room) { room.roles ||= new Map(); room.bans ||= new Set(); room.health ||= new Map(); room.settings ||= { name: 'Комната ' + room.owner.name, description: '', public: true, capacity: 50, autoNext: true, chat: true }; room.chat ||= []; room.reactions ||= []; room.history ||= []; room.epoch ||= 0; }
   controller(room) { return room.controller && room.controller.expires > this.store.now() ? room.controller : null; }
   canControl(room, user) { this.initialize(room); return room.owner.id === user.id || !room.bans.has(user.id) && room.roles.get(user.id) === 'dj'; }
   requireLease(room, user, value) { const controller = this.controller(room); if (!controller || controller.user.id !== user.id || typeof value.lease !== 'string' || controller.secret !== value.lease || controller.connection !== value.connection) throw new HttpError(409, 'Управление передано на другое устройство. Нажми «Вести здесь», чтобы вернуть его.'); return controller; }

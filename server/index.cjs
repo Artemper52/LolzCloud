@@ -5,6 +5,7 @@ const { version } = require('./package.json');
 const { CloudStore, HttpError, profile, safeNext, hash } = require('./core.cjs');
 const { PlayerServices } = require('./player-services.cjs');
 const { RoomEngine } = require('./room-engine.cjs');
+const { RoomCatalog } = require('./catalog.cjs');
 const ROOT = path.join(__dirname, 'public');
 const publicFile = name => fs.readFileSync(path.join(ROOT, name), 'utf8');
 const inlineHash = value => "'sha256-" + createHash('sha256').update(value).digest('base64') + "'";
@@ -12,6 +13,7 @@ const cookies = req => Object.fromEntries(String(req.headers.cookie || '').split
 function createServer({ origin = 'https://lolzcloud.com', clientId = process.env.LOLZ_CLIENT_ID, redirectMode = process.env.LOLZ_REDIRECT_MODE ?? 'explicit', spicyKey = process.env.SPICY_LYRICS_SECRET_KEY, store = new CloudStore({ filename: path.join(process.env.LOLZCLOUD_STATE || '/var/lib/lolzcloud', 'sessions.json'), origin }), fetcher = fetch, verifyProfile = null } = {}) {
   if (!['explicit', 'registered'].includes(redirectMode)) throw new Error('LOLZ_REDIRECT_MODE must be explicit or registered.');
   const limits = new Map(), lyrics = new Map(), rooms = new RoomEngine(store), players = new PlayerServices(store, rooms); let upstream = 0;
+  const catalog = new RoomCatalog(fetcher);
   function limit(key, max, window = 60000) {
     const now = Date.now(); let entry = limits.get(key);
     if (!entry || entry.until <= now) { entry = { count: 0, until: now + window }; limits.set(key, entry); }
@@ -50,7 +52,7 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
   function headers(res, room = false) {
     res.setHeader('Cache-Control', 'no-store'); res.setHeader('X-Content-Type-Options', 'nosniff'); res.setHeader('Referrer-Policy', 'no-referrer');
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-    res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'" + (room ? ' https://w.soundcloud.com' : '') + "; style-src 'self'; img-src 'self' https: data:; connect-src 'self'; frame-src " + (room ? 'https://w.soundcloud.com' : "'none'") + "; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'");
+    res.setHeader('Content-Security-Policy', "default-src 'none'; script-src 'self'" + (room ? ' https://w.soundcloud.com https://www.youtube.com https://s.ytimg.com' : '') + "; style-src 'self'; img-src 'self' https: data:; connect-src 'self'; frame-src " + (room ? 'https://w.soundcloud.com https://www.youtube.com https://www.youtube-nocookie.com' : "'none'") + "; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'");
   }
   function send(res, value, status = 200) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(value)); }
   function redirect(res, url) { res.writeHead(303, { Location: url }); res.end(); }
@@ -105,7 +107,7 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
         if (typeof data.deviceCode !== 'string' || !/^[\w-]{43}$/.test(data.deviceCode)) throw new HttpError(400, 'Неверный код подключения.');
         return send(res, store.pollDevice(data.deviceCode));
       }
-      const assets = { '/cloud/room.css': 'room.css', '/cloud/site.js': 'site.js', '/cloud/callback.js': 'callback.js', '/cloud/room.js': 'room.js', '/cloud/remote.js': 'remote.js', '/cloud/queue.js': 'queue.js', '/cloud/room-sync.js': 'room-sync.js' };
+      const assets = { '/cloud/room.css': 'room.css', '/cloud/site.js': 'site.js', '/cloud/callback.js': 'callback.js', '/cloud/room.js': 'room.js', '/cloud/remote.js': 'remote.js', '/cloud/queue.js': 'queue.js', '/cloud/room-sync.js': 'room-sync.js', '/cloud/media-source.js': 'media-source.js', '/cloud/room-players.js': 'room-players.js' };
       if (assets[url.pathname] && method === 'GET') {
         headers(res); res.writeHead(200, { 'Content-Type': url.pathname.endsWith('.css') ? 'text/css; charset=utf-8' : 'text/javascript; charset=utf-8' }); res.end(fs.readFileSync(path.join(ROOT, assets[url.pathname]))); return;
       }
@@ -132,6 +134,7 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
         if (method === 'POST' && action === 'command') { limit('remote-command:' + auth.user.id, 120); return send(res, players.command(id, auth.user, await jsonBody(req))); }
       }
       if (url.pathname === '/api/rooms' && method === 'POST') return send(res, store.createRoom(auth.user), 201);
+      if (url.pathname === '/api/music/search' && method === 'GET') { limit('catalog:'+auth.user.id,30);return send(res,{tracks:await catalog.search(url.searchParams.get('q'))}); }
       if (url.pathname === '/api/rooms' && method === 'GET') return send(res, { rooms: [...store.rooms.values()].filter(room => room.owner.id === auth.user.id || room.settings?.public && !room.bans?.has(auth.user.id)).map(room => store.viewRoom(room, auth.user)) });
       const room = url.pathname.match(/^\/api\/rooms\/([a-f0-9]{32})(?:\/(join|leave|state|queue|control|message|events))?$/);
       if (room) {
