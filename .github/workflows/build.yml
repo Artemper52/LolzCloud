@@ -42,11 +42,11 @@ jobs:
           version=$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')
 
           if [ "$GITHUB_REF" = refs/heads/main ] && { [ "$GITHUB_EVENT_NAME" = push ] || [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; } &&
-          [ "$version" = 0.9.9 ]; then
-            git diff --quiet 548acac9529c93f49c58696c15927562caad42c8 HEAD -- . ':(exclude).github'
+          [ "$version" = 0.9.12 ] && [ "$(sha256sum server/public/room.js | cut -d' ' -f1)" = 7f3eafa04877a873a799aad7c29d071207bded4add049a0f2da951d26713cd01 ]; then
+            git diff --quiet 900e454503ccef858738bf99e010ab8e2602c76d HEAD -- . ':(exclude).github'
             release_archive="$RUNNER_TEMP/lolzcloud-source-0912.zip"
-            curl --fail --silent --show-error --retry 3 https://lolzcloud.com/downloads/LolzCloud-0.9.12-import-source-r2.zip -o "$release_archive"
-            printf '%s  %s\n' 58da77883c118d2c06914e2e7e2a11a9c8678f69e83123e9b15378e84d8ee1a8 "$release_archive" | sha256sum -c -
+            curl --fail --silent --show-error --retry 3 https://lolzcloud.com/downloads/LolzCloud-0.9.12-import-source-r3.zip -o "$release_archive"
+            printf '%s  %s\n' ef21339ffd262ac7fa10b777110e190694b96c7583752d76c6ab5f24dc7c3be8 "$release_archive" | sha256sum -c -
             python3 - <<'PY'
           import json, os, shutil, zipfile
 
