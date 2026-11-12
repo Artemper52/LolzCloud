@@ -62,10 +62,21 @@ app.whenReady().then(async () => {
     await positions('playing'); await js(host, 'document.getElementById("host-play").click()'); await until(async () => (await Promise.all([host, one, two].map(window => js(window, '!window.__fakeWidget.playing()')))).every(Boolean), 'Shared pause was not applied'); await positions('paused');
     await js(host, 'document.getElementById("host-seek").value="37";document.getElementById("host-seek").dispatchEvent(new Event("change"))'); await delay(1500); const paused = await positions('seek'); assert.ok(paused.every(value => Math.abs(value - 37) < .4));
     await js(host, 'document.getElementById("host-play").click()'); await delay(2000); await positions('resume');
+    await js(host, `window.__holdRoomPositions=true;window.__fakeWidget.emit('seek');
+      window.__latePlayerErrors=[];
+      const originalYoutube=window.LolzCloudRoomPlayers.youtube;
+      window.LolzCloudRoomPlayers.youtube=async(...args)=>{
+        for(const callback of window.__heldRoomPositions.splice(0))try{callback();}catch(error){window.__latePlayerErrors.push(error.message);}
+        window.__holdRoomPositions=false;
+        window.LolzCloudRoomPlayers.youtube=originalYoutube;
+        return originalYoutube(...args);
+      };void 0;`);
+    assert.ok(await js(host, 'window.__heldRoomPositions?.length>0'), 'The regression must hold a pending player callback before replacement');
     await js(two,'window.__blockYoutube=true');
     const youtubeUrl='https://music.youtube.com/watch?v=fixtureYT01';
     await js(host,'document.getElementById("host-track").value='+JSON.stringify(youtubeUrl)+';document.getElementById("host-track-form").requestSubmit()');
     await until(()=>js(host,'window.__fakePlayer?.url()==='+JSON.stringify(youtubeUrl)+'&&window.__fakePlayer.playing()'), 'Browser host did not start YouTube');
+    assert.deepEqual(await js(host, 'window.__latePlayerErrors'), [], 'Replaced player callbacks must be ignored during source changes');
     await until(()=>js(two,'document.getElementById("connection-status").textContent.includes("Нажми Play")'), 'Blocked YouTube autoplay was incorrectly shown as synchronized');
     await js(two,'window.__blockYoutube=false;document.getElementById("resync").click()');await delay(2000);
     await positions('YouTube playing');

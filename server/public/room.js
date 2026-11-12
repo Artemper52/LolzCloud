@@ -38,14 +38,24 @@
   }
   async function calibrate() { for (let attempt = 0; attempt < 3; attempt++) { const sent = performance.now(); try { const value = await request('/api/clock'); clock.sample(value.serverTime, sent); } catch { break; } } }
   function seekNow(position) { if (!widget || !ready) return; lastApplied = performance.now(); widget.seekTo(position); }
+  function samplePlayer(callback) {
+    if (stopped || !ready || !widget) return;
+    const player = widget, token = generation, url = loaded;
+    const current = () => !stopped && ready && player === widget && token === generation && url === loaded && state?.playback.url === url;
+    player.getPosition(position => {
+      if (!current()) return;
+      player.isPaused(paused => { if (current()) callback(position, paused); });
+    });
+  }
   function sync(force = false) {
     if (stopped || !widget || !ready || !state || !loaded) return;
     if (nativeHost()) { health.status = 'ready'; health.driftMs = 0; updateBadge(); return; }
     if (lastStateAt && performance.now() - lastStateAt > 15000) { widget.pause(); health.status = 'buffering'; updateBadge(); return; }
     if (!started) { lastApplied = performance.now(); widget.pause(); health.status = 'autoplay'; health.driftMs = null; updateBadge(); return; }
-    const source = loaded, token = generation;
-    widget.isPaused(paused => { if (stopped || !started || token !== generation || source !== loaded) return; if (state.playback.playing === paused) { lastApplied = performance.now(); state.playback.playing ? widget.play() : widget.pause(); } });
-    widget.getPosition(position => { if (stopped || !started || token !== generation || state.playback.url !== source) return; const decision = correction.decide(position, target(), performance.now(), source, force); health.driftMs = Math.round(decision.drift); if (decision.seek) seekNow(Math.max(0, decision.position)); health.status = autoplayBlocked ? 'autoplay' : 'ready'; updateBadge(); });
+    const source = loaded, token = generation, player = widget;
+    const current = () => !stopped && started && ready && token === generation && player === widget && source === loaded && state?.playback.url === source;
+    player.isPaused(paused => { if (!current()) return; if (state.playback.playing === paused) { lastApplied = performance.now(); state.playback.playing ? player.play() : player.pause(); } });
+    player.getPosition(position => { if (!current()) return; const decision = correction.decide(position, target(), performance.now(), source, force); health.driftMs = Math.round(decision.drift); if (decision.seek) seekNow(Math.max(0, decision.position)); health.status = autoplayBlocked ? 'autoplay' : 'ready'; updateBadge(); });
   }
   function widgetReady(token) {
     if (token !== generation || stopped || health.status === 'error') return;
@@ -63,7 +73,7 @@
     });
     updateBadge(); sync(true);
   }
-  function nativeUpdate() { if (!isController() || performance.now() - lastApplied < 800 || !ready) return; const token = generation; widget.getPosition(position => widget.isPaused(paused => { if (token === generation && isController()) void publish({ position: position / 1000, playing: !paused }); })); }
+  function nativeUpdate() { if (!isController() || performance.now() - lastApplied < 800) return; samplePlayer((position, paused) => { if (isController()) void publish({ position: position / 1000, playing: !paused }); }); }
   function soundCloudWidget() {
     if (window.SC?.Widget) return Promise.resolve(window.SC.Widget);
     if (!widgetScript) widgetScript = new Promise((resolve, reject) => {
@@ -90,9 +100,10 @@
   async function load(track, retry = false) {
     const url = track.url, kind = nativeHost() ? 'desktop' : media.provider(url);
     if (url === loaded && kind === playerKind && !retry) return;
+    const token = ++generation;
+    ready = false;
     if (widget && (kind !== playerKind || kind === 'youtube')) { const old=el('player'), parent=old?.parentElement;widget.pause();widget.destroy?.();widget=null;const replacement=document.createElement('iframe');replacement.id='player';replacement.title='Плеер комнаты';replacement.allow='autoplay; encrypted-media; fullscreen';if(old?.isConnected)old.replaceWith(replacement);else parent?.append(replacement); }
     playerKind = kind;
-    const token = ++generation;
     loaded = url; ready = false; autoplayBlocked = false; health.status = url ? 'buffering' : 'autoplay'; health.driftMs = null;
     clearTimeout(playerTimeout);
     const frame = el('player');
@@ -110,7 +121,7 @@
       if (kind === 'youtube') {
         widget?.destroy?.();
         playerTimeout = setTimeout(()=>playerFailed(token),18000);
-        const next = await window.LolzCloudRoomPlayers.youtube(frame,track,{ready:()=>widgetReady(token),changed:playing=>{if(token!==generation)return;if(playing)autoplayBlocked=false;nativeUpdate();},ended:()=>{if(isController()&&state.settings.autoNext)void nextTrack().catch(message)},error:()=>playerFailed(token),blocked:()=>{if(token!==generation)return;autoplayBlocked=true;health.status='autoplay';updateBadge();message('Нажми Play в плеере YouTube, чтобы разрешить звук.');}});
+        const next = await window.LolzCloudRoomPlayers.youtube(frame,track,{ready:()=>widgetReady(token),changed:playing=>{if(token!==generation)return;if(playing)autoplayBlocked=false;nativeUpdate();},ended:()=>{if(token===generation&&!stopped&&isController()&&state.settings.autoNext)void nextTrack().catch(message)},error:()=>playerFailed(token),blocked:()=>{if(token!==generation)return;autoplayBlocked=true;health.status='autoplay';updateBadge();message('Нажми Play в плеере YouTube, чтобы разрешить звук.');}});
         if(token!==generation){next.destroy?.();return;} widget=next;
         if(token!==generation)widget.destroy?.(); return;
       }
@@ -213,7 +224,7 @@
     eventStream.onerror = () => { void poll(); };
   }
   function close(reason) {
-    stopped = true; started = false; lease = ''; pendingPublish = null;
+    stopped = true; ready = false; generation++; started = false; lease = ''; pendingPublish = null;
     clearTimeout(playerTimeout); widget?.pause(); eventStream?.close();
     el('host-controls').hidden = el('claim-host').hidden = el('release-host').hidden = true;
     el('chat-input').disabled = el('chat-form').querySelector('button').disabled = true;
@@ -279,7 +290,7 @@
     if(type==='playPause')started=!started;else if(type==='pause')started=false;else if(type==='play')started=true;else return false;
     if(started)widget.play();else widget.pause();updateControls();sync(started);return true;
   }};
-  if(desktop)setInterval(()=>{if(stopped||nativeHost()||!ready||!widget||!state?.playback.url)return;const token=generation;widget.getPosition(position=>widget.isPaused(paused=>{if(token!==generation)return;desktop.listen({...state.playback,position:position/1000,playing:started&&!paused,rate:1});}));},400);
+  if(desktop)setInterval(()=>{if(stopped||nativeHost()||!state?.playback.url)return;samplePlayer((position,paused)=>{if(!nativeHost())desktop.listen({...state.playback,position:position/1000,playing:started&&!paused,rate:1});});},400);
   updateControls();
   setInterval(poll, 8000); setInterval(() => { if (!stopped) void calibrate(); }, 30000);
   window.LolzCloudSessionReady.then(session => { if (!session) return; void calibrate(); void poll(); });
