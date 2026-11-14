@@ -44,6 +44,17 @@ final class AudioEffectsTests: XCTestCase {
         XCTAssertEqual(result.1/result.0,pow(10,-6.0/20),accuracy:0.015)
         XCTAssertEqual(LCDSPReadMetrics(core).appliedRevision,2)
     }
+    func testSilentPrefetchTailCannotEraseMeasuredEffectEnergy() throws {
+        let core=try XCTUnwrap(LCDSPCreate());defer{LCDSPRelease(core)}
+        _=config(core,preamp:-6);_=LCDSPPrepare(core,44100,1,65536)
+        _=process(core,hz:660)
+        var silence=[Float](repeating:0,count:8192)
+        silence.withUnsafeMutableBufferPointer{LCDSPProcess(core,$0.baseAddress,nil,UInt32($0.count),1)}
+        let measured=LCDSPReadMetrics(core)
+        XCTAssertGreaterThan(measured.inputRMS,0.01)
+        XCTAssertEqual(measured.outputRMS/measured.inputRMS,Float(pow(10,-6.0/20)),accuracy:0.01)
+        LCDSPReset(core);XCTAssertEqual(LCDSPReadMetrics(core).inputRMS,0)
+    }
     func testStereoPlanarAndInterleavedKeepIndependentState() throws {
         let a=try XCTUnwrap(LCDSPCreate()),b=try XCTUnwrap(LCDSPCreate());defer{LCDSPRelease(a);LCDSPRelease(b)}
         _=config(a,gains:[-4,3,5,-2,1]);_=config(b,gains:[-4,3,5,-2,1]);_=LCDSPPrepare(a,44100,2,65536);_=LCDSPPrepare(b,44100,2,65536)

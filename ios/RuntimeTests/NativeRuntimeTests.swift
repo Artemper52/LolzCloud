@@ -232,7 +232,7 @@ import UIKit
         // It must neither replace this selection nor cancel/rearm its transport.
         effects(player,client:client,revision:2,gains:[0,0,10,0,0])
         try await waitFor("real local AVPlayer tap processes selected audio") {
-            (player.audioEffects.measurement?.processedFrames ?? 0)>6000 && player.audioEffects.status["state"] as? String == "applied"
+            (player.audioEffects.measurement?.processedFrames ?? 0)>6000 && (player.audioEffects.measurement?.inputRMS ?? 0)>0.01 && player.audioEffects.status["state"] as? String == "applied"
         }
         XCTAssertEqual(player.current?.id,tracks[0].id)
         let near=try XCTUnwrap(player.audioEffects.measurement)
@@ -248,7 +248,7 @@ import UIKit
         }
         XCTAssertGreaterThan(av.currentTime().seconds,1.1,"Pause/resume during asynchronous tap setup must preserve the requested seek")
         try await waitFor("second local track has a new real processed tap") {
-            (player.audioEffects.measurement?.processedFrames ?? 0)>6000 && player.audioEffects.status["state"] as? String == "applied"
+            (player.audioEffects.measurement?.processedFrames ?? 0)>6000 && (player.audioEffects.measurement?.inputRMS ?? 0)>0.01 && player.audioEffects.status["state"] as? String == "applied"
         }
         let far=try XCTUnwrap(player.audioEffects.measurement)
         XCTAssertGreaterThan(nearRatio/(far.outputRMS/far.inputRMS),2.5,"The actual AVPlayer PCM must show frequency-selective EQ, not just a control acknowledgement")
@@ -286,7 +286,7 @@ import UIKit
         player.configureQueue([network],index:0,repeatMode:"off",shuffle:false)
         player.play(network,queueIndex:0)
         try await waitFor("genuine cached MP3 traverses real AVPlayer audio tap") {
-            (player.audioEffects.measurement?.processedFrames ?? 0)>3000 && player.audioEffects.status["state"] as? String == "applied"
+            (player.audioEffects.measurement?.processedFrames ?? 0)>3000 && (player.audioEffects.measurement?.inputRMS ?? 0)>0.01 && player.audioEffects.status["state"] as? String == "applied"
         }
         XCTAssertTrue((av.currentItem?.asset as? AVURLAsset)?.url.isFileURL == true)
         let measurement=try XCTUnwrap(player.audioEffects.measurement)

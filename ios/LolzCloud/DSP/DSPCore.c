@@ -18,12 +18,15 @@ struct LCDSPCore {
     double sampleRate, coefficients[BANDS][COEFFICIENTS], target[BANDS][COEFFICIENTS];
     double steps[BANDS][COEFFICIENTS], history[2][BANDS][2];
     double gain, targetGain, gainStep, wet, targetWet, wetStep;
+    double inputEnergy, outputEnergy;
+    uint64_t energySamples;
     uint32_t maximumFrames, renderChannels, rampRemaining;
 };
 static uint32_t bits(float value){uint32_t result;memcpy(&result,&value,sizeof result);return result;}
 static float number(uint32_t value){float result;memcpy(&result,&value,sizeof result);return result;}
 static double finite_sample(double value){return isfinite(value)?value:0;}
 static void identity(double c[COEFFICIENTS]){c[0]=1;c[1]=c[2]=c[3]=c[4]=0;}
+static void reset_energy(LCDSPCore *s){s->inputEnergy=s->outputEnergy=0;s->energySamples=0;atomic_store(&s->inputRMS,bits(0));atomic_store(&s->outputRMS,bits(0));}
 static int read_settings(LCDSPCore *s,Settings *out){
     /* Atomic words prevent a C data race. SC ordering makes the sequence check
        a coherent bounded snapshot. A preempted producer cannot stall audio. */
@@ -85,6 +88,7 @@ static void apply_settings(LCDSPCore *s,Settings next,int immediate){
     atomic_store(&s->bandMask,mask);atomic_store(&s->unavailable,missing?3:0);
     atomic_store(&s->headroom,bits((float)-boost));
     s->current=next;
+    reset_energy(s);
     if(immediate){memcpy(s->coefficients,s->target,sizeof s->target);s->gain=s->targetGain;s->wet=s->targetWet;s->rampRemaining=0;}
     else{
         s->rampRemaining=(uint32_t)fmax(64,s->sampleRate*0.025);
@@ -102,11 +106,11 @@ int LCDSPPrepare(LCDSPCore *s,double sampleRate,uint32_t channels,uint32_t maxim
 }
 void LCDSPUnprepare(LCDSPCore *s){if(s){atomic_store(&s->prepared,0);s->rampRemaining=0;memset(s->history,0,sizeof s->history);}}
 void LCDSPUnavailable(LCDSPCore *s,uint32_t reason){if(s){atomic_store(&s->prepared,0);atomic_store(&s->unavailable,reason?reason:1);}}
-void LCDSPReset(LCDSPCore *s){if(s)memset(s->history,0,sizeof s->history);}
+void LCDSPReset(LCDSPCore *s){if(s){memset(s->history,0,sizeof s->history);reset_energy(s);}}
 void LCDSPProcess(LCDSPCore *s,float *left,float *right,uint32_t frames,uint32_t stride){
     if(!s||!left||!frames||!stride||stride>2||frames>s->maximumFrames||!atomic_load(&s->prepared)||(s->renderChannels==2&&!right))return;
     Settings cfg;if(read_settings(s,&cfg)&&cfg.revision!=s->current.revision)apply_settings(s,cfg,0);
-    double inSquares=0,outSquares=0;
+    double inSquares=0,outSquares=0;uint64_t measuredSamples=0;
     for(uint32_t f=0;f<frames;f++){
         if(s->rampRemaining){
             for(unsigned b=0;b<BANDS;b++)for(unsigned c=0;c<COEFFICIENTS;c++)s->coefficients[b][c]+=s->steps[b][c];
@@ -115,7 +119,6 @@ void LCDSPProcess(LCDSPCore *s,float *left,float *right,uint32_t frames,uint32_t
         }
         for(uint32_t ch=0;ch<s->renderChannels;ch++){
             float *p=(ch?right:left)+(size_t)f*stride;double input=finite_sample(*p),output=input;
-            inSquares+=input*input;
             if(s->wet>0.000001){
                 double filtered=input;
                 for(unsigned b=0;b<BANDS;b++){
@@ -125,12 +128,15 @@ void LCDSPProcess(LCDSPCore *s,float *left,float *right,uint32_t frames,uint32_t
                 output=input+(filtered*s->gain-input)*s->wet;
                 output=fmax(-0.98,fmin(0.98,finite_sample(output)));
             }
-            *p=(float)output;outSquares+=output*output;
+            *p=(float)output;
+            if(!s->rampRemaining){inSquares+=input*input;outSquares+=output*output;measuredSamples++;}
         }
     }
-    double samples=(double)frames*s->renderChannels;
-    atomic_store(&s->inputRMS,bits((float)fmin(3.402823466e38,sqrt(inSquares/samples))));
-    atomic_store(&s->outputRMS,bits((float)fmin(3.402823466e38,sqrt(outSquares/samples))));
+    s->inputEnergy+=inSquares;s->outputEnergy+=outSquares;s->energySamples+=measuredSamples;
+    if(s->energySamples){
+        atomic_store(&s->inputRMS,bits((float)fmin(3.402823466e38,sqrt(s->inputEnergy/s->energySamples))));
+        atomic_store(&s->outputRMS,bits((float)fmin(3.402823466e38,sqrt(s->outputEnergy/s->energySamples))));
+    }
     atomic_fetch_add(&s->frames,frames);
     if(!s->rampRemaining)atomic_store(&s->appliedRevision,s->current.revision);
 }

@@ -10,6 +10,8 @@ typedef struct {
     uint64_t processedFrames;
     uint32_t requestedRevision, appliedRevision;
     uint32_t prepared, unavailableReason, sampleRate, channels, activeBandMask;
+    /* Cumulative steady PCM energy since settings/discontinuity. A silent
+       prefetch/tail block must not erase evidence of processed source audio. */
     float inputRMS, outputRMS, headroomDb;
 } LCDSPMetrics;
 LCDSPCore *LCDSPCreate(void);
