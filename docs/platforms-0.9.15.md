@@ -1,20 +1,20 @@
-# Платформы LolzCloud: состояние 0.9.15 / Android 0.1.5
+# Платформы LolzCloud: 0.9.15-r2 / Android 0.1.5 / веб 0.9.17
 
-14 ноября 2026 года. Это матрица реализованных возможностей и фактических проверок, а не заявление о полной одинаковости клиентов. «Есть» означает наличие реализации; уровень проверки указан отдельно. Внешние сервисы могут ограничивать конкретную запись или требовать подтверждённый вход.
+14 ноября 2026 года. Матрица дополнена результатами ревизии исходников r2; настольные бинарные файлы 0.9.15 и Android APK 0.1.5 не заменяются. Сервер/PWA развиваются отдельно как 0.9.17. Это матрица реализованных возможностей и фактических проверок, а не заявление о полной одинаковости клиентов. «Есть» означает наличие реализации; уровень проверки указан отдельно. Внешние сервисы могут ограничивать конкретную запись или требовать подтверждённый вход. [Сводка r2 и статус публикации](releases/0.9.15-r2.md).
 
 ## Клиенты и границы выпуска
 
 | Клиент | Что подготовлено | Что фактически подтверждено |
 | --- | --- | --- |
-| Windows desktop 0.9.15 | Electron-клиент, опубликованные Setup/portable | [Desktop music UI/Node проверки](desktop-music-audit-0.9.15.md), реальная изолированная установка 0.9.14→0.9.15 и [публичные контрольные суммы](releases/public-0.9.15.json) |
-| Linux 0.9.15 | x64 AppImage и tar.gz; ARM64 tar.gz | [x64 запуск/keyring/sandbox](linux-verification-0.9.15.md) и [3 Linux software-audio/player/YT UI набора](linux-runtime-0.9.15.md); ARM64 статически, DAC не проверен |
-| Android 0.1.5 / code6 | Подписанный APK, min API 26; нативный личный аудиоплеер | [20 новых / 58 catalog / 29 lyrics / 50 social core и 11 exact assets](android/fixes-0.1.5.md), Android 15 / API 35 emulator; публичный манифест подтверждён |
-| iPhone/iPad PWA | Общий веб-клиент `/app/`, устанавливаемый средствами браузера | [Повторный browser прогон, импорт аудио/TXT/LRC, worker upgrade и IndexedDB migration](ios-pwa-imports.md); физический Safari и iOS background не проверены |
-| Native iOS 0.1.1 | SwiftUI/WKWebView shell, AVPlayer, локальные файлы и системные media controls в исходниках | [34 Swift policy/filesystem tests и parse 4 файлов](../ios/verification-0.1.1.json); Xcode/iOS SDK build, подпись IPA, AVPlayer на устройстве и TestFlight проверяются отдельно |
+| Windows desktop 0.9.15 | Electron-клиент, опубликованные Setup/portable | [Desktop music UI](desktop-music-audit-0.9.15.md), установка 0.9.14→0.9.15, [публичные суммы](releases/public-0.9.15.json); для r2 — 345 Node tests: 343 общих + 2 проверки версии iOS |
+| Linux 0.9.15 | x64 AppImage и tar.gz; ARM64 tar.gz | [x64 запуск/keyring/sandbox](linux-verification-0.9.15.md), [3 software-audio/player/YT UI набора](linux-runtime-0.9.15.md), 343 общих теста в Ubuntu CI и отдельный повтор 17 update tests на Linux; ARM64 статически, DAC не проверен |
+| Android 0.1.5 / code6 | Тот же подписанный APK, min API 26; нативный личный аудиоплеер | [Полный 71 social/offline сценарий](android/social-full-0.1.5.md); ранее [20 audio / 58 catalog / 29 lyrics / 50 social core и 11 exact assets](android/fixes-0.1.5.md). Наборы пересекаются; Android 15 / API 35 emulator, не физический телефон |
+| iPhone/iPad PWA | Общий веб-клиент `/app/`, устанавливаемый средствами браузера | [65 общих browser checks и 17 повторных import checks](ios-pwa-native-intent.md); отдельно IDB 5, lyrics 8, pairing 13, policy 10. Физический Safari и iOS background не проверены |
+| Native iOS 0.1.1 | SwiftUI/WKWebView, AVPlayer, локальные файлы; simulator build и неподписанная device-сборка | [34 Swift policy/filesystem tests](../ios/verification-0.1.1.json), [успешный Apple SDK CI](https://github.com/Artemper52/LolzCloud/actions/runs/43617605003) на `4def8a9f69c612f7a319f47830bb66d1e8f007b1`; физические iPhone/iPad, подпись и распространение pending |
 
 ## Функции
 
-| Возможность | Windows | Linux | Android | iOS PWA | Native iOS source |
+| Возможность | Windows | Linux | Android | iOS PWA | Native iOS 0.1.1: SDK build, device QA pending |
 | --- | --- | --- | --- | --- | --- |
 | Личный поиск и музыка SoundCloud | Есть | Общий desktop-код | Native search + MediaPlayer, без browser fallback | Серверный поиск + HTMLAudio | Общий UI + AVPlayer bridge в коде |
 | Личный источник YouTube Music | Отдельный sandbox guest | Общий desktop-код | Отдельный WebView | Отдельный личный источник не заявлен | Не заявлен |
@@ -38,16 +38,20 @@
 
 Умеренное тестовое отклонение 0,7 с восстановилось за 2453 мс, крупное 9 с — за 576 мс; это наблюдения данного прогона, не гарантированная задержка любого внешнего сервиса. Наличие одинаковых 11 assets в APK подтверждает упаковку общего клиента, но не заменяет эти UI/HTTP проверки.
 
-PWA проверен в Chromium с настоящими HTMLAudio/MP3, HTTP, IndexedDB и service worker. После добавления файлов полный браузерный набор повторно пройден, отдельно проверены импорт MP3/WAV/M4A/FLAC и TXT/LRC, переход worker v1 на новую оболочку, сохранение старой библиотеки и закрытие позднего соединения после заблокированной миграции. [Числа, отчёты и границы проверки](ios-pwa-imports.md). 13 отдельных сценариев device pairing подтверждают установку собственного HttpOnly cookie; подтверждение кода в них выполняет контролируемая фикстура.
+PWA проверен в Chromium с настоящими HTMLAudio/MP3, HTTP, IndexedDB и service worker. После защиты native client/request полный набор прошёл 65 проверок, включая delayed selection/playback, pause/resume, повторные записи в очереди и worker v1→v3; [отчёт](ios-pwa-native-intent.md). На том же worker повторно прошли 17 проверок импорта MP3/WAV/M4A/FLAC и TXT/LRC. Отдельно сохранены 5 проверок заблокированной миграции IDB, 8 точечных lyrics checks и 10 policy tests: [scope импорта](ios-pwa-imports.md). 13 отдельных сценариев device pairing подтверждают установку собственного HttpOnly cookie; подтверждение кода в них выполняет контролируемая фикстура. Наборы проверяют частично одинаковые функции и не складываются в число уникальных пользовательских сценариев.
 
-Native iOS 0.1.1 прошёл 34 pure-policy/filesystem tests в Swift 6.2.1 под Linux и syntax parse 4 Swift-файлов. Покрыты собственный реестр локальных файлов, квота, восстановление индекса, смешанная очередь, повторные экземпляры трека и client/request generation. Этот parse не использует Apple SDK. [Точный scope и текущий статус сборки](../ios/README.md) сохранены отдельно от браузерного PWA QA. Самостоятельный Mac CI запускается через `.github/workflows/ios.yml` с конкретной ревизией исходников.
+Native iOS 0.1.1 прошёл 34 policy/filesystem tests и Linux syntax parse четырёх файлов. Покрыты собственный реестр локальных файлов, квота, восстановление индекса, смешанная очередь, повторные экземпляры трека и client/request generation. Затем [реальный macOS CI с Apple SDK](https://github.com/Artemper52/LolzCloud/actions/runs/43617605003) на `4def8a9f69c612f7a319f47830bb66d1e8f007b1` успешно выполнил Swift tests, сборку для generic iOS Simulator и Release archive для generic iOS device с `CODE_SIGNING_ALLOWED=NO`. Вложенные артефакты проверены отдельно: device arm64 и simulator arm64+x86_64, версия 0.1.1/build2, минимум iOS 16.4, семейства iPhone/iPad. Использованы Xcode 16.4 и SDK 18.5. Это проверка типов, компоновки и структуры артефактов, а не запуск приложения или аудио на iPhone/iPad. [Нативный README](../ios/README.md) содержит отдельные сведения об артефактах и установке.
+
+Android полный 71-check прогон прошёл на неизменном опубликованном APK SHA-256 `ee61577bcf8b45650fad41a76715d3b532012cc949289a61dbb2adfc41db72d0`: настоящий SAF image picker/callback, MediaPlayer, NotificationManager и переходы приложения. Социальные события и вход — объявленные fixtures; реальная личная авторизация не заявляется. Он дополняет, а не заменяет и не суммируется с прежними 20/58/29/50. В audio-audit вызовы audio focus внедрялись тестом; физические наушники, звонки и конкуренция с другим аудиоприложением не проверялись.
+
+Для r2 в Windows прошли 345 Node tests: 343 общих и 2 проверки версии iOS. Ubuntu CI подтвердил все 343 общих; целевые 17 update tests дополнительно повторены на настоящем Linux после исправления переносимости тестового пути. Эти 17 входят в общий набор и не добавляются к нему. Продуктовый код обновлятора этим исправлением не менялся.
 
 ## Что ещё не завершено
 
-- **Native iOS:** нужен Mac с Xcode/iOS SDK, реальная сборка и подпись, provisioning/Apple Developer, проверка на iPhone/iPad. IPA и App Store/TestFlight выпуск не заявляются наличием Swift-файлов или успешных pure-policy tests.
+- **Native iOS:** Apple SDK build уже прошёл. Остаются provisioning/Apple Developer, подпись для установки, физические iPhone/iPad и проверка AVPlayer, lockscreen, фонового режима, файловых providers и личного входа. Неподписанная CI-сборка не означает доступную установку или выпуск в App Store/TestFlight.
 - **macOS desktop:** цель сборщика существует, но `.app`/DMG этого выпуска, macOS GUI, codesign и notarization здесь не проверены.
 - **Linux ARM64:** архив собран и проверен по ELF/правам, но не запускался на ARM64. Для Linux нет обещания любого дистрибутива, Wayland-композитора или аудиоустройства.
-- **GitHub:** актуальный source commit/tag и GitHub Release — отдельные действия. Права пользовательской учётной записи на push и завершение публикации текущих исходников требуют подтверждения координатора. Публичный APK-манифест или файлы на сайте не доказывают успешный GitHub push.
+- **GitHub и исходники:** ветка `codex/recover-platforms-0.9.15` и успешный CI commit подтверждены; это уже не неподтверждённый push. Итоговые source-архивы `LolzCloud-0.9.15-r2-source.zip` и native iOS 0.1.1, release tag и GitHub Release пока ожидают отдельной проверки публикации. Не следует считать наличие ветки или CI-артефакта опубликованным релизом.
 - **Личные аккаунты и физические устройства:** автоматические fixtures и изолированные профили не подтверждают personal OAuth, все региональные записи и мобильные ограничения каждой ОС.
 
 [Сайт загрузок проверен отдельно](website-0.9.15-qa.md): 20 browser checks на 360/390/1440 px и iPhone-порядок рекомендаций. Проверены интерфейс и целевые адреса ссылок; публичные файлы и GitHub assets проверяются при публикации отдельно.

@@ -15,7 +15,7 @@ fs.mkdirSync(directory,{recursive:true});
 const digest=file=>crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 const seen=new Set(),rows=[];
 for(const row of plan.files){
- if(typeof row.name!=='string'||path.basename(row.name)!==row.name||seen.has(row.name)||!/^(?:LolzCloud-[A-Za-z0-9_.-]+\.(?:zip|tar\.gz|AppImage|exe|blockmap)|legacy\.yml|update-legacy\.json|android-update\.json|platforms\.json)$/.test(row.name))throw Error('Unexpected public asset name');
+ if(typeof row.name!=='string'||path.basename(row.name)!==row.name||seen.has(row.name)||!/^(?:LolzCloud-[A-Za-z0-9_.-]+\.(?:zip|tar\.gz|AppImage|exe|blockmap|ipa)|LolzCloud-\d+\.\d+\.\d+-SHA256SUMS\.txt|legacy\.yml|update-legacy\.json|android-update\.json|platforms\.json)$/.test(row.name))throw Error('Unexpected public asset name');
  seen.add(row.name);
  if(row.local){const target=path.join(directory,row.name);fs.copyFileSync(path.resolve(row.local),target);rows.push({name:row.name,size:fs.statSync(target).size,sha256:digest(target),source:'upload'});}
  else {if(row.remote!==`/opt/lolzcloud-builds/release-${version}/dist/${row.name}`||!/^[a-f0-9]{64}$/.test(row.sha256)||!Number.isSafeInteger(row.size)||row.size<=0)throw Error('Invalid frozen Linux build reference');rows.push({name:row.name,remote:row.remote,size:row.size,sha256:row.sha256,source:'build'});}
@@ -34,7 +34,7 @@ if(!previous.startsWith('/srv/lolzcloud/releases/')||!fs.lstatSync(link).isSymbo
 fs.mkdirSync(release);fs.mkdirSync(destination);execFileSync('cp',['-al',previous+'/.',destination]);
 const mutable=new Set(['legacy.yml','update-legacy.json','android-update.json','platforms.json']),published=[];
 for(const row of plan.files){
- if(path.basename(row.name)!==row.name||!/^(?:LolzCloud-[A-Za-z0-9_.-]+\.(?:zip|tar\.gz|AppImage|exe|blockmap)|legacy\.yml|update-legacy\.json|android-update\.json|platforms\.json)$/.test(row.name))throw Error('Invalid artifact name');
+ if(path.basename(row.name)!==row.name||!/^(?:LolzCloud-[A-Za-z0-9_.-]+\.(?:zip|tar\.gz|AppImage|exe|blockmap|ipa)|LolzCloud-\d+\.\d+\.\d+-SHA256SUMS\.txt|legacy\.yml|update-legacy\.json|android-update\.json|platforms\.json)$/.test(row.name))throw Error('Invalid artifact name');
  const source=row.source==='upload'?path.join(upload,row.name):row.remote;
  if(row.source!=='upload'&&source!==('/opt/lolzcloud-builds/release-'+plan.version+'/dist/'+row.name))throw Error('Invalid build input path');
  const sourceStat=fs.lstatSync(source);if(!sourceStat.isFile()||sourceStat.size!==row.size||hash(source)!==row.sha256)throw Error('Source hash/size mismatch: '+row.name);

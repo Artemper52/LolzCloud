@@ -1,7 +1,7 @@
 {
   "releaseCandidate": "0.1.1",
   "bundleBuild": "2",
-  "checkedAt": "2026-11-14T16:16:19Z",
+  "checkedAt": "2026-11-14T16:58:54Z",
   "sourceFrozen": true,
   "toolchain": "Swift 6.2.1, Docker swift:6.2.1-bookworm on Linux",
   "sourceHashesSha256": {
@@ -34,7 +34,7 @@
     "scope": "syntax only; no Apple SDK type checking"
   },
   "projectInputs": {
-    "appleSDKBuild": "pending",
+    "appleSDKBuild": "passed",
     "backgroundAudio": true,
     "deviceRuntime": "pending",
     "iconHeight": 1024,
@@ -47,7 +47,8 @@
     ],
     "projectObjects": 26,
     "sharedScheme": true,
-    "status": "passed"
+    "status": "passed",
+    "appleSDKProof": "docs/ios-sdk-0.1.1-verification.json"
   },
   "implementation": [
     "UIDocumentPicker audio import",
@@ -67,8 +68,13 @@
     "maximumLocalDurationSeconds": 86400
   },
   "appleSDKBuild": {
-    "status": "pending",
-    "reason": "Not performed by this verification; a separate macOS CI run is required."
+    "status": "passed",
+    "run": "https://github.com/Artemper52/LolzCloud/actions/runs/43617605003",
+    "commit": "4def8a9f69c612f7a319f47830bb66d1e8f007b1",
+    "xcode": "16.4 (16F6)",
+    "sdk": "18.5",
+    "simulatorBuild": true,
+    "deviceArchive": true
   },
   "deviceRuntime": {
     "status": "pending",
@@ -82,17 +88,57 @@
     ]
   },
   "signedIPA": {
-    "status": "not produced"
+    "status": "not produced",
+    "unsignedDeviceArchiveProduced": true
   },
   "workflowRun": {
-    "status": "not performed in this review"
+    "status": "passed",
+    "url": "https://github.com/Artemper52/LolzCloud/actions/runs/43617605003",
+    "commit": "4def8a9f69c612f7a319f47830bb66d1e8f007b1"
   },
   "artifactsDirectory": "D:/LolzCloud-Android-Toolchain/ios-review-0.1.1",
-  "scopeNote": "Foundation policy/filesystem tests use isolated fixtures. They do not prove physical iPhone/iPad UI, security-scoped provider access or AVFoundation decoding. PWA browser verification is separate.",
+  "scopeNote": "Apple SDK simulator compilation and generic-device archive passed. Archive/plist/Mach-O inspection passed. No physical iOS runtime or Apple distribution signing is claimed. The Linux-only historical report is preserved separately.",
   "bridgeIntent": {
     "clientId": "lowercase per-document UUID",
     "requestId": "monotonic safe integer >= 1; same intent may cover stop/queue/play",
     "handshake": "first queue for a new document; previous client retired",
     "snapshots": "selection and playback echo the current client/request; system Next retains them"
+  },
+  "macOSPolicyTests": {
+    "status": "passed",
+    "tests": 34,
+    "failures": 0
+  },
+  "compiledArtifacts": [
+    {
+      "file": "LolzCloud-iOS-0.1.1-simulator.zip",
+      "bytes": 826608,
+      "sha256": "e664f211324bc6abee7bbe7ddac4aaf779899a293ce7243d5d14c16aeb8f40a6",
+      "version": "0.1.1",
+      "build": "2",
+      "minimumOS": "16.4",
+      "deviceFamily": [
+        1,
+        2
+      ],
+      "provisioningProfile": false
+    },
+    {
+      "file": "LolzCloud-iOS-0.1.1-unsigned.ipa",
+      "bytes": 218523,
+      "sha256": "6a3d7b4d36e328aa3a961c63b43fd4453f7a678655235c23e25fc0744e0c479e",
+      "version": "0.1.1",
+      "build": "2",
+      "minimumOS": "16.4",
+      "deviceFamily": [
+        1,
+        2
+      ],
+      "provisioningProfile": false
+    }
+  ],
+  "artifactStaticVerification": "docs/ios-sdk-0.1.1-verification.json",
+  "sourceHashes": {
+    "Package.swift": "6266e84ab1085488b72681e491fa107b70cde91b718155fe47e311e3a64a7510"
   }
 }

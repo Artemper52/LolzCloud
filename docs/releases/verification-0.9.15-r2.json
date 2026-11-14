@@ -1,0 +1,179 @@
+{
+  "revision": "0.9.15-r2",
+  "checkedAt": "2026-11-14T17:03:50.585194+00:00",
+  "desktopVersion": "0.9.15",
+  "androidVersion": "0.1.5",
+  "webVersion": "0.9.17",
+  "nativeIOSVersion": "0.1.1",
+  "node": {
+    "windows": {
+      "tests": 345,
+      "failures": 0
+    },
+    "ubuntuCI": {
+      "tests": 343,
+      "failures": 0
+    },
+    "updatePortabilityWindowsAndLinux": {
+      "testsEach": 17,
+      "failures": 0
+    }
+  },
+  "browser": {
+    "pwa": 65,
+    "imports": 17,
+    "indexedDBMigration": 5,
+    "lyrics": 8,
+    "pairing": 13,
+    "website": 20,
+    "physicalSafariTested": false
+  },
+  "nativeIOS": {
+    "swiftPolicyTests": 34,
+    "appleSDKBuild": true,
+    "deviceArchive": "unsigned",
+    "physicalDeviceTested": false,
+    "run": "https://github.com/Artemper52/LolzCloud/actions/runs/43617605003",
+    "compiledCommit": "4def8a9f69c612f7a319f47830bb66d1e8f007b1"
+  },
+  "android": {
+    "fullSocialOfflineChecks": 71,
+    "apkUnchanged": true,
+    "physicalDeviceTested": false
+  },
+  "publicWebAndMusic": {
+    "checkedAt": "2026-11-14T16:35:47.223Z",
+    "checks": [
+      {
+        "name": "public service revision",
+        "ok": true,
+        "version": "0.9.17"
+      },
+      {
+        "name": "public app app.css",
+        "ok": true,
+        "http": 200,
+        "bytes": 15362,
+        "sha256": "c2eee5b4fb4c11e5a3785da26ef74e38e909f8ce8e61905537bb7f3a6a311ff8"
+      },
+      {
+        "name": "public app core.js",
+        "ok": true,
+        "http": 200,
+        "bytes": 8411,
+        "sha256": "dbbe9a2040318a3ce7bce9a31ff61729c383f2d94e15d93e4042adba5548d6b7"
+      },
+      {
+        "name": "public app app.js",
+        "ok": true,
+        "http": 200,
+        "bytes": 67490,
+        "sha256": "4dc6938c7f59ecc68d59051d8465166dd88b5c240364b255da78f93df99f0524"
+      },
+      {
+        "name": "public app icon-192.png",
+        "ok": true,
+        "http": 200,
+        "bytes": 7875,
+        "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4"
+      },
+      {
+        "name": "public app icon.svg",
+        "ok": true,
+        "http": 200,
+        "bytes": 366,
+        "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6"
+      },
+      {
+        "name": "public app icon-512.png",
+        "ok": true,
+        "http": 200,
+        "bytes": 9687,
+        "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef"
+      },
+      {
+        "name": "public app imports.js",
+        "ok": true,
+        "http": 200,
+        "bytes": 2375,
+        "sha256": "9c025444b795b53b730d27723d18006a743c11601f22c86b2f89bea9d384abc2"
+      },
+      {
+        "name": "public app index.html",
+        "ok": true,
+        "http": 200,
+        "bytes": 15642,
+        "sha256": "2322156362209578e703b19dc47d77d8b6903418193b96d8e0fd70ec726da14e"
+      },
+      {
+        "name": "public app manifest.webmanifest",
+        "ok": true,
+        "http": 200,
+        "bytes": 440,
+        "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7"
+      },
+      {
+        "name": "public app offline.js",
+        "ok": true,
+        "http": 200,
+        "bytes": 4979,
+        "sha256": "8774eb963ff7fe0c85e61668c0355d8c3b0e3467a3e30a7ba032c49771ab3936"
+      },
+      {
+        "name": "public app sw.js",
+        "ok": true,
+        "http": 200,
+        "bytes": 1507,
+        "sha256": "3f16bb375f2cc174ee8559fbd9f5e1ead95f8ef2d8d17739ac69146268384784"
+      },
+      {
+        "name": "scoped worker and no-store",
+        "ok": true
+      },
+      {
+        "name": "live search accepts exact signed sources",
+        "ok": true,
+        "count": 20
+      },
+      {
+        "name": "requested recording found",
+        "ok": true
+      },
+      {
+        "name": "requested audio prepares",
+        "ok": true,
+        "http": 200
+      },
+      {
+        "name": "real MP3 byte range",
+        "ok": true,
+        "http": 206,
+        "bytes": 512
+      },
+      {
+        "name": "representative lyrics match strict identity",
+        "ok": true,
+        "http": 200,
+        "timed": true,
+        "lines": 19
+      }
+    ],
+    "retries": [
+      {
+        "url": "/app/app.js",
+        "attempt": 1,
+        "cause": "UND_ERR_CONNECT_TIMEOUT"
+      },
+      {
+        "url": "/app/app.js",
+        "attempt": 2,
+        "cause": "UND_ERR_CONNECT_TIMEOUT"
+      }
+    ]
+  },
+  "publication": {
+    "publicSourceArchive": "pending",
+    "nativeDownloads": "pending",
+    "githubRelease": "pending"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "ok": true,
+  "count": 20,
+  "checks": [
+    "Homepage has no horizontal overflow at 390px",
+    "All platform download actions remain readable and fit at 390px",
+    "Homepage has no horizontal overflow at 360px",
+    "All platform download actions remain readable and fit at 360px",
+    "Homepage has no horizontal overflow at 1440px",
+    "All platform download actions remain readable and fit at 1440px",
+    "Four real platform choices are present",
+    "iOS links to the installable web app and labels it explicitly",
+    "Desktop, Linux, Legacy and source links consistently target version 0.9.15",
+    "Android download targets the declared 0.1.5 APK",
+    "Screenshot tabs switch the actual image and accessible selected state",
+    "Screenshot opens in a working lightbox",
+    "Install article and iOS instructions fit at 390px",
+    "Install article and iOS instructions fit at 360px",
+    "Install article and iOS instructions fit at 1440px",
+    "Native iOS links expose compiled unsigned IPA, simulator and source while keeping the PWA first and requiring personal Apple signing",
+    "All installation table-of-contents links resolve to real sections",
+    "iPhone visitors see their installable platform first in the download choices",
+    "Recommended visual order matches DOM, screen-reader and keyboard link order",
+    "Website scenarios have no uncaught JavaScript errors"
+  ],
+  "screenshots": [
+    "D:\\LolzCloud-Android-Toolchain\\release-r2\\qa\\website-final\\website-home-390.png",
+    "D:\\LolzCloud-Android-Toolchain\\release-r2\\qa\\website-final\\website-downloads-390.png",
+    "D:\\LolzCloud-Android-Toolchain\\release-r2\\qa\\website-final\\website-home-360.png",
+    "D:\\LolzCloud-Android-Toolchain\\release-r2\\qa\\website-final\\website-downloads-360.png",
+    "D:\\LolzCloud-Android-Toolchain\\release-r2\\qa\\website-final\\website-home-1440.png",
+    "D:\\LolzCloud-Android-Toolchain\\release-r2\\qa\\website-final\\website-downloads-1440.png",
+    "D:\\LolzCloud-Android-Toolchain\\release-r2\\qa\\website-final\\website-install-ios-390.png",
+    "D:\\LolzCloud-Android-Toolchain\\release-r2\\qa\\website-final\\website-install-ios-360.png",
+    "D:\\LolzCloud-Android-Toolchain\\release-r2\\qa\\website-final\\website-install-ios-1440.png",
+    "D:\\LolzCloud-Android-Toolchain\\release-r2\\qa\\website-final\\website-ios-downloads-390.png"
+  ],
+  "errors": [],
+  "failure": "",
+  "limitation": "Local rendering and link target verification only; publication availability and release signatures are verified by the release coordinator."
+}

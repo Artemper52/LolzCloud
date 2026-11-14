@@ -1,0 +1,335 @@
+{
+  "status": "passed",
+  "workflowRun": "https://github.com/Artemper52/LolzCloud/actions/runs/43617605003",
+  "compiledCommit": "4def8a9f69c612f7a319f47830bb66d1e8f007b1",
+  "outerArtifact": {
+    "file": "LolzCloud-iOS-0.1.1-build-artifacts.zip",
+    "bytes": 1037213,
+    "sha256": "ce81c3373c72a5aa91e6cee49bcefc0f3ed8986504806f9115552b354a2bd173"
+  },
+  "artifacts": [
+    {
+      "file": "LolzCloud-iOS-0.1.1-simulator.zip",
+      "bytes": 826608,
+      "sha256": "e664f211324bc6abee7bbe7ddac4aaf779899a293ce7243d5d14c16aeb8f40a6",
+      "appPath": "LolzCloud.app/",
+      "bundleIdentifier": "com.lolzcloud.ios",
+      "version": "0.1.1",
+      "build": "2",
+      "minimumOS": "16.4",
+      "deviceFamily": [
+        1,
+        2
+      ],
+      "backgroundModes": [
+        "audio"
+      ],
+      "platform": "iphonesimulator",
+      "sdk": "iphonesimulator18.5",
+      "xcode": "1640",
+      "xcodeBuild": "16F6",
+      "provisioningProfile": false,
+      "codeResources": false,
+      "binaries": [
+        {
+          "path": "LolzCloud.app/LolzCloud.debug.dylib",
+          "bytes": 2687944,
+          "sha256": "42a82ad0b780c70d12bfd59f09ac1a113c7957072b772e84ebd88cf02143297a",
+          "slices": [
+            {
+              "architecture": "x86_64",
+              "fileType": 6,
+              "build": {
+                "platform": "iOS Simulator",
+                "minimumOS": "16.4.0",
+                "sdk": "18.5.0"
+              },
+              "linkedLibraries": [
+                "/System/Library/Frameworks/Foundation.framework/Foundation",
+                "/usr/lib/libobjc.A.dylib",
+                "/usr/lib/libSystem.B.dylib",
+                "/System/Library/Frameworks/AVFAudio.framework/AVFAudio",
+                "/System/Library/Frameworks/AVFoundation.framework/AVFoundation",
+                "/System/Library/Frameworks/Combine.framework/Combine",
+                "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+                "/System/Library/Frameworks/CoreMedia.framework/CoreMedia",
+                "/System/Library/Frameworks/MediaPlayer.framework/MediaPlayer",
+                "/System/Library/Frameworks/SwiftUI.framework/SwiftUI",
+                "/System/Library/Frameworks/UIKit.framework/UIKit",
+                "/System/Library/Frameworks/WebKit.framework/WebKit",
+                "/usr/lib/swift/libswiftAVFoundation.dylib",
+                "/usr/lib/swift/libswiftCore.dylib",
+                "/usr/lib/swift/libswiftCoreAudio.dylib",
+                "/usr/lib/swift/libswiftCoreFoundation.dylib",
+                "/usr/lib/swift/libswiftCoreImage.dylib",
+                "/usr/lib/swift/libswiftCoreMIDI.dylib",
+                "/usr/lib/swift/libswiftCoreMedia.dylib",
+                "/usr/lib/swift/libswiftDarwin.dylib",
+                "/usr/lib/swift/libswiftDataDetection.dylib",
+                "/usr/lib/swift/libswiftDispatch.dylib",
+                "/usr/lib/swift/libswiftMetal.dylib",
+                "/usr/lib/swift/libswiftOSLog.dylib",
+                "/usr/lib/swift/libswiftObjectiveC.dylib",
+                "/usr/lib/swift/libswiftQuartzCore.dylib",
+                "/usr/lib/swift/libswiftSpatial.dylib",
+                "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+                "/usr/lib/swift/libswiftXPC.dylib",
+                "/usr/lib/swift/libswift_Concurrency.dylib",
+                "/usr/lib/swift/libswiftos.dylib",
+                "/usr/lib/swift/libswiftsimd.dylib",
+                "/usr/lib/swift/libswiftUIKit.dylib"
+              ],
+              "codeSignatures": []
+            },
+            {
+              "architecture": "arm64",
+              "fileType": 6,
+              "build": {
+                "platform": "iOS Simulator",
+                "minimumOS": "16.4.0",
+                "sdk": "18.5.0"
+              },
+              "linkedLibraries": [
+                "/System/Library/Frameworks/Foundation.framework/Foundation",
+                "/usr/lib/libobjc.A.dylib",
+                "/usr/lib/libSystem.B.dylib",
+                "/System/Library/Frameworks/AVFAudio.framework/AVFAudio",
+                "/System/Library/Frameworks/AVFoundation.framework/AVFoundation",
+                "/System/Library/Frameworks/Combine.framework/Combine",
+                "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+                "/System/Library/Frameworks/CoreMedia.framework/CoreMedia",
+                "/System/Library/Frameworks/MediaPlayer.framework/MediaPlayer",
+                "/System/Library/Frameworks/SwiftUI.framework/SwiftUI",
+                "/System/Library/Frameworks/UIKit.framework/UIKit",
+                "/System/Library/Frameworks/WebKit.framework/WebKit",
+                "/usr/lib/swift/libswiftAVFoundation.dylib",
+                "/usr/lib/swift/libswiftCore.dylib",
+                "/usr/lib/swift/libswiftCoreAudio.dylib",
+                "/usr/lib/swift/libswiftCoreFoundation.dylib",
+                "/usr/lib/swift/libswiftCoreImage.dylib",
+                "/usr/lib/swift/libswiftCoreMIDI.dylib",
+                "/usr/lib/swift/libswiftCoreMedia.dylib",
+                "/usr/lib/swift/libswiftDarwin.dylib",
+                "/usr/lib/swift/libswiftDataDetection.dylib",
+                "/usr/lib/swift/libswiftDispatch.dylib",
+                "/usr/lib/swift/libswiftMetal.dylib",
+                "/usr/lib/swift/libswiftOSLog.dylib",
+                "/usr/lib/swift/libswiftObjectiveC.dylib",
+                "/usr/lib/swift/libswiftQuartzCore.dylib",
+                "/usr/lib/swift/libswiftSpatial.dylib",
+                "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+                "/usr/lib/swift/libswiftXPC.dylib",
+                "/usr/lib/swift/libswift_Concurrency.dylib",
+                "/usr/lib/swift/libswiftos.dylib",
+                "/usr/lib/swift/libswiftsimd.dylib",
+                "/usr/lib/swift/libswiftUIKit.dylib"
+              ],
+              "codeSignatures": [
+                {
+                  "bytes": 10184,
+                  "adHoc": true,
+                  "cmsPresent": false,
+                  "teamID": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "LolzCloud.app/LolzCloud",
+          "bytes": 72232,
+          "sha256": "8c357a9322ea79c8c9a83d9342073c4e1e72e0a6e10b501e4b506e8a5a643071",
+          "slices": [
+            {
+              "architecture": "x86_64",
+              "fileType": 2,
+              "build": {
+                "platform": "iOS Simulator",
+                "minimumOS": "16.4.0",
+                "sdk": "18.5.0"
+              },
+              "linkedLibraries": [
+                "@rpath/LolzCloud.debug.dylib",
+                "/usr/lib/libSystem.B.dylib"
+              ],
+              "codeSignatures": []
+            },
+            {
+              "architecture": "arm64",
+              "fileType": 2,
+              "build": {
+                "platform": "iOS Simulator",
+                "minimumOS": "16.4.0",
+                "sdk": "18.5.0"
+              },
+              "linkedLibraries": [
+                "@rpath/LolzCloud.debug.dylib",
+                "/usr/lib/libSystem.B.dylib"
+              ],
+              "codeSignatures": [
+                {
+                  "bytes": 440,
+                  "adHoc": true,
+                  "cmsPresent": false,
+                  "teamID": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "LolzCloud.app/__preview.dylib",
+          "bytes": 33144,
+          "sha256": "c0d58e29a0d292ecae5723bcd8907c0a1fcbec6c82af720dc6ba2a19ec59f8ca",
+          "slices": [
+            {
+              "architecture": "x86_64",
+              "fileType": 6,
+              "build": {
+                "platform": "iOS Simulator",
+                "minimumOS": "16.4.0",
+                "sdk": "18.5.0"
+              },
+              "linkedLibraries": [
+                "/usr/lib/libSystem.B.dylib"
+              ],
+              "codeSignatures": []
+            },
+            {
+              "architecture": "arm64",
+              "fileType": 6,
+              "build": {
+                "platform": "iOS Simulator",
+                "minimumOS": "16.4.0",
+                "sdk": "18.5.0"
+              },
+              "linkedLibraries": [
+                "/usr/lib/libSystem.B.dylib"
+              ],
+              "codeSignatures": [
+                {
+                  "bytes": 296,
+                  "adHoc": true,
+                  "cmsPresent": false,
+                  "teamID": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "LolzCloud-iOS-0.1.1-unsigned.ipa",
+      "bytes": 218523,
+      "sha256": "6a3d7b4d36e328aa3a961c63b43fd4453f7a678655235c23e25fc0744e0c479e",
+      "appPath": "Payload/LolzCloud.app/",
+      "bundleIdentifier": "com.lolzcloud.ios",
+      "version": "0.1.1",
+      "build": "2",
+      "minimumOS": "16.4",
+      "deviceFamily": [
+        1,
+        2
+      ],
+      "backgroundModes": [
+        "audio"
+      ],
+      "platform": "iphoneos",
+      "sdk": "iphoneos18.5",
+      "xcode": "1640",
+      "xcodeBuild": "16F6",
+      "provisioningProfile": false,
+      "codeResources": false,
+      "binaries": [
+        {
+          "path": "Payload/LolzCloud.app/LolzCloud",
+          "bytes": 500488,
+          "sha256": "7a535a742ca9a2406c389881b6b9083022c87c816cd26b532a02a04ea601b7d1",
+          "slices": [
+            {
+              "architecture": "arm64",
+              "fileType": 2,
+              "build": {
+                "platform": "iOS",
+                "minimumOS": "16.4.0",
+                "sdk": "18.5.0"
+              },
+              "linkedLibraries": [
+                "/System/Library/Frameworks/Foundation.framework/Foundation",
+                "/usr/lib/libobjc.A.dylib",
+                "/usr/lib/libSystem.B.dylib",
+                "/System/Library/Frameworks/AVFAudio.framework/AVFAudio",
+                "/System/Library/Frameworks/AVFoundation.framework/AVFoundation",
+                "/System/Library/Frameworks/Combine.framework/Combine",
+                "/System/Library/Frameworks/CoreFoundation.framework/CoreFoundation",
+                "/System/Library/Frameworks/CoreMedia.framework/CoreMedia",
+                "/System/Library/Frameworks/MediaPlayer.framework/MediaPlayer",
+                "/System/Library/Frameworks/SwiftUI.framework/SwiftUI",
+                "/System/Library/Frameworks/UIKit.framework/UIKit",
+                "/System/Library/Frameworks/WebKit.framework/WebKit",
+                "/usr/lib/swift/libswiftAVFoundation.dylib",
+                "/usr/lib/swift/libswiftCore.dylib",
+                "/usr/lib/swift/libswiftCoreAudio.dylib",
+                "/usr/lib/swift/libswiftCoreFoundation.dylib",
+                "/usr/lib/swift/libswiftCoreImage.dylib",
+                "/usr/lib/swift/libswiftCoreMIDI.dylib",
+                "/usr/lib/swift/libswiftCoreMedia.dylib",
+                "/usr/lib/swift/libswiftDarwin.dylib",
+                "/usr/lib/swift/libswiftDataDetection.dylib",
+                "/usr/lib/swift/libswiftDispatch.dylib",
+                "/usr/lib/swift/libswiftMetal.dylib",
+                "/usr/lib/swift/libswiftOSLog.dylib",
+                "/usr/lib/swift/libswiftObjectiveC.dylib",
+                "/usr/lib/swift/libswiftQuartzCore.dylib",
+                "/usr/lib/swift/libswiftSpatial.dylib",
+                "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+                "/usr/lib/swift/libswiftXPC.dylib",
+                "/usr/lib/swift/libswift_Concurrency.dylib",
+                "/usr/lib/swift/libswiftos.dylib",
+                "/usr/lib/swift/libswiftsimd.dylib",
+                "/usr/lib/swift/libswiftUIKit.dylib"
+              ],
+              "codeSignatures": []
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "physicalDeviceTests": "not performed",
+  "distributionSigning": "no provisioning profile, signing team or CMS distribution signature; installation requires Apple signing",
+  "scope": "Archive/plist/Mach-O static inspection plus a successful Apple SDK compilation; no physical runtime claim.",
+  "checkedAt": "2026-11-14T16:58:54Z",
+  "macOSBuild": {
+    "status": "passed",
+    "xcode": "16.4 (16F6)",
+    "deviceSDK": "18.5",
+    "simulatorSDK": "18.5",
+    "policyTests": 34,
+    "failures": 0,
+    "versionParserTests": 2,
+    "simulatorBuild": "BUILD SUCCEEDED",
+    "deviceArchive": "ARCHIVE SUCCEEDED",
+    "logSummary": {
+      "runId": 43617605003,
+      "jobId": 132516108345,
+      "commit": "4def8a9f69c612f7a319f47830bb66d1e8f007b1",
+      "url": "https://github.com/Artemper52/LolzCloud/actions/runs/43617605003",
+      "swiftTestSummaries": [
+        "Executed 34 tests, with 0 failures (0 unexpected) in 0.050 (0.051) seconds",
+        "Executed 34 tests, with 0 failures (0 unexpected) in 0.050 (0.052) seconds",
+        "Executed 34 tests, with 0 failures (0 unexpected) in 0.050 (0.053) seconds"
+      ],
+      "simulatorBuildSucceeded": true,
+      "deviceArchiveSucceeded": true,
+      "xcodeApplications": [
+        "Xcode_16.4.app"
+      ],
+      "sdkNames": [
+        "iPhoneOS18.5.sdk",
+        "iPhoneSimulator18.5.sdk"
+      ]
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "checkedAt": "2026-11-14T16:39:46.666Z",
+  "cause": "Windows-only fixture executable string passed through host path.dirname yielded dot on POSIX; preflight disk adapter therefore received the wrong installation directory.",
+  "fix": "Test-only host path.join builds the injected executable path while retaining the intended simulated Windows directory. Preflight explicitly asserts the intended Windows installation and temporary directories.",
+  "changed": [
+    "tests/app-updates.test.cjs"
+  ],
+  "productionChanged": false,
+  "assertionsPreserved": [
+    "Actual prepareNsisTemporary with Windows path/disk adapter",
+    "C-full to D fixed sibling fallback",
+    "Download, preflight, profile preparation, handoff ordering",
+    "Original global environment unchanged",
+    "Per-process TEMP/TMP restored on failed handoff",
+    "No safe alternative keeps app open"
+  ],
+  "windows": {
+    "node": "v24.13.0",
+    "command": "node --test tests/app-updates.test.cjs",
+    "pass": 17,
+    "fail": 0,
+    "skip": 0
+  },
+  "linux": {
+    "host": "boston",
+    "node": "v22.23.2",
+    "command": "node --test --test-reporter=tap tests/app-updates.test.cjs",
+    "pass": 17,
+    "fail": 0,
+    "skip": 0,
+    "tap": "linux-targeted.tap.txt",
+    "isolatedDirectory": "/tmp/LolzCloud-update-portability-cdcf899b",
+    "exactSourceSha256Matched": true,
+    "dependencies": {
+      "yazl": "3.3.1",
+      "yauzl": "3.4.0"
+    }
+  },
+  "sourceSha256": {
+    "tests/app-updates.test.cjs": "cdcf899b475d2e70dfde61a904940094bf331b2e5fb6d33799f71a1a874c89d3",
+    "source/integrations/app-updates.cjs": "ea3648c194c55846aa15f093cf21198ed46b7b5fe717fefec5b563241648e9f0",
+    "source/integrations/portable-update.cjs": "e6586ce7fcb8f540eb5ef83a8769f6b65422855b2813043fbd26cb0cf51498e8",
+    "source/integrations/update-temporary.cjs": "6292ebd3e2bfd856212e6f6e13e10912e4352e07ec3da3fdd586d7b474987bd9",
+    "source/main.js": "274b36c520fdec33a8080b42a71fdb87450ccd6fbbe80a31daf9151081b43068"
+  },
+  "scope": "Targeted test suite only; no product binary rebuild, installer execution, service mutation or release publication."
+}
