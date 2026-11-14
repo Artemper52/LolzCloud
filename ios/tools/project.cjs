@@ -2,7 +2,7 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..'),project=path.join(root,'LolzCloud.xcodeproj');
 const id=name=>crypto.createHash('sha256').update('LolzCloud-iOS:'+name).digest('hex').slice(0,24).toUpperCase();
-const files=['App.swift','MediaPolicy.swift','NativePlayer.swift','AccountLogin.swift','AudioEffectsPolicy.swift','NativeAudioEffects.swift','DSP/DSPCore.c','DSP/NativeAudioTap.c'];
+const files=['App.swift','MediaPolicy.swift','NativePlayer.swift','AccountLogin.swift','AudioEffectsPolicy.swift','NativeAudioEffects.swift','NativeCatalog.swift','NativeProfileShare.swift','DSP/DSPCore.c','DSP/NativeAudioTap.c'];
 const objects=[],add=(name,type,body)=>objects.push(`${id(name)} = { isa = ${type}; ${body} };`);
 for(const file of files){add(file,'PBXFileReference',`lastKnownFileType = ${file.endsWith('.c')?'sourcecode.c.c':'sourcecode.swift'}; path = ${JSON.stringify(file)}; sourceTree = "<group>";`);add('build:'+file,'PBXBuildFile',`fileRef = ${id(file)};`);}
 add('Info.plist','PBXFileReference','lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>";');

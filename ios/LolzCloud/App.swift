@@ -13,12 +13,15 @@ import UniformTypeIdentifiers
 @MainActor final class AppShell: NSObject, ObservableObject, WKScriptMessageHandler, WKNavigationDelegate, WKUIDelegate, UIDocumentPickerDelegate {
     let player = NativePlayer()
     let login = AccountLogin()
+    let profileShare = NativeProfileShare()
     private(set) var webView: WKWebView!
     @Published var loadError = ""
     @Published var loading = true
     @Published var offline = false
     private var pendingAccount: [String:Any]?
     private var pendingDownloads: [String:[String:Any]] = [:]
+    private var pendingProfileExport: [String:Any]?
+    private var profileExportOwner: [String:Any] = [:]
     private weak var audioPicker: UIDocumentPickerViewController?
     override init() {
         super.init()
@@ -34,6 +37,11 @@ import UniformTypeIdentifiers
         webView.allowsBackForwardNavigationGestures = true
         player.emit = { [weak self] name,detail in self?.event(name,detail) }
         login.completed = { [weak self] name,detail in self?.event(name,detail) }
+        profileShare.emit = { [weak self] name,detail in
+            guard let self else { return }
+            self.event(name,detail.merging(self.profileExportOwner) { _,owner in owner })
+            if detail["state"] as? String != "sharing" { self.profileExportOwner = [:] }
+        }
         reload()
     }
     func reload() { offline = false; loadError = ""; loading = true; webView.load(URLRequest(url:MediaPolicy.origin.appendingPathComponent("app/"),cachePolicy:.useProtocolCachePolicy,timeoutInterval:25)) }
@@ -41,6 +49,7 @@ import UniformTypeIdentifiers
         guard UIApplication.shared.applicationState == .active, !loading, MediaPolicy.bridgePage(webView.url) else {
             if name == "account" { pendingAccount = detail }
             else if name == "download", let id = detail["id"] as? String, pendingDownloads.count < 200 || pendingDownloads[id] != nil { pendingDownloads[id] = detail }
+            else if name == "profileExport" { pendingProfileExport = detail }
             return
         }
         guard let data = try? JSONSerialization.data(withJSONObject:detail), let json = String(data:data,encoding:.utf8) else { return }
@@ -49,9 +58,11 @@ import UniformTypeIdentifiers
     func foreground() {
         guard UIApplication.shared.applicationState == .active, !loading, MediaPolicy.bridgePage(webView.url) else { return }
         if let detail = pendingAccount { pendingAccount = nil; event("account",detail) }
+        if let detail = pendingProfileExport { pendingProfileExport = nil; event("profileExport",detail) }
         let downloads = pendingDownloads; pendingDownloads.removeAll()
         for detail in downloads.values { event("download",detail) }
         player.listDownloads()
+        event("capabilities",player.capabilities)
     }
     func userContentController(_ userContentController: WKUserContentController,didReceive message: WKScriptMessage) {
         guard message.frameInfo.isMainFrame, message.frameInfo.securityOrigin.protocol == "https", message.frameInfo.securityOrigin.host == "lolzcloud.com",
@@ -62,6 +73,24 @@ import UniformTypeIdentifiers
         if action == "effects" {
             if let client, let request, let revision = MediaPolicy.requestID(object["revision"]), let config = object["config"] as? [String:Any] {
                 player.configureEffects(config,revision:revision,client:client,request:request)
+            }
+            return
+        }
+        if action == "capabilities" || action == "exportProfile" {
+            guard let client, let request, player.ownsClientIntent(client:client,request:request) else { return }
+            if action == "capabilities" { event("capabilities",player.capabilities); return }
+            guard let json = object["json"] as? String, let filename = object["filename"] as? String,
+                  let operation = object["operationId"] as? String else { return }
+            let owner: [String:Any] = ["clientId":client,"requestId":request]
+            // Do not let a rejected second presentation relabel the completion
+            // belonging to an already visible share sheet.
+            let previousOwner = profileExportOwner
+            profileExportOwner = owner
+            do { try profileShare.present(json:json,filename:filename,operationId:operation,webView:webView) }
+            catch {
+                profileExportOwner = previousOwner
+                event("profileExport",owner.merging(["state":"error","operationId":String(operation.prefix(100)),
+                    "error":(error as? UserError)?.localizedDescription ?? "Не удалось открыть сохранение профиля. Повтори попытку."]) { _,new in new })
             }
             return
         }

@@ -25,10 +25,23 @@ enum MediaPolicy {
         return position
     }
     static func identifier(_ value: String) -> Bool {
-        value.range(of: "^[1-9][0-9]{0,15}$", options: .regularExpression) != nil
+        value.range(of: "^[1-9][0-9]{0,15}$", options: .regularExpression) == value.startIndex..<value.endIndex
+    }
+    static func sourceURL(_ value: String) -> String? {
+        guard value.count <= 500, let url = URL(string:value), url.scheme == "https",
+              ["soundcloud.com","www.soundcloud.com"].contains(url.host ?? ""),
+              url.port == nil || url.port == 443, url.user == nil, url.password == nil,
+              url.query == nil, url.fragment == nil,
+              url.path.range(of:"^/[A-Za-z0-9_-]+/[A-Za-z0-9_-]+/?$",options:.regularExpression) != nil else { return nil }
+        return "https://soundcloud.com"+url.path.replacingOccurrences(of:"/$",with:"",options:.regularExpression)
+    }
+    static func referenceIdentifier(_ value: String) -> Bool {
+        guard value.hasPrefix("ref:") else { return false }
+        let address = String(value.dropFirst(4))
+        return sourceURL(address) == address
     }
     static func localIdentifier(_ value: String) -> Bool {
-        value.range(of:"^local:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",options:.regularExpression) != nil
+        value.range(of:"^local:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$",options:.regularExpression) == value.startIndex..<value.endIndex
     }
     static func accountID(_ value: Any?) -> String? {
         guard let number = value as? NSNumber, CFGetTypeID(number) != CFBooleanGetTypeID(),
@@ -140,14 +153,21 @@ struct QueuePolicy {
     private(set) var shuffle = false
     private var history: [Int] = []
     var current: SavedTrack? { tracks.indices.contains(index) ? tracks[index] : nil }
+    @discardableResult mutating func refreshCurrent(_ track: SavedTrack, expectedID: String) -> Bool {
+        guard tracks.indices.contains(index), tracks[index].id == expectedID,
+              !track.isLocal, !track.isCatalogReference,
+              track.sameCatalogIdentity(as:tracks[index]) else { return false }
+        tracks[index] = track
+        return true
+    }
     mutating func configure(_ rows: [SavedTrack], index proposed: Int, repeatMode: String, shuffle: Bool, currentID: String?) -> Bool {
         guard rows.count <= 200, ["off","all","one"].contains(repeatMode), proposed >= -1,
               rows.isEmpty ? proposed <= 0 : proposed < rows.count else { return false }
         let previous = tracks, previousIndex = index
         func mapped(_ position: Int) -> Int? {
             guard previous.indices.contains(position) else { return nil }
-            let id = previous[position].id, occurrence = previous[..<position].filter { $0.id == id }.count
-            let matches = rows.indices.filter { rows[$0].id == id }
+            let track = previous[position], occurrence = previous[..<position].filter { $0.sameCatalogIdentity(as:track) }.count
+            let matches = rows.indices.filter { rows[$0].sameCatalogIdentity(as:track) }
             return matches.indices.contains(occurrence) ? matches[occurrence] : nil
         }
         let remappedHistory = history.compactMap(mapped)
@@ -155,7 +175,16 @@ struct QueuePolicy {
             if previous.indices.contains(previousIndex), previous[previousIndex].id == id, let position = mapped(previousIndex) { return position }
             return rows.firstIndex { $0.id == id }
         }
-        tracks = rows; self.repeatMode = repeatMode; self.shuffle = shuffle
+        // An older web snapshot may still contain the exact selected reference.
+        // Retain resolved metadata at the same occurrence instead of resetting
+        // the native background queue or moving to the first duplicate.
+        tracks = rows.enumerated().map { offset,row in
+            guard row.isCatalogReference else { return row }
+            let occurrence = rows[..<offset].filter { $0.sameCatalogIdentity(as:row) }.count
+            let matches = previous.filter { $0.sameCatalogIdentity(as:row) }
+            guard matches.indices.contains(occurrence), !matches[occurrence].isCatalogReference else { return row }
+            return matches[occurrence]
+        }; self.repeatMode = repeatMode; self.shuffle = shuffle
         index = currentID != nil ? preserved ?? -1 : (rows.indices.contains(proposed) ? proposed : -1)
         history = remappedHistory
         return true
@@ -193,6 +222,22 @@ struct QueuePolicy {
 enum UserError: LocalizedError {
     case message(String)
     var errorDescription: String? { if case .message(let message) = self { return message }; return nil }
+}
+
+enum PortableProfileFile {
+    static let maximumBytes = 750_000
+    static func data(json: String, filename: String, operationID: String) throws -> Data {
+        guard filename.range(of:"^LolzCloud-profile-[0-9]{4}-[0-9]{2}-[0-9]{2}\\.json$",options:.regularExpression) == filename.startIndex..<filename.endIndex,
+              MediaPolicy.localIdentifier("local:"+operationID),
+              let data = json.data(using:.utf8), !data.isEmpty, data.count <= maximumBytes,
+              let object = try? JSONSerialization.jsonObject(with:data) as? [String:Any],
+              Set(object.keys).isSubset(of:Set(["format","version","exportedAt","music","wave","tools"])),
+              object["format"] as? String == "lolzcloud-profile", MediaPolicy.number(object["version"]) == 1,
+              object["music"] is [String:Any], object["wave"] is [String:Any], object["tools"] is [String:Any] else {
+            throw UserError.message("Не удалось подготовить файл профиля. Проверь формат и размер данных.")
+        }
+        return data
+    }
 }
 
 enum OfflineCommit {
@@ -252,18 +297,35 @@ struct SavedTrack: Codable, Identifiable {
     let duration: Double
     let cover: String
     let source: String
+    let sourceUrl: String
     private(set) var fileExtension: String?
     var isLocal: Bool { source == "local" }
+    var isCatalogReference: Bool { source == "catalog" }
+    func sameCatalogIdentity(as other: SavedTrack) -> Bool {
+        if id == other.id { return true }
+        guard !isLocal, !other.isLocal, isCatalogReference || other.isCatalogReference,
+              !sourceUrl.isEmpty, sourceUrl == other.sourceUrl else { return false }
+        // A numeric reference already has an exact identity. Only a URL-only
+        // reference can acquire a different numeric ID after lookup.
+        return MediaPolicy.referenceIdentifier(id) || MediaPolicy.referenceIdentifier(other.id)
+    }
     init?(_ object: [String: Any]) {
         guard let id = object["id"] as? String else { return nil }
-        if object["source"] as? String == "local" || object["local"] as? Bool == true {
+        if object["source"] as? String == "catalog" {
+            guard object["local"] as? Bool != true, object["audioUrl"] as? String == "",
+                  MediaPolicy.identifier(id) || MediaPolicy.referenceIdentifier(id) else { return nil }
+            let address = object["url"] as? String ?? ""
+            guard address.isEmpty || MediaPolicy.sourceURL(address) != nil,
+                  !MediaPolicy.referenceIdentifier(id) || String(id.dropFirst(4)) == MediaPolicy.sourceURL(address) else { return nil }
+            source = "catalog"; audioUrl = ""; sourceUrl = MediaPolicy.sourceURL(address) ?? ""
+        } else if object["source"] as? String == "local" || object["local"] as? Bool == true {
             guard MediaPolicy.localIdentifier(id), object["audioUrl"] as? String == "", object["url"] == nil || object["url"] as? String == "" else { return nil }
-            source = "local"; audioUrl = ""
+            source = "local"; audioUrl = ""; sourceUrl = ""
         } else {
             guard object["source"] == nil || object["source"] as? String == "soundcloud", MediaPolicy.identifier(id),
                   let address = object["audioUrl"] as? String ?? object["url"] as? String,
                   let url = MediaPolicy.audio(address), url.path.split(separator:"/")[2] == Substring(id) else { return nil }
-            source = "soundcloud"; audioUrl = url.absoluteString
+            source = "soundcloud"; audioUrl = url.absoluteString; sourceUrl = (object["url"] as? String).flatMap(MediaPolicy.sourceURL) ?? ""
         }
         self.id = id
         title = String((object["title"] as? String ?? "Без названия").prefix(300))
@@ -276,10 +338,10 @@ struct SavedTrack: Codable, Identifiable {
               var track = SavedTrack(["id":id,"title":title,"artist":artist,"duration":duration,"audioUrl":"","source":"local"]) else { return nil }
         track.fileExtension = fileExtension; return track
     }
-    private enum CodingKeys: String, CodingKey { case id,title,artist,audioUrl,duration,cover,source,fileExtension }
+    private enum CodingKeys: String, CodingKey { case id,title,artist,audioUrl,duration,cover,source,fileExtension; case sourceUrl = "url" }
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy:CodingKeys.self)
-        let object: [String:Any] = ["id":try values.decode(String.self,forKey:.id),"title":try values.decode(String.self,forKey:.title),"artist":try values.decode(String.self,forKey:.artist),"audioUrl":try values.decode(String.self,forKey:.audioUrl),"duration":try values.decode(Double.self,forKey:.duration),"cover":try values.decode(String.self,forKey:.cover),"source":try values.decodeIfPresent(String.self,forKey:.source) ?? "soundcloud"]
+        let object: [String:Any] = ["id":try values.decode(String.self,forKey:.id),"title":try values.decode(String.self,forKey:.title),"artist":try values.decode(String.self,forKey:.artist),"audioUrl":try values.decode(String.self,forKey:.audioUrl),"duration":try values.decode(Double.self,forKey:.duration),"cover":try values.decode(String.self,forKey:.cover),"source":try values.decodeIfPresent(String.self,forKey:.source) ?? "soundcloud","url":try values.decodeIfPresent(String.self,forKey:.sourceUrl) ?? ""]
         guard var track = SavedTrack(object) else { throw DecodingError.dataCorruptedError(forKey:.id,in:values,debugDescription:"Invalid stored track") }
         if track.isLocal {
             let ext = try values.decode(String.self,forKey:.fileExtension)
@@ -288,7 +350,11 @@ struct SavedTrack: Codable, Identifiable {
         }
         self = track
     }
-    var object: [String: Any] { ["id":id,"title":title,"artist":artist,"audioUrl":audioUrl,"duration":duration,"cover":cover,"source":source,"local":isLocal] }
+    var object: [String: Any] {
+        var value: [String:Any] = ["id":id,"title":title,"artist":artist,"audioUrl":audioUrl,"duration":duration,"cover":cover,"source":source,"local":isLocal]
+        if !sourceUrl.isEmpty { value["url"] = sourceUrl }
+        return value
+    }
 }
 
 enum LocalAudioFiles {

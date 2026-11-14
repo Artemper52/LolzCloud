@@ -75,7 +75,8 @@ import UIKit
         try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
     }
 
-    private func wave(_ name: String, seconds: Double = 8, hz: Double = 440, sampleRate: Int = 16_000) throws -> URL {
+    private func wave(_ name: String, seconds: Double = 8, hz: Double = 440, sampleRate: Int = 16_000,
+                      signal: ((Int) -> Double)? = nil) throws -> URL {
         let rate = sampleRate, count = Int(Double(rate)*seconds)
         var data = Data()
         func text(_ value: String) { data.append(contentsOf: value.utf8) }
@@ -85,7 +86,8 @@ import UIKit
         u16(1); u16(1); u32(UInt32(rate)); u32(UInt32(rate*2)); u16(2); u16(16)
         text("data"); u32(UInt32(count*2))
         for i in 0..<count {
-            let sample = Int16(sin(Double(i)*2*Double.pi*hz/Double(rate))*4000)
+            let value = signal.map { min(1,max(-1,$0(i)))*32767 } ?? sin(Double(i)*2*Double.pi*hz/Double(rate))*4000
+            let sample = Int16(value)
             u16(UInt16(bitPattern: sample))
         }
         let file = scratch.appendingPathComponent(name+".wav")
@@ -293,6 +295,138 @@ import UIKit
         XCTAssertGreaterThan(measurement.inputRMS,0.01)
         XCTAssertEqual(measurement.outputRMS/measurement.inputRMS,Float(pow(10,-6.0/20)),accuracy:0.025)
         XCTAssertTrue((player.audioEffects.status["capabilities"] as? [String:Bool])?["normalization"] == false)
+    }
+
+    private func advancedEffects(_ player: NativePlayer, client: String, request: Int = 1, revision: Int,
+                                 reverb: Double = 0, echo: Double = 0, normalization: Bool = false) {
+        XCTAssertTrue(player.configureEffects(["enabled":true,"gains":[0,0,0,0,0],"preampDb":0,
+            "reverb":reverb,"echo":echo,"normalization":normalization],revision:revision,client:client,request:request))
+    }
+
+    private func energy(_ player: NativePlayer, _ range: Range<Int>, input: Bool = false) -> Double {
+        range.reduce(0) { sum,index in
+            guard let value = player.audioEffects.energyWindow(index) else { return sum }
+            return sum+Double(input ? value.inputEnergy : value.outputEnergy)
+        }
+    }
+
+    func testActualTapEchoImpulseAndReverbTail() async throws {
+        let player = subject(), client = UUID().uuidString.lowercased(), rate = 48_000
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
+        let source = try wave("Real tap impulse",seconds:4,sampleRate:rate,signal: { $0==rate/10 ? 0.25 : 0 })
+        let track = try await importOne(player,source), av = try avPlayer(player)
+        player.configureQueue([track],index:0,repeatMode:"off",shuffle:false)
+        advancedEffects(player,client:client,revision:1,echo:0.8)
+        player.play(track,queueIndex:0)
+        try await waitFor("real AVPlayer echo produces temporal energy",timeout:12) {
+            guard let m = player.audioEffects.measurement else { return false }
+            return m.processedFrames > UInt64(m.sampleRate)*2 && av.rate>0 && player.audioEffects.status["state"] as? String == "applied"
+        }
+        let inputBins = (0..<25).map { self.energy(player,$0..<($0+1),input:true) }
+        let impulse = try XCTUnwrap(inputBins.indices.max { inputBins[$0]<inputBins[$1] })
+        XCTAssertGreaterThan(inputBins[impulse],0.001)
+        let echo = energy(player,(impulse+27)..<(impulse+30))
+        XCTAssertEqual(energy(player,(impulse+27)..<(impulse+30),input:true),0,accuracy:0.000001)
+        XCTAssertEqual(echo/inputBins[impulse],pow(0.8*0.6,2),accuracy:0.04,"Actual decoded PCM must echo about 280 ms after the impulse")
+        XCTAssertGreaterThan(energy(player,(impulse+55)..<(impulse+58)),0.00001)
+        XCTAssertTrue((player.audioEffects.status["capabilities"] as? [String:Bool])?["echo"] == true)
+        player.stop(); advancedEffects(player,client:client,revision:2,reverb:0.8)
+        player.play(track,queueIndex:0)
+        try await waitFor("real AVPlayer reverb produces a decaying tail",timeout:12) {
+            guard let m = player.audioEffects.measurement else { return false }
+            return m.processedFrames > UInt64(m.sampleRate)*2 && player.audioEffects.status["state"] as? String == "applied"
+        }
+        let early = energy(player,20..<50), late = energy(player,100..<130)
+        XCTAssertEqual(energy(player,20..<130,input:true),0,accuracy:0.000001)
+        XCTAssertGreaterThan(early,0.000001); XCTAssertGreaterThan(late,0); XCTAssertLessThan(late,early*0.1)
+        XCTAssertTrue((player.audioEffects.status["capabilities"] as? [String:Bool])?["reverb"] == true)
+    }
+
+    func testActualTapNormalizationConvergesWithoutChangingPausedTransport() async throws {
+        let player = subject(), client = UUID().uuidString.lowercased(), sampleRate = 48_000
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
+        let source = try wave("Real normalization",seconds:14,sampleRate:sampleRate,
+            signal: { sin(Double($0)*2*Double.pi*1000/Double(sampleRate))*0.025 })
+        let track = try await importOne(player,source), av = try avPlayer(player)
+        player.configureQueue([track],index:0,repeatMode:"off",shuffle:false)
+        advancedEffects(player,client:client,revision:1,normalization:true)
+        player.play(track,queueIndex:0)
+        try await waitFor("real PCM normalizer measures gated energy and converges",timeout:25) {
+            guard let m = player.audioEffects.measurement else { return false }
+            return m.normalizationMeasured != 0 && m.normalizationGainDb>7.5 && m.normalizationFrames>m.sampleRate*11
+        }
+        let measured = try XCTUnwrap(player.audioEffects.measurement)
+        XCTAssertEqual(measured.normalizationTargetDb,8,accuracy:0.02)
+        XCTAssertEqual(measured.normalizationGainDb,8,accuracy:0.5)
+        XCTAssertGreaterThan(measured.outputRMS/measured.inputRMS,1.3)
+        XCTAssertTrue(measured.loudnessDb.isFinite)
+        XCTAssertTrue((player.audioEffects.status["capabilities"] as? [String:Bool])?["normalization"] == true)
+        player.pause(); let position = av.currentTime().seconds
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:2,handshake:false))
+        advancedEffects(player,client:client,request:2,revision:2,reverb:0.4,echo:0.5)
+        try await settle(0.35)
+        XCTAssertEqual(av.rate,0); XCTAssertEqual(player.state,"paused")
+        XCTAssertEqual(av.currentTime().seconds,position,accuracy:0.08)
+        XCTAssertEqual(player.current?.id,track.id)
+        XCTAssertFalse(player.configureEffects(["enabled":true,"gains":[0,0,0,0,0],"preampDb":0,"reverb":0.8,"echo":0.8,"normalization":true],revision:50,client:client,request:500))
+    }
+
+    func testAdvancedSettingsFollowRealDuplicateQueueWithoutDoubleAdvance() async throws {
+        let player = subject(), client = UUID().uuidString.lowercased()
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
+        let tracks = try await imported(player,[wave("Advanced queue A",seconds:0.8),wave("Advanced queue B",seconds:0.8)])
+        let queue = [tracks[0],tracks[1],tracks[0]]
+        player.configureQueue(queue,index:0,repeatMode:"off",shuffle:false)
+        advancedEffects(player,client:client,revision:1,reverb:0.2,echo:0.3,normalization:true)
+        player.play(queue[0],queueIndex:0)
+        advancedEffects(player,client:client,revision:2,reverb:0.5,echo:0.4,normalization:true)
+        try await waitFor("advanced queue ends at its duplicate occurrence",timeout:12) {
+            player.state == "ended" && self.records.contains { $0["event"] as? String == "selection" && $0["index"] as? Int == 2 }
+        }
+        let selected = records.filter { $0["event"] as? String == "selection" }.compactMap { $0["index"] as? Int }
+        var transitions: [Int] = []
+        for index in selected where transitions.last != index { transitions.append(index) }
+        XCTAssertEqual(transitions,[0,1,2])
+        XCTAssertEqual(player.current?.id,tracks[0].id); XCTAssertEqual(player.audioEffects.revision,2)
+        XCTAssertEqual(player.audioEffects.status["clientId"] as? String,client)
+        XCTAssertEqual(player.audioEffects.status["requestId"] as? Int,1)
+        XCTAssertGreaterThan(player.audioEffects.measurement?.processedFrames ?? 0,0)
+    }
+
+    func testLazyCatalogReferenceUsesSeededCacheAndPreservesDuplicateOccurrence() async throws {
+        let importer = subject(), local = try await importOne(importer,wave("Catalog neighbour",seconds:1.1))
+        let reference = try XCTUnwrap(SavedTrack(["id":"1930572542","source":"catalog","audioUrl":"","title":"Public metadata fixture"]))
+        // Real bounded public metadata lookup; audio below is a seeded genuine
+        // MP3 fixture, not a claim of HTTPS downloading or source authenticity.
+        let network = try await NativeCatalog.resolve(reference)
+        XCTAssertEqual(network.id,reference.id); XCTAssertFalse(network.isCatalogReference)
+        let fixture = try XCTUnwrap(Bundle(for:NativeRuntimeTests.self).url(forResource:"tone",withExtension:"mp3"))
+        try Data(contentsOf:fixture).write(to:offline.appendingPathComponent(try XCTUnwrap(LocalAudioFiles.filename(network))))
+        try JSONEncoder().encode([local,network]).write(to:offline.appendingPathComponent("index.json"),options:.atomic)
+        importer.stop()
+        let player = subject(), av = try avPlayer(player), client = UUID().uuidString.lowercased()
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
+        let snapshot = [local,reference,reference]
+        player.configureQueue(snapshot,index:1,repeatMode:"off",shuffle:false)
+        player.play(reference,queueIndex:1); player.pause()
+        advancedEffects(player,client:client,revision:1,echo:0.4)
+        try await settle(0.3)
+        XCTAssertNil(av.currentItem); XCTAssertEqual(av.rate,0); XCTAssertEqual(player.state,"paused")
+        player.resume()
+        try await waitFor("native lazy lookup selects the cached numeric record",timeout:20) {
+            player.current?.id == network.id && player.current?.isCatalogReference == false && av.rate>0 && av.currentTime().seconds>0.15
+        }
+        XCTAssertTrue((av.currentItem?.asset as? AVURLAsset)?.url.isFileURL == true)
+        let time = av.currentTime().seconds
+        player.configureQueue(snapshot,index:0,repeatMode:"off",shuffle:false)
+        XCTAssertEqual(player.current?.audioUrl,network.audioUrl)
+        XCTAssertGreaterThanOrEqual(av.currentTime().seconds,time-0.08)
+        XCTAssertEqual(records.last { $0["event"] as? String == "selection" }?["index"] as? Int,1)
+        XCTAssertEqual(records.last { $0["event"] as? String == "selection" }?["previousId"] as? String,reference.id)
+        try await waitFor("native end resolves the second reference occurrence",timeout:20) {
+            self.records.contains { $0["event"] as? String == "selection" && $0["index"] as? Int == 2 && ($0["track"] as? [String:Any])?["audioUrl"] as? String == network.audioUrl }
+        }
+        XCTAssertEqual(player.audioEffects.revision,1)
     }
 
     private func javascript(_ source: String, in web: WKWebView) async throws -> Any? {

@@ -20,6 +20,7 @@ import Combine
     private var generation: Int { intent.generation }
     private var offlineQueue = false
     private var queue = QueuePolicy()
+    private var selectionAlias: String?
     private var clientIntent = NativeClientIntent()
     private var preparationTask: Task<Void,Never>?
     private var effectsTask: Task<Void,Never>?
@@ -70,12 +71,22 @@ import Combine
         guard let client, let request else { return clientIntent.clientID == nil }
         return clientIntent.accept(client:client,request:request,handshake:handshake)
     }
+    func ownsClientIntent(client: String, request: Int) -> Bool { clientIntent.clientID == client && clientIntent.requestID == request }
+    var capabilities: [String:Any] { clientIntent.fields.merging(["catalogReferences":1,"profileExport":1,"effectsSchema":2]) { _,new in new } }
     @discardableResult func configureEffects(_ config: [String:Any], revision: Int, client: String, request: Int) -> Bool {
         // Settings acknowledge the current transport owner; they cannot advance
         // its request ID, change playback generation, cancel prepare or resume.
         guard clientIntent.clientID == client, clientIntent.requestID == request,
               audioEffects.configure(config,revision:revision,client:client,request:request) else { return false }
-        emit?("effects",audioEffects.status); return true
+        emit?("effects",effectsStatus); return true
+    }
+    private var effectsStatus: [String:Any] {
+        var result = audioEffects.status
+        result["catalogReferences"] = 1
+        if var normalization = result["normalization"] as? [String:Any] {
+            normalization["key"] = current?.id ?? ""; result["normalization"] = normalization
+        }
+        return result
     }
     private func transportEvent(_ name: String,_ detail: [String:Any]) { emit?(name,detail.merging(clientIntent.fields) { _,new in new }) }
     func configureQueue(_ tracks: [SavedTrack], index: Int, repeatMode: String, shuffle: Bool) {
@@ -85,25 +96,37 @@ import Combine
         }
         guard queue.configure(resolved,index:index,repeatMode:repeatMode,shuffle:shuffle,currentID:current?.id ?? queue.current?.id) else { return }
         if let selected = queue.current, selected.id == current?.id { current = selected }
+        if resolved.indices.contains(queue.index), resolved[queue.index].isCatalogReference,
+           let current, resolved[queue.index].sameCatalogIdentity(as:current) { selectionAlias = resolved[queue.index].id }
         publish()
     }
     func play(_ requested: SavedTrack, position: Double = 0, localQueue: Bool = false, prepare: Bool = false, queueIndex: Int? = nil) {
-        if let queueIndex { guard queue.tracks.indices.contains(queueIndex), queue.tracks[queueIndex].id == requested.id, queue.tracks[queueIndex].audioUrl == requested.audioUrl else { return } }
+        var selected = requested
+        if let queueIndex {
+            guard queue.tracks.indices.contains(queueIndex), queue.tracks[queueIndex].sameCatalogIdentity(as:requested) else { return }
+            let slot = queue.tracks[queueIndex]
+            // Canonicalize this explicit occurrence only. A stale web ref must
+            // not force a second lookup or move to the first equal duplicate.
+            if requested.isCatalogReference, !slot.isCatalogReference { selected = slot }
+            _ = queue.select(slot.id,index:queueIndex)
+            if !selected.isLocal, !selected.isCatalogReference { guard queue.refreshCurrent(selected,expectedID:slot.id) else { return } }
+        }
         let ticket = intent.select()
-        queue.select(requested.id,index:queueIndex); preparationTask?.cancel(); preparationTask = nil
+        queue.select(selected.id,index:queueIndex); selectionAlias = requested.isCatalogReference ? requested.id : nil
+        preparationTask?.cancel(); preparationTask = nil
         effectsTask?.cancel(); effectsTask = nil; needsEffectsPreparation = false; audioEffects.clearItem()
         offlineQueue = localQueue; watchdog?.cancel(); watchdog = nil
         player.pause(); itemObservation = nil
         if let endObserver { NotificationCenter.default.removeObserver(endObserver); self.endObserver = nil }
         player.replaceCurrentItem(with: nil)
-        current = requested; state = "loading"; error = ""
+        current = selected; state = "loading"; error = ""
         let track: SavedTrack
-        if requested.isLocal {
-            guard let registered = tracks.first(where: { $0.id == requested.id && $0.isLocal }), LocalAudioFiles.existing(registered,in:directory) != nil else { fail("Локальный файл не найден. Импортируй его заново."); return }
+        if selected.isLocal {
+            guard let registered = tracks.first(where: { $0.id == selected.id && $0.isLocal }), LocalAudioFiles.existing(registered,in:directory) != nil else { fail("Локальный файл не найден. Импортируй его заново."); return }
             track = registered; current = track
-        } else { track = requested }
+        } else { track = selected }
         requestedPosition = position.isFinite ? max(0,position) : 0
-        needsPreparation = prepare && !tracks.contains(where: { $0.id == track.id })
+        needsPreparation = track.isCatalogReference || (prepare && !tracks.contains(where: { $0.id == track.id }))
         if needsPreparation {
             publish()
             preparationTask = Task { [weak self] in
@@ -115,10 +138,19 @@ import Combine
                 }
                 defer { background.end(); if self.generation == ticket { self.preparationTask = nil } }
                 do {
-                    try await AudioPreparation.awaitReady(audio:track.audioUrl,request:{ endpoint, timeout in try await self.prepareRequest(endpoint,timeout:timeout,expected:track.audioUrl) })
+                    let resolved = try await NativeCatalog.resolve(track)
+                    try Task.checkCancellation()
+                    guard self.generation == ticket, self.intent.wantsPlay, self.current?.sameCatalogIdentity(as:track) == true else { return }
+                    if track.isCatalogReference {
+                        if self.queue.current?.sameCatalogIdentity(as:track) == true { guard self.queue.refreshCurrent(resolved,expectedID:self.queue.current!.id) else { throw UserError.message("Очередь изменилась. Выбери трек ещё раз.") } }
+                        self.selectionAlias = track.id; self.current = resolved; self.publish()
+                    }
+                    if !self.tracks.contains(where:{ $0.id == resolved.id && LocalAudioFiles.existing($0,in:self.directory) != nil }) {
+                        try await AudioPreparation.awaitReady(audio:resolved.audioUrl,request:{ endpoint, timeout in try await self.prepareRequest(endpoint,timeout:timeout,expected:resolved.audioUrl) })
+                    }
                     try Task.checkCancellation()
                     guard self.generation == ticket, self.intent.wantsPlay else { return }
-                    self.needsPreparation = false; self.install(track,ticket:ticket,position:self.requestedPosition)
+                    self.needsPreparation = false; self.install(resolved,ticket:ticket,position:self.requestedPosition)
                 } catch is CancellationError { }
                 catch { if self.generation == ticket, self.intent.wantsPlay { self.fail((error as? UserError)?.localizedDescription ?? "Не удалось подготовить аудио. Повтори попытку.") } }
             }
@@ -131,7 +163,7 @@ import Combine
         let source: URL
         if let registered = tracks.first(where: { $0.id == track.id }), let saved = LocalAudioFiles.existing(registered,in:directory) { source = saved }
         else if track.isLocal { fail("Локальный файл не найден. Импортируй его заново."); return }
-        else { source = URL(string:track.audioUrl)! }
+        else { guard let address = MediaPolicy.audio(track.audioUrl) else { fail("Не удалось восстановить сохранённый трек. Повтори попытку."); return }; source = address }
         let item = AVPlayerItem(url: source); player.replaceCurrentItem(with: item)
         itemObservation = item.observe(\.status, options: [.initial,.new]) { [weak self] item, _ in
             Task { @MainActor in
@@ -181,7 +213,7 @@ import Combine
         intent.stop(); preparationTask?.cancel(); preparationTask = nil; needsPreparation = false; requestedPosition = 0; watchdog?.cancel(); watchdog = nil; player.pause(); itemObservation = nil
         effectsTask?.cancel(); effectsTask = nil; needsEffectsPreparation = false; audioEffects.clearItem()
         if let endObserver { NotificationCenter.default.removeObserver(endObserver); self.endObserver = nil }
-        player.replaceCurrentItem(with: nil); current = nil; state = "paused"
+        player.replaceCurrentItem(with: nil); current = nil; selectionAlias = nil; state = "paused"
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation); publish()
     }
@@ -217,10 +249,14 @@ import Combine
         let time = player.currentTime().seconds, duration = player.currentItem?.duration.seconds ?? 0
         // Effects acknowledge their own last accepted request, never a newly
         // handshaken transport document that has not sent settings yet.
-        emit?("effects",audioEffects.status)
+        emit?("effects",effectsStatus)
         let queueOwned = queue.current?.id == current?.id && current != nil
-        if queueOwned, let selected = queue.current { transportEvent("selection",["index":queue.index,"track":selected.object,"queue":true]) }
-        if !offlineQueue { transportEvent("playback",["id":current?.id ?? "","state":state,"time":time.isFinite ? max(0,time):requestedPosition,"duration":duration.isFinite && duration > 0 ? duration:(current?.duration ?? 0),"error":error,"queue":queueOwned,"rate":settings.rate,"sleepDeadline":settings.sleepDeadline]) }
+        if queueOwned, let selected = queue.current {
+            var detail: [String:Any] = ["index":queue.index,"track":selected.object,"queue":true]
+            if let selectionAlias { detail["previousId"] = selectionAlias }
+            transportEvent("selection",detail)
+        }
+        if !offlineQueue { transportEvent("playback",["id":current?.id ?? "","state":state,"time":time.isFinite ? max(0,time):requestedPosition,"duration":duration.isFinite && duration > 0 ? duration:(current?.duration ?? 0),"error":error,"queue":queueOwned,"rate":settings.rate,"sleepDeadline":settings.sleepDeadline,"catalogReferences":1]) }
         guard let track = current else { return }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = [MPMediaItemPropertyTitle:track.title,MPMediaItemPropertyArtist:track.artist,MPMediaItemPropertyPlaybackDuration:duration.isFinite && duration > 0 ? duration:track.duration,MPNowPlayingInfoPropertyElapsedPlaybackTime:time.isFinite ? max(0,time):0,MPNowPlayingInfoPropertyPlaybackRate:player.rate]
     }
@@ -305,9 +341,20 @@ import Combine
             background.start { [weak self] in if self?.downloadTickets[track.id] == ticket { self?.downloadTasks[track.id]?.cancel() } }
             defer { background.end(); if self.downloadTickets[track.id] == ticket { self.downloadTasks.removeValue(forKey:track.id); self.downloadTickets.removeValue(forKey:track.id) } }
             do {
+                let resolved = try await NativeCatalog.resolve(track)
+                try Task.checkCancellation()
+                guard self.downloadTickets[track.id] == ticket else { return }
+                if self.tracks.contains(where:{ $0.id == resolved.id }) {
+                    self.emit?("download",["id":track.id,"state":"ready","track":resolved.object,"previousId":track.id,"tracks":self.tracks.map(\.object)]); return
+                }
+                if track.isCatalogReference {
+                    try await AudioPreparation.awaitReady(audio:resolved.audioUrl,request:{ endpoint,timeout in try await self.prepareRequest(endpoint,timeout:timeout,expected:resolved.audioUrl) })
+                    try Task.checkCancellation()
+                }
                 let size = self.storedBytes()
                 guard size < 256*1024*1024 else { throw UserError.message("Офлайн-хранилище заполнено. Удали ненужные загрузки.") }
-                var request = URLRequest(url: URL(string:track.audioUrl)!); request.timeoutInterval = 125
+                guard let address = MediaPolicy.audio(resolved.audioUrl) else { throw UserError.message("Не удалось восстановить адрес аудио.") }
+                var request = URLRequest(url:address); request.timeoutInterval = 125
                 let transport = NoRedirects(maximumDownloadBytes:20_000_000)
                 let configuration = URLSessionConfiguration.ephemeral; configuration.timeoutIntervalForResource = 125; configuration.urlCache = nil; configuration.httpShouldSetCookies = false
                 let session = URLSession(configuration:configuration,delegate:transport,delegateQueue:nil)
@@ -321,13 +368,14 @@ import Combine
                 let handle = try FileHandle(forReadingFrom:temporary); let header = try handle.read(upToCount:3) ?? Data(); try handle.close()
                 guard header.starts(with:Data("ID3".utf8)) || header.count >= 2 && header[0] == 0xff && header[1] & 0xe0 == 0xe0 else { throw UserError.message("Сервер не вернул MP3.") }
                 let duration = try await AVURLAsset(url:temporary).load(.duration).seconds
-                guard duration.isFinite, duration > 0, track.duration <= 20 || duration >= track.duration*0.8 else { throw UserError.message("Источник отдал только отрывок. Загрузка не сохранена.") }
+                guard duration.isFinite, duration > 0, resolved.duration <= 20 || duration >= resolved.duration*0.8 else { throw UserError.message("Источник отдал только отрывок. Загрузка не сохранена.") }
                 try Task.checkCancellation()
                 let committedBytes = self.storedBytes()
+                if self.tracks.contains(where:{ $0.id == resolved.id }) { self.listDownloads(); return }
                 guard committedBytes+bytes <= 256*1024*1024 else { throw UserError.message("Офлайн-хранилище заполнено. Удали ненужные загрузки.") }
-                let updated = self.tracks+[track]
-                try OfflineCommit.install(temporary:temporary,destination:self.file(track),index:self.index,data:try JSONEncoder().encode(updated))
-                self.tracks = updated; self.emit?("download",["id":track.id,"state":"ready","tracks":updated.map(\.object)])
+                let updated = self.tracks+[resolved]
+                try OfflineCommit.install(temporary:temporary,destination:self.file(resolved),index:self.index,data:try JSONEncoder().encode(updated))
+                self.tracks = updated; self.emit?("download",["id":track.id,"state":"ready","track":resolved.object,"previousId":track.id,"tracks":updated.map(\.object)])
             } catch { self.emit?("download",["id":track.id,"state":"error","error":(error as? UserError)?.localizedDescription ?? "Не удалось сохранить трек. Проверь сеть и свободное место."]) }
         }
     }

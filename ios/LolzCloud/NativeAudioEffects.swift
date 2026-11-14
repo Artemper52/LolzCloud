@@ -9,6 +9,7 @@ import MediaToolbox
     private(set) var revision = 0
     private var document = ""
     private var ownerRequest = 0
+    private var advancedRequest = false
     private var serial: UInt32 = 1
     private var binding: AudioEffectsBinding?
     private var unavailable = ""
@@ -27,6 +28,7 @@ import MediaToolbox
             guard next >= revision, next != revision || value == settings else { return false }
         }
         let changed = value != settings
+        advancedRequest = object.count == 6
         document = client; ownerRequest = request; revision = next; settings = value
         if changed {
             serial &+= 1; if serial == 0 { serial = 1 }
@@ -37,7 +39,7 @@ import MediaToolbox
     }
 
     func clearItem() { binding = nil; unavailable = "" }
-    func markUnavailable() { binding = nil; unavailable = "Для этого источника эквалайзер недоступен. Исходный звук сохранён." }
+    func markUnavailable() { binding = nil; unavailable = "Для этого источника эффекты недоступны. Исходный звук сохранён." }
 
     func attach(to item: AVPlayerItem, tracks: [AVAssetTrack]) throws {
         guard !tracks.isEmpty, tracks.count <= 8 else { throw UserError.message("Неподдерживаемое число аудиодорожек.") }
@@ -52,6 +54,10 @@ import MediaToolbox
         let rows = binding?.measurements ?? []
         return rows.first(where: { $0.processedFrames > 0 }) ?? rows.first
     }
+    func energyWindow(_ index: Int) -> LCDSPEnergyWindow? {
+        guard (0..<256).contains(index) else { return nil }
+        return binding?.energyWindow(UInt32(index))
+    }
 
     var status: [String:Any] {
         let rows = binding?.measurements ?? []
@@ -64,12 +70,16 @@ import MediaToolbox
         else if rows.contains(where: { $0.unavailableReason == 2 }) { reason = "Не удалось подготовить эквалайзер. Исходный звук сохранён." }
         else if rows.contains(where: { $0.unavailableReason == 3 }) { reason = "Выбранная полоса выше частоты этого файла. Уменьши её до нуля." }
         let state = !settings.enabled ? "bypassed" : !reason.isEmpty ? "unsupported" : matched ? "applied" : "pending"
+        let advanced = advancedRequest && reason.isEmpty && rows.contains { $0.prepared != 0 && $0.unavailableReason == 0 }
         var result: [String:Any] = ["revision":revision,"config":settings.object,
-            "capabilities":["eq":true,"preamp":true,"reverb":false,"echo":false,"normalization":false,"pitch":false],
+            "effectsSchema":2,"capabilities":["eq":true,"preamp":true,"reverb":advanced,"echo":advanced,"normalization":advanced,"pitch":false],
             "state":state,"appliedRevision":matched ? revision : 0,
             "sampleRate":metric?.sampleRate ?? 0,"channels":metric?.channels ?? 0,
             "processedFrames":frames,"activeBandMask":metric?.activeBandMask ?? 0,
-            "headroomDb":metric?.headroomDb ?? 0,"error":reason]
+            "headroomDb":metric?.headroomDb ?? 0,"peakDb":metric?.peakDb ?? -120,"reductionDb":metric?.limiterReductionDb ?? 0,
+            "normalization":["enabled":settings.enabled && settings.normalization,"measured":(metric?.normalizationMeasured ?? 0) != 0,
+                "loudness":(metric?.normalizationFrames ?? 0)>0 ? (metric?.loudnessDb ?? -120) as Any : NSNull(),
+                "gainDb":metric?.normalizationGainDb ?? 0,"targetDb":metric?.normalizationTargetDb ?? 0,"processedFrames":metric?.normalizationFrames ?? 0],"error":reason]
         if !document.isEmpty, ownerRequest > 0 { result["clientId"] = document; result["requestId"] = ownerRequest }
         return result
     }
@@ -86,7 +96,7 @@ private final class AudioEffectsBinding {
                 guard let core = LCDSPCreate() else { throw UserError.message("Не удалось подготовить эквалайзер.") }
                 created.append(core)
                 let gains = settings.gains.map(Float.init)
-                let valid = gains.withUnsafeBufferPointer { LCDSPConfigure(core, settings.enabled ? 1 : 0, $0.baseAddress, $0.count, Float(settings.preampDb), serial) }
+                let valid = gains.withUnsafeBufferPointer { LCDSPConfigureAdvanced(core, settings.enabled ? 1 : 0, $0.baseAddress, $0.count, Float(settings.preampDb), Float(settings.reverb), Float(settings.echo), settings.normalization ? 1 : 0, serial) }
                 guard valid != 0, let tap = LCNativeAudioTapCreate(core) else { throw UserError.message("Не удалось подключить эквалайзер.") }
                 let input = AVMutableAudioMixInputParameters(track: track)
                 input.audioTapProcessor = tap
@@ -99,9 +109,10 @@ private final class AudioEffectsBinding {
     func configure(_ settings: AudioEffectsSettings, serial: UInt32) {
         let gains = settings.gains.map(Float.init)
         gains.withUnsafeBufferPointer { buffer in
-            for core in cores { _ = LCDSPConfigure(core, settings.enabled ? 1 : 0, buffer.baseAddress, buffer.count, Float(settings.preampDb), serial) }
+            for core in cores { _ = LCDSPConfigureAdvanced(core, settings.enabled ? 1 : 0, buffer.baseAddress, buffer.count, Float(settings.preampDb), Float(settings.reverb), Float(settings.echo), settings.normalization ? 1 : 0, serial) }
         }
     }
     var measurements: [LCDSPMetrics] { cores.map { LCDSPReadMetrics($0) } }
+    func energyWindow(_ index: UInt32) -> LCDSPEnergyWindow? { cores.first.map { LCDSPReadEnergyWindow($0,index) } }
     deinit { cores.forEach { LCDSPRelease($0) } }
 }
