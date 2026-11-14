@@ -1,0 +1,226 @@
+{
+  "revision": "0.9.16",
+  "checkedAt": "2026-11-14T19:06:33.020Z",
+  "published": true,
+  "sourceCommit": "98eb2e722cb324332c598ea091ce0334a25436de",
+  "website": "https://lolzcloud.com/#download",
+  "webServiceVersion": "0.9.18",
+  "android": {
+    "versionName": "0.1.6",
+    "versionCode": 7,
+    "packageName": "com.lolzcloud.mobile",
+    "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.6.apk",
+    "size": 2528624,
+    "sha256": "2509087bb8cc80e14675e487093d8f9bbc1a8fb382421142236d9dcd4f6bd17f",
+    "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+    "sourceSha256": "daa190ea33f06581a11f293fdb4a2f1ff13e2cabf71dc32c631cb5c9e89dae11"
+  },
+  "github": {
+    "id": 445522402,
+    "url": "https://github.com/Artemper52/LolzCloud/releases/tag/v0.9.16",
+    "tag": "v0.9.16",
+    "latest": true,
+    "files": 22,
+    "verification": "https://github.com/Artemper52/LolzCloud/actions/runs/43629626437",
+    "allReportedDigestsMatched": true,
+    "actualOfficialAndGitHubBytesVerifiedByMirror": true
+  },
+  "files": [
+    {
+      "name": "android-update.json",
+      "url": "https://lolzcloud.com/downloads/android-update.json",
+      "size": 438,
+      "sha256": "22ef73ee64cc1154a5f4d3a71c746836bb75b2b6a36c9c95f99d29dd161b5bed",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/android-update.json",
+      "digestVerified": true
+    },
+    {
+      "name": "latest.yml",
+      "url": "https://lolzcloud.com/downloads/latest.yml",
+      "size": 366,
+      "sha256": "fab228f65ea0fb2a4b807d86c0565b53ab832e8a51a25be4b209a5f45ea99ce5",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/latest.yml",
+      "digestVerified": true
+    },
+    {
+      "name": "legacy.yml",
+      "url": "https://lolzcloud.com/downloads/legacy.yml",
+      "size": 373,
+      "sha256": "ec0bbcacb954c1b557ba8327e49a5b0b4cd3a8756a90b8c83c7078b167036ed2",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/legacy.yml",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.16-linux-arm64.tar.gz",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.16-linux-arm64.tar.gz",
+      "size": 159409566,
+      "sha256": "6e8b8e2418a3d0a77148b43553e14ee3f5feb4cf124b1e702fdb87d09b3bbef9",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-0.9.16-linux-arm64.tar.gz",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.16-linux-x64.AppImage",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.16-linux-x64.AppImage",
+      "size": 147454456,
+      "sha256": "3242003d61d123325a9b2b16445e12fe2bc1b17933233e6d0ecdb5855fea5301",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-0.9.16-linux-x64.AppImage",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.16-linux-x64.tar.gz",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.16-linux-x64.tar.gz",
+      "size": 160316724,
+      "sha256": "3c4474d060a3da39e5711924da9f520f4db55b0bc4a38806c7ffb91693fec88a",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-0.9.16-linux-x64.tar.gz",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.16-source.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.16-source.zip",
+      "size": 21789530,
+      "sha256": "2f84bedfa4c22255d49a9c69e88bf6237d3a772b13e0e427826413f945a88e58",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-0.9.16-source.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.16-win-x64-Setup.exe",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.16-win-x64-Setup.exe",
+      "size": 146394186,
+      "sha256": "93356ceea169ac1ddf7b5a44acb4a790332f4667b4ec3014e3f63cfafaf908e9",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-0.9.16-win-x64-Setup.exe",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.16-win-x64-Setup.exe.blockmap",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.16-win-x64-Setup.exe.blockmap",
+      "size": 152495,
+      "sha256": "edd949d89af7c716c8b3800302e0e2448e881e5ae34ba6add6af676649dd1d9e",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-0.9.16-win-x64-Setup.exe.blockmap",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.16-win-x64.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.16-win-x64.zip",
+      "size": 196669243,
+      "sha256": "4a989ed144667c593fb4c86aaca126f37bc0d6efe33bf1d7995f2cb02f975375",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-0.9.16-win-x64.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.16-win7-legacy-Setup.exe",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.16-win7-legacy-Setup.exe",
+      "size": 99539305,
+      "sha256": "79d9bffa7fac38bb2ac42f4866417049dd2ebe067cfb9574ff97f658c8c61b4d",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-0.9.16-win7-legacy-Setup.exe",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.16-win7-legacy-Setup.exe.blockmap",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.16-win7-legacy-Setup.exe.blockmap",
+      "size": 104968,
+      "sha256": "3256dbe2eb2bc4590aa60fad4f1b09919362a2a39c2eb35fe9369920abb64ca0",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-0.9.16-win7-legacy-Setup.exe.blockmap",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.16-win7-legacy-x64.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.16-win7-legacy-x64.zip",
+      "size": 134386314,
+      "sha256": "cceafccc59f16840a15af0f700d193e4cf0997b6570fa28fd9682fff4a11daff",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-0.9.16-win7-legacy-x64.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-Android-0.1.6.apk",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.6.apk",
+      "size": 2528624,
+      "sha256": "2509087bb8cc80e14675e487093d8f9bbc1a8fb382421142236d9dcd4f6bd17f",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-Android-0.1.6.apk",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "size": 10190,
+      "sha256": "b656175abd7283ab4ddb43eb46cc3b38ce666af4d9b5378c3a6e1ed98a23b129",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "size": 10190,
+      "sha256": "bd1b43bb821a5fb2a122f0d5e8e3e3d2b0c3bbb94f887016be79f9e6ed98aebe",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.1-simulator.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.1-simulator.zip",
+      "size": 826608,
+      "sha256": "e664f211324bc6abee7bbe7ddac4aaf779899a293ce7243d5d14c16aeb8f40a6",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-iOS-0.1.1-simulator.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.1-source.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.1-source.zip",
+      "size": 74894,
+      "sha256": "1407903af7cdb7bcf7579b9ca33a28232c2068dfef1fb96cfccdfca3cda2c1e4",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-iOS-0.1.1-source.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.1-unsigned.ipa",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.1-unsigned.ipa",
+      "size": 218523,
+      "sha256": "6a3d7b4d36e328aa3a961c63b43fd4453f7a678655235c23e25fc0744e0c479e",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-iOS-0.1.1-unsigned.ipa",
+      "digestVerified": true
+    },
+    {
+      "name": "update-legacy.json",
+      "url": "https://lolzcloud.com/downloads/update-legacy.json",
+      "size": 588,
+      "sha256": "0642b2676bf2946d6c34009662615d98c8083181cef019a88a23d49d8c2b1fb3",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/update-legacy.json",
+      "digestVerified": true
+    },
+    {
+      "name": "update.json",
+      "url": "https://lolzcloud.com/downloads/update.json",
+      "size": 565,
+      "sha256": "440173e904523589c22e3c0bbc307a98e17a62bd2bf2a67d82478be12755324c",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/update.json",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.16-SHA256SUMS.txt",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.16-SHA256SUMS.txt",
+      "size": 2038,
+      "sha256": "8e94b6ca88b7756766c3ee7af8305041671f2b32d2943240a79ae53c7ddcfbc2",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.16/LolzCloud-0.9.16-SHA256SUMS.txt",
+      "digestVerified": true
+    }
+  ],
+  "tests": {
+    "node": 358,
+    "mobileRoomChecks": 22,
+    "layoutChecks": 24,
+    "roomScenarios": 12,
+    "androidMediaChecks": 13,
+    "androidSocialBackChecks": 17,
+    "nativeDesktopQueue": "passed",
+    "windowsUpgrade015to016": "passed",
+    "linuxX64BinaryAndAppImage": "passed",
+    "linuxRoomChecks": 22,
+    "iosSimulatorTests": 5,
+    "publicMusicChecks": 21,
+    "publicDownloadsAndUpdates": 28
+  },
+  "limitations": [
+    "Provider SDK/catalog and accounts in room integration suites are declared fixtures.",
+    "No physical Android/iPhone/iPad or acoustic device sync test.",
+    "ARM64 runtime, physical Windows 7, Apple distribution signing and external iOS document provider remain unverified."
+  ]
+}
