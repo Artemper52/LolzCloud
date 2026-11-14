@@ -1,0 +1,574 @@
+{
+  "status": "passed",
+  "version": "0.9.15",
+  "selectedRuntimeFiles": 141,
+  "appAsarSha256": "e0910015fb83dd3eda1becd4bc167d9b1318a97332c18d67c156a5265939e247",
+  "comparison": "Current desktop runtime and shared-client source vs frozen Linux source vs immutable x64 ASAR; generated/test-only/platform-binary files excluded",
+  "files": [
+    {
+      "path": "config/app.json",
+      "sha256": "229168d855f49cbf6a5df066792190aa5180ea0d0a3eb28e2e90c2732bbe029a"
+    },
+    {
+      "path": "source/app/index.html",
+      "sha256": "ab69aa478db9822fc48cc83747e6d81d17ac28ab17e495aea853b9af20863a77"
+    },
+    {
+      "path": "source/app/lib/css/controls.css",
+      "sha256": "0acb405c01e7c10e48851fdb82dea96347c2021c81ce5f52a579a82fdda8b189"
+    },
+    {
+      "path": "source/app/lib/css/features.css",
+      "sha256": "888c42d7e9c506e5c09951eb196ae9126ca0ec0b0ea8a6fd102235fa36631536"
+    },
+    {
+      "path": "source/app/lib/css/lolzteam.css",
+      "sha256": "461adbb1a590bab72f680d94649b18cb3a37053d11cc120e3dd5238b22752f8e"
+    },
+    {
+      "path": "source/app/lib/css/lyrics.css",
+      "sha256": "bcc75e0cf1137522eab2f884e8c7d59f76e44e2454799b1afe2d8e607dc35e9a"
+    },
+    {
+      "path": "source/app/lib/css/mini-polish.css",
+      "sha256": "81b01a7fdcdbb9b9d86a9a34081e8acc4ff1d45f2ebfcac5b00a1b3341f5a766"
+    },
+    {
+      "path": "source/app/lib/css/mini.css",
+      "sha256": "dc5c0eb516b93556f72801f832a97eabaff2b3ebabddeb9c3805c50b53a0181e"
+    },
+    {
+      "path": "source/app/lib/css/player-tools.css",
+      "sha256": "dac3220a3df39eb357e2931f12ccbddeb75fa0d8910b6f4863c308fb3c4f90e6"
+    },
+    {
+      "path": "source/app/lib/css/room-lobby.css",
+      "sha256": "67d45e1a5f3dc1d196f0c53cf0d856493d971f259c3e01258e925c62e74fe5f5"
+    },
+    {
+      "path": "source/app/lib/css/room-stage.css",
+      "sha256": "043675226d768bf83baec8f1d2e8f8089b124ce53dce304857c001c209aeaa68"
+    },
+    {
+      "path": "source/app/lib/css/shell-panels.css",
+      "sha256": "f80d396f5c1e94c96b0b49e30e1fb28aed28c837434d0edfbf2230369ba1bdca"
+    },
+    {
+      "path": "source/app/lib/css/shell-polish.css",
+      "sha256": "d503f3754809954fefa7e29ee15f3cf480d8c70b998cd024f680c8c4f4b61680"
+    },
+    {
+      "path": "source/app/lib/css/shell.css",
+      "sha256": "b526aedd6c658132cd3d377a63263e2b4953960ac34062a44b6cfeaf3b7fc1f4"
+    },
+    {
+      "path": "source/app/lib/css/sound-lab.css",
+      "sha256": "bcc2f7a6e8f7a728c4b1cf0b36b6323ab6409125f610d76bc0a6cbb847271f5a"
+    },
+    {
+      "path": "source/app/lib/css/soundcloud-login.css",
+      "sha256": "3326956b4f69f640ffc5f93bd1bc787815849b87af44a451936f317950d53b31"
+    },
+    {
+      "path": "source/app/lib/css/studio-interface.css",
+      "sha256": "3b0af55faaf09d836b5bdd5257fe1d02203892b5a3a452e7289cebcba9ca4b0b"
+    },
+    {
+      "path": "source/app/lib/css/studio-updates.css",
+      "sha256": "5add5ada2c5a0ceee60f0ad1194f804b2d5decd75108e953593ba0713c473f75"
+    },
+    {
+      "path": "source/app/lib/css/typography.css",
+      "sha256": "f74f759c49423ec691f57f5e2e223381530697a4891a9f96b11dfc9b9f292e1d"
+    },
+    {
+      "path": "source/app/lib/css/voicetags.css",
+      "sha256": "6368768e3ff608d5174d3c6418eb0ee9408e31047b9eb02b2f00a53d2064a6aa"
+    },
+    {
+      "path": "source/app/lib/css/wave.css",
+      "sha256": "af631b28e6f9acef258c90b6ec9436b73f9415de075aa95b2d97d3f4073b73dd"
+    },
+    {
+      "path": "source/app/lib/css/youtube-music.css",
+      "sha256": "dd449e7c71226ab31be057d885788d028268a55f5fdb3fd592fd6f7233036d9b"
+    },
+    {
+      "path": "source/app/lib/js/app-updates.js",
+      "sha256": "2f936ebe2f46e57f20f9691c10cea4379a32b8cacb25d07cebe082d1ec0ccc55"
+    },
+    {
+      "path": "source/app/lib/js/artwork.js",
+      "sha256": "ce16e710f440f696176ca9f3490966b45ff717a7f4ec9ee77a2ebacf554091e7"
+    },
+    {
+      "path": "source/app/lib/js/features.js",
+      "sha256": "3ad5bd8296eeda8d36e8868e069d9a2f071a8b417e95175e8f6c22a3db1655a5"
+    },
+    {
+      "path": "source/app/lib/js/host.js",
+      "sha256": "b1fabd625a692d5463c4f29a1907aa4c4138f132a6a636afc1bd33ac4b433fd7"
+    },
+    {
+      "path": "source/app/lib/js/local-player.js",
+      "sha256": "1548b0d482d427466213466ae6087e7cb16064a607c707b80d8dfbaace8249d3"
+    },
+    {
+      "path": "source/app/lib/js/lolzteam.js",
+      "sha256": "df38708eeb2a2571d5f25742ad5da9f1f24dd1f24933dfa654c5ee8bad507f1f"
+    },
+    {
+      "path": "source/app/lib/js/lyrics-view.js",
+      "sha256": "d4f0f3fa4adf70eb6feedec37224a32c528d8971d3a27aeea3dc4b3f745f5bac"
+    },
+    {
+      "path": "source/app/lib/js/media-source.js",
+      "sha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c"
+    },
+    {
+      "path": "source/app/lib/js/mini.js",
+      "sha256": "da0497c999fb9103d4eceff6e62439cfed31168a5616428d63e557bf06cbce92"
+    },
+    {
+      "path": "source/app/lib/js/player-tools.js",
+      "sha256": "fb71eaff554901fef8b1f4111f83fb447268f9b3f5d79a0195519f384fdc52f9"
+    },
+    {
+      "path": "source/app/lib/js/range-controls.js",
+      "sha256": "79986fb891e59c6aa577fc5e87c4dabd4ce649e9836a0df0f6acc754373d2a91"
+    },
+    {
+      "path": "source/app/lib/js/room-lobby.js",
+      "sha256": "67d03f73cada5d51e8586d25a74c5a489904dbd63fba932a3e9f6858c5a9b9cd"
+    },
+    {
+      "path": "source/app/lib/js/soundcloud-login.js",
+      "sha256": "e68b33c953a91cdf4a268684910b1a824c6d57d1f1ee06a389699e4cdb5e9430"
+    },
+    {
+      "path": "source/app/lib/js/track-colors.js",
+      "sha256": "3ca2d213ea66121a094a6780d9ff48a4b355d687ee555f997fdc726e5278fe0f"
+    },
+    {
+      "path": "source/app/lib/js/track-visuals.js",
+      "sha256": "46a5ae25fa9270914a976851eec7d1b183c822c3182e441dfd0358f18b11aafa"
+    },
+    {
+      "path": "source/app/lib/js/voicetags.js",
+      "sha256": "f832309aab7f48cc2a2d76204fee8171c338a570a58bd87ca84e7525663b1a36"
+    },
+    {
+      "path": "source/app/lib/js/wave-view.js",
+      "sha256": "b7439f973c2cc7df2e4c8970034c1e00c6cdd49d8c6d60c353e5db67864e820b"
+    },
+    {
+      "path": "source/app/lib/js/webview-layout.js",
+      "sha256": "20c4adc0fcf94b6b2ee126e578fa4ddbf7ed2c00614332b184ce190c4d522df7"
+    },
+    {
+      "path": "source/app/lib/js/youtube-music.js",
+      "sha256": "d15826a1f50775093281b86ee9193751c2d8ff7e1ae9909c4173b4f599398656"
+    },
+    {
+      "path": "source/app/lib/room-client/media-source.js",
+      "sha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c"
+    },
+    {
+      "path": "source/app/lib/room-client/room-players.js",
+      "sha256": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9"
+    },
+    {
+      "path": "source/app/lib/room-client/room-sync.js",
+      "sha256": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab"
+    },
+    {
+      "path": "source/app/lib/room-client/room.css",
+      "sha256": "6cf31a3a394ef113052cd05923def96c1ef31efcf8aed0594a2f5ef8e8a06ffc"
+    },
+    {
+      "path": "source/app/lib/room-client/room.html",
+      "sha256": "66b3669833b0a1a5d4558f637f33ce9ce1aa08a0a85169a937ff111895bf652b"
+    },
+    {
+      "path": "source/app/lib/room-client/room.js",
+      "sha256": "608fb79f4ca2616cd9da1eb1ff6d6f372669a5cb5bbb187d59b0d7d503a56455"
+    },
+    {
+      "path": "source/app/lib/room-client/rooms.html",
+      "sha256": "6a50ba012f3ec1876f9a2a0bf82cc20e06fa98b9d7983f58e824ca32925e7020"
+    },
+    {
+      "path": "source/app/lib/room-client/site.js",
+      "sha256": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616"
+    },
+    {
+      "path": "source/app/lib/room-client/social.css",
+      "sha256": "d16d9131ad980d13e441a7ae866d2b08e7c4b58e0a387ec892a1de1aa80ffa86"
+    },
+    {
+      "path": "source/app/lib/room-client/social.html",
+      "sha256": "d905f78fe734677728c9e3d3b9e426f8d7fd984c4fdc66a7ea5318834aefd3fe"
+    },
+    {
+      "path": "source/app/lib/room-client/social.js",
+      "sha256": "c3e8b8c0c185afd7fa7f13c5692bfe8339c8e2aeeb139fb70485a1d0c50da601"
+    },
+    {
+      "path": "source/app/lib/templates/features.html",
+      "sha256": "fe93ba3cb6e73993137964702beed37e694f0822e3659afc797daf9cfe13db29"
+    },
+    {
+      "path": "source/app/lib/templates/lolzteam.html",
+      "sha256": "d8685075d39e01a105dbff4d0d8028318cb4f914c4cea623270218de28384d75"
+    },
+    {
+      "path": "source/app/lib/templates/player-tools.html",
+      "sha256": "e1d078aed7a43a2ebc8760b93a74e68b0d116ae2889f57b92749e294ad2584ef"
+    },
+    {
+      "path": "source/app/lib/templates/soundcloud-login.html",
+      "sha256": "b749f3ea89a14a773a6bfd30f10855466cc75c07ba8dc36adbbe4a68ce16d1b7"
+    },
+    {
+      "path": "source/app/session-transfer/bookmark.js",
+      "sha256": "81c6a37ade7814ff79ec5c11ca2c1ea5a9a7c98d3b96d97d8917c197e36a75b9"
+    },
+    {
+      "path": "source/app/session-transfer/helper/background.js",
+      "sha256": "9687011d4ab59a8a79852a0e9991c037b2d89474be6df2f672e7b2c290f6809d"
+    },
+    {
+      "path": "source/app/session-transfer/helper/bridge.js",
+      "sha256": "3a0b9d68f27bea592902f7264d3f95de73747e6c9190500e3c0527dfb316a367"
+    },
+    {
+      "path": "source/app/session-transfer/helper/content.js",
+      "sha256": "bf55776a0d3fa3d7cd0f53197a6d68552a0429aec31109ebde7df5c045a8a125"
+    },
+    {
+      "path": "source/app/session-transfer/helper/manifest.json",
+      "sha256": "726376fda45b10fa77e1d5a91d0a737ae59ff5f5d7c5ff2213cd3b11b3cada87"
+    },
+    {
+      "path": "source/app/session-transfer/helper/popup.css",
+      "sha256": "4081fe51d8a9dfdf33fcce7af0b38389cff8079ea297c33a168eb72e076b9cee"
+    },
+    {
+      "path": "source/app/session-transfer/helper/popup.html",
+      "sha256": "5a72c088a54c12ddc09701162c28273c5e5923775b4ae047620fa01b1bed95dd"
+    },
+    {
+      "path": "source/app/session-transfer/helper/popup.js",
+      "sha256": "64562b26019ad6a1ea93e5c48e58ef97a4f534434ba048a01af7aafaba996e6d"
+    },
+    {
+      "path": "source/app/session-transfer/index.html",
+      "sha256": "e0a561d28d7c4a910c89c862ee0c3621b863206f68e5c826f01efc9e07c7327b"
+    },
+    {
+      "path": "source/app/session-transfer/receive.html",
+      "sha256": "32557d3506a21b8ac9d776fa00896deace917e4c24aef9f06216cd5f6e9194a3"
+    },
+    {
+      "path": "source/app/session-transfer/style.css",
+      "sha256": "9f4a12d406391ce9854935b7facdda767a992ac78c8e72ce361fafc6e1a489f2"
+    },
+    {
+      "path": "source/guest-preload.cjs",
+      "sha256": "787f697f4dd269820d5b2b0d3d38265f3284d83ec5036bb05c350efa8e5bdc7c"
+    },
+    {
+      "path": "source/integrations/app-config.cjs",
+      "sha256": "ba217ee205199e84e7184b8dc70af8a79b0f678a8bdb9d7b3397dd2964067266"
+    },
+    {
+      "path": "source/integrations/app-updates.cjs",
+      "sha256": "ea3648c194c55846aa15f093cf21198ed46b7b5fe717fefec5b563241648e9f0"
+    },
+    {
+      "path": "source/integrations/audio-download.cjs",
+      "sha256": "0a5892e0ebd4d260323e8f6e3b663d7e00c826348d537694708788ef521ddd72"
+    },
+    {
+      "path": "source/integrations/audio-ducker.cjs",
+      "sha256": "0463aa27eb3332836c4eb7ce5ee4828b07d15acfbc846bed76c5ade2c226fdf6"
+    },
+    {
+      "path": "source/integrations/browser-profiles.cjs",
+      "sha256": "5ec1f270bf02167aa0806b6d18d9d2cc19cdc10858799ff4d3fc502bfe904677"
+    },
+    {
+      "path": "source/integrations/browser-session-identity.cjs",
+      "sha256": "a4bf10ab2eef5662c50d64007db788883fd199a24755f28dbec7402d02c81464"
+    },
+    {
+      "path": "source/integrations/browser-session.cjs",
+      "sha256": "f995c45c130e480f444c78927fbbc2947c630dc3e51152d04d45f65795ca2c75"
+    },
+    {
+      "path": "source/integrations/clipboard.cjs",
+      "sha256": "23e7b3e151c4a61dfe203f30d5ef0ae25d4b047dedf3e1489269e5c9cf3d5143"
+    },
+    {
+      "path": "source/integrations/discord.cjs",
+      "sha256": "6a681cf78944bb94b7c4f72b60a04dc9217a75e6ff3350f6a268cf439f3c61b9"
+    },
+    {
+      "path": "source/integrations/discovery.cjs",
+      "sha256": "7b5d643a4cf6d0cddcd1a3ec539a2dd910687d119efaaa3fd0a1f540320f11be"
+    },
+    {
+      "path": "source/integrations/downloads.cjs",
+      "sha256": "f8266e8a4b822efdef2b6a2d88d4d1b10477966116ef7296c405cb105f0ce6c6"
+    },
+    {
+      "path": "source/integrations/durable-json.cjs",
+      "sha256": "3ccb643e25e92ee5abb933448610b7af6c9cf6906a0d0383c5f02e4f25a82fd2"
+    },
+    {
+      "path": "source/integrations/legacy-runtime.cjs",
+      "sha256": "8971bf38ab67af3921c6e197b8ae41bb8fe37a62ee30a87d89c13969a975d486"
+    },
+    {
+      "path": "source/integrations/local-library.cjs",
+      "sha256": "ef593106212e4a4431b5e9cb8727f6875b26eb98d1053c1cd4b3a4195353f97b"
+    },
+    {
+      "path": "source/integrations/lolzteam/api.cjs",
+      "sha256": "c9fbde8f5caf1bd00309e385ef7ac5a3541eee6f357c7767bf471d7bc6048170"
+    },
+    {
+      "path": "source/integrations/lolzteam/index.cjs",
+      "sha256": "bbd138a5b2044ea623f9b33088dd57f09f80c00e7ba21955dda81266a3c30a51"
+    },
+    {
+      "path": "source/integrations/lolzteam/service.cjs",
+      "sha256": "965a7551e90c09c52052e490318cff98f23ab9a189394ee87af90f01f591d8d2"
+    },
+    {
+      "path": "source/integrations/lolzteam/status.cjs",
+      "sha256": "5c147d440fdcc5666527f010732d82b10495b365efc5aea4ae7104a6f3577fdb"
+    },
+    {
+      "path": "source/integrations/lolzteam/store.cjs",
+      "sha256": "768e95a4b5298a0da8ca0cedb127a15a733921cdaa070872861513b60868e6b3"
+    },
+    {
+      "path": "source/integrations/lyric-formats.cjs",
+      "sha256": "a0389f4abe5e1d84cf3afd01fed5291807bc1b58d414d76f9fb19c31c61bbd07"
+    },
+    {
+      "path": "source/integrations/lyric-identity.cjs",
+      "sha256": "8c4bc67bf405a2474a4d2df0e4126a8f92f93ddaec0e7fd0b66b5e492f08523c"
+    },
+    {
+      "path": "source/integrations/lyric-match.cjs",
+      "sha256": "358e43f449c63cb7b067ac092439068bdff482c69336b948b0e5632f8bce01ed"
+    },
+    {
+      "path": "source/integrations/lyric-prefetch.cjs",
+      "sha256": "636520ca39e486afee806e0c9971eed2ed1632680e0667b413828b7bba39a10a"
+    },
+    {
+      "path": "source/integrations/lyric-providers.cjs",
+      "sha256": "7d8911eed20a89c437f5c4d305885b6aca29bd6ce8aa1b14678c323d7d705b05"
+    },
+    {
+      "path": "source/integrations/lyric-settings.cjs",
+      "sha256": "bf07e812b59c02d2adf23a706d91babbe86c015a5c343ef9a9b4d74489bc31e3"
+    },
+    {
+      "path": "source/integrations/lyric-source.cjs",
+      "sha256": "d7aa9652e237f11bf2f9001e8e4bbc105d9e08d7d8deedd0c4a1ee3006482a9a"
+    },
+    {
+      "path": "source/integrations/lyrics.cjs",
+      "sha256": "eef0ad310b13c8aff2a719efd26c08babc82636022e508c889dcf72a63657ba9"
+    },
+    {
+      "path": "source/integrations/mini-window.cjs",
+      "sha256": "72f686e03744d0b08d35fa6335952c69f6cca78f9a08db2a623f3bebc664464b"
+    },
+    {
+      "path": "source/integrations/music.cjs",
+      "sha256": "afecb395d3eaef4ec7c5330a5ad556c3135da587ccf5c278782d64906661393c"
+    },
+    {
+      "path": "source/integrations/playback-history.cjs",
+      "sha256": "47c201d08d75954a5d33549a10aad3484481b93d45247eecfcd6ba379b328ea7"
+    },
+    {
+      "path": "source/integrations/player-experience.cjs",
+      "sha256": "aea85082d569de7cf48716c7091d363e33ad1b60306fa8fbbe73cb22f087d406"
+    },
+    {
+      "path": "source/integrations/player-tools.cjs",
+      "sha256": "cdbbebcc60291819cd771170aba8acf673e9068ee1a242c3cc77355f0280aefe"
+    },
+    {
+      "path": "source/integrations/portable-profile.cjs",
+      "sha256": "f560c943d1c1f4c3892b2fb6246cbf1384fe9cebd4077e13608e03350f470e2c"
+    },
+    {
+      "path": "source/integrations/portable-update.cjs",
+      "sha256": "e6586ce7fcb8f540eb5ef83a8769f6b65422855b2813043fbd26cb0cf51498e8"
+    },
+    {
+      "path": "source/integrations/profile-migration.cjs",
+      "sha256": "297e1730c7398ff1a803a66311e714b004daa85fec3c073f179feaa0194fd8ad"
+    },
+    {
+      "path": "source/integrations/profiles.cjs",
+      "sha256": "0f2ec4a0194375680810c0b442b04f38adc26978f66b65025049dd04e170155b"
+    },
+    {
+      "path": "source/integrations/release-radar.cjs",
+      "sha256": "79e4bcf590b201f3ac84d126426d206d8b1e8dafd58856eb7aa12a33e2aace64"
+    },
+    {
+      "path": "source/integrations/repeat-intent.cjs",
+      "sha256": "6c974f25e8dff6342adc2d288186930800de1d0fce8e1de0599056535fe38d26"
+    },
+    {
+      "path": "source/integrations/room-client.cjs",
+      "sha256": "3e80ca9177fe2fe6901c668b0cb22088aa256af509e7b03c96b8c050311465af"
+    },
+    {
+      "path": "source/integrations/room-view.cjs",
+      "sha256": "c6da0a3160d7604843bb67417f9a28d61af4ef7291f7a4806fe890611397cbf1"
+    },
+    {
+      "path": "source/integrations/room.cjs",
+      "sha256": "b47a43ba4d6f76db8b5bac69d972627a85005dcccb01c89729d26b6e49583916"
+    },
+    {
+      "path": "source/integrations/sc-profile.cjs",
+      "sha256": "ff5b424ab8aa8d47fe13077922739281a3a3f60e31670547343f4466ca7221e9"
+    },
+    {
+      "path": "source/integrations/secure-storage.cjs",
+      "sha256": "7c8ced4c07955d28d2c49dae17db2d28950fd8e03dc21fb11ef5e7071e25e098"
+    },
+    {
+      "path": "source/integrations/self-test.cjs",
+      "sha256": "0688f55c27cc41bc5ac4be760b6d460fd010a1b875af8b5a02278b9cfe5d405a"
+    },
+    {
+      "path": "source/integrations/session-import.cjs",
+      "sha256": "d70860172c092073f7262c49b1801e459ddc3620d918d5a821be2246becf8f2a"
+    },
+    {
+      "path": "source/integrations/session-recovery.cjs",
+      "sha256": "a6f64477d8bbecbe9f35b26bccfb8a774d9a235367fbfac355709b19997c0629"
+    },
+    {
+      "path": "source/integrations/social-notifications.cjs",
+      "sha256": "503694482403a6885c62b1a956530ea50a9eacf70d88310d86e54db5edd5f9e0"
+    },
+    {
+      "path": "source/integrations/sound-protection.cjs",
+      "sha256": "9f96c080f5bdfff3839ed68b727421c1b1bd002926dbf2f6711f635b25f1817c"
+    },
+    {
+      "path": "source/integrations/sound-settings.cjs",
+      "sha256": "1e70452a4896c1e8c1bbc0ea297da284feb6629274772c6a6b2d1f50b873bcc8"
+    },
+    {
+      "path": "source/integrations/soundcloud-client.cjs",
+      "sha256": "98f845454c507dfa184422e6e73b00e0eec8122261a383b4b67e4b93dd8eebf5"
+    },
+    {
+      "path": "source/integrations/soundcloud-session.cjs",
+      "sha256": "1750a329fb8f5a06f9c537c8c87e5e9935cb96f996e44b02af420f7ec63d1c79"
+    },
+    {
+      "path": "source/integrations/studio.cjs",
+      "sha256": "aa60f35a84b8c3e85c9b472a273ce6cec129ed31c205b4da30f3f90b94da1a21"
+    },
+    {
+      "path": "source/integrations/track-visuals.cjs",
+      "sha256": "1512ca009f60f864cf2322ad624309e68364bfba5faacdf113306be8acf41801"
+    },
+    {
+      "path": "source/integrations/update-temporary.cjs",
+      "sha256": "6292ebd3e2bfd856212e6f6e13e10912e4352e07ec3da3fdd586d7b474987bd9"
+    },
+    {
+      "path": "source/integrations/voicetags.cjs",
+      "sha256": "85c85b03fb14cc0d3af328a28110369ac6f004c8ca09789771c70bb357907950"
+    },
+    {
+      "path": "source/integrations/wave-history.cjs",
+      "sha256": "190176887cc5e3e2f639c9b45bf2601ad9d7a23812c8a28491fd7c0f0c4e9452"
+    },
+    {
+      "path": "source/integrations/wave-preferences.cjs",
+      "sha256": "016eeaccaaa7c804da945ef76b80ebe1ef969aee08136fb636026230d833e8b8"
+    },
+    {
+      "path": "source/integrations/wave-request.cjs",
+      "sha256": "0b3930470a1e192e40982ac61a6f37f40034bd3ac5e1dfc6ad5477d66fb95b16"
+    },
+    {
+      "path": "source/integrations/wave.cjs",
+      "sha256": "44484e2a04c7f18c9f1287a5f1b26cc0809de7f34100c3e00b9b8832d2ead816"
+    },
+    {
+      "path": "source/integrations/youtube-music.cjs",
+      "sha256": "9dd2adc02d1c990611d0c0855167d2d86fc3128d05e7bbd08c9ac5fe399667ec"
+    },
+    {
+      "path": "source/main.js",
+      "sha256": "274b36c520fdec33a8080b42a71fdb87450ccd6fbbe80a31daf9151081b43068"
+    },
+    {
+      "path": "source/package.json",
+      "sha256": "f4e194c6ddb83eca1256c767bd771cd76f5a21f16a101651db03973d74f9be81"
+    },
+    {
+      "path": "source/plugins/beat-tracker.js",
+      "sha256": "5fe11da52101b32ca2f1b346ddf057cfa958d167e13ee8942672951bb7f3f83c"
+    },
+    {
+      "path": "source/plugins/infoticker.js",
+      "sha256": "9eb41139588470b3d827b60b79dd5f10e17ef7dbd6f212387e48aed164629a2e"
+    },
+    {
+      "path": "source/plugins/normalization-worklet.js",
+      "sha256": "b3cdd397c68f4648ae5651b2062d1d8c134ea0404b2e1bf91d13634e8bb83501"
+    },
+    {
+      "path": "source/plugins/playback-control.js",
+      "sha256": "9e31b01ac8e81fe739218ca397ddee5933f4a8760f9e2957c3529be07a714198"
+    },
+    {
+      "path": "source/plugins/promotions.js",
+      "sha256": "96d01d162c3f5aa533fe1f9aa87473b5553a74400ecf468a443f9dd3affec2c1"
+    },
+    {
+      "path": "source/plugins/repeat-control.js",
+      "sha256": "c335dd4c55286641da5a63bda5c7e6bc863af060d0a359249837420335429b38"
+    },
+    {
+      "path": "source/plugins/sound-effects.js",
+      "sha256": "5e82cf2ba4c95fcb054ffa73c4de46cb20ed2da5cf77975fcd6045cf0268ee9d"
+    },
+    {
+      "path": "source/plugins/tempo-worklet.js",
+      "sha256": "46b53414aee4265bab3c46939bbb1002179c47ed56b72fd0034524ab8a53949e"
+    },
+    {
+      "path": "source/plugins/verification.js",
+      "sha256": "e0e835d1276a7e4e9d0ad48d182ad3743711fd8993810af73a14b1c4a6df6258"
+    },
+    {
+      "path": "source/plugins/youtube-control.js",
+      "sha256": "7f508b93c39de41e6922201e0ac94bd8fd2840907249fe032d25b40c5dedd423"
+    },
+    {
+      "path": "source/youtube-preload.cjs",
+      "sha256": "4618ac9f0daf1de0b88375407fee8c93315e2a94f3884720184d22d791340e38"
+    }
+  ],
+  "changes": []
+}

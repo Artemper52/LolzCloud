@@ -1,0 +1,212 @@
+{
+  "androidApi": 35,
+  "device": "Android SDK built for x86_64",
+  "webView": "com.android.webview 124.0.6367.219",
+  "version": "0.1.1",
+  "apkSha256": "3cea67b5187b01a61ab0c2271b5c76de54566c06edca1d282d4feb52b84ff1d5",
+  "webViewClientReplaced": false,
+  "usesRealPublicHttps": true,
+  "status": "passed",
+  "pages": [
+    {
+      "path": "/login",
+      "title": "Вход · LolzCloud",
+      "ready": "complete",
+      "bodyColor": "rgb(236, 244, 237)",
+      "bodyBackground": "rgb(12, 17, 14)",
+      "rootBackground": "rgb(12, 17, 14)",
+      "headingColor": "rgb(236, 244, 237)",
+      "headingSize": "48px",
+      "linkColor": "rgb(22, 55, 34)",
+      "buttonBackground": "rgb(184, 233, 199)",
+      "viewport": 412,
+      "scrollWidth": 412,
+      "sheets": [
+        {
+          "href": "https://lolzcloud.com/cloud/room.css",
+          "rules": 240
+        }
+      ],
+      "assetProbe": {
+        "listedFiles": [
+          "logo.svg",
+          "media-source.js",
+          "room-players.js",
+          "room-sync.js",
+          "room.css",
+          "room.html",
+          "room.js",
+          "site.js"
+        ],
+        "directOpen": true,
+        "sample": ":root{color-scheme:dark;font-family:'Segoe UI Variable','Segoe UI',Arial,sans-serif;background:#0c110e;color:#ecf4ed;font-synthesis:none;--mint:#b8e9c7;--muted:#91a699}*{box-sizing",
+        "interceptMime": "text/css",
+        "interceptStatus": 200
+      },
+      "nativeHeading": "Вход в LolzCloud",
+      "entry": "login",
+      "entryUrl": "https://lolzcloud.com/login",
+      "styledLogin": true,
+      "screenshot": "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/webview-release_verified/login.png",
+      "localScreenshot": "D:\\LolzCloud-Android-Toolchain\\video-review-20261112\\release-verified-screenshots\\login.png"
+    },
+    {
+      "path": "/login",
+      "title": "Вход · LolzCloud",
+      "ready": "complete",
+      "bodyColor": "rgb(236, 244, 237)",
+      "bodyBackground": "rgb(12, 17, 14)",
+      "rootBackground": "rgb(12, 17, 14)",
+      "headingColor": "rgb(236, 244, 237)",
+      "headingSize": "48px",
+      "linkColor": "rgb(22, 55, 34)",
+      "buttonBackground": "rgb(184, 233, 199)",
+      "viewport": 412,
+      "scrollWidth": 412,
+      "sheets": [
+        {
+          "href": "https://lolzcloud.com/cloud/room.css",
+          "rules": 240
+        }
+      ],
+      "assetProbe": {
+        "listedFiles": [
+          "logo.svg",
+          "media-source.js",
+          "room-players.js",
+          "room-sync.js",
+          "room.css",
+          "room.html",
+          "room.js",
+          "site.js"
+        ],
+        "directOpen": true,
+        "sample": ":root{color-scheme:dark;font-family:'Segoe UI Variable','Segoe UI',Arial,sans-serif;background:#0c110e;color:#ecf4ed;font-synthesis:none;--mint:#b8e9c7;--muted:#91a699}*{box-sizing",
+        "interceptMime": "text/css",
+        "interceptStatus": 200
+      },
+      "nativeHeading": "Вход в LolzCloud",
+      "entry": "rooms",
+      "entryUrl": "https://lolzcloud.com/rooms",
+      "styledLogin": true,
+      "screenshot": "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/webview-release_verified/rooms.png",
+      "localScreenshot": "D:\\LolzCloud-Android-Toolchain\\video-review-20261112\\release-verified-screenshots\\rooms.png"
+    },
+    {
+      "path": "/login",
+      "title": "Вход · LolzCloud",
+      "ready": "complete",
+      "bodyColor": "rgb(236, 244, 237)",
+      "bodyBackground": "rgb(12, 17, 14)",
+      "rootBackground": "rgb(12, 17, 14)",
+      "headingColor": "rgb(236, 244, 237)",
+      "headingSize": "48px",
+      "linkColor": "rgb(22, 55, 34)",
+      "buttonBackground": "rgb(184, 233, 199)",
+      "viewport": 412,
+      "scrollWidth": 412,
+      "sheets": [
+        {
+          "href": "https://lolzcloud.com/cloud/room.css",
+          "rules": 240
+        }
+      ],
+      "assetProbe": {
+        "listedFiles": [
+          "logo.svg",
+          "media-source.js",
+          "room-players.js",
+          "room-sync.js",
+          "room.css",
+          "room.html",
+          "room.js",
+          "site.js"
+        ],
+        "directOpen": true,
+        "sample": ":root{color-scheme:dark;font-family:'Segoe UI Variable','Segoe UI',Arial,sans-serif;background:#0c110e;color:#ecf4ed;font-synthesis:none;--mint:#b8e9c7;--muted:#91a699}*{box-sizing",
+        "interceptMime": "text/css",
+        "interceptStatus": 200
+      },
+      "nativeHeading": "Вход в LolzCloud",
+      "entry": "remote",
+      "entryUrl": "https://lolzcloud.com/remote/0123456789abcdef0123456789abcdef",
+      "styledLogin": true,
+      "screenshot": "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/webview-release_verified/remote.png",
+      "localScreenshot": "D:\\LolzCloud-Android-Toolchain\\video-review-20261112\\release-verified-screenshots\\remote.png"
+    },
+    {
+      "path": "/login",
+      "title": "Вход · LolzCloud",
+      "ready": "complete",
+      "bodyColor": "rgb(236, 244, 237)",
+      "bodyBackground": "rgb(12, 17, 14)",
+      "rootBackground": "rgb(12, 17, 14)",
+      "headingColor": "rgb(236, 244, 237)",
+      "headingSize": "48px",
+      "linkColor": "rgb(22, 55, 34)",
+      "buttonBackground": "rgb(184, 233, 199)",
+      "viewport": 412,
+      "scrollWidth": 412,
+      "sheets": [
+        {
+          "href": "https://lolzcloud.com/cloud/room.css",
+          "rules": 240
+        }
+      ],
+      "assetProbe": {
+        "listedFiles": [
+          "logo.svg",
+          "media-source.js",
+          "room-players.js",
+          "room-sync.js",
+          "room.css",
+          "room.html",
+          "room.js",
+          "site.js"
+        ],
+        "directOpen": true,
+        "sample": ":root{color-scheme:dark;font-family:'Segoe UI Variable','Segoe UI',Arial,sans-serif;background:#0c110e;color:#ecf4ed;font-synthesis:none;--mint:#b8e9c7;--muted:#91a699}*{box-sizing",
+        "interceptMime": "text/css",
+        "interceptStatus": 200
+      },
+      "nativeHeading": "Вход в LolzCloud",
+      "entry": "connect",
+      "entryUrl": "https://lolzcloud.com/connect?code=TEST-ONLY",
+      "styledLogin": true,
+      "screenshot": "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/webview-release_verified/connect.png",
+      "localScreenshot": "D:\\LolzCloud-Android-Toolchain\\video-review-20261112\\release-verified-screenshots\\connect.png"
+    }
+  ],
+  "console": [],
+  "errorRetry": {
+    "url": "https://lolzcloud.com/__webview_rendering_missing_page_20261112",
+    "publicHttpStatus": 404,
+    "initialState": {
+      "panelVisibility": 0,
+      "panelShown": true,
+      "message": "Страница не найдена. Комната могла быть закрыта; проверь ссылку.",
+      "heading": "Не удалось открыть страницу",
+      "webVisibility": 8,
+      "webUrl": "https://lolzcloud.com/__webview_rendering_missing_page_20261112",
+      "webTitle": "404 Not Found",
+      "progress": 100,
+      "pageError": true
+    },
+    "retryStartsLoading": true,
+    "newProgressSignals": 4,
+    "finalState": {
+      "panelVisibility": 0,
+      "panelShown": true,
+      "message": "Страница не найдена. Комната могла быть закрыта; проверь ссылку.",
+      "heading": "Не удалось открыть страницу",
+      "webVisibility": 8,
+      "webUrl": "https://lolzcloud.com/__webview_rendering_missing_page_20261112",
+      "webTitle": "404 Not Found",
+      "progress": 100,
+      "pageError": true
+    },
+    "passed": true,
+    "screenshot": "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/webview-release_verified/error-404.png",
+    "localScreenshot": "D:\\LolzCloud-Android-Toolchain\\video-review-20261112\\release-verified-screenshots\\error-404.png"
+  }
+}

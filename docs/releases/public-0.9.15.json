@@ -1,0 +1,143 @@
+{
+  "version": "0.9.15",
+  "android": "0.1.5",
+  "published": true,
+  "website": "https://lolzcloud.com/#download",
+  "iosInstalledWeb": "https://lolzcloud.com/app/",
+  "iosNative": {
+    "sourceOnly": true,
+    "sourceURL": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.0-source.zip",
+    "swiftTests": 23,
+    "appleSDKBuild": false,
+    "signedIPA": false
+  },
+  "publicFullIntegrity": {
+    "checkedAt": "2026-11-14T15:13:30.276Z",
+    "version": "0.9.15",
+    "files": [
+      {
+        "name": "LolzCloud-0.9.15-win-x64-Setup.exe",
+        "http": 200,
+        "size": 146389460,
+        "sha256": "41cdd42420c0207f515dabb9ccde7813c1ed1612e983bfb571230316f863cf7d",
+        "verified": true
+      },
+      {
+        "name": "LolzCloud-0.9.15-source.zip",
+        "http": 200,
+        "size": 20730613,
+        "sha256": "d547048ac68556ff67ed178f751b4d8dc55db5bfea4a2c009de48e15b2c89ec1",
+        "verified": true
+      },
+      {
+        "name": "LolzCloud-iOS-0.1.0-source.zip",
+        "http": 200,
+        "size": 57444,
+        "sha256": "bb34ada5073a9001fff02d0f0e23ca6a531a00a8e550ce44b307044c9681a0f6",
+        "verified": true
+      }
+    ]
+  },
+  "publicMusic": {
+    "checkedAt": "2026-11-14T15:08:31.366Z",
+    "checks": [
+      {
+        "name": "public PWA index.html",
+        "ok": true,
+        "http": 200,
+        "sha256": "e460bf3d5969ce2b7f036f8ce8f9759910054974f12ed7c0f1e707d2ab090a56"
+      },
+      {
+        "name": "public PWA app.js",
+        "ok": true,
+        "http": 200,
+        "sha256": "96bae8714e8f27542ec6d85eded8d6ced3169a2126449deb645e663352b6243a"
+      },
+      {
+        "name": "public PWA core.js",
+        "ok": true,
+        "http": 200,
+        "sha256": "760593bda48f481e7573d1f6e9ed872d485ce7665fd9221d1fcb346311976249"
+      },
+      {
+        "name": "public PWA app.css",
+        "ok": true,
+        "http": 200,
+        "sha256": "b148b8a88bced50820aa7116e30765b92f3895a0c5090610d3dc634996f2044e"
+      },
+      {
+        "name": "public PWA sw.js",
+        "ok": true,
+        "http": 200,
+        "sha256": "68b8e13c82e7e39bb945e0a2a300faf5ebd4d56d46575622ab764b94976ca4db"
+      },
+      {
+        "name": "public PWA manifest.webmanifest",
+        "ok": true,
+        "http": 200,
+        "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7"
+      },
+      {
+        "name": "live search parses in installed web client",
+        "ok": true,
+        "results": 20
+      },
+      {
+        "name": "requested recording is present",
+        "ok": true
+      },
+      {
+        "name": "issued audio is prepared",
+        "ok": true,
+        "http": 200
+      },
+      {
+        "name": "real MP3 supports byte range",
+        "ok": true,
+        "http": 206,
+        "bytes": 512
+      },
+      {
+        "name": "representative lyrics match strict web policy",
+        "ok": true,
+        "http": 200,
+        "timed": true,
+        "lines": 19
+      }
+    ]
+  },
+  "olderUpdateDetection": {
+    "readOnly": true,
+    "code": "verified released0.9.12 updater",
+    "rows": [
+      {
+        "current": "0.9.12",
+        "target": "0.9.15",
+        "status": "available",
+        "available": true
+      },
+      {
+        "current": "0.9.14",
+        "target": "0.9.15",
+        "status": "available",
+        "available": true
+      }
+    ]
+  },
+  "githubPreparation": {
+    "published": false,
+    "parent": "3af2b36577a80c9c1e9a6e7d8bdecdddf82a6fea",
+    "commit": "b03dfbe7846fec3b1c63cfc569b71578faa01f7d",
+    "branch": "codex/platforms-0.9.15",
+    "worktreeAndOriginalIndexUnchanged": true
+  },
+  "limitations": [
+    "GitHub connected account has read-only repository permission; release not published there.",
+    "Physical Safari and signed native IPA not verified.",
+    "Linux ARM64 validated statically."
+  ],
+  "cleanup": {
+    "ownedEmulatorStopped": true,
+    "ownedSshForwardStopped": true
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "date": "2026-11-14",
+  "beforeVersion": "0.9.13",
+  "afterVersion": "0.9.14",
+  "installerExitCode": 0,
+  "profileFilesUnchangedBeforeRestart": 14,
+  "installedAsarSha256": "2ad93db0c8a2ec41a426776375b1d08de7d75c02a6f1510dd9b027368f8aca36",
+  "installerSha256": "acc678affefc0a0ee8df25e258b85347f5bbfbede7b94daa6a611b9e29834a65",
+  "processScopedTemporaryVolume": "D:",
+  "globalTemporaryEnvironmentChanged": false,
+  "gracefulShutdown": true,
+  "profileBackupCreated": true,
+  "gui": {
+    "observedAt": "2026-11-14T12:11:28.662Z",
+    "tool": "computer-use",
+    "sidebarName": "Artemper",
+    "sidebarRole": "Владелец",
+    "otherUsersRolesChangedDuringCheck": false
+  }
+}

@@ -13,7 +13,7 @@
   document.body.insertAdjacentHTML('beforeend', fs.readFileSync(path.join(__dirname, 'lib/templates/features.html'), 'utf8'));
   const el = name => document.getElementById('lc-' + name), studio = el('studio'), view = document.getElementById('webview');
   let snapshot = null, feature = null, tab = 'share', lyricTrack = '', lyrics = null, lyricLoading = '';
-  let dspApplied = '', soundDraft = null, keysDirty = false, lastLists = '', lastPresets = '', playRequest = 0, lyricsFont = 1, waveApplied = null, waveListSignature = '';
+  let dspApplied = '', soundDraft = null, keysDirty = false, lastLists = '', lastPresets = '', playRequest = 0, openingSoundCloud = 0, lyricsFont = 1, waveApplied = null, waveListSignature = '';
   let playerApplied = null;
   let repeatApplied = null, repeatApplying = false;
   let uiScale = 1;
@@ -48,7 +48,7 @@
       const result = await ipcRenderer.invoke('features:action', { type, ...args });
       if (result.state) feature = result.state;
       if (!result.ok) throw new Error(result.error);
-      message(['copy-bbcode', 'card-copy', 'copy-collections', 'room-copy'].includes(type) ? 'Скопировано в буфер обмена' : 'Готово');
+      message(['copy-bbcode', 'card-copy', 'copy-collections', 'room-copy'].includes(type) ? 'Скопировано в буфер обмена' : type === 'media' ? '' : 'Готово');
       render(); return result.state;
     } catch (error) { message(error.message || 'Не удалось выполнить действие.', true); return null; }
     finally { pending.delete(type); complete(); }
@@ -62,7 +62,7 @@
     studio.querySelectorAll('[data-pane]').forEach(pane => { pane.hidden = pane.dataset.pane !== tab; });
     if (!studio.open) studio.show();
     document.body.classList.add('shell-studio-open'); window.lolzSelectNavigation?.(tab);
-    const titles = { share: 'Сейчас слушаю', wave: 'Моя волна', library: 'Моя музыка', community: 'Подборки', lyrics: 'Текст песни', audio: 'Звук и эффекты', room: 'Комнаты', radar: 'Радар новинок', moments: 'Любимые моменты', versions: 'Другие версии', private: 'Приватность', keys: 'Горячие клавиши', settings: 'Настройки', sources: 'Источники текста' };
+    const titles = { share: 'Сейчас слушаю', wave: 'Моя волна', library: 'Моя музыка', community: 'Подборки', lyrics: 'Текст песни', audio: 'Звук и эффекты', room: 'Комнаты', social: 'Профиль и друзья', radar: 'Радар новинок', moments: 'Любимые моменты', versions: 'Другие версии', private: 'Приватность', keys: 'Горячие клавиши', settings: 'Настройки', sources: 'Источники текста' };
     el('studio-title').textContent = titles[tab] || 'LolzCloud'; render();
     if (tab === 'lyrics') void loadLyrics();
   }
@@ -507,6 +507,8 @@
   }
   window.addEventListener('lolzcloud:state', event => { snapshot = event.detail; if (snapshot.features) feature = snapshot.features; render(); });
   async function media(command, value) {
+    if(command==='playPause'&&openingSoundCloud)command='pause';
+    if(['pause','next','previous'].includes(command))cancelPendingPlayback();
     if (window.LolzCloudYouTube?.active) return window.LolzCloudYouTube.media(command, value);
     const data = JSON.stringify([command, value]);
     try {
@@ -515,7 +517,9 @@
       return result;
     } catch { message('Не удалось передать команду в SoundCloud. Повтори после загрузки трека.', true); return false; }
   }
-  window.addEventListener('lolzcloud:provider-ready', () => { guestReady = true; dspApplied = ''; safetyApplied = ''; repeatApplied = null; playerApplied = null; if (feature) { void applyDsp(feature.dsp); if (latestSafety) void applySafety(latestSafety); } });
+  function cancelPendingPlayback(){playRequest++;openingSoundCloud=0;}
+  ipcRenderer.on('lolzcloud:pause-soundcloud',cancelPendingPlayback);
+  window.addEventListener('lolzcloud:provider-ready', () => { if(window.LolzCloudYouTube?.active)cancelPendingPlayback();guestReady = true; dspApplied = ''; safetyApplied = ''; repeatApplied = null; playerApplied = null; if (feature) { void applyDsp(feature.dsp); if (latestSafety) void applySafety(latestSafety); } });
   ipcRenderer.on('lolzcloud:media', (_, data) => media(data.command, data.value));
   ipcRenderer.on('lolzcloud:dsp', (_, config) => { dspApplied = ''; void applyDsp(config); });
   async function applySafety(config) {
@@ -530,16 +534,18 @@
   ipcRenderer.on('lolzcloud:play-url', async (_, value) => {
     window.LolzCloudYouTube?.leave();
     const url = scUrl(typeof value === 'string' ? value : value?.url); if (!url) return;
-    const id = ++playRequest;
+    const id = ++playRequest;openingSoundCloud=id;
     document.getElementById('lzt-dialog')?.close();
     try {
       await view.loadURL(url);
       for (let attempt = 0; attempt < 30 && id === playRequest; attempt++) {
         const started = await view.executeJavaScript(`window.__lolzcloudPlayback?.play(${JSON.stringify(url)}) === 'playing'`, true).catch(() => false);
-        if (started) {if(value?.resume){await media('seek',value.resume.position);if(!value.resume.playing)await media('pause');}return;}
+        if(id!==playRequest)return;
+        if (started) {if(value?.resume){await media('seek',value.resume.position);if(id===playRequest&&!value.resume.playing)await media('pause');}return;}
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
     } catch { if (id === playRequest) message('Не удалось открыть трек SoundCloud.', true); }
+    finally{if(openingSoundCloud===id)openingSoundCloud=0;}
   });
   view.addEventListener('dom-ready', async () => {
     guestReady = true;

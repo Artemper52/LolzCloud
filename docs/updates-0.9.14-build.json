@@ -1,0 +1,72 @@
+{
+  "status": "ready",
+  "generatedAt": "2026-11-14T12:02:10.225Z",
+  "version": "0.9.14",
+  "published": false,
+  "installed": false,
+  "application": "D:\\LolzCloud-Android-Toolchain\\desktop-release-0.9.14-final\\LolzCloud-win32-x64",
+  "setup": {
+    "file": "D:\\LolzCloud-Android-Toolchain\\update-mirror-0.9.14\\LolzCloud-0.9.14-win-x64-Setup.exe",
+    "bytes": 146487758,
+    "sha256": "acc678affefc0a0ee8df25e258b85347f5bbfbede7b94daa6a611b9e29834a65",
+    "sha512": "GAn/2EXtuCw7fGhh+P/WkaF8toWhfDacgArTLXroEfmtDnxJP2OTa9tMQKQDWYKBj6SdW5p9EgwggZnOZ11D9g=="
+  },
+  "archive": {
+    "file": "D:\\LolzCloud-Android-Toolchain\\update-mirror-0.9.14\\LolzCloud-0.9.14-win-x64.zip",
+    "bytes": 196773164,
+    "sha256": "946df1edb8fcaedd8e75960252151f5feb7cf9d170a6a1cca23fb80ac812c5d5",
+    "sha512": "iyLcr9ym/Dx3+ZlVEaDqXESfIHD/261pDiA6N8LsmubkkR+gqjzv7T2oIgtJ8N+YpyBjnI8rFaH2rsyYe9D3Jg=="
+  },
+  "asar": {
+    "file": "D:\\LolzCloud-Android-Toolchain\\desktop-release-0.9.14-final\\LolzCloud-win32-x64\\resources\\app.asar",
+    "bytes": 19239180,
+    "sha256": "2ad93db0c8a2ec41a426776375b1d08de7d75c02a6f1510dd9b027368f8aca36",
+    "sha512": "bQEPt/KtISs89Pxs6orw0N7IPXhg39yXkBX4mspd5/OWCh0WRfay/Dr67FnqqzxYwS8SUMRHwef3FYH7wvOo6A=="
+  },
+  "packagedVerification": {
+    "status": "passed",
+    "generatedAt": "2026-11-14T11:59:19.241Z",
+    "application": "D:\\LolzCloud-Android-Toolchain\\desktop-release-0.9.14-final\\LolzCloud-win32-x64",
+    "version": "0.9.14",
+    "expectedElectron": "45.2.1",
+    "sourceFiles": {
+      "source/integrations/update-temporary.cjs": {
+        "sha256": "6292ebd3e2bfd856212e6f6e13e10912e4352e07ec3da3fdd586d7b474987bd9",
+        "matchesWorkspace": true
+      },
+      "source/integrations/app-updates.cjs": {
+        "sha256": "ea3648c194c55846aa15f093cf21198ed46b7b5fe717fefec5b563241648e9f0",
+        "matchesWorkspace": true
+      },
+      "source/main.js": {
+        "sha256": "274b36c520fdec33a8080b42a71fdb87450ccd6fbbe80a31daf9151081b43068",
+        "matchesWorkspace": true
+      }
+    },
+    "minimumTemporaryMiB": 1536,
+    "bundledRolesMatchServer": true,
+    "compatibilitySelfTest": {
+      "passed": true,
+      "isolatedProfile": "D:\\LolzCloud-Android-Toolchain\\tmp\\LolzCloud-self-test-tQ1OwE",
+      "stdout": "\r\nCompatibility self-test passed: Electron 45.2.1, Node 24.22.1, binary fetch/streams, session cookies, stored bookmarks and native renderer.\n",
+      "stderr": ""
+    },
+    "userProfileUsed": false,
+    "installed": false,
+    "published": false
+  },
+  "nsisSpace": {
+    "payloadBytes": 476122081,
+    "requiredTempBytes": 1220679680,
+    "helperFloorBytes": 1610612736,
+    "covered": true
+  },
+  "portableAsarMatchesFinalApplication": true,
+  "latestYamlVerified": true,
+  "stageReceipt": "20261114T120100-updates-0.9.14-ea68e7e5",
+  "preservedUnpublishedArchive": {
+    "file": "D:\\LolzCloud-Android-Toolchain\\update-mirror-0.9.14\\LolzCloud-0.9.14-win-x64.before-temp-guard.zip",
+    "bytes": 196772844
+  },
+  "partialSetupPreserved": "D:\\LolzCloud-Android-Toolchain\\desktop-release-0.9.14-final\\installers\\LolzCloud-0.9.14-win-x64-Setup.initial-failed.exe"
+}

@@ -13,6 +13,13 @@ function attributes(line) {
   return Object.fromEntries([...line.matchAll(/(?:^|,)([A-Z0-9-]+)=("[^"]*"|[^,]*)/g)].map(match => [match[1], match[2].replace(/^"|"$/g, '')]));
 }
 const isMp3 = row => /^audio\/mpeg(?:\s*;|$)/i.test(row.format?.mime_type || '');
+function supportedTranscoding(row, duration = 0) {
+  // FairPlay/SAMPLE-AES and CTR formats require the provider's protected player.
+  // Accept only the full stream formats handled by the downloader below.
+  return !!row && !row.snipped && !/\/preview\//i.test(row.url || '')
+    && ['progressive', 'hls', 'encrypted-hls'].includes(row.format?.protocol)
+    && (!row.duration || row.duration >= duration * 800 - 1000);
+}
 function formatScore(row) {
   // Prefer a dedicated full stream; SoundCloud's adaptive "abr" playlists may
   // be unavailable even when the same recording has working AAC/Opus streams.
@@ -87,7 +94,7 @@ class SoundCloudAudioSource {
     // author's "downloadable" flag controls original files, not stream formats.
     if (!track?.title) throw new Error(raw?.policy === 'SNIP' ? 'SoundCloud отдаёт только отрывок. Для полной записи может потребоваться вход или подписка.' : 'SoundCloud не предоставил доступ к этой записи. Проверь вход и доступность трека.');
     track.duration = Math.max(track.duration, Math.round((Number(raw.full_duration) || 0) / 1000));
-    const choices = (raw.media?.transcodings || []).filter(row => !row.snipped && !/\/preview\//i.test(row.url || '') && ['progressive', 'hls', 'encrypted-hls'].includes(row.format?.protocol) && (!row.duration || row.duration >= track.duration * 800 - 1000));
+    const choices = (raw.media?.transcodings || []).filter(row => supportedTranscoding(row, track.duration));
     choices.sort((a, b) => formatScore(b) - formatScore(a));
     if (!choices.length) throw new Error('SoundCloud не предоставил полный поддерживаемый поток для этой записи.');
     let lastError;
@@ -144,4 +151,4 @@ class SoundCloudAudioSource {
     } finally { await file.close(); if (!complete) await fs.rm(filename, { force: true }); }
   }
 }
-module.exports = { SoundCloudAudioSource, parsePlaylist, mediaUrl };
+module.exports = { SoundCloudAudioSource, parsePlaylist, mediaUrl, supportedTranscoding };

@@ -6,7 +6,9 @@
   <meta name="theme-color" content="#111813">
   <title>Слушаем вместе · LolzCloud</title>
   <link rel="stylesheet" href="/cloud/room.css">
+  <link rel="stylesheet" href="/cloud/social.css">
   <script src="/cloud/site.js" defer></script>
+  <script src="/cloud/social.js" defer></script>
   <script src="/cloud/room-sync.js" defer></script>
   <script src="/cloud/media-source.js" defer></script>
   <script src="/cloud/room-players.js" defer></script>
@@ -49,7 +51,8 @@
     <aside class="room-social">
       <section class="people chat-panel">
         <div class="people-heading"><h2>Чат</h2></div>
-        <div id="chat-messages" role="log" aria-label="Сообщения комнаты"></div>
+        <button id="chat-unread" class="chat-unread" hidden>Новые сообщения ↓</button>
+        <div id="chat-messages" role="log" aria-label="Сообщения комнаты" aria-live="polite" aria-relevant="additions"></div>
         <div id="reactions" aria-live="polite"></div>
         <div class="reaction-buttons" aria-label="Реакции">
           <button data-reaction="🔥" aria-label="Огонь">🔥</button><button data-reaction="❤️" aria-label="Сердце">❤️</button><button data-reaction="👏" aria-label="Аплодисменты">👏</button><button data-reaction="🎵" aria-label="Музыка">🎵</button><button data-reaction="💀" aria-label="Череп">💀</button><button data-reaction="✨" aria-label="Искры">✨</button>

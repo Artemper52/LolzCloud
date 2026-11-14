@@ -1,0 +1,1 @@
+YouTube production UI passed: native video URL on home/search, real IPC and shared footer hitboxes at 100/125%, actual speed/EQ graph, Voicetag over playing video, mini player, visible full/mini synced lyrics and seeking.

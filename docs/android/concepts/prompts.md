@@ -1,5 +1,13 @@
 # Промпты концептов
 
+## Иллюстрация Forest для APK
+
+Сохранена в `android/app/src/main/res/drawable-nodpi/forest_art.png`. Встроенный image_gen; самостоятельный авторский визуал, не обложка чужого альбома.
+
+```text
+Use case: photorealistic-natural. Asset type: a square default artwork for a personal Android music library, LolzCloud Forest design. An original quiet editorial photograph of dense conifer forest in the early morning, layered dark pine silhouettes with natural pale mist between ridgelines, subtle film grain, desaturated deep evergreen and grey-green palette, authentic overcast light, no sunlight beam, no gradient overlay, no text, no logos, no people, no device or interface frame. Composition edge to edge square, carefully balanced forest textures, usable as a 300dp album artwork with a dark forest themed music app. Photo feels tactile and calm rather than fantasy.
+```
+
 Сгенерировано встроенным image_gen; картинка `style-directions.png` — концепт, не скриншот готового приложения. Для APK выбрано направление Forest. Реальные скриншоты APK сохраняются отдельно.
 
 ## Сравнение направлений

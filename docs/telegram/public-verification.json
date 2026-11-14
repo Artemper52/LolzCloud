@@ -1,0 +1,56 @@
+{
+  "status": "passed",
+  "generatedAt": "2026-11-13T22:40:37.550Z",
+  "checks": [
+    {
+      "name": "Telegram long polling is live",
+      "health": {
+        "ok": true,
+        "bot": "lolzcloudbot",
+        "pollAgeSeconds": 16,
+        "activeDownloads": 0,
+        "cacheTracks": 0,
+        "inlineMode": "direct-audio",
+        "cacheChannelConfigured": false
+      }
+    },
+    {
+      "name": "Room and social backend still healthy",
+      "health": {
+        "ok": true,
+        "version": "0.9.13",
+        "roomProtocol": 2,
+        "socialProtocol": 1,
+        "oauthConfigured": true,
+        "spicyConfigured": true
+      }
+    },
+    {
+      "name": "Public HTTPS MP3 matches prepared file",
+      "status": 200,
+      "bytes": 1434133,
+      "totalMs": 461,
+      "sha256": "3013abed7a2da84fb8ea13c2bf734c9b44a4d1945cbadfd515e6cf45d342f1b9",
+      "mime": "audio/mpeg"
+    },
+    {
+      "name": "Public HEAD",
+      "status": 200
+    },
+    {
+      "name": "Public byte range",
+      "status": 206
+    },
+    {
+      "name": "Unsigned media is hidden",
+      "status": 404
+    }
+  ],
+  "unitTests": {
+    "total": 275,
+    "passed": 275,
+    "telegram": 16
+  },
+  "realTelegramUiTest": "not performed: no signed-in Telegram session",
+  "cacheChannelConfigured": false
+}

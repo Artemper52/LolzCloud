@@ -1,0 +1,82 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Only an isolated emulator may run mutation checks",
+      "passed": true
+    },
+    {
+      "name": "Production audio service binding",
+      "passed": true
+    },
+    {
+      "name": "Native activity is foreground before hardware Back regression",
+      "passed": true
+    },
+    {
+      "name": "Open native room Activity for hardware Back test",
+      "passed": true
+    },
+    {
+      "name": "Own-origin room fixture loaded without an account",
+      "passed": true
+    },
+    {
+      "name": "Actual social.js opens an HTML drawer over the room fixture",
+      "passed": true
+    },
+    {
+      "name": "Back fixture starts without native WebView history",
+      "passed": true
+    },
+    {
+      "name": "First hardware Back is processed",
+      "passed": true
+    },
+    {
+      "name": "First system Back closes the social drawer without finishing the room activity",
+      "passed": true
+    },
+    {
+      "name": "First Back preserves the exact WebView instance and room URL",
+      "passed": true
+    },
+    {
+      "name": "Closing the real drawer retains the same connected room player DOM",
+      "passed": true
+    },
+    {
+      "name": "Second system Back follows normal native history/finish behavior",
+      "passed": true
+    },
+    {
+      "name": "Return to native activity after leaving the room",
+      "passed": true
+    },
+    {
+      "name": "Open native social Activity for hardware Back test",
+      "passed": true
+    },
+    {
+      "name": "Own-origin social fixture loaded without an account",
+      "passed": true
+    },
+    {
+      "name": "Actual standalone social page is open for Back regression",
+      "passed": true
+    },
+    {
+      "name": "Standalone social page exits normally without a close()/Back loop",
+      "passed": true
+    }
+  ],
+  "diagnostics": [],
+  "generatedAt": "2026-11-13T21:55:59.567Z",
+  "emulator": "emulator-5554",
+  "androidApi": "35",
+  "androidVersion": "15",
+  "deviceModel": "Android SDK built for x86_64",
+  "apk": "LolzCloud-Android-0.1.2.apk",
+  "apkSha256": "cd15baff03a366bdf404ca50eaa3137be212fe9df18b6df5a93e50bae7370b9f",
+  "scope": "Real private offline storage/MediaPlayer and real Android NotificationManager; social events are isolated fixtures, not a personal-account login."
+}

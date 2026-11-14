@@ -1,0 +1,742 @@
+{
+  "status": "failed",
+  "error": "java.lang.AssertionError: Select the real provider-backed PNG document",
+  "checks": [
+    {
+      "name": "Only an isolated emulator may run mutation checks",
+      "passed": true
+    },
+    {
+      "name": "Production audio service binding",
+      "passed": true
+    },
+    {
+      "name": "Offline conversion replaces the original HTTPS row instead of duplicate-id no-op",
+      "passed": true
+    },
+    {
+      "name": "Offline conversion preserves identity, likes and imported lyrics",
+      "passed": true
+    },
+    {
+      "name": "Saved queue and resume position point to the real local file",
+      "passed": true
+    },
+    {
+      "name": "History opens the saved local source",
+      "passed": true
+    },
+    {
+      "name": "Offline source is actually played by the native MediaPlayer",
+      "passed": true
+    },
+    {
+      "name": "Actual playback source is private file, with no stream/network dependency",
+      "passed": true
+    },
+    {
+      "name": "Seek fixture before active source replacement",
+      "passed": true
+    },
+    {
+      "name": "Active MediaPlayer adopts the saved source and resumes its existing position",
+      "passed": true
+    },
+    {
+      "name": "Active source replacement retains queue identity and index",
+      "passed": true
+    },
+    {
+      "name": "A stale second download cannot overwrite an already changed source",
+      "passed": true
+    },
+    {
+      "name": "Native social entry opens the real OnlineActivity",
+      "passed": true
+    },
+    {
+      "name": "Opening the shared social/profile page does not pause native music",
+      "passed": true
+    },
+    {
+      "name": "The isolated own-origin view is ready before room handoff",
+      "passed": true
+    },
+    {
+      "name": "Browsing the isolated same-origin /rooms view keeps native music playing",
+      "passed": true
+    },
+    {
+      "name": "Actual same-origin room entry pauses the native player before room audio",
+      "passed": true
+    },
+    {
+      "name": "Room handoff retains local queue and resume position",
+      "passed": true
+    },
+    {
+      "name": "Own social page is available for native image upload",
+      "passed": true
+    },
+    {
+      "name": "Actual bundled social fixture document loaded without a personal account",
+      "passed": true
+    },
+    {
+      "name": "The isolated form retains the trusted social main-frame URL",
+      "passed": true
+    },
+    {
+      "name": "Isolated form exists in the genuine own-origin document",
+      "passed": true
+    },
+    {
+      "name": "Frame-focused file request has an iframe as top-level active element",
+      "passed": true
+    },
+    {
+      "name": "Provider-frame upload request is explicitly cancelled",
+      "passed": true
+    },
+    {
+      "name": "Provider frames receive no native file URI or picker",
+      "passed": true
+    },
+    {
+      "name": "Only a focused top-level file input can open the picker",
+      "passed": true
+    },
+    {
+      "name": "A genuine top-level input tap opens the real Android system document picker",
+      "passed": true
+    },
+    {
+      "name": "Cancelling the system picker resolves the production WebView callback",
+      "passed": true
+    },
+    {
+      "name": "Cancelled image selection exposes no file URI to the page",
+      "passed": true
+    },
+    {
+      "name": "Real input can reopen the system picker after cancellation",
+      "passed": true
+    },
+    {
+      "name": "Open actual SAF root menu",
+      "passed": true
+    },
+    {
+      "name": "PNG-only test provider appears in the real Android picker",
+      "passed": true
+    },
+    {
+      "name": "Select the real provider-backed PNG document",
+      "passed": false
+    }
+  ],
+  "diagnostics": [
+    {
+      "phase": "upload-fixture",
+      "frameFocus": "\"IFRAME\"",
+      "dom": "\"{\\\"url\\\":\\\"https://lolzcloud.com/social?native-upload-fixture=885c7b45-261d-4e15-aacb-d0dbb95bd59d\\\",\\\"ready\\\":\\\"complete\\\",\\\"visibility\\\":\\\"visible\\\",\\\"avatar\\\":true,\\\"provider\\\":true,\\\"active\\\":\\\"IFRAME\\\",\\\"body\\\":\\\"\\u003Ch1>Native upload fixture\\u003C/h1>\\u003Cinput id=\\\\\\\"avatar\\\\\\\" type=\\\\\\\"file\\\\\\\" accept=\\\\\\\"image/jpeg,image/png\\\\\\\">\\u003Ciframe id=\\\\\\\"provider\\\\\\\" tabindex=\\\\\\\"0\\\\\\\" src=\\\\\\\"https://w.soundcloud.com/\\\\\\\">\\u003C/iframe>\\\"}\""
+    },
+    {
+      "phase": "SAF drawer provider row",
+      "bounds": "[189,90][614,161]"
+    },
+    {
+      "phase": "SAF before",
+      "nodes": [
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.ViewGroup",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "androidx.drawerlayout.widget.DrawerLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.ScrollView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.ScrollView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,189][1080,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "androidx.recyclerview.widget.RecyclerView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,189][1080,315]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.HorizontalScrollView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,315][1080,315]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[63,315][1017,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.ViewGroup",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,189]"
+        },
+        {
+          "text": "null",
+          "description": "Show roots",
+          "class": "android.widget.ImageButton",
+          "enabled": true,
+          "clickable": true,
+          "selected": false,
+          "bounds": "[0,63][147,189]"
+        },
+        {
+          "text": "LolzCloud images",
+          "description": "null",
+          "class": "android.widget.TextView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[189,90][614,161]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "androidx.appcompat.widget.LinearLayoutCompat",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[954,63][1080,189]"
+        },
+        {
+          "text": "null",
+          "description": "More options",
+          "class": "android.widget.ImageView",
+          "enabled": true,
+          "clickable": true,
+          "selected": false,
+          "bounds": "[954,63][1080,189]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.ViewGroup",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.GridView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.View",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][32,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.ViewGroup",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,2214][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.View",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,2214][1080,2340]"
+        }
+      ]
+    },
+    {
+      "phase": "SAF before screenshot",
+      "path": "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/social-picker-before.png"
+    },
+    {
+      "phase": "SAF PNG tile tap",
+      "bounds": "[64,484][366,786]",
+      "package": "com.android.documentsui"
+    },
+    {
+      "phase": "SAF PNG accessibility action",
+      "clicked": false
+    },
+    {
+      "phase": "SAF PNG tile tap",
+      "bounds": "[64,484][366,786]",
+      "package": "com.android.documentsui"
+    },
+    {
+      "phase": "SAF PNG accessibility action",
+      "clicked": false
+    },
+    {
+      "phase": "SAF PNG tile tap",
+      "bounds": "[64,484][366,786]",
+      "package": "com.android.documentsui"
+    },
+    {
+      "phase": "SAF PNG accessibility action",
+      "clicked": false
+    },
+    {
+      "phase": "SAF PNG tile tap",
+      "bounds": "[64,484][366,786]",
+      "package": "com.android.documentsui"
+    },
+    {
+      "phase": "SAF PNG accessibility action",
+      "clicked": false
+    },
+    {
+      "phase": "SAF PNG tile tap",
+      "bounds": "[64,484][366,786]",
+      "package": "com.android.documentsui"
+    },
+    {
+      "phase": "SAF PNG accessibility action",
+      "clicked": false
+    },
+    {
+      "phase": "SAF after",
+      "nodes": [
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.ViewGroup",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "androidx.drawerlayout.widget.DrawerLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.ScrollView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.ScrollView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,189][1080,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "androidx.recyclerview.widget.RecyclerView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,189][1080,315]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.HorizontalScrollView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,315][1080,315]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[63,315][1017,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.ViewGroup",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,189]"
+        },
+        {
+          "text": "null",
+          "description": "Show roots",
+          "class": "android.widget.ImageButton",
+          "enabled": true,
+          "clickable": true,
+          "selected": false,
+          "bounds": "[0,63][147,189]"
+        },
+        {
+          "text": "LolzCloud images",
+          "description": "null",
+          "class": "android.widget.TextView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[189,90][614,161]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "androidx.appcompat.widget.LinearLayoutCompat",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[954,63][1080,189]"
+        },
+        {
+          "text": "null",
+          "description": "More options",
+          "class": "android.widget.ImageView",
+          "enabled": true,
+          "clickable": true,
+          "selected": false,
+          "bounds": "[954,63][1080,189]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.ViewGroup",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.GridView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.View",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][32,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.ViewGroup",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,2214][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.View",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,2214][1080,2340]"
+        }
+      ]
+    },
+    {
+      "phase": "SAF after screenshot",
+      "path": "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/social-picker-after.png"
+    }
+  ],
+  "generatedAt": "2026-11-14T16:07:04.186Z",
+  "emulator": "emulator-5554",
+  "androidApi": "35",
+  "androidVersion": "15",
+  "deviceModel": "Android SDK built for x86_64",
+  "apk": "LolzCloud-Android-0.1.5.apk",
+  "apkSha256": "ee61577bcf8b45650fad41a76715d3b532012cc949289a61dbb2adfc41db72d0",
+  "scope": "Real private offline storage/MediaPlayer and real Android NotificationManager; social events are isolated fixtures, not a personal-account login."
+}

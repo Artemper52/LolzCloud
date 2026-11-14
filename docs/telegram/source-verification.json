@@ -1,0 +1,45 @@
+{
+  "status": "passed",
+  "generatedAt": "2026-11-13T22:31:15.015Z",
+  "username": "lolzcloudbot",
+  "inlineEnabled": true,
+  "results": 20,
+  "searchMs": 297,
+  "coldMs": 1183,
+  "warmMs": 0,
+  "track": {
+    "id": "1930572542",
+    "title": "гной",
+    "artist": "тёмный принц",
+    "duration": 89,
+    "bytes": 1434133,
+    "sha256": "3013abed7a2da84fb8ea13c2bf734c9b44a4d1945cbadfd515e6cf45d342f1b9",
+    "audioUrl": "https://lolzcloud.com/telegram/audio/1930572542/920e04b3ea35e40fe1242427.mp3"
+  },
+  "persistentCacheReopen": true,
+  "probe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "mp3",
+        "disposition": {
+          "attached_pic": 0
+        }
+      },
+      {
+        "codec_name": "mjpeg",
+        "disposition": {
+          "attached_pic": 1
+        }
+      }
+    ],
+    "format": {
+      "duration": "88.581224",
+      "tags": {
+        "title": "гной",
+        "artist": "тёмный принц"
+      }
+    }
+  }
+}

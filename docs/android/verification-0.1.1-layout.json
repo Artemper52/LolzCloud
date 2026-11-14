@@ -1,0 +1,21 @@
+{
+  "version": "0.1.1",
+  "status": "passed",
+  "checks": [
+    "Real 360dp device configuration with 200% system font",
+    "Large-font query remains visible above the keyboard",
+    "Search action can be reached by scrolling with the keyboard visible",
+    "Actual URI keyboard window stays visible after its animation",
+    "Large-font invitation error leaves the Open action visible",
+    "Validation message is announced as an accessibility live region",
+    "Actual URI keyboard window stays visible after its animation",
+    "Long audio-link explanation scrolls while both dialog actions remain reachable"
+  ],
+  "generatedAt": "2026-11-12T19:14:36.805Z",
+  "configuration": {
+    "widthDp": 360,
+    "fontScale": 2,
+    "theme": "paper"
+  },
+  "apkSha256": "3cea67b5187b01a61ab0c2271b5c76de54566c06edca1d282d4feb52b84ff1d5"
+}

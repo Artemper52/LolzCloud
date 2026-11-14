@@ -10,7 +10,7 @@ const { prunePlayed } = require('./wave-history.cjs');
 const { writeJson } = require('./durable-json.cjs');
 function createPlayerExperience({ app, service, music, wave, lyrics, room, discovery, downloads, media, play, getWindow, notify, dialog, clipboard }) {
   const directory = app.getPath('userData'), tools = new PlayerTools(path.join(directory, 'player-tools.json')), library = new LocalLibrary(path.join(directory, 'local-library.json'), downloads.directory), radar = new ReleaseRadar(path.join(directory, 'release-radar.json'), discovery), send = (channel, value) => getWindow()?.webContents.send(channel, value);
-  let local = null, pendingSeek = null, versions = { source: null, candidates: [], loading: false, error: '' }, lookupRevision = 0, remote = null, remoteBusy = false, remotePollAt = 0, profileBusy = false, cloudRevision = null, lastError = '', roomNextBusy = false;
+  let local = null, pendingSeek = null, versions = { source: null, candidates: [], loading: false, error: '' }, lookupRevision = 0, remote = null, remoteBusy = false, remotePollAt = 0, profileBusy = false, cloudRevision = null, lastError = '', roomNextBusy = false, roomAdvanceKey = '';
   wave.isDuplicate = (track, cache, now) => tools.duplicate(track, cache, now);
   let localStartedAt = 0, localOrigin = '', localGeneration = 0;
   const current = () => local ? { ...local } : service.displayPlayback();
@@ -59,7 +59,23 @@ function createPlayerExperience({ app, service, music, wave, lyrics, room, disco
     catch (error) { if (revision === lookupRevision) versions = { source: { ...track }, candidates: [], loading: false, error: error.message }; }
     notify();
   }
-  async function roomNext() { if (roomNextBusy || !room.room) return; roomNextBusy = true; try { const result = await room.queueAction({ type: 'next' }); if (result.track) { stopLocal(); await play(result.track.url, result.track); } } finally { roomNextBusy = false; } }
+  async function roomNext(action = {}) {
+    const active = room.room, source = current(), lease = room.lease;
+    if (roomNextBusy || !active || !room.getState().hosting) return;
+    if (action.expectedUrl && action.expectedUrl !== source.url
+      || Number.isSafeInteger(action.expectedEpoch) && action.expectedEpoch !== active.epoch
+      || action.expectedController && action.expectedController !== active.controller?.connection) return;
+    const key = [active.id, active.epoch, lease, source.url].join('|');
+    if (action.automatic && (active.settings?.autoNext === false || roomAdvanceKey === key)) return;
+    // A manual Next may retry a failed request; repeated end events may not pop two songs.
+    if (action.automatic) roomAdvanceKey = key;
+    roomNextBusy = true;
+    try {
+      const result = await room.queueAction({ type: 'next' });
+      if (room.room?.id !== active.id || room.lease !== lease || room.room?.epoch !== active.epoch || current().url !== source.url) return;
+      if (result.track) { stopLocal(); await play(result.track.url, result.track); }
+    } finally { roomNextBusy = false; }
+  }
   async function act(action) {
     lastError = '';
     switch (action?.type) {
@@ -96,7 +112,7 @@ function createPlayerExperience({ app, service, music, wave, lyrics, room, disco
       case 'remote-copy': if (!remote) throw new Error('Сначала включи пульт.'); clipboard.writeText(remote.url); break;
       case 'remote-stop': { const old = remote; remote = null; if (old) await room.request('/api/remotes/' + old.id, { method: 'DELETE' }); break; }
       case 'room-queue': await room.queueAction(action.action); break;
-      case 'room-next': await roomNext(); break;
+      case 'room-next': await roomNext(action); break;
       default: throw new Error('Неизвестное действие плеера.');
     }
     notify(); return null;
@@ -107,7 +123,8 @@ function createPlayerExperience({ app, service, music, wave, lyrics, room, disco
     if (track.url !== lastNormalizationUrl) { lastNormalizationUrl = track.url; sendNormalization(); }
     if (pendingSeek) { if (Date.now() > pendingSeek.until) { pendingSeek = null; lastError = 'Не удалось открыть трек закладки. Можно повторить.'; } else if (source.fresh && track.url === pendingSeek.url && track.duration > 0) { const value = pendingSeek; pendingSeek = null; void media('seek', Math.min(track.duration, value.position)); } }
     if (track.playing && track.position >= Math.min(30, track.duration * .5) && radar.data.tracks.some(row => row.url === track.url) && !radar.data.heard.includes(track.url)) radar.heard(track.url);
-    if (!local && previous?.url === track.url && previous.playing && !track.playing && track.position >= track.duration - .5 && track.duration > 1 && room.getState().hosting && room.getState().settings?.autoNext !== false && room.getState().queue?.some(row => row.approved)) void roomNext().catch(error => { lastError = error.message; });
+    if (track.url && (previous?.url !== track.url || track.position < track.duration - 2 && previous?.position >= previous?.duration - 2)) roomAdvanceKey = '';
+    if (!local && previous?.url === track.url && previous.playing && !track.playing && track.position >= track.duration - .5 && track.duration > 1 && room.getState().hosting && room.getState().settings?.autoNext !== false && room.getState().queue?.some(row => row.approved)) void roomNext({ automatic: true, expectedUrl: track.url }).catch(error => { lastError = error.message; });
     previous = { ...track };
     if (remote && !remoteBusy && Date.now() >= remotePollAt) { const target = remote; remoteBusy = true; remotePollAt = Date.now() + 1800; void (async () => { try { const result = await room.request('/api/remotes/' + target.id + '/state', { method: 'PUT', body: { fresh: source.fresh === true, private: source.private === true, playback: source.private ? null : source.playback, volume: music.data.player.volume ?? 1, ack: target.ack } }); if (remote !== target) return; for (const command of result.commands || []) { if (command.id <= target.ack) continue; if (Number.isSafeInteger(command.id) && command.id === target.ack + 1) { if (command.command === 'volume') music.configurePlayer({ volume: command.value }); await media(command.command, command.value); target.ack = command.id; } } target.error = ''; } catch (error) { target.error = error.message; } finally { remoteBusy = false; notify(); } })(); }
   }

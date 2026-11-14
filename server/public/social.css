@@ -1,0 +1,132 @@
+/* The same social surface is used in the browser, desktop guest and Android WebView. */
+.social-nav { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+.social-nav button { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 9px 11px; font-size: 12px; border-radius: 12px; color: #bdcfc2; }
+.social-nav button:hover { background: #ffffff0a; color: #edf4ef; }
+.social-unread { min-width: 19px; padding: 2px 5px; border-radius: 10px; background: var(--mint, #b8e9c7); color: #173a24; font-size: 10px; font-weight: 700; text-align: center; }
+header:has(.social-nav) #account { margin-left: 8px; }
+.account-profile { display: inline-flex; align-items: center; gap: 9px; min-height: 40px; padding: 0; text-align: left; }
+.account-profile > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.social-page { max-width: 760px; margin: 26px auto 70px; padding: 0 24px; }
+.social-dialog { position: fixed; inset: 0 0 0 auto; width: min(100%, 510px); max-width: none; height: 100dvh; max-height: none; margin: 0; padding: 0; border: 0; border-left: 1px solid #ffffff18; color: #ecf4ed; background: #101813; box-shadow: -20px 0 90px #0005; }
+.social-dialog::backdrop { background: #030a07a6; }
+.social-surface { display: flex; flex-direction: column; min-height: 0; height: 100%; color: #ecf4ed; background: #101813; font-size: 14px; }
+.social-page > .social-surface { height: auto; min-height: 580px; border: 1px solid #ffffff13; border-radius: 24px; overflow: hidden; }
+.social-topbar { flex: none; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 22px 24px 16px; }
+.social-topbar h2 { margin: 0; font-size: 22px; letter-spacing: -.035em; }
+.social-close { min-width: 44px; min-height: 44px; border-radius: 50%; background: #ffffff08; font-size: 24px; line-height: 1; }
+.social-close:hover { background: #ffffff13; }
+.social-tabs { display: flex; flex: none; gap: 20px; padding: 0 24px; border-bottom: 1px solid #ffffff12; }
+.social-tabs button { min-height: 48px; padding: 10px 0 13px; color: #96ac9e; border-bottom: 2px solid transparent; font-size: 13px; }
+.social-tabs button[aria-selected=true] { color: #d1efda; border-color: #b8e9c7; }
+.social-view { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 24px; scrollbar-width: thin; scrollbar-color: #4b6655 transparent; }
+.social-page .social-view { overflow: visible; }
+.social-status { flex: none; margin: 0; padding: 12px 24px; background: #213327; font-size: 12px; line-height: 1.55; color: #d4e8db; overflow-wrap: anywhere; }
+.social-status:empty { display: none; }
+.social-status[data-error=true] { background: #3b2820; color: #f1d2c3; }
+.social-loading, .social-empty { margin: 8px 0; font-size: 14px; line-height: 1.7; color: #9bb2a3; }
+.social-retry { margin-top: 14px; }
+.social-cover { position: relative; height: 145px; margin: -24px -24px 0; overflow: hidden; background: #263c2e; }
+.social-cover[data-preset=forest] { background: linear-gradient(125deg, #334c36, #152b22 65%, #577044); }
+.social-cover[data-preset=paper] { background: linear-gradient(125deg, #cfc9af, #8d9b7e); }
+.social-cover[data-preset=ink] { background: linear-gradient(125deg, #29354a, #141d2e 70%, #3b4964); }
+.social-cover img { width: 100%; height: 100%; object-fit: cover; }
+.social-cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(transparent 45%, #10181365); pointer-events: none; }
+.social-profile-head { position: relative; display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-top: -33px; }
+.social-profile-head > .avatar { width: 84px; height: 84px; border: 5px solid #101813; border-radius: 26px; font-size: 30px; background: #2a4533; }
+.social-profile-head > .button { min-height: 40px; padding: 11px 15px; }
+.social-name { margin: 16px 0 7px; font-size: 29px; letter-spacing: -.045em; line-height: 1.18; overflow-wrap: anywhere; }
+.social-badges { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; min-width: 0; margin: 0; font-size: 12px; line-height: 1.5; color: #a9c2b2; }
+.social-app-role { display: inline-flex; align-items: center; padding: 2px 7px; border: 1px solid #b8e9c72b; border-radius: 6px; color: #ccebd6; font-weight: 600; }
+.social-role-editor { display: grid; gap: 14px; margin-top: 18px; padding-top: 20px; border-top: 1px solid #ffffff15; }
+.social-role-editor h4, .social-role-editor p { margin: 0; }
+.social-role-editor h4 { font-size: 16px; }
+.social-role-editor .social-role-choice { display: flex; flex-direction: row; align-items: start; gap: 12px; line-height: 1.6; }
+.social-role-choice input { flex: none; width: 18px; height: 18px; min-width: 18px; padding: 0; margin: 3px 0 0; accent-color: #b8e9c7; }
+.social-role-choice strong { color: #deece3; font-size: 14px; }
+.social-role-footer { display: flex; gap: 8px; flex-wrap: wrap; }
+.social-role-footer .button { min-height: 44px; padding: 10px 14px; }
+.social-verified { display: inline-flex; align-items: center; gap: 5px; min-width: 0; color: #bedeca; }
+.social-verified-mark { flex: none; display: inline-grid; place-items: center; width: 14px; height: 14px; border-radius: 50%; background: #b8e9c71c; color: #b8e9c7; font-size: 10px; }
+.social-bio { margin: 22px 0; font-size: 14px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; color: #d4dfd8; }
+.social-profile-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin: 20px 0; font-size: 12px; color: #95ad9d; }
+.social-profile-links a { text-decoration: underline; text-underline-offset: 4px; color: #c5dfce; }
+.social-all-titles { margin: 16px 0; font-size: 12px; line-height: 1.8; color: #b4cabc; }
+.social-all-titles summary { font-size: 12px; }
+.social-all-titles ul { padding-left: 18px; }
+.social-profile-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; padding-top: 20px; border-top: 1px solid #ffffff12; }
+.social-user { display: inline-flex; align-items: center; gap: 10px; min-width: 0; text-align: left; padding: 0; }
+.social-user > span:not(.avatar) { min-width: 0; }
+.social-user-name { display: block; color: #e2ece6; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.social-user:hover .social-user-name { color: #b8e9c7; }
+.social-user .social-badges { margin-top: 3px; font-size: 10px; gap: 4px 8px; }
+.social-user .social-verified-mark { width: 12px; height: 12px; font-size: 9px; }
+.social-person { display: flex; align-items: center; gap: 10px; padding: 16px 0; border-bottom: 1px solid #ffffff0d; }
+.social-person > .social-user { flex: 1; }
+.social-person .avatar { width: 42px; height: 42px; border-radius: 14px; }
+.social-person-actions { display: flex; flex: none; gap: 5px; flex-wrap: wrap; justify-content: end; max-width: 48%; }
+.social-person-actions button { min-height: 40px; padding: 9px 11px; border-radius: 12px; font-size: 11px; background: #ffffff08; }
+.social-person-actions button.social-action-primary { background: #b8e9c7; color: #173822; }
+.social-section { margin-top: 28px; }
+.social-section:first-child { margin-top: 0; }
+.social-section-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin: 0 0 10px; }
+.social-section-heading .button { min-height: 40px; padding: 10px 12px; font-size: 11px; }
+.social-section-heading h3 { margin: 0; font-size: 16px; letter-spacing: -.02em; }
+.social-section-heading > span { font-size: 12px; color: #94ab9d; }
+.social-search { display: flex; align-items: stretch; gap: 8px; margin: 0 0 14px; }
+.social-search input { flex: 1; min-width: 0; width: 100%; }
+.social-search .button { padding: 12px 16px; border-radius: 12px; }
+.social-search-results:empty { display: none; }
+.social-invite-context { margin: 0 0 20px; padding: 14px 16px; border-radius: 12px; color: #c8ddcf; background: #b8e9c70a; font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.social-invite-link { display: block; width: 100%; margin: 12px 0 8px; font-size: 11px; }
+.social-invite-context .button { padding: 9px 12px; min-height: 40px; }
+.social-notification { position: relative; padding: 20px 0; border-bottom: 1px solid #ffffff12; }
+.social-notification[data-unread=true]::before { content: ''; position: absolute; top: 25px; left: -13px; width: 5px; height: 5px; border-radius: 50%; background: #b8e9c7; }
+.social-notification .social-user .avatar { width: 32px; height: 32px; border-radius: 11px; }
+.social-notification-copy { margin: 11px 0 7px; color: #d6e2da; font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+.social-notification time { color: #829c8c; font-size: 11px; }
+.social-notification-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.social-notification-actions .button { min-height: 40px; padding: 10px 14px; font-size: 12px; }
+.social-note { display: block; color: #8fa798; font-size: 12px; line-height: 1.6; }
+.social-editor { display: grid; gap: 24px; margin: 0; align-items: stretch; }
+.social-editor label { display: flex; flex-direction: column; gap: 9px; font-size: 13px; color: #c6d9cd; }
+.social-editor textarea { display: block; min-height: 110px; resize: vertical; max-width: 100%; width: 100%; color: #edf4ef; font: inherit; line-height: 1.6; border: 1px solid #ffffff20; border-radius: 12px; padding: 12px; background: #ffffff07; }
+.social-editor select { width: 100%; color: #e3eee6; font: inherit; min-height: 44px; padding: 10px 12px; border: 1px solid #ffffff20; border-radius: 12px; background: #1b2920; }
+.social-editor fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+.social-editor legend { margin-bottom: 12px; padding: 0; font-size: 15px; font-weight: 600; }
+.social-editor input[type=file] { width: 100%; min-height: 44px; padding: 9px; font-size: 12px; }
+.social-editor input[type=file]::file-selector-button { min-height: 30px; color: #c7ddce; background: #ffffff0a; border: 0; border-radius: 7px; padding: 6px 10px; margin-right: 10px; font: inherit; }
+.social-edit-preview { position: relative; margin-bottom: 14px; }
+.social-edit-preview .social-cover { margin: 0; height: 115px; border-radius: 16px; }
+.social-edit-preview > .avatar { width: 65px; height: 65px; margin: -25px 0 0 15px; border: 4px solid #101813; border-radius: 21px; font-size: 24px; }
+.social-source-controls, .social-preset-options { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+.social-source-controls button, .social-preset-options button { min-height: 40px; padding: 9px 12px; border: 1px solid #ffffff19; border-radius: 10px; font-size: 12px; color: #9db6a6; }
+.social-source-controls button[aria-pressed=true], .social-preset-options button[aria-pressed=true] { border-color: #b8e9c7; color: #d7efdf; background: #b8e9c70a; }
+.social-editor .social-preference { flex-direction: row; gap: 12px; align-items: start; padding: 4px 0; line-height: 1.6; }
+.social-preference input { flex: none; margin: 3px 0 0; accent-color: #b8e9c7; width: 18px; height: 18px; }
+.social-editor-footer { display: flex; gap: 10px; flex-wrap: wrap; padding-top: 14px; border-top: 1px solid #ffffff12; }
+.social-editor-footer .button { min-height: 44px; }
+.social-surface :is(button, input, select, textarea):focus-visible { outline: 2px solid #b8e9c7; outline-offset: 3px; }
+body[data-page=social] > #status { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 620px) {
+  header:has(.social-nav) { flex-wrap: wrap; gap: 8px 12px; padding: 14px 16px; }
+  header:has(.social-nav) .brand { font-size: 21px; }
+  header:has(.social-nav) .brand img { width: 31px; height: 31px; }
+  header:has(.social-nav) #account { margin-left: auto; max-width: 150px; }
+  header:has(.social-nav) #account .avatar { display: grid; width: 31px; height: 31px; border-radius: 11px; }
+  header:has(.social-nav) #logout { padding: 9px; }
+  .social-nav { order: 4; width: 100%; margin-left: 0; gap: 8px; }
+  .social-nav button { padding: 8px 10px; font-size: 12px; }
+  .social-page { margin: 8px 0 0; padding: 0; }
+  .social-page > .social-surface { border: 0; border-radius: 0; }
+  .social-dialog { width: 100%; border: 0; }
+  .social-topbar { padding: 16px 20px 10px; }
+  .social-tabs { padding-inline: 20px; gap: 22px; }
+  .social-view { padding: 22px 20px; }
+  .social-cover { margin: -22px -20px 0; }
+  .social-status { padding-inline: 20px; }
+  .social-person { flex-wrap: wrap; }
+  .social-person > .social-user { flex-basis: 100%; }
+  .social-person-actions { max-width: 100%; margin-left: 52px; justify-content: start; }
+  .social-name { font-size: 27px; }
+}
+@media (prefers-reduced-motion: reduce) { .social-surface *, .social-nav * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }

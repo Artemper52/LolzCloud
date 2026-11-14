@@ -1,0 +1,32 @@
+{
+  "phase": "configuration",
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Real SAF fixture is available for configuration testing",
+      "passed": true
+    },
+    {
+      "name": "Previous fixture lyrics were cleared to prevent a false positive",
+      "passed": true
+    },
+    {
+      "name": "System SAF picker is open before recreating the production activity",
+      "passed": true
+    },
+    {
+      "name": "A new MainActivity instance binds while the real system picker stays open",
+      "passed": true
+    },
+    {
+      "name": "Actual SAF result stores the selected LRC for the original fixture track after recreation",
+      "passed": true
+    },
+    {
+      "name": "Queue and current track remain unchanged during picker recreation",
+      "passed": true
+    }
+  ],
+  "apkSha256": "8c02504b8085d3b2ee8e361d9d0cfd36fb80e0471d99b9cc6bd226d49d9834c9",
+  "generatedAt": "2026-11-12T17:43:19.645Z"
+}

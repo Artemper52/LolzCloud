@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T12:02:41.965Z",
+  "packagedSourceMatches": true,
+  "packagedSourceSha256": "6292ebd3e2bfd856212e6f6e13e10912e4352e07ec3da3fdd586d7b474987bd9",
+  "temporary": {
+    "directory": "D:\\Applications\\.LolzCloud-update-temp",
+    "alternate": true,
+    "requiredBytes": 2147483648
+  },
+  "freeBytesC": 13017088,
+  "freeBytesD": 52944334848,
+  "processEnvironmentUnchanged": true,
+  "globalEnvironmentUnchanged": true,
+  "installerExecuted": false
+}

@@ -1,0 +1,25 @@
+{
+  "version": "0.9.15",
+  "artifacts": [
+    {
+      "name": "LolzCloud-0.9.15-linux-x64.AppImage",
+      "size": 147454456,
+      "sha256": "ab81a437bc6fe8960268efee47ab2b8e213fbee5d6549a9998e44c528824a4e4",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.15/dist/LolzCloud-0.9.15-linux-x64.AppImage"
+    },
+    {
+      "name": "LolzCloud-0.9.15-linux-x64.tar.gz",
+      "size": 160305565,
+      "sha256": "c64f12d871e8b88c9c74d4a5577dab20ec6f5c69c39a8fea9e973422c3104a1c",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.15/dist/LolzCloud-0.9.15-linux-x64.tar.gz"
+    },
+    {
+      "name": "LolzCloud-0.9.15-linux-arm64.tar.gz",
+      "size": 159401586,
+      "sha256": "d87f345e78e3892ad8392bb1ce36f15c4d887e6ab60cc97d1c6053e9cee3a4ba",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.15/dist/LolzCloud-0.9.15-linux-arm64.tar.gz"
+    }
+  ],
+  "nativeX64Passed": true,
+  "arm64StaticOnly": true
+}

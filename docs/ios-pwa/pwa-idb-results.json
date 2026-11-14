@@ -1,0 +1,13 @@
+{
+  "ok": true,
+  "count": 5,
+  "checks": [
+    "A genuinely blocked v1→v2 request rejects without reporting an open connection",
+    "A rejected request closes its late onsuccess connection after the blocking tab releases the database",
+    "Retry creates exactly one new live connection and returns the upgraded database",
+    "Subsequent reads reuse the successful retry connection",
+    "A later version change closes the sole remaining connection without a leaked blocked upgrade"
+  ],
+  "failure": "",
+  "fixtureNote": "Two real isolated Chromium windows sharing IndexedDB. Controlled old-version blocker, production open implementation, instrumented open/close counts."
+}

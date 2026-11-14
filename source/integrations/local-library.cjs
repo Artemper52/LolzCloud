@@ -58,13 +58,18 @@ class LocalLibrary {
   get(id) { const row = this.tracks.find(row => row.id === id); if (!row || !fs.existsSync(row.path)) throw new Error('Файл не найден. Подключи его заново.'); return row; }
   play(id, queue) { const row = this.get(id); this.queue = (Array.isArray(queue) ? queue : this.tracks.map(row => row.id)).filter(value => this.tracks.some(row => row.id === value)); if (!this.queue.includes(id)) this.queue.unshift(id); this.current = id; return { ...row, url: 'lolzcloud-local://' + row.id, source: pathToFileURL(row.path).href }; }
   step(direction = 1, ended = false) {
-    if (ended && this.repeat === 'one') return this.play(this.current, this.queue);
-    let index = this.queue.indexOf(this.current) + direction;
-    if (index < 0 || index >= this.queue.length) { if (this.repeat !== 'all') return null; index = (index + this.queue.length) % this.queue.length; }
-    for (let attempts = 0; attempts < this.queue.length; attempts++, index += direction) { try { return this.play(this.queue[index], this.queue); } catch { if (index < 0 || index >= this.queue.length) break; } }
+    if (!this.queue.length) return null;
+    if (ended && this.repeat === 'one') { try { return this.play(this.current, this.queue); } catch { return null; } }
+    direction = direction < 0 ? -1 : 1;
+    let index = this.queue.indexOf(this.current);
+    for (let attempts = 0; attempts < this.queue.length; attempts++) {
+      index += direction;
+      if (index < 0 || index >= this.queue.length) { if (this.repeat !== 'all') return null; index = (index + this.queue.length) % this.queue.length; }
+      try { return this.play(this.queue[index], this.queue); } catch { /* A disconnected file must not hide other queued music. */ }
+    }
     return null;
   }
-  duration(id, seconds) { if (Number.isFinite(seconds) && seconds > 0 && seconds <= 14400) { const row = this.get(id); if (Math.abs(row.duration - seconds) > .5) { row.duration = seconds; this.save(); } } }
+  duration(id, seconds) { if (Number.isFinite(seconds) && seconds > 0 && seconds <= 14400) { const row = this.tracks.find(row => row.id === id); if (row && Math.abs(row.duration - seconds) > .5) { row.duration = seconds; this.save(); } } }
   remove(id) { this.tracks = this.tracks.filter(row => row.id !== id); this.queue = this.queue.filter(value => value !== id); this.save(); }
 }
 module.exports = { LocalLibrary, id3, EXTENSIONS };

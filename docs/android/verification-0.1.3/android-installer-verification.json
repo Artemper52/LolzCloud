@@ -1,0 +1,140 @@
+{
+  "target": "emulator-5554",
+  "generatedAt": "2026-11-14T10:41:44.623Z",
+  "apkSha256": "e5fb9fe5bd07bc5889ab3cb69ffcbfdc482440998c3b8533d108f9bf81781d77",
+  "baseline": {
+    "versionName": "0.1.3",
+    "versionCode": 4
+  },
+  "offeredFixture": {
+    "versionName": "0.1.4",
+    "versionCode": 5,
+    "sha256": "bc6f67da2c91538d35458c0452e06cfcb3b30b5706adf232777541c799f65dde"
+  },
+  "installedBefore": {
+    "versionCode": 4,
+    "versionName": "0.1.3"
+  },
+  "permissionBefore": "REQUEST_INSTALL_PACKAGES: deny; time=+1d17h7m11s398ms ago",
+  "newerApkInstalled": false,
+  "status": "passed",
+  "phase": {
+    "phase": "installer",
+    "status": "passed",
+    "checks": [
+      {
+        "name": "Installer phase runs only on an emulator",
+        "passed": true
+      },
+      {
+        "name": "Installed application matches the current updater fixture baseline",
+        "passed": true
+      },
+      {
+        "name": "The future fixture has a greater versionCode and is never installed",
+        "passed": true
+      },
+      {
+        "name": "Installed application matches the current updater fixture baseline",
+        "passed": true
+      },
+      {
+        "name": "The future fixture has a greater versionCode and is never installed",
+        "passed": true
+      },
+      {
+        "name": "Bundled updater fixture matches its declared package, version, size and checksum: test-current.apk",
+        "passed": true
+      },
+      {
+        "name": "Bundled updater fixture matches its declared package, version, size and checksum: test-next.apk",
+        "passed": true
+      },
+      {
+        "name": "Bundled updater fixture matches its declared package, version, size and checksum: test-wrong-signer.apk",
+        "passed": true
+      },
+      {
+        "name": "Updater rejects reinstalling the current APK version",
+        "passed": true
+      },
+      {
+        "name": "Updater accepts a newer same-package APK with the installed signing certificate",
+        "passed": true
+      },
+      {
+        "name": "Updater rejects a newer APK signed by a different certificate",
+        "passed": true
+      },
+      {
+        "name": "Updater rejects a malformed non-APK file",
+        "passed": true
+      },
+      {
+        "name": "Bundled updater fixture matches its declared package, version, size and checksum: LolzCloud-Android-update.apk",
+        "passed": true
+      },
+      {
+        "name": "Unknown-source installation is initially denied",
+        "passed": true
+      },
+      {
+        "name": "The newer same-certificate fixture passes package, version and signature validation",
+        "passed": true
+      },
+      {
+        "name": "Read-only update provider exposes the exact verified APK",
+        "passed": true
+      },
+      {
+        "name": "Update provider rejects an unrelated cache path",
+        "passed": true
+      },
+      {
+        "name": "Update provider rejects write access",
+        "passed": true
+      },
+      {
+        "name": "Opening unknown-source settings persists the pending verified update",
+        "passed": true
+      },
+      {
+        "name": "System unknown-source settings identifies LolzCloud",
+        "passed": true
+      },
+      {
+        "name": "Emulator grants the install-source permission",
+        "passed": true
+      },
+      {
+        "name": "System Package Installer parsed the provider APK and offers a LolzCloud update",
+        "passed": true
+      },
+      {
+        "name": "System installer UI evidence",
+        "passed": true,
+        "package": "com.android.packageinstaller",
+        "ui": "android.widget.FrameLayout text=null desc=null\nandroid.widget.FrameLayout text=null desc=null\nandroid.widget.FrameLayout text=null desc=null\nandroid.widget.LinearLayout text=null desc=null\nandroid.widget.LinearLayout text=null desc=null\nandroid.widget.LinearLayout text=null desc=null\nandroid.widget.ImageView text=null desc=null\nandroid.widget.TextView text=LolzCloud desc=null\nandroid.widget.FrameLayout text=null desc=null\nandroid.widget.FrameLayout text=null desc=null\nandroid.widget.FrameLayout text=null desc=null\nandroid.widget.TextView text=Do you want to update this app? desc=null\nandroid.widget.ScrollView text=null desc=null\nandroid.widget.LinearLayout text=null desc=null\nandroid.widget.Button text=CANCEL desc=null\nandroid.widget.Button text=UPDATE desc=null\n"
+      },
+      {
+        "name": "Resuming installation clears the pending permission state",
+        "passed": true
+      },
+      {
+        "name": "Cancelling leaves the current baseline version and versionCode installed",
+        "passed": true
+      },
+      {
+        "name": "Cancelling update preserves library and theme preferences",
+        "passed": true
+      }
+    ]
+  },
+  "permissionAfter": "REQUEST_INSTALL_PACKAGES: deny; time=+699ms ago",
+  "permissionRestoredToDeny": true,
+  "installedAfter": {
+    "versionCode": 4,
+    "versionName": "0.1.3"
+  },
+  "baselinePreserved": true
+}

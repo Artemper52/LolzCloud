@@ -1,0 +1,18 @@
+{
+  "scenario": "User selected Track2 and is awaiting preparation; an older valid native selection for Track1 is delivered",
+  "before": {
+    "index": 1,
+    "current": "2",
+    "phase": "loading",
+    "loaded": false
+  },
+  "after": {
+    "index": 0,
+    "current": "1",
+    "phase": "loading",
+    "loaded": true,
+    "playVersion": 3,
+    "preparationAborted": true
+  },
+  "scope": "Exact selection handler extracted from app.js; deterministic code-level event ordering, not a physical WKWebView/device test"
+}

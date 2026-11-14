@@ -1,0 +1,56 @@
+{
+  "version": "0.9.15",
+  "androidVersion": "0.1.5",
+  "checkedAt": "2026-11-14T15:05:48.326Z",
+  "nodeTests": {
+    "passed": 340,
+    "failed": 0
+  },
+  "android": {
+    "audioAudit": 20,
+    "catalog": 58,
+    "lyrics": 29,
+    "socialCore": 50,
+    "bundledAssets": 11,
+    "focusCallbacksInjected": true,
+    "personalOAuth": false
+  },
+  "desktop": {
+    "targetedTests": 41,
+    "playerUI": true,
+    "youtubeUI": true,
+    "modernNativeSelfTest": true,
+    "legacyNativeSelfTestOnModernWindows": true,
+    "realUpgrade014to015": true,
+    "profilePreserved": true
+  },
+  "linux": {
+    "nativeX64": true,
+    "fuseAndExtract": true,
+    "keyring": true,
+    "sandbox": true,
+    "arm64": "static-only"
+  },
+  "iosWeb": {
+    "browserBeforeLyricsFix": 51,
+    "targetedLyricsAfterFix": 8,
+    "policy": 7,
+    "pairing": 13,
+    "physicalSafari": false
+  },
+  "website": {
+    "layoutAndLinks": 20
+  },
+  "iosNative": {
+    "swiftPolicy": 23,
+    "parsedSources": 4,
+    "xcodeProjectStructure": true,
+    "appleSDKBuild": false,
+    "device": false,
+    "signedIPA": false
+  },
+  "github": {
+    "published": false,
+    "reason": "Connected account lacks write permission; local Git is not authenticated."
+  }
+}

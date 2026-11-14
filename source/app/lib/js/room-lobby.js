@@ -1,7 +1,7 @@
 (() => {
   'use strict';
   const { ipcRenderer } = require('electron');
-  const { ROOM_PARTITION } = require('../integrations/room-view.cjs');
+  const { ROOM_ORIGIN, ROOM_PARTITION, roomUrl, socialUrl } = require('../integrations/room-view.cjs');
   const { readFileSync } = require('node:fs');
   const { join } = require('node:path');
   const roomStyles = readFileSync(join(__dirname, 'lib/css/room-stage.css'), 'utf8');
@@ -11,6 +11,9 @@
   let rooms = [], filter = 'public', authenticated = false, ready = false;
   let listing = false, pending = false, listError = '', actionError = '', lastList = 0;
   let guest = null, activeUrl = '', navigation = 0, cardsSignature = '';
+  let socialGuest = null, socialSequence = 0, socialFailed = false, cloudUserId = null;
+  let shellAvatarUrl = '';
+  const socialContent = document.getElementById('lc-social-content'), socialStatus = document.getElementById('lc-social-status');
   function sessionChanged() {
     document.body.classList.toggle('room-stage-open', !!activeUrl && document.body.dataset.view === 'room');
     const button = document.querySelector('[data-view=room]');
@@ -20,7 +23,92 @@
     }
     window.dispatchEvent(new CustomEvent('lolzcloud:room-session', { detail: { active: !!activeUrl } }));
   }
-  window.LolzCloudRooms = { get active() { return !!activeUrl; }, leave: () => leave() };
+  window.LolzCloudRooms = { get active() { return !!activeUrl; }, leave: () => leave(), openSocial: (tab, options) => openSocial(tab, options) };
+  const profileEntry = document.getElementById('open-account');
+  if (profileEntry) { profileEntry.onclick = () => { void openSocial('profile'); }; profileEntry.title = 'Профиль LolzCloud'; profileEntry.setAttribute('aria-label', 'Профиль LolzCloud'); }
+  document.getElementById('lc-social-connections')?.addEventListener('click', () => window.lolzShowAccount?.());
+  function shellIdentity(user) {
+    const name = document.getElementById('account-name'), description = document.getElementById('account-description'), avatar = document.getElementById('account-avatar');
+    if (!name || !description || !avatar) return;
+    const appRole = user?.roles?.find(role => role.source === 'lolzcloud' && role.id === 'owner') || user?.roles?.find(role => role.source === 'lolzcloud' && role.id === 'tester');
+    name.textContent = user?.name || 'Твой профиль'; description.textContent = appRole?.label || (user?.rank?.source === 'lolzcloud' ? user.rank.label : 'Открыть профиль LolzCloud');
+    avatar.textContent = (user?.name || 'L').slice(0, 1).toUpperCase();
+    let url = ''; try { const value = new URL(user?.avatar); if (value.protocol === 'https:' && !value.username && !value.password) url = value.href; } catch { /* Use the user's initial. */ }
+    if (url === shellAvatarUrl) return;
+    shellAvatarUrl = url; avatar.classList.remove('has-social-avatar'); avatar.style.backgroundImage = '';
+    if (url) { const image = new Image(); image.onload = () => { if (shellAvatarUrl === url) { avatar.style.backgroundImage = 'url(' + JSON.stringify(url) + ')'; avatar.classList.add('has-social-avatar'); } }; image.src = url; }
+  }
+
+  function socialState(value) {
+    const badge = document.getElementById('lc-social-unread'), inbox = document.getElementById('lc-social-inbox');
+    const count = authenticated && String(value?.userId) === String(cloudUserId) ? Math.max(0, Math.floor(Number(value?.unread) || 0)) : 0;
+    if (badge) { badge.hidden = !count; badge.textContent = count > 99 ? '99+' : String(count); }
+    inbox?.setAttribute('aria-label', count ? 'Уведомления, непрочитанных: ' + count : 'Уведомления');
+  }
+  function socialRoomOpen(event) {
+    if (event.channel === 'lolzcloud:social-open-rooms') { window.LolzCloudStudio.open('room'); return; }
+    if (event.channel !== 'lolzcloud:social-open-room') return;
+    const target = roomUrl(event.args?.[0]?.url);
+    if (!target) return;
+    window.LolzCloudStudio.open('room');
+    if (target === activeUrl && guest) { void guest.executeJavaScript('window.LolzCloudSocial?.close()', true).catch(() => {}); return; }
+    void change('open', target);
+  }
+  async function showSocial(view, tab, options, sequence) {
+    for (let attempt = 0; attempt < 50; attempt++) {
+      if (sequence !== socialSequence || view !== guest && view !== socialGuest) return;
+      try {
+        const shown = await view.executeJavaScript('(()=>{if(!window.LolzCloudSocial?.open)return false;window.LolzCloudSocial.open(' + JSON.stringify(tab) + ',' + JSON.stringify(options) + ');return true})()', true);
+        if (shown) { if (view === socialGuest) socialStatus.textContent = ''; return; }
+      } catch { /* The webview is still loading. */ }
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    if (sequence === socialSequence) window.LolzCloudStudio.notify('Профиль пока не загрузился. Попробуй открыть его ещё раз.', true);
+  }
+  function detachSocial() {
+    socialSequence++;
+    if (!socialGuest) return;
+    const view = socialGuest; socialGuest = null;
+    try { Promise.resolve(view.loadURL('about:blank')).catch(() => {}).finally(() => view.remove()); } catch { view.remove(); }
+  }
+  async function openSocial(tab = 'profile', options = {}) {
+    if (!['profile', 'friends', 'notifications'].includes(tab)) return;
+    if (!authenticated) {
+      window.LolzCloudStudio.open('room');
+      window.LolzCloudStudio.notify('Войди через Lolzteam, чтобы открыть профиль, друзей и уведомления.');
+      lobby.querySelector('[data-do="room-login"]')?.focus(); return;
+    }
+    if (socialFailed && !activeUrl) { detachSocial(); socialFailed = false; }
+    const sequence = ++socialSequence, data = {};
+    if (Number.isSafeInteger(Number(options.userId)) && Number(options.userId) > 0) data.userId = Number(options.userId);
+    if (activeUrl) data.roomId = activeUrl.split('/')[4];
+    const target = new URL('/social', ROOM_ORIGIN); target.searchParams.set('tab', tab);
+    if (data.userId) target.searchParams.set('user', data.userId);
+    try {
+      const address = await request('social', target.href);
+      if (sequence !== socialSequence || !authenticated || !socialUrl(address)) return;
+      if (guest && activeUrl) {
+        window.LolzCloudStudio.open('room');
+        await showSocial(guest, tab, data, sequence); return;
+      }
+      window.LolzCloudStudio.open('social');
+      document.getElementById('page-title').textContent = 'Профиль и друзья';
+      if (!socialGuest) {
+        socialStatus.textContent = 'Загружаем профиль…';
+        const view = document.createElement('webview'); view.setAttribute('partition', ROOM_PARTITION); view.setAttribute('aria-label', 'Профиль и друзья LolzCloud'); view.src = address;
+        view.addEventListener('ipc-message', socialRoomOpen);
+        const failed = () => { if (view === socialGuest) { socialFailed = true; socialStatus.textContent = 'Не удалось загрузить профиль. Открой раздел ещё раз.'; } };
+        view.addEventListener('did-fail-load', event => { if (event.isMainFrame && event.errorCode !== -3) failed(); });
+        view.addEventListener('render-process-gone', failed);
+        socialGuest = view; socialContent.append(view);
+      }
+      await showSocial(socialGuest, tab, data, sequence);
+    } catch (error) { window.LolzCloudStudio.notify(error.message || 'Не удалось открыть профиль.', true); }
+  }
+  document.querySelectorAll('[data-social-open]').forEach(button => { button.onclick = () => { void openSocial(button.dataset.socialOpen); }; });
+  ipcRenderer.on('lolzcloud:open-social', (_event, value) => { void openSocial(value?.tab || 'notifications'); });
+  ipcRenderer.on('lolzcloud:social-state', (_event, value) => socialState(value));
+  ipcRenderer.on('lolzcloud:cloud-identity', (_event, user) => { if (authenticated && user?.id === cloudUserId) shellIdentity(user); });
 
   async function request(type, url) {
     const reply = await ipcRenderer.invoke('rooms:action', { type, url });
@@ -117,6 +205,7 @@
     view.setAttribute('partition', ROOM_PARTITION);
     view.setAttribute('aria-label', 'Комната LolzCloud');
     view.src = url;
+    view.addEventListener('ipc-message', socialRoomOpen);
     view.addEventListener('dom-ready', () => {
       if (guest === view) void view.insertCSS(roomStyles).catch(() => {});
     });
@@ -136,6 +225,7 @@
   }
 
   function leave(notify = true) {
+    socialSequence++;
     navigation++;
     detach();
     activeUrl = ''; stage.hidden = true; lobby.hidden = false;
@@ -176,6 +266,7 @@
     catch (error) { el('stage-status').textContent = error.message; }
   };
   window.addEventListener('lolzcloud:navigation', event => {
+    document.body.classList.toggle('social-stage-open', event.detail === 'social');
     if (event.detail === 'room') { if (!activeUrl) void refresh(); }
     // The room session outlives its screen: hidden guests keep their audio,
     // connection, host lease and drafts until an explicit leave action.
@@ -185,11 +276,14 @@
     const state = event.detail.features?.room;
     if (!state) return;
     el('broadcast').disabled = !state.authenticated || !event.detail.fresh || event.detail.private || !event.detail.playback?.url;
-    const changed = authenticated !== !!state.authenticated;
+    const changed = authenticated !== !!state.authenticated || cloudUserId !== (state.user?.id || null);
     authenticated = !!state.authenticated;
+    cloudUserId = state.user?.id || null;
+    shellIdentity(authenticated ? state.user : null);
+    socialState(event.detail.features?.social);
     if (ready && !changed) return;
     ready = true; actionError = '';
-    if (!authenticated) { rooms = []; listError = ''; if (activeUrl || pending) leave(); }
+    if (!authenticated) { rooms = []; listError = ''; if (activeUrl || pending) leave(); detachSocial(); if (document.body.dataset.view === 'social') window.LolzCloudStudio.open('room'); }
     render();
     if (authenticated && document.body.dataset.view === 'room') void refresh();
   });

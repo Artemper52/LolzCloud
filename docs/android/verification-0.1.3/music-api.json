@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T00:08:54.915Z",
+  "results": 1,
+  "track": {
+    "id": "1930572542",
+    "title": "гной",
+    "artist": "тёмный принц",
+    "duration": 89,
+    "source": "https://soundcloud.com/darkprinceee/gnoy",
+    "audioUrl": "https://lolzcloud.com/music/audio/1930572542/bcd527cc110efa95cb49a325.mp3"
+  },
+  "mp3": {
+    "bytes": 1434133,
+    "sha256": "3013abed7a2da84fb8ea13c2bf734c9b44a4d1945cbadfd515e6cf45d342f1b9",
+    "downloadMs": 841,
+    "mime": "audio/mpeg"
+  },
+  "rangeStatus": 206
+}

@@ -3,7 +3,7 @@
   const { ipcRenderer } = require('electron');
   const bridgeCode=require('node:fs').readFileSync(require('node:path').join(__dirname,'../plugins/youtube-control.js'),'utf8');
   const surface = document.getElementById('youtube-surface'), status = document.getElementById('youtube-status');
-  let view = null, active = false, revision = 0, trackRevision = 0, openingTrack = false, ready = false, trackLoad = null, nativeCss = null, bridgeRetry = 0;
+  let view = null, active = false, requested = false, revision = 0, trackRevision = 0, openingTrack = false, ready = false, trackLoad = null, nativeCss = null, bridgeRetry = 0;
   const tools=document.createElement('div');tools.id='youtube-tools';
   for(const [caption,run]of [['Мини-плеер ↗',()=>ipcRenderer.invoke('features:action',{type:'mini'})],['Текст песни',()=>window.LolzCloudStudio.open('lyrics')]]){
     const button=document.createElement('button');button.type='button';button.textContent=caption;button.onclick=()=>Promise.resolve(run()).catch(()=>{});tools.append(button);
@@ -30,7 +30,10 @@
     try { return await view.executeJavaScript('window.__lolzcloudYouTube?.command(' + JSON.stringify(command) + ',' + JSON.stringify(value ?? null) + ')', true); } catch { return false; }
   }
   async function media(command,value) {
+    if(command==='pause'){trackRevision++;openingTrack=false;return executeMedia(command,value);}
+    const request=trackRevision;
     if(openingTrack&&trackLoad)await trackLoad;
+    if(request!==trackRevision)return false;
     return executeMedia(command,value);
   }
   function mount() {
@@ -48,20 +51,20 @@
   }
   async function open(background = false) {
     if (active) { if(!background){surface.hidden = false; document.getElementById('lc-studio')?.close(); window.lolzSelectNavigation('youtube'); view?.focus();} return; }
-    const request = ++revision;
+    const request = ++revision; requested = true;
     status.textContent = 'Переключаем источник…';
     await ipcRenderer.invoke('features:action', { type: 'wave-stop' }).catch(() => {});
     await ipcRenderer.invoke('features:action', { type: 'media', command: 'pause' }).catch(() => {});
     if (request !== revision) return;
     await ipcRenderer.invoke('features:action', { type: 'playback-source', source: 'youtube' }).catch(() => {});
-    if (request !== revision) { void ipcRenderer.invoke('features:action', { type: 'playback-source', source: 'soundcloud' }); return; }
+    if (request !== revision) { if(!requested)void ipcRenderer.invoke('features:action', { type: 'playback-source', source: 'soundcloud' }).catch(()=>{}); return; }
     active = true; document.body.dataset.source = 'youtube'; surface.hidden = background;
     if(!background){document.getElementById('lc-studio')?.close(); window.lolzSelectNavigation('youtube');}
     status.textContent = 'Поиск и прослушивание · YouTube Music';
     mount(); if(ready)window.dispatchEvent(new Event('lolzcloud:provider-ready')); if(!background)view.focus();
   }
   function leave() {
-    revision++; trackRevision++; openingTrack=false;if (view) void media('pause');
+    revision++; requested=false; trackRevision++; openingTrack=false;if (view) void media('pause');
     if (active) void ipcRenderer.invoke('features:action', { type: 'playback-source', source: 'soundcloud' }).catch(() => {});
     active = false; document.body.dataset.source = 'soundcloud'; surface.hidden = true;
     window.dispatchEvent(new Event('lolzcloud:provider-ready'));
@@ -80,13 +83,18 @@
     const {mediaUrl}=require('./lib/js/media-source.js'),url = mediaUrl(typeof value === 'string' ? value : value?.url);
     if (!url) return;
     const request=++trackRevision;openingTrack=true;
+    const valid=()=>active&&view&&request===trackRevision;
     try{
       await open(value?.background === true);
+      if(!valid())return;
       if(mediaUrl(view.getURL())!==url)await view.loadURL(url).catch(()=>{});
-      if(play)for(let i=0;i<40&&active&&request===trackRevision;i++){
+      if(!valid())return;
+      if(play)for(let i=0;i<40&&valid();i++){
         const track=await view.executeJavaScript('window.__lolzcloudYouTube?.snapshot()').catch(()=>null);
+        if(!valid())return;
         if(track?.url===url&&track.duration>0){
           if(value?.resume)await executeMedia('seek',value.resume.position);
+          if(!valid())return;
           if(await executeMedia(value?.resume?.playing===false?'pause':'play'))return;
         }
         await new Promise(resolve=>setTimeout(resolve,500));
@@ -99,13 +107,15 @@
   let polling = false;
   setInterval(async () => {
     if (!active || !view || polling || openingTrack) return; polling = true;
+    const request=revision,trackRequest=trackRevision,valid=()=>active&&request===revision&&trackRequest===trackRevision;
     try {
-      const value = await view.executeJavaScript('window.__lolzcloudYouTube?.snapshot()');
-      if (!active) return;
+      const sample = await view.executeJavaScript('({playback:window.__lolzcloudYouTube?.snapshot(),audio:window.__lolzcloudGetAudioState?.()})');
+      if (!valid()) return;
+      const value=sample?.playback;
       if (value?.url && value.title) ipcRenderer.send('youtube:playback', value);
-      else if(Date.now()-bridgeRetry>2000){bridgeRetry=Date.now();if(!await ensureBridge())status.textContent=view.getURL().includes('consent.')?'Подтверди выбор cookies в YouTube Music, чтобы продолжить.':'Подключаем управление YouTube Music…';}
-      const audio = await view.executeJavaScript('window.__lolzcloudGetAudioState?.()');
-      if (active && audio) ipcRenderer.send('features:audio', { ...audio, source: 'youtube' });
+      else if(Date.now()-bridgeRetry>2000){bridgeRetry=Date.now();const connected=await ensureBridge();if(!valid())return;if(!connected)status.textContent=view.getURL().includes('consent.')?'Подтверди выбор cookies в YouTube Music, чтобы продолжить.':'Подключаем управление YouTube Music…';}
+      const audio=sample?.audio;
+      if (valid() && audio) ipcRenderer.send('features:audio', { ...audio, source: 'youtube' });
     } catch { /* Navigation is still loading. */ }
     finally { polling = false; }
   },250);

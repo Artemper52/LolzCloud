@@ -1,0 +1,18 @@
+{
+  "verifiedAt": "2026-11-14T16:17:36.5171771Z",
+  "status": "passed",
+  "checks": 71,
+  "versionName": "0.1.5",
+  "versionCode": 6,
+  "installedBeforeSha256": "ee61577bcf8b45650fad41a76715d3b532012cc949289a61dbb2adfc41db72d0",
+  "installedAfterSha256": "ee61577bcf8b45650fad41a76715d3b532012cc949289a61dbb2adfc41db72d0",
+  "artifactSha256": "ee61577bcf8b45650fad41a76715d3b532012cc949289a61dbb2adfc41db72d0",
+  "productionUnchanged": true,
+  "notificationPermissionBefore": true,
+  "notificationPermissionAfter": true,
+  "historicalFailedReportSha256": "b172e8edd99d76d84173615297edb214a38de26cb7870246c1650c87768014bb",
+  "historicalFailureUnchanged": true,
+  "finalInstrumentationSha256": "744549667485043e27428a243192141f8c6c76d75d16338afe03de37bb4b5392",
+  "harnessSourceSha256": "d7202051b5554350240e1fd7b6ad6a1e487190c4697f17fb83e86d0812253bb2",
+  "runnerSha256": "73fa61089fa6d8e7122bc355313e771d7d78164f7caba10084dac2421c4b4276"
+}

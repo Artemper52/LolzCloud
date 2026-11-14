@@ -1,0 +1,37 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T11:38:07.950Z",
+  "track": {
+    "id": "2267636573",
+    "title": "Xtal",
+    "artist": "dibbeddib"
+  },
+  "polls": [
+    {
+      "status": 202,
+      "ms": 198,
+      "state": "preparing",
+      "error": ""
+    },
+    {
+      "status": 202,
+      "ms": 170,
+      "state": "preparing",
+      "error": ""
+    },
+    {
+      "status": 202,
+      "ms": 215,
+      "state": "preparing",
+      "error": ""
+    },
+    {
+      "status": 200,
+      "ms": 148,
+      "state": "ready",
+      "error": ""
+    }
+  ],
+  "prepareMs": 3977,
+  "rangeStatus": 206
+}

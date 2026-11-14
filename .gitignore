@@ -39,3 +39,11 @@ release-radar.json
 rooms-state.json
 player-profiles.json
 profile-backups/
+ios/.build/
+ios/DerivedData/
+ios/output/
+ios/*.xcarchive/
+**/xcuserdata/
+*.xcuserstate
+*.mobileprovision
+website/*.backup

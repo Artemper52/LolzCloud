@@ -1,0 +1,16 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T12:01:51.138Z",
+  "manifest": {
+    "versionName": "0.1.4",
+    "versionCode": 5,
+    "packageName": "com.lolzcloud.mobile",
+    "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.4.apk",
+    "size": 2520432,
+    "sha256": "4e4758653fdc547a28688d8cd3760c21a62d6abaef84b8cce00ba1ce2961308d",
+    "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44"
+  },
+  "apkSha256": "4e4758653fdc547a28688d8cd3760c21a62d6abaef84b8cce00ba1ce2961308d",
+  "publicBytes": 2520432,
+  "signatureVerifiedByIdenticalBuild": true
+}

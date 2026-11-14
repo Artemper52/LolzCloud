@@ -1,0 +1,26 @@
+{
+  "phase": "audio-retry",
+  "status": "passed",
+  "checks": [
+    "Only the isolated Android emulator may run library\/network mutations",
+    "Production native playback service binds",
+    "A genuinely rejected signed URL yields a bounded native playback error",
+    "Preparation failure preserves selected queue, index and seek in memory and on disk",
+    "Playback failure exposes the native Retry action",
+    "The native player displays the actual readable failure beside Retry",
+    "Tapping the visible native Retry button clears the error and prepares the existing selection",
+    "A rejected retry remains an actionable error",
+    "Retry never resets the selected queue or last position",
+    "Pause cancels preparation and stale requests cannot autoplay or overwrite the new selection",
+    "The supported source plays through prepare and native MediaPlayer after cancellation"
+  ],
+  "screenshots": [
+    "\/storage\/emulated\/0\/Android\/data\/com.lolzcloud.mobile\/files\/native-catalog\/catalog-audio-retry.png"
+  ],
+  "realPublicHttps": true,
+  "nativeMediaPlayer": true,
+  "fakeMediaSdk": false,
+  "personalAccountsUsed": false,
+  "version": "0.1.4",
+  "apkSha256": "4e4758653fdc547a28688d8cd3760c21a62d6abaef84b8cce00ba1ce2961308d"
+}

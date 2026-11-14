@@ -1,0 +1,8 @@
+build/
+app/build/
+.gradle/
+output/
+local.properties
+*.jks
+*.keystore
+app/src/main/assets/room-client/

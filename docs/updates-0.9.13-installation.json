@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-14",
+  "status": "passed",
+  "installedPath": "D:/Applications/LolzCloud",
+  "beforeVersion": "0.9.12",
+  "afterVersion": "0.9.13",
+  "installerSha256": "fee50dccd79ddce9030665d6ec49b5e64f45a1ce6182550d3d121220bf062cdb",
+  "initialFreeBytesC": 2805760,
+  "reproduction": {"temporaryVolume": "C:", "installerExitCode": 112},
+  "repair": {"temporaryVolume": "D:", "installerExitCode": 0},
+  "profileBackupCreated": true,
+  "profileJsonFilesUnchangedBeforeRestart": 13,
+  "installedAsarVersionVerified": true,
+  "windowsUninstallRegistryVersionVerified": true,
+  "globalTemporaryEnvironmentChanged": false,
+  "updateCacheMoved": false,
+  "checks": [
+    "Downloaded pending installer has the exact published size and SHA-256",
+    "Real silent installer stops with ERROR_DISK_FULL 112 using C: temporary storage",
+    "Same verified installer succeeds using process-scoped temporary storage on D:",
+    "All 13 saved profile JSON files remain byte-identical after installation",
+    "Installed package.json and Windows uninstall registry both show 0.9.13"
+  ]
+}

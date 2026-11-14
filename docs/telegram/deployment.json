@@ -1,0 +1,8 @@
+{
+  "release": "20261113T223709-telegram-eff64637",
+  "archiveSha256": "fbf1e24fc63cca8d5536bc92477ba53537860fd1b0eb32b0bcb47ad2e546fff8",
+  "files": 28,
+  "status": "deployed",
+  "deployedAt": "2026-11-13T22:37:25.359Z",
+  "backup": "/var/backups/lolzcloud-telegram/20261113T223709-telegram-eff64637"
+}

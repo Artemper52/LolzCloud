@@ -1,0 +1,69 @@
+{
+  "checkedAt": "2026-11-14T14:53:18Z",
+  "sourceFrozen": true,
+  "toolchain": "Swift 6.2.1, Docker swift:6.2.1-bookworm on Linux",
+  "sourceHashesSha256": {
+    "AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
+    "App.swift": "3b527ad8db53dabd05ddbb4ec3bd3a344d5abcf59a117366323e42f9809c0c78",
+    "MediaPolicy.swift": "afecc318a7d9b37c6b22b7cdb7390879faecc2605c1b5e9f3810be259797f531",
+    "NativePlayer.swift": "f277134b30f68301048d5aa90cf2e3d4e1849cfc5b434f4d2e654f0963418e2a",
+    "MediaPolicyTests.swift": "b2f8cc3d9f922122c57724cd8954eaecca0e786175965d1c8c965484a7c8ec0d"
+  },
+  "remoteCopyHashesMatch": true,
+  "policyTests": {
+    "status": "passed",
+    "tests": 23,
+    "failures": 0,
+    "command": "swift test --package-path ios"
+  },
+  "swiftFrontendParse": {
+    "status": "passed",
+    "files": [
+      "App.swift",
+      "NativePlayer.swift",
+      "AccountLogin.swift",
+      "MediaPolicy.swift"
+    ],
+    "scope": "syntax only; no Apple SDK type checking"
+  },
+  "projectInputs": {
+    "appleSDKBuild": "pending",
+    "backgroundAudio": true,
+    "deviceRuntime": "pending",
+    "iconHeight": 1024,
+    "iconWidth": 1024,
+    "nativeSources": [
+      "AccountLogin.swift",
+      "App.swift",
+      "MediaPolicy.swift",
+      "NativePlayer.swift"
+    ],
+    "projectObjects": 26,
+    "sharedScheme": true,
+    "status": "passed"
+  },
+  "appleSDKBuild": {
+    "status": "pending",
+    "reason": "macOS/Xcode unavailable"
+  },
+  "iPhoneIPadRuntime": {
+    "status": "pending",
+    "includes": [
+      "real AVPlayer audio",
+      "lock-screen commands",
+      "cold background Next",
+      "browser pairing",
+      "audio interruption",
+      "sleep expiry",
+      "WebKit cookie lifecycle"
+    ]
+  },
+  "signedIPA": {
+    "status": "not produced"
+  },
+  "workflowRun": {
+    "status": "not run; no GitHub write access"
+  },
+  "artifactsDirectory": "D:/LolzCloud-Android-Toolchain/ios-review-0.1.0",
+  "scopeNote": "Swift policy and Linux filesystem checks are independent of the PWA browser verification and do not prove a native iOS build."
+}

@@ -1,0 +1,34 @@
+{
+  "cases": [
+    {
+      "recordId": 21473776,
+      "matchedArtist": "тёмный принц",
+      "found": true,
+      "timed": true,
+      "artist": "тёмный принц",
+      "matchedTitle": "гной",
+      "title": "гной",
+      "lines": 19,
+      "versionMismatch": false,
+      "durationMs": 89000
+    },
+    {
+      "recordId": 22661302,
+      "matchedArtist": "тёмный принц",
+      "found": true,
+      "timed": true,
+      "artist": "тёмный принц",
+      "matchedTitle": "цветы",
+      "title": "цветы",
+      "lines": 21,
+      "versionMismatch": false,
+      "durationMs": 98000
+    }
+  ],
+  "realPublicHttps": true,
+  "sourceTextPrinted": false,
+  "scope": "Two requested Cyrillic recordings through the actual native provider/matching policy on the host JVM; no device or account login.",
+  "generatedAt": "2026-11-14T11:46:47.232228700Z",
+  "source": "https://lrclib.net",
+  "status": "passed"
+}

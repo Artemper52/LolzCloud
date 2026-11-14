@@ -1,0 +1,134 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Production MediaPlayer service binds for lyrics integration",
+      "passed": true
+    },
+    {
+      "name": "Real local audio advances before opening lyrics",
+      "passed": true
+    },
+    {
+      "name": "Declared provider is requested by the production lyrics page",
+      "passed": true
+    },
+    {
+      "name": "Native lyrics page displays loading while the request is in flight",
+      "passed": true
+    },
+    {
+      "name": "Opening/loading lyrics never pauses or restarts native music",
+      "passed": true
+    },
+    {
+      "name": "Matched source text becomes actual native lyric views",
+      "passed": true
+    },
+    {
+      "name": "Production UI retains source timestamps rather than estimating line times",
+      "passed": true
+    },
+    {
+      "name": "Touching a timed native line seeks the real MediaPlayer",
+      "passed": true
+    },
+    {
+      "name": "Playback position highlights the current genuine timed line",
+      "passed": true
+    },
+    {
+      "name": "Lyrics interaction preserves the current native queue and track",
+      "passed": true
+    },
+    {
+      "name": "Successful automatic lyrics persist separately and can load without another network request",
+      "passed": true
+    },
+    {
+      "name": "Network/provider failures expose an actual Retry state instead of a false not-found result",
+      "passed": true
+    },
+    {
+      "name": "A lyric network error leaves audio playing",
+      "passed": true
+    },
+    {
+      "name": "A successful empty provider response clears stale lines",
+      "passed": true
+    },
+    {
+      "name": "An empty catalogue remains a neutral no-result, distinct from errors",
+      "passed": true
+    },
+    {
+      "name": "A different-duration match still offers the written source text",
+      "passed": true
+    },
+    {
+      "name": "Different-version written text has no seek action or synthetic synchronization",
+      "passed": true
+    },
+    {
+      "name": "Metadata correction opens an actual native dialog",
+      "passed": true
+    },
+    {
+      "name": "Explicit corrected metadata drives a new successful native lookup",
+      "passed": true
+    },
+    {
+      "name": "Manual lookup identity survives repository recreation for that recording",
+      "passed": true
+    },
+    {
+      "name": "Lyrics metadata correction never changes the playing track's real metadata",
+      "passed": true
+    },
+    {
+      "name": "A delayed first-track request is genuinely in flight",
+      "passed": true
+    },
+    {
+      "name": "Track change cancels stale lyrics and presents only the new recording's response",
+      "passed": true
+    },
+    {
+      "name": "A late old-track response cannot overwrite the next track",
+      "passed": true
+    },
+    {
+      "name": "User-imported LRC takes priority over an automatic result",
+      "passed": true
+    },
+    {
+      "name": "Opening imported lyrics does not issue an automatic lookup or overwrite the user's text",
+      "passed": true
+    },
+    {
+      "name": "Automatic result cache never writes the LibraryStore imported-lyrics field",
+      "passed": true
+    },
+    {
+      "name": "An empty filtered catalogue page retains its actual next-page button",
+      "passed": true
+    },
+    {
+      "name": "Empty-page wording distinguishes filtered records from an exhausted search",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/lyrics-review/lyrics-found.png",
+    "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/lyrics-review/lyrics-error.png",
+    "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/lyrics-review/lyrics-plain.png"
+  ],
+  "scope": "Declared bounded LRCLIB transport fixtures; real native UI, source LRC line highlighting/seeking, MediaPlayer, private cache/import priority/cancel. No substituted media SDK, real-user account or room navigation.",
+  "version": "0.1.4",
+  "versionCode": 5,
+  "apkSha256": "4e4758653fdc547a28688d8cd3760c21a62d6abaef84b8cce00ba1ce2961308d",
+  "androidApi": 35,
+  "personalAccountsUsed": false,
+  "generatedAt": "2026-11-14T11:32:56.203Z",
+  "emulator": "emulator-5554"
+}

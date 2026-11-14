@@ -1,0 +1,82 @@
+{
+  "target": "emulator-5554",
+  "generatedAt": "2026-11-12T17:34:18.960Z",
+  "apkSha256": "3c0baed3e639cb4511f2fbfeb971eed4bc0bfbed1873d34418c553425fb25a85",
+  "permissionBefore": "REQUEST_INSTALL_PACKAGES: deny; time=+49s832ms ago",
+  "newerApkInstalled": false,
+  "status": "passed",
+  "phase": {
+    "phase": "installer",
+    "status": "passed",
+    "checks": [
+      {
+        "name": "Installer phase runs only on an emulator",
+        "passed": true
+      },
+      {
+        "name": "Installed application is the 0.1.0 fixture baseline",
+        "passed": true
+      },
+      {
+        "name": "Unknown-source installation is initially denied",
+        "passed": true
+      },
+      {
+        "name": "The real 0.1.1 update fixture passes package, version and signature validation",
+        "passed": true
+      },
+      {
+        "name": "Read-only update provider exposes the exact verified APK",
+        "passed": true
+      },
+      {
+        "name": "Update provider rejects an unrelated cache path",
+        "passed": true
+      },
+      {
+        "name": "Update provider rejects write access",
+        "passed": true
+      },
+      {
+        "name": "Opening unknown-source settings persists the pending verified update",
+        "passed": true
+      },
+      {
+        "name": "System unknown-source settings identifies LolzCloud",
+        "passed": true
+      },
+      {
+        "name": "Emulator grants the install-source permission",
+        "passed": true
+      },
+      {
+        "name": "System Package Installer parsed the provider APK and offers a LolzCloud update",
+        "passed": true
+      },
+      {
+        "name": "System installer UI evidence",
+        "passed": true,
+        "package": "com.android.packageinstaller",
+        "ui": "android.widget.FrameLayout text=null desc=null\nandroid.widget.FrameLayout text=null desc=null\nandroid.widget.FrameLayout text=null desc=null\nandroid.widget.LinearLayout text=null desc=null\nandroid.widget.LinearLayout text=null desc=null\nandroid.widget.LinearLayout text=null desc=null\nandroid.widget.ImageView text=null desc=null\nandroid.widget.TextView text=LolzCloud desc=null\nandroid.widget.FrameLayout text=null desc=null\nandroid.widget.FrameLayout text=null desc=null\nandroid.widget.FrameLayout text=null desc=null\nandroid.widget.TextView text=Do you want to update this app? desc=null\nandroid.widget.ScrollView text=null desc=null\nandroid.widget.LinearLayout text=null desc=null\nandroid.widget.Button text=CANCEL desc=null\nandroid.widget.Button text=UPDATE desc=null\n"
+      },
+      {
+        "name": "Resuming installation clears the pending permission state",
+        "passed": true
+      },
+      {
+        "name": "Cancelling leaves application version 0.1.0 installed",
+        "passed": true
+      },
+      {
+        "name": "Cancelling update preserves library and theme preferences",
+        "passed": true
+      }
+    ]
+  },
+  "permissionAfter": "REQUEST_INSTALL_PACKAGES: deny; time=+1s82ms ago",
+  "permissionRestoredToDeny": true,
+  "installedPackage": [
+    "versionCode=1 minSdk=26 targetSdk=36",
+    "versionName=0.1.0"
+  ]
+}

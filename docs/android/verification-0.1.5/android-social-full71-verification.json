@@ -1,0 +1,628 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Only an isolated emulator may run mutation checks",
+      "passed": true
+    },
+    {
+      "name": "Production audio service binding",
+      "passed": true
+    },
+    {
+      "name": "Offline conversion replaces the original HTTPS row instead of duplicate-id no-op",
+      "passed": true
+    },
+    {
+      "name": "Offline conversion preserves identity, likes and imported lyrics",
+      "passed": true
+    },
+    {
+      "name": "Saved queue and resume position point to the real local file",
+      "passed": true
+    },
+    {
+      "name": "History opens the saved local source",
+      "passed": true
+    },
+    {
+      "name": "Offline source is actually played by the native MediaPlayer",
+      "passed": true
+    },
+    {
+      "name": "Actual playback source is private file, with no stream/network dependency",
+      "passed": true
+    },
+    {
+      "name": "Seek fixture before active source replacement",
+      "passed": true
+    },
+    {
+      "name": "Active MediaPlayer adopts the saved source and resumes its existing position",
+      "passed": true
+    },
+    {
+      "name": "Active source replacement retains queue identity and index",
+      "passed": true
+    },
+    {
+      "name": "A stale second download cannot overwrite an already changed source",
+      "passed": true
+    },
+    {
+      "name": "Native social entry opens the real OnlineActivity",
+      "passed": true
+    },
+    {
+      "name": "Opening the shared social/profile page does not pause native music",
+      "passed": true
+    },
+    {
+      "name": "The isolated own-origin view is ready before room handoff",
+      "passed": true
+    },
+    {
+      "name": "Browsing the isolated same-origin /rooms view keeps native music playing",
+      "passed": true
+    },
+    {
+      "name": "Actual same-origin room entry pauses the native player before room audio",
+      "passed": true
+    },
+    {
+      "name": "Room handoff retains local queue and resume position",
+      "passed": true
+    },
+    {
+      "name": "Own social page is available for native image upload",
+      "passed": true
+    },
+    {
+      "name": "Actual bundled social fixture document loaded without a personal account",
+      "passed": true
+    },
+    {
+      "name": "The isolated form retains the trusted social main-frame URL",
+      "passed": true
+    },
+    {
+      "name": "Isolated form exists in the genuine own-origin document",
+      "passed": true
+    },
+    {
+      "name": "Frame-focused file request has an iframe as top-level active element",
+      "passed": true
+    },
+    {
+      "name": "Provider-frame upload request is explicitly cancelled",
+      "passed": true
+    },
+    {
+      "name": "Provider frames receive no native file URI or picker",
+      "passed": true
+    },
+    {
+      "name": "Only a focused top-level file input can open the picker",
+      "passed": true
+    },
+    {
+      "name": "A genuine top-level input tap opens the real Android system document picker",
+      "passed": true
+    },
+    {
+      "name": "Cancelling the system picker resolves the production WebView callback",
+      "passed": true
+    },
+    {
+      "name": "Cancelled image selection exposes no file URI to the page",
+      "passed": true
+    },
+    {
+      "name": "Real input can reopen the system picker after cancellation",
+      "passed": true
+    },
+    {
+      "name": "Open actual SAF root menu",
+      "passed": true
+    },
+    {
+      "name": "PNG-only test provider appears in the real Android picker",
+      "passed": true
+    },
+    {
+      "name": "Select the real provider-backed PNG document",
+      "passed": true
+    },
+    {
+      "name": "Selecting the PNG actually returns from the system picker",
+      "passed": true
+    },
+    {
+      "name": "Production chooser callback delivers actual image bytes to FileReader and Canvas",
+      "passed": true
+    },
+    {
+      "name": "Native SAF image decodes with the genuine MIME, dimensions and nonempty bytes",
+      "passed": true
+    },
+    {
+      "name": "Canvas reads the PNG provider's exact generated RGBA pixel",
+      "passed": true
+    },
+    {
+      "name": "Open a genuine pending picker for Activity teardown",
+      "passed": true
+    },
+    {
+      "name": "Activity destruction cancels the genuine outstanding chooser callback",
+      "passed": true
+    },
+    {
+      "name": "Return to the real native activity before notification UI assertions",
+      "passed": true
+    },
+    {
+      "name": "Finish any genuine API check before native fixture delivery",
+      "passed": true
+    },
+    {
+      "name": "System notification permission/channel is genuinely enabled",
+      "passed": true
+    },
+    {
+      "name": "First real Android snapshot establishes baseline without an old notification",
+      "passed": true
+    },
+    {
+      "name": "A new unread friend request reaches Android's real NotificationManager",
+      "passed": true
+    },
+    {
+      "name": "System notification contains the genuine event type and actor",
+      "passed": true
+    },
+    {
+      "name": "Social notification protects lock-screen content",
+      "passed": true
+    },
+    {
+      "name": "Notification PendingIntent is immutable",
+      "passed": true
+    },
+    {
+      "name": "Repeated snapshot does not duplicate a native notification",
+      "passed": true
+    },
+    {
+      "name": "Dedup ids persist outside the page process",
+      "passed": true
+    },
+    {
+      "name": "Read/expired events remove stale native notifications",
+      "passed": true
+    },
+    {
+      "name": "Server-disabled social notifications stay silent",
+      "passed": true
+    },
+    {
+      "name": "A new invitation remains visible as a system notification while app is foreground",
+      "passed": true
+    },
+    {
+      "name": "Global profile badge reflects the real API unread count outside the profile page",
+      "passed": true
+    },
+    {
+      "name": "Unread badge updates preserve the existing search input, focus and cursor",
+      "passed": true
+    },
+    {
+      "name": "A later background event remains deliverable",
+      "passed": true
+    },
+    {
+      "name": "Real notification click opens the review page without accepting or joining a room",
+      "passed": true
+    },
+    {
+      "name": "Native activity is foreground before hardware Back regression",
+      "passed": true
+    },
+    {
+      "name": "Open native room Activity for hardware Back test",
+      "passed": true
+    },
+    {
+      "name": "Own-origin room fixture loaded without an account",
+      "passed": true
+    },
+    {
+      "name": "Actual social.js opens an HTML drawer over the room fixture",
+      "passed": true
+    },
+    {
+      "name": "Back fixture starts without native WebView history",
+      "passed": true
+    },
+    {
+      "name": "First hardware Back is processed",
+      "passed": true
+    },
+    {
+      "name": "First system Back closes the social drawer without finishing the room activity",
+      "passed": true
+    },
+    {
+      "name": "First Back preserves the exact WebView instance and room URL",
+      "passed": true
+    },
+    {
+      "name": "Closing the real drawer retains the same connected room player DOM",
+      "passed": true
+    },
+    {
+      "name": "Second system Back follows normal native history/finish behavior",
+      "passed": true
+    },
+    {
+      "name": "Return to native activity after leaving the room",
+      "passed": true
+    },
+    {
+      "name": "Open native social Activity for hardware Back test",
+      "passed": true
+    },
+    {
+      "name": "Own-origin social fixture loaded without an account",
+      "passed": true
+    },
+    {
+      "name": "Actual standalone social page is open for Back regression",
+      "passed": true
+    },
+    {
+      "name": "Standalone social page exits normally without a close()/Back loop",
+      "passed": true
+    }
+  ],
+  "diagnostics": [
+    {
+      "phase": "upload-fixture",
+      "frameFocus": "\"IFRAME\"",
+      "dom": "\"{\\\"url\\\":\\\"https://lolzcloud.com/social?native-upload-fixture=83554ecf-a2fa-4ad1-820e-203ea3e4134d\\\",\\\"ready\\\":\\\"complete\\\",\\\"visibility\\\":\\\"visible\\\",\\\"avatar\\\":true,\\\"provider\\\":true,\\\"active\\\":\\\"IFRAME\\\",\\\"body\\\":\\\"\\u003Ch1>Native upload fixture\\u003C/h1>\\u003Cinput id=\\\\\\\"avatar\\\\\\\" type=\\\\\\\"file\\\\\\\" accept=\\\\\\\"image/jpeg,image/png\\\\\\\">\\u003Ciframe id=\\\\\\\"provider\\\\\\\" tabindex=\\\\\\\"0\\\\\\\" src=\\\\\\\"https://w.soundcloud.com/\\\\\\\">\\u003C/iframe>\\\"}\""
+    },
+    {
+      "phase": "SAF drawer provider row",
+      "bounds": "[189,90][614,161]"
+    },
+    {
+      "phase": "SAF before",
+      "nodes": [
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.ViewGroup",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,0][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "androidx.drawerlayout.widget.DrawerLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.ScrollView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.ScrollView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,189][1080,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "androidx.recyclerview.widget.RecyclerView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,189][1080,315]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.HorizontalScrollView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,315][1080,315]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[63,315][1017,473]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.ViewGroup",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,189]"
+        },
+        {
+          "text": "null",
+          "description": "Show roots",
+          "class": "android.widget.ImageButton",
+          "enabled": true,
+          "clickable": true,
+          "selected": false,
+          "bounds": "[0,63][147,189]"
+        },
+        {
+          "text": "LolzCloud images",
+          "description": "null",
+          "class": "android.widget.TextView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[189,90][614,161]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "androidx.appcompat.widget.LinearLayoutCompat",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[954,63][1080,189]"
+        },
+        {
+          "text": "null",
+          "description": "More options",
+          "class": "android.widget.ImageView",
+          "enabled": true,
+          "clickable": true,
+          "selected": false,
+          "bounds": "[954,63][1080,189]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.FrameLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.LinearLayout",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.ViewGroup",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.widget.GridView",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.View",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,63][32,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.ViewGroup",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,2214][1080,2340]"
+        },
+        {
+          "text": "null",
+          "description": "null",
+          "class": "android.view.View",
+          "enabled": true,
+          "clickable": false,
+          "selected": false,
+          "bounds": "[0,2214][1080,2340]"
+        }
+      ]
+    },
+    {
+      "phase": "SAF before screenshot",
+      "path": "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/social-picker-before.png"
+    },
+    {
+      "phase": "SAF PNG tile tap",
+      "bounds": "[64,484][366,786]",
+      "package": "com.android.documentsui"
+    },
+    {
+      "phase": "SAF PNG accessibility action",
+      "clicked": false,
+      "fileEnabled": true,
+      "fileVisible": true,
+      "targetClass": "android.widget.FrameLayout"
+    },
+    {
+      "phase": "SAF PNG system input tap",
+      "x": 215,
+      "y": 635
+    },
+    {
+      "phase": "after-image-selection",
+      "pendingNativeCallback": false,
+      "dom": "\"{\\\"url\\\":\\\"https://lolzcloud.com/social?native-upload-fixture=83554ecf-a2fa-4ad1-820e-203ea3e4134d\\\",\\\"files\\\":1,\\\"result\\\":{\\\"name\\\":\\\"native-avatar.png\\\",\\\"type\\\":\\\"image/png\\\",\\\"size\\\":108,\\\"width\\\":8,\\\"height\\\":8,\\\"pixel\\\":[85,170,119,255]}}\""
+    },
+    {
+      "phase": "successful-image-upload",
+      "result": {
+        "name": "native-avatar.png",
+        "type": "image/png",
+        "size": 108,
+        "width": 8,
+        "height": 8,
+        "pixel": [
+          85,
+          170,
+          119,
+          255
+        ]
+      }
+    },
+    {
+      "phase": "Android notification cancellation",
+      "latencyMs": 7
+    },
+    {
+      "phase": "before-Back-main-lifecycle",
+      "finishing": false,
+      "destroyed": false,
+      "focus": false,
+      "task": 110,
+      "baseAction": "android.intent.action.MAIN"
+    }
+  ],
+  "generatedAt": "2026-11-14T16:15:08.654Z",
+  "emulator": "emulator-5554",
+  "androidApi": "35",
+  "androidVersion": "15",
+  "deviceModel": "Android SDK built for x86_64",
+  "apk": "LolzCloud-Android-0.1.5.apk",
+  "apkSha256": "ee61577bcf8b45650fad41a76715d3b532012cc949289a61dbb2adfc41db72d0",
+  "scope": "Real private offline storage/MediaPlayer and real Android NotificationManager; social events are isolated fixtures, not a personal-account login."
+}

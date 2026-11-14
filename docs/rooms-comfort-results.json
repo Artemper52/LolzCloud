@@ -1,0 +1,85 @@
+{
+  "status": "passed",
+  "durationMs": 36778,
+  "sdk": "Deterministic SoundCloud/YouTube SDK fixtures; real HTTP, SSE, sessions and UI",
+  "scenarios": [
+    "Listener controls remain unavailable and server rejects a listener host claim",
+    "Local volume and local mute preserve shared playback and other listeners",
+    "Chat delivers to host and guests, preserves another guest draft/focus, mobile layout fits 420px",
+    "SoundCloud seek-to-end uses the room queue and duplicate FINISH advances exactly once",
+    "Auto-next off leaves the ended source paused and preserves the room queue",
+    "YouTube restores an externally changed playback rate to 1x without advancing the queue",
+    "YouTube seek-to-end and duplicate ended events each consume one approved room-queue entry",
+    "Room layouts fit both 420px and 360px mobile viewports",
+    "Guest queue suggestions accept votes and host approval through the UI",
+    "Owner UI assigns and revokes DJ; listeners cannot claim a lease or advance the queue",
+    "Real SSE recovery and browser/DJ/desktop handoff preserve synchronized playback"
+  ],
+  "measurements": [
+    {
+      "label": "playing",
+      "spreadMs": 81
+    },
+    {
+      "label": "playing drift +9s",
+      "recoveryMs": 566
+    },
+    {
+      "label": "playing drift +9s settled",
+      "spreadMs": 108
+    },
+    {
+      "label": "periodic moderate drift +0.7s",
+      "recoveryMs": 2422
+    },
+    {
+      "label": "periodic moderate drift +0.7s settled",
+      "spreadMs": 102
+    },
+    {
+      "label": "listener local resume",
+      "spreadMs": 103
+    },
+    {
+      "label": "paused",
+      "spreadMs": 98
+    },
+    {
+      "label": "paused drift +7s",
+      "recoveryMs": 2396
+    },
+    {
+      "label": "paused drift +7s settled",
+      "spreadMs": 98
+    },
+    {
+      "label": "seek",
+      "spreadMs": 0
+    },
+    {
+      "label": "resume",
+      "spreadMs": 96
+    },
+    {
+      "label": "YouTube playing",
+      "spreadMs": 78
+    },
+    {
+      "label": "YouTube seek",
+      "spreadMs": 0
+    },
+    {
+      "label": "SoundCloud after YouTube",
+      "spreadMs": 47
+    },
+    {
+      "label": "desktop takeover",
+      "spreadMs": 75
+    },
+    {
+      "label": "reconnect",
+      "spreadMs": 75
+    }
+  ],
+  "errors": []
+}

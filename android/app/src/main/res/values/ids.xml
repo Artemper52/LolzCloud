@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="search_query" type="id" />
+    <item name="search_submit" type="id" />
+    <item name="search_soundcloud" type="id" />
+    <item name="search_youtube" type="id" />
+    <item name="search_local" type="id" />
+    <item name="online_link_input" type="id" />
+    <item name="search_loading" type="id" />
+    <item name="search_catalog_error" type="id" />
+    <item name="search_retry" type="id" />
+    <item name="search_more" type="id" />
+</resources>

@@ -14,10 +14,9 @@ async function main() {
   let uninstaller;
   try {
     let previous = process.env.LOLZCLOUD_SETUP_PREVIOUS_APP;
-    // CI uses the last published GitHub release; local checks can select a newer site build.
-    const previousVersion=process.env.LOLZCLOUD_SETUP_PREVIOUS_VERSION||'0.9.9';
+    const previousVersion=process.env.LOLZCLOUD_SETUP_PREVIOUS_VERSION||'0.9.10';
     if (!previous) {
-      const response = await fetch('https://github.com/Artemper52/LolzCloud/releases/download/v'+previousVersion+'/update.json?fixture=0912', { signal: AbortSignal.timeout(20000) });
+      const response = await fetch('https://github.com/Artemper52/LolzCloud/releases/download/v'+previousVersion+'/update.json?fixture=0911', { signal: AbortSignal.timeout(20000) });
       if (!response.ok) throw Error('Previous Setup fixture release is unavailable.');
       const manifest = validateManifest(await response.json());
       if (manifest.version !== previousVersion) throw Error('Unexpected previous fixture version.');

@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "kind": "read-only public manifest GET",
+  "url": "https://lolzcloud.com/downloads/android-update.json",
+  "httpStatus": 200,
+  "observedAt": "2026-11-14T13:51:50.479Z",
+  "manifest": {
+    "versionName": "0.1.5",
+    "versionCode": 6,
+    "packageName": "com.lolzcloud.mobile",
+    "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.5.apk",
+    "size": 2520432,
+    "sha256": "ee61577bcf8b45650fad41a76715d3b532012cc949289a61dbb2adfc41db72d0",
+    "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44"
+  },
+  "apkDownloadedInThisCheck": false,
+  "personalAccountsUsed": false
+}

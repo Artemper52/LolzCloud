@@ -2,7 +2,7 @@
   'use strict';
   const { ipcRenderer } = require('electron');
   const audio = document.createElement('audio'); audio.hidden = true; audio.preload = 'auto'; document.body.append(audio);
-  let current = null, generation = 0, context = null, graph = null, config = { enabled: false }, normalization = { enabled: false }, lastGainSave = 0, volume = 1;
+  let current = null, generation = 0, playRevision = 0, wantsPlay = false, context = null, graph = null, config = { enabled: false }, normalization = { enabled: false }, lastGainSave = 0, volume = 1;
   function report() { if (!current) return; ipcRenderer.send('player-tools:local-state', { id: current.id, token: current.token, duration: Number.isFinite(audio.duration) ? audio.duration : 0, position: audio.currentTime, playing: !audio.paused && !audio.ended, ended: audio.ended, error: !!audio.error }); }
   function impulse(owner) { const buffer = owner.createBuffer(2, Math.ceil(owner.sampleRate * 1.2), owner.sampleRate); let seed = 143; for (let channel = 0; channel < 2; channel++) { const data = buffer.getChannelData(channel); for (let i = 0; i < data.length; i++) { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; data[i] = (seed / 2 ** 31 - 1) * (1 - i / data.length) ** 3; } } return buffer; }
   async function attach() {
@@ -27,15 +27,22 @@
     target(graph.master.gain, volume); graph.filters.forEach((filter, index) => target(filter.gain, config.enabled ? config.gains?.[index] || 0 : 0)); target(graph.reverb.gain, config.enabled ? (config.reverb || 0) * .7 : 0); target(graph.echo.gain, config.enabled ? (config.echo || 0) * .6 : 0); target(graph.feedback.gain, config.enabled ? (config.echo || 0) * .55 : 0);
     graph.normalizer?.port.postMessage({ enabled: normalization.enabled, key: current?.url || '', gainDb: current?.cachedGain });
   }
+  async function resumePlayback() {
+    const token = generation, request = ++playRevision; wantsPlay = true;
+    const valid = () => current && token === generation && request === playRevision && wantsPlay;
+    try { await attach(); if (!valid()) return; apply(); await context?.resume(); if (!valid()) return; await audio.play(); } catch { if (valid()) { wantsPlay = false; report(); } }
+  }
+  function pausePlayback() { wantsPlay = false; playRevision++; audio.pause(); }
   async function play(value) {
     if (!value || !/^[a-f0-9]{32}$/.test(value.id) || !String(value.source).startsWith('file:')) return;
     const token = ++generation; audio.pause(); current = { ...value }; normalization.enabled = value.normalization === true; volume = Math.max(0, Math.min(1, Number(value.volume) || 0)); audio.volume = 1; audio.src = value.source; audio.load();
     const position = Number(value.position) || 0;
     audio.onloadedmetadata = () => { if (token !== generation) return; if (position > 0) audio.currentTime = Math.min(audio.duration, position); report(); };
-    try { await attach(); if (token !== generation) return; apply(); await context?.resume(); if (token !== generation) return; await audio.play(); } catch { report(); }
+    await resumePlayback();
   }
-  function stop() { generation++; current = null; audio.pause(); audio.removeAttribute('src'); audio.load(); }
-  function command({ command, value }) { if (!current) return; if (command === 'playPause') command = audio.paused ? 'play' : 'pause'; if (command === 'play') void audio.play().catch(report); else if (command === 'pause') audio.pause(); else if (command === 'seek' && Number.isFinite(value) && Number.isFinite(audio.duration)) audio.currentTime = Math.max(0, Math.min(audio.duration, value)); else if (command === 'volume' && Number.isFinite(value)) { volume = Math.max(0, Math.min(1, value)); apply(); } report(); }
+  function stop() { generation++; current = null; pausePlayback(); audio.removeAttribute('src'); audio.load(); }
+  function command({ command, value }) { if (!current) return; if (command === 'playPause') command = wantsPlay || !audio.paused ? 'pause' : 'play'; if (command === 'play') void resumePlayback(); else if (command === 'pause') pausePlayback(); else if (command === 'seek' && Number.isFinite(value) && Number.isFinite(audio.duration)) audio.currentTime = Math.max(0, Math.min(audio.duration, value)); else if (command === 'volume' && Number.isFinite(value)) { volume = Math.max(0, Math.min(1, value)); apply(); } report(); }
+  audio.addEventListener('ended', () => { wantsPlay = false; });
   for (const event of ['play', 'pause', 'seeked', 'ended', 'error', 'durationchange']) audio.addEventListener(event, report);
   setInterval(() => { if (current && !audio.paused) report(); }, 500);
   ipcRenderer.on('lolzcloud:local-play', (_event, value) => { void play(value); }); ipcRenderer.on('lolzcloud:local-stop', stop); ipcRenderer.on('lolzcloud:local-media', (_event, value) => command(value)); ipcRenderer.on('lolzcloud:dsp', (_event, value) => { config = value; apply(); }); ipcRenderer.on('lolzcloud:normalization', (_event, value) => { normalization = value; apply(); });

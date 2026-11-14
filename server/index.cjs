@@ -6,13 +6,15 @@ const { CloudStore, HttpError, profile, safeNext, hash } = require('./core.cjs')
 const { PlayerServices } = require('./player-services.cjs');
 const { RoomEngine } = require('./room-engine.cjs');
 const { RoomCatalog } = require('./catalog.cjs');
+const { SocialService } = require('./social.cjs');
 const ROOT = path.join(__dirname, 'public');
 const publicFile = name => fs.readFileSync(path.join(ROOT, name), 'utf8');
 const inlineHash = value => "'sha256-" + createHash('sha256').update(value).digest('base64') + "'";
 const cookies = req => Object.fromEntries(String(req.headers.cookie || '').split(';').map(row => row.trim().split(/=(.*)/s).slice(0, 2)).filter(row => row.length === 2));
-function createServer({ origin = 'https://lolzcloud.com', clientId = process.env.LOLZ_CLIENT_ID, redirectMode = process.env.LOLZ_REDIRECT_MODE ?? 'explicit', spicyKey = process.env.SPICY_LYRICS_SECRET_KEY, store = new CloudStore({ filename: path.join(process.env.LOLZCLOUD_STATE || '/var/lib/lolzcloud', 'sessions.json'), origin }), fetcher = fetch, verifyProfile = null } = {}) {
+function createServer({ origin = 'https://lolzcloud.com', clientId = process.env.LOLZ_CLIENT_ID, redirectMode = process.env.LOLZ_REDIRECT_MODE ?? 'explicit', spicyKey = process.env.SPICY_LYRICS_SECRET_KEY, store = new CloudStore({ filename: path.join(process.env.LOLZCLOUD_STATE || '/var/lib/lolzcloud', 'sessions.json'), origin }), fetcher = fetch, verifyProfile = null, socialOptions = {} } = {}) {
   if (!['explicit', 'registered'].includes(redirectMode)) throw new Error('LOLZ_REDIRECT_MODE must be explicit or registered.');
   const limits = new Map(), lyrics = new Map(), rooms = new RoomEngine(store), players = new PlayerServices(store, rooms); let upstream = 0;
+  const social = new SocialService(store, rooms, socialOptions);
   const catalog = new RoomCatalog(fetcher);
   function limit(key, max, window = 60000) {
     const now = Date.now(); let entry = limits.get(key);
@@ -22,7 +24,7 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
   }
   async function jsonBody(req) {
     if (!String(req.headers['content-type']).startsWith('application/json')) throw new HttpError(415, 'Нужен JSON-запрос.');
-    const chunks = []; let size = 0; const maximum = req.url === '/api/profile' ? 1050000 : 16384; for await (const chunk of req) { size += chunk.length; if (size > maximum) throw new HttpError(413, 'Слишком большой запрос.'); chunks.push(chunk); }
+    const chunks = []; let size = 0; const pathname = req.url.split('?')[0], maximum = pathname === '/api/social/media' ? 1400000 : pathname === '/api/profile' ? 1050000 : 16384; for await (const chunk of req) { size += chunk.length; if (size > maximum) throw new HttpError(413, 'Слишком большой запрос.'); chunks.push(chunk); }
     try { return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}'); } catch { throw new HttpError(400, 'Некорректный запрос.'); }
   }
   async function apiJson(url, options = {}, max = 2_000_000) {
@@ -43,7 +45,8 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
   function session(req, required = true) {
     const bearer = req.headers.authorization?.match(/^Bearer ([a-zA-Z0-9_-]{43})$/)?.[1], secret = bearer || cookies(req)['__Host-lc_session'];
     const value = store.session(secret); if (!value && required) throw new HttpError(401, 'Войди через Lolzteam, чтобы подключиться.');
-    return value ? { ...value, secret, bearer: !!bearer } : null;
+    if (value) social.observe(value.user, true, value.verifiedAt);
+    return value ? { ...value, user: social.get(value.user.id, value.user), secret, bearer: !!bearer } : null;
   }
   function guard(req, user) {
     if (req.headers.origin && req.headers.origin !== origin) throw new HttpError(403, 'Недоверенный источник запроса.');
@@ -57,7 +60,7 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
   function send(res, value, status = 200) { res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' }); res.end(JSON.stringify(value)); }
   function redirect(res, url) { res.writeHead(303, { Location: url }); res.end(); }
   function cookie(name, value, age) { return name + '=' + value + '; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=' + age; }
-  function page(res, name, room = false) { headers(res, room); res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(fs.readFileSync(path.join(ROOT, name))); }
+  function page(res, name, room = false, embedded = false) { headers(res, room); if(embedded)res.setHeader('Content-Security-Policy',res.getHeader('Content-Security-Policy').replace("frame-ancestors 'none'","frame-ancestors 'self'")); res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' }); res.end(fs.readFileSync(path.join(ROOT, name))); }
   function callback(res) {
     const style = publicFile('callback.css').replace(/\r\n/g, '\n');
     const script = publicFile('callback.js').replace(/\r\n/g, '\n');
@@ -75,7 +78,17 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
       const url = new URL(req.url, origin), method = req.method;
       if (!['GET', 'POST', 'PUT', 'DELETE'].includes(method)) throw new HttpError(405, 'Метод не поддерживается.');
       const peer = String(req.headers['x-real-ip'] || req.socket.remoteAddress).slice(0, 100);
-      if (url.pathname === '/api/health' && method === 'GET') return send(res, { ok: true, version, roomProtocol: 2, oauthConfigured: !!clientId, spicyConfigured: !!spicyKey });
+      if (url.pathname === '/api/health' && method === 'GET') return send(res, { ok: true, version, roomProtocol: 2, socialProtocol: 1, oauthConfigured: !!clientId, spicyConfigured: !!spicyKey });
+      if(url.pathname==='/app'&&method==='GET')return redirect(res,'/app/');
+      if ((url.pathname==='/app'||url.pathname==='/app/'||/^\/app\/[a-z0-9][a-z0-9._-]{0,100}$/.test(url.pathname))&&method==='GET') {
+        const name=url.pathname==='/app'||url.pathname==='/app/'?'index.html':url.pathname.slice(5);
+        const types={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.webmanifest':'application/manifest+json'};
+        if(!types[path.extname(name)]||name.includes('..'))throw new HttpError(404,'Файл не найден.');
+        const file=path.join(ROOT,'app',name);if(!fs.existsSync(file)||!fs.lstatSync(file).isFile())throw new HttpError(404,'Файл не найден.');
+        res.setHeader('Content-Security-Policy',"default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' https: data: blob:; media-src 'self' blob:; connect-src 'self' https://lrclib.net; frame-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'");
+        if(name==='sw.js')res.setHeader('Service-Worker-Allowed','/app/');
+        res.writeHead(200,{'Content-Type':types[path.extname(name)]});res.end(fs.readFileSync(file));return;
+      }
       if (url.pathname === '/auth/lolz' && method === 'GET') {
         if (!clientId || !/^[a-zA-Z0-9_-]{5,100}$/.test(clientId)) throw new HttpError(503, 'Вход временно недоступен.');
         limit('login:' + peer, 20);
@@ -99,7 +112,7 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
         return send(res, { next, user: value.user });
       }
       if (url.pathname === '/api/session' && method === 'GET') {
-        const value = session(req, false); return send(res, value ? { authenticated: true, user: value.user, csrf: value.csrf, spicyAvailable: !!spicyKey } : { authenticated: false });
+        const value = session(req, false); return send(res, value ? { authenticated: true, user: value.user, csrf: value.csrf, spicyAvailable: !!spicyKey, socialProtocol: 1 } : { authenticated: false, socialProtocol: 1 });
       }
       if (url.pathname === '/api/desktop/start' && method === 'POST') { limit('desktop:' + peer, 20); await jsonBody(req); return send(res, store.beginDevice()); }
       if (url.pathname === '/api/desktop/poll' && method === 'POST') {
@@ -107,19 +120,62 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
         if (typeof data.deviceCode !== 'string' || !/^[\w-]{43}$/.test(data.deviceCode)) throw new HttpError(400, 'Неверный код подключения.');
         return send(res, store.pollDevice(data.deviceCode));
       }
-      const assets = { '/cloud/room.css': 'room.css', '/cloud/site.js': 'site.js', '/cloud/callback.js': 'callback.js', '/cloud/room.js': 'room.js', '/cloud/remote.js': 'remote.js', '/cloud/queue.js': 'queue.js', '/cloud/room-sync.js': 'room-sync.js', '/cloud/media-source.js': 'media-source.js', '/cloud/room-players.js': 'room-players.js' };
+      if (url.pathname === '/api/desktop/session' && method === 'POST') {
+        // Home Screen web apps have their own cookie jar on iOS. Commit a
+        // verified device grant into this jar without exposing an HttpOnly
+        // cookie to JavaScript or depending on Safari's separate login cookie.
+        if(req.headers.origin!==origin)throw new HttpError(403,'Недоверенный источник подключения.');
+        limit('device-session:'+peer,20);
+        const value=session(req);
+        if(!value.bearer)throw new HttpError(403,'Нужно подтверждение подключения приложения.');
+        const body=await jsonBody(req);
+        if(!body||Array.isArray(body)||Object.keys(body).length)throw new HttpError(400,'Неверный запрос подключения.');
+        const age=Math.max(1,Math.min(7*86400,Math.floor((value.expires-store.now())/1000)));
+        res.setHeader('Set-Cookie',cookie('__Host-lc_session',value.secret,age));
+        return send(res,{authenticated:true,user:value.user,csrf:value.csrf,socialProtocol:1});
+      }
+      const assets = { '/cloud/room.css': 'room.css', '/cloud/site.js': 'site.js', '/cloud/social.js': 'social.js', '/cloud/social.css': 'social.css', '/cloud/callback.js': 'callback.js', '/cloud/room.js': 'room.js', '/cloud/remote.js': 'remote.js', '/cloud/queue.js': 'queue.js', '/cloud/room-sync.js': 'room-sync.js', '/cloud/media-source.js': 'media-source.js', '/cloud/room-players.js': 'room-players.js' };
       if (assets[url.pathname] && method === 'GET') {
         headers(res); res.writeHead(200, { 'Content-Type': url.pathname.endsWith('.css') ? 'text/css; charset=utf-8' : 'text/javascript; charset=utf-8' }); res.end(fs.readFileSync(path.join(ROOT, assets[url.pathname]))); return;
       }
-      if (url.pathname === '/login' && method === 'GET') return page(res, 'login.html');
+      if (url.pathname === '/login' && method === 'GET') return page(res, 'login.html',false,true);
+      if (url.pathname === '/social' && method === 'GET') { if (!session(req, false)) return redirect(res, '/login?next=' + encodeURIComponent(safeNext(url.pathname + url.search))); return page(res, 'social.html',false,true); }
+      const media = url.pathname.match(/^\/media\/profiles\/([1-9]\d{0,14})\/((?:avatar|background)-[a-f0-9]{24}\.(?:png|jpg))$/);
+      if (media && method === 'GET') { const image = social.media(media[1], media[2]); res.writeHead(200, { 'Content-Type': image.type, 'Cache-Control': 'public, max-age=86400, immutable' }); res.end(image.bytes); return; }
       if (/^\/remote\/[a-f0-9]{32}$/.test(url.pathname) && method === 'GET') { if (!session(req, false)) return redirect(res, '/login?next=' + encodeURIComponent(safeNext(url.pathname))); return page(res, 'remote.html'); }
       if (url.pathname === '/connect' && method === 'GET' || url.pathname === '/rooms' && method === 'GET' || /^\/room\/[a-f0-9]{32}\/?$/.test(url.pathname) && method === 'GET') {
         if (!session(req, false)) return redirect(res, '/login?next=' + encodeURIComponent(safeNext(url.pathname + url.search)));
-        return page(res, url.pathname === '/connect' ? 'connect.html' : url.pathname === '/rooms' ? 'rooms.html' : 'room.html', url.pathname.startsWith('/room/'));
+        return page(res, url.pathname === '/connect' ? 'connect.html' : url.pathname === '/rooms' ? 'rooms.html' : 'room.html', url.pathname.startsWith('/room/'),url.pathname!=='/connect');
       }
       const auth = session(req); limit('user:' + auth.user.id, 900);
       if (url.pathname === '/api/clock' && method === 'GET') return send(res, { serverTime: store.now() });
       if (method !== 'GET') guard(req, auth);
+      if (url.pathname === '/api/social/me' && method === 'GET') return send(res, { profile: social.get(auth.user.id, auth.user) });
+      if (url.pathname === '/api/social/me' && method === 'PUT') { limit('social-profile:' + auth.user.id, 20); return send(res, { profile: social.update(auth.user, await jsonBody(req)) }); }
+      if (url.pathname === '/api/social/users' && method === 'GET') { limit('social-search:' + auth.user.id, 60); return send(res, { users: social.search(url.searchParams.get('q'), auth.user) }); }
+      const socialUser = url.pathname.match(/^\/api\/social\/users\/([1-9]\d{0,14})$/);
+      if (socialUser && method === 'GET') return send(res, { profile: social.get(Number(socialUser[1]), auth.user) });
+      const socialRoles = url.pathname.match(/^\/api\/social\/users\/([1-9]\d{0,14})\/roles$/);
+      if (socialRoles && method === 'PUT') { limit('social-roles:' + auth.user.id, 20); return send(res, { profile: social.updateRoles(auth.user, Number(socialRoles[1]), await jsonBody(req)) }); }
+      if (url.pathname === '/api/social/friends' && method === 'GET') return send(res, social.friendList(auth.user));
+      if (url.pathname === '/api/social/friends' && method === 'POST') { limit('social-friend:' + auth.user.id, 20); return send(res, social.requestFriend(auth.user, (await jsonBody(req)).userId)); }
+      const friendAction = url.pathname.match(/^\/api\/social\/friends\/([1-9]\d{0,14})(\/accept)?$/);
+      if (friendAction && method === 'POST' && friendAction[2]) { await jsonBody(req); return send(res, social.acceptFriend(auth.user, Number(friendAction[1]))); }
+      if (friendAction && method === 'DELETE' && !friendAction[2]) return send(res, social.removeFriend(auth.user, Number(friendAction[1])));
+      if (url.pathname === '/api/social/invitations' && method === 'POST') { limit('social-invite:' + auth.user.id, 30); const data = await jsonBody(req); return send(res, { invitation: social.invite(auth.user, data.userId, data.roomId) }); }
+      const invitation = url.pathname.match(/^\/api\/social\/invitations\/([a-f0-9-]{36})\/respond$/);
+      if (invitation && method === 'POST') return send(res, social.respond(auth.user, invitation[1], (await jsonBody(req)).accept));
+      if (url.pathname === '/api/social/notifications' && method === 'GET') return send(res, social.inbox(auth.user));
+      if (url.pathname === '/api/social/notifications/read' && method === 'POST') return send(res, social.read(auth.user, await jsonBody(req)));
+      if (url.pathname === '/api/social/media' && method === 'POST') { limit('social-media:' + auth.user.id, 15); return send(res, social.upload(auth.user, await jsonBody(req)), 201); }
+      if (url.pathname === '/api/social/events' && method === 'GET') {
+        let close = () => {}, heartbeat, unsubscribe = () => {}, finished = false;
+        const push = () => { if (finished) return; try { if (!store.session(auth.secret)) return close(); if (!res.write('event: notifications\ndata: ' + JSON.stringify(social.inbox(auth.user)) + '\n\n')) close(); } catch { close(); } };
+        unsubscribe = social.subscribe(auth.user, push);
+        res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-cache, no-transform', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' }); res.flushHeaders();
+        close = () => { if (finished) return; finished = true; clearInterval(heartbeat); unsubscribe(); res.end(); };
+        heartbeat = setInterval(push, 15000); heartbeat.unref(); res.on('close', close); push(); return;
+      }
       if (url.pathname === '/api/logout' && method === 'POST') { store.logout(auth.secret); res.setHeader('Set-Cookie', cookie('__Host-lc_session', '', 0)); return send(res, { ok: true }); }
       if (url.pathname === '/api/desktop/approve' && method === 'POST') { const data = await jsonBody(req); store.approveDevice(data.code, auth.user); return send(res, { ok: true }); }
       if (url.pathname === '/api/profile' && method === 'GET') return send(res, players.getProfile(auth.user));
@@ -144,7 +200,7 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
           res.writeHead(200, { 'Content-Type': 'text/event-stream; charset=utf-8', 'Cache-Control': 'no-cache, no-transform', Connection: 'keep-alive', 'X-Accel-Buffering': 'no' }); res.flushHeaders();
           let finished = false, unsubscribe = () => {}, heartbeat;
           const close = () => { if (finished) return; finished = true; clearInterval(heartbeat); unsubscribe(); res.end(); };
-          const push = () => { if (finished) return; try { if (auth.expires <= store.now()) return close(); const value = store.viewRoom(store.room(id), auth.user); if (!res.write('event: state\ndata: ' + JSON.stringify(value) + '\n\n')) close(); } catch { res.write('event: closed\ndata: {}\n\n'); close(); } };
+          const push = () => { if (finished) return; try { if (auth.expires <= store.now() || !store.session(auth.secret)) return close(); const value = store.viewRoom(store.room(id), auth.user); if (!res.write('event: state\ndata: ' + JSON.stringify(value) + '\n\n')) close(); } catch { res.write('event: closed\ndata: {}\n\n'); close(); } };
           unsubscribe = rooms.subscribe(id, push); heartbeat = setInterval(push, 5000); heartbeat.unref(); res.on('close', close); push(); return;
         }
         if (method === 'GET' && !action) return send(res, store.viewRoom(store.room(id), auth.user));
@@ -185,7 +241,7 @@ function createServer({ origin = 'https://lolzcloud.com', clientId = process.env
   });
   server.requestTimeout = 20000; server.headersTimeout = 10000;
   const cleanup = setInterval(() => { store.prune(); for (const [id, row] of lyrics) if (row.until <= Date.now()) lyrics.delete(id); }, 60000); cleanup.unref();
-  server.on('close', () => { clearInterval(cleanup); rooms.dispose(); store.save(); }); server.store = store;
+  server.on('close', () => { clearInterval(cleanup); rooms.dispose(); social.dispose(); store.save(); }); server.store = store; server.social = social;
   return server;
 }
 if (require.main === module) {

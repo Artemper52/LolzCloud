@@ -1,0 +1,29 @@
+{
+  "version": "0.1.3",
+  "status": "passed",
+  "checks": [
+    "Default source is visibly selected SoundCloud",
+    "Native SoundCloud scope displays its search hint, not a local-library empty state",
+    "Empty online query stays in the field with an inline error",
+    "Real accessibility text entry accepts Cyrillic",
+    "Search field exposes the keyboard Search action",
+    "Actual accessibility IME Enter action is accepted",
+    "Actual keyboard Search displays native SoundCloud results for the Cyrillic query without a browser",
+    "Query survives native SoundCloud search",
+    "Changing source preserves query and does not launch a page",
+    "Visible Search button opens matching YouTube Music results",
+    "Only My music displays the local no-results state",
+    "Local search finds the existing imported fixture",
+    "Search source and Cyrillic query survive actual activity recreation",
+    "Invitation starts empty with a short hint and disabled Open",
+    "Link field uses URI input and keyboard Go",
+    "Invalid invitation keeps the dialog, text and inline error",
+    "Unsubmitted invitation survives actual activity recreation",
+    "Keyboard Go opens the validated room URL",
+    "Remote dialog rejects a room URL instead of opening the wrong destination",
+    "Audio-link dialog retains a rejected YouTube service-page URL",
+    "SoundCloud link opens native results without a browser or autoplay"
+  ],
+  "apkSha256": "e5fb9fe5bd07bc5889ab3cb69ffcbfdc482440998c3b8533d108f9bf81781d77",
+  "phase": "ui"
+}

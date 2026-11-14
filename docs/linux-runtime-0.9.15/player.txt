@@ -1,0 +1,4 @@
+Room navigation passed: listener, 13 panels, profile/search overlays, Esc, close/reopen and preserved chat/audio/lease.
+Room navigation passed: YouTube host, 13 panels, profile/search overlays, Esc, close/reopen and preserved chat/audio/lease.
+Room navigation passed: SoundCloud host, 13 panels, profile/search overlays, Esc, close/reopen and preserved chat/audio/lease.
+Player UI passed: shared SoundCloud/YouTube footer and mini, actual audio seek/repeat/DSP/like, room host/listener bridge and handoff without duplicate audio, Profile/Friends/Inbox preserve the active room guest/audio/chat draft, isolated standalone social, local volume/pause, privacy, directory/chat, lyric seek, bookmarks, offline profile.

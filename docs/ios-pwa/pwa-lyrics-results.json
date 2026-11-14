@@ -1,0 +1,59 @@
+{
+  "ok": true,
+  "count": 8,
+  "checks": [
+    "GET404 falls back to search and selects exact Unicode-normalized title/artist while preserving slowed",
+    "Own title/artist with a five-second duration mismatch renders plain text without clickable timings",
+    "A foreign title and artist never become this track lyrics",
+    "Correction fields and actions fit the actual 360px player",
+    "Manual correction persists separately from catalogue metadata and cached lyric content",
+    "Cache is bound to corrected identity and survives reload without confusing original metadata",
+    "HTTP429 never starts a search fallback",
+    "Targeted lyric scenarios have no uncaught browser errors"
+  ],
+  "requests": [
+    {
+      "path": "/api/get",
+      "title": "Песня (slowed)",
+      "artist": "Артист"
+    },
+    {
+      "path": "/api/search",
+      "title": "Песня (slowed)",
+      "artist": "Артист"
+    },
+    {
+      "path": "/api/get",
+      "title": "Другая длительность",
+      "artist": "Артист"
+    },
+    {
+      "path": "/api/search",
+      "title": "Другая длительность",
+      "artist": "Артист"
+    },
+    {
+      "path": "/api/get",
+      "title": "Сырое имя из каталога",
+      "artist": "Артист"
+    },
+    {
+      "path": "/api/search",
+      "title": "Сырое имя из каталога",
+      "artist": "Артист"
+    },
+    {
+      "path": "/api/get",
+      "title": "Исправленная песня",
+      "artist": "Правильный артист"
+    },
+    {
+      "path": "/api/get",
+      "title": "Слишком много запросов",
+      "artist": "Артист"
+    }
+  ],
+  "errors": [],
+  "failure": "",
+  "fixtureNote": "Actual isolated Chromium UI + real local app HTTP; LRCLIB JSON/status responses are deterministic protocol fixtures. No physical Safari or live provider success claim."
+}

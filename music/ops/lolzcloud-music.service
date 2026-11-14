@@ -1,0 +1,29 @@
+[Unit]
+Description=LolzCloud native music catalogue and MP3 cache
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=lolzcloud-music
+Group=lolzcloud-music
+WorkingDirectory=/opt/lolzcloud-music/current
+ExecStart=/opt/lolzcloud-runtime/node music/index.cjs
+Environment=NODE_ENV=production
+EnvironmentFile=/etc/lolzcloud-music/credentials.env
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/lolzcloud-music
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+MemoryMax=512M
+TasksMax=48
+CPUQuota=150%
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

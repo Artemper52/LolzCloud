@@ -1,0 +1,56 @@
+{
+  "generatedAt": "2026-11-14T11:44:32.662Z",
+  "status": "passed",
+  "evidence": "Observed completed test run in this agent session before code freeze; tests were not rerun for documentation.",
+  "command": "node --test tests/social-roles.test.cjs tests/social.test.cjs",
+  "testCount": 21,
+  "pass": 21,
+  "fail": 0,
+  "tests": [
+    "owner bootstrap uses an explicit canonical id and app roles stay separate from forum titles and rank",
+    "only server-authorized owners can assign Tester or Owner to another user",
+    "self-role edits and removal of the final owner fail without changing access",
+    "role writes use revision checks, a closed field/role set and normal profile writes cannot bypass authority",
+    "role route enforces authentication, cookie CSRF and exact request Origin",
+    "role badges decorate rooms and fresh session cards without changing verified forum identity",
+    "persistent roles survive restart and bootstrap never promotes another configured id when an owner already exists",
+    "a service without a configured canonical owner never grants authority by name or client identity fields",
+    "verified group labels survive normalization; editable custom titles never become membership badges",
+    "profiles have shared authenticated identity and server-owned ranks; client cannot forge badges",
+    "older sessions cannot undo a newer Lolzteam identity refresh",
+    "friend requests require consent, deduplicate, notify only the target and support cancellation/removal",
+    "privacy preferences suppress unsolicited requests, invitations and native alert delivery",
+    "room invitations enforce sender membership, recipient identity and explicit acceptance without autoplay",
+    "expired/closed/banned room invitations cannot grant access",
+    "read acknowledgements are account-scoped and never accept an invitation",
+    "image upload validates bytes/size/ownership and serves a custom avatar without trusting external URLs",
+    "browser social mutations keep CSRF/origin guards",
+    "notification SSE streams only that account and immediately publishes changes",
+    "logout revokes an already open room SSE stream instead of retaining cached authorization",
+    "social profiles and friendships survive restart without provider secrets; persistence failure rolls back"
+  ],
+  "sourceSnapshot": {
+    "server/social.cjs": "a444bf8191085c2f7d37f5913db9f7f4f8efc64519dc4b6c7f782edf0596683c",
+    "server/public/social.js": "c3e8b8c0c185afd7fa7f13c5692bfe8339c8e2aeeb139fb70485a1d0c50da601",
+    "server/public/social.css": "d16d9131ad980d13e441a7ae866d2b08e7c4b58e0a387ec892a1de1aa80ffa86",
+    "tests/social-roles.test.cjs": "e2471073b61e87762f12444cfcc3f4d5674f4099e2766bd9d4e9288b1e8475db",
+    "tests/social.test.cjs": "6c4384b327f77bacb89a6de69a1c236ea621fab7323596978f0ce9da00e5798e"
+  },
+  "deployment": {
+    "serverVersion": "0.9.14",
+    "canonicalUserId": 6277567,
+    "name": "Artemper",
+    "persistedAppRoles": [
+      "owner"
+    ],
+    "verificationSource": "Release coordinator confirmed canonical identity and persisted role on the deployed server; this documentation task made no remote mutation."
+  },
+  "uiReport": "social-ui-results.json",
+  "uiChecks": 36,
+  "limitations": [
+    "UI screenshots use explicit test accounts and deterministic media SDK adapters, not real user accounts.",
+    "HTTP, SSE, DOM actions, role mutations and 360px layout checks were real in an isolated local service."
+  ],
+  "roleSpecificTests": 8,
+  "existingSocialRegressionTests": 13
+}

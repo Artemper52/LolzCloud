@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LolzCloud — профили и комнаты, 0.9.13 / Android 0.1.2</title>
+<style>
+  :root { color-scheme: dark; font-family: system-ui, sans-serif; background: #101413; color: #e6ece9; }
+  body { max-width: 1240px; margin: auto; padding: 32px 20px 64px; line-height: 1.6; }
+  h1 { font-size: clamp(25px, 4vw, 37px); line-height: 1.2; margin-bottom: 12px; }
+  h2 { font-size: 21px; margin: 40px 0 12px; }
+  p { max-width: 85ch; color: #b8c3bd; }
+  a { color: #9cd8b6; text-underline-offset: 3px; }
+  .phones { display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; }
+  figure { margin: 0 0 26px; }
+  .phones figure { width: min(360px, 100%); }
+  img { display: block; max-width: 100%; height: auto; border: 1px solid #36443c; border-radius: 8px; box-sizing: border-box; }
+  figcaption { margin-top: 9px; color: #b8c3bd; font-size: 14px; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px 22px; padding: 16px 0; }
+</style>
+<h1>Профили, друзья и комнаты LolzCloud</h1>
+<p>14 ноября 2026 · Android 0.1.2 · Windows и сервер 0.9.13.</p>
+<p>Это снимки работающего интерфейса из проверок. Пользователи, титулы, сообщения и изображения — синтетические тестовые данные. Мобильные кадры показывают общий Web UI при ширине 360 px; это не скриншоты нативной Android Activity. Настольные кадры ниже сняты в настоящем Electron. Музыкальные SDK в тестах заменены адаптерами.</p>
+<nav class="links" aria-label="Материалы">
+  <a href="../mobile-parity-0.9.13.md">Аудит и оставшиеся отличия</a>
+  <a href="https://lolzcloud.com/downloads/beta/LolzCloud-Android-0.1.2.apk">Скачать Android APK</a>
+  <a href="https://lolzcloud.com/downloads/beta/LolzCloud-0.9.13-win-x64-Setup.exe">Скачать Windows Setup</a>
+  <a href="SHA256SUMS.txt">SHA-256</a>
+</nav>
+<h2>Мобильный общий интерфейс</h2>
+<div class="phones">
+  <figure><a href="profile-mobile-360.png"><img src="profile-mobile-360.png" alt="Профиль с аватаром, фоном и отдельными титулами и рангом" loading="lazy"></a><figcaption>Профиль, 360 px. Своя фотография и фон, титулы форума и отдельный ранг LolzCloud.</figcaption></figure>
+  <figure><a href="notifications-mobile-360.png"><img src="notifications-mobile-360.png" alt="Входящие и приглашение в комнату на мобильной ширине" loading="lazy"></a><figcaption>Входящие, 360 px. Приглашение принимается отдельным действием.</figcaption></figure>
+</div>
+<h2>Друзья и чат общего Web UI</h2>
+<figure><a href="friends-invite-desktop.png"><img src="friends-invite-desktop.png" alt="Друзья и отправка приглашения в текущую комнату" loading="lazy"></a><figcaption>Друзья и приглашения из комнаты.</figcaption></figure>
+<figure><a href="room-chat-desktop.png"><img src="room-chat-desktop.png" alt="Чат комнаты с аватарами, титулами и временем сообщений" loading="lazy"></a><figcaption>Чат: профиль автора, группировка, время и непрочитанные сообщения.</figcaption></figure>
+<h2>Приложение Windows</h2>
+<figure><a href="room-social-desktop.png"><img src="room-social-desktop.png" alt="Профиль поверх комнаты в настоящем окне Electron" loading="lazy"></a><figcaption>Профиль поверх комнаты. Тот же плеер и подключение сохраняются.</figcaption></figure>
+<figure><a href="social-standalone-desktop.png"><img src="social-standalone-desktop.png" alt="Отдельная страница профиля в приложении Electron" loading="lazy"></a><figcaption>Отдельная страница профиля вне комнаты.</figcaption></figure>
+<nav class="links" aria-label="Результаты проверок">
+  <a href="android-native.json">Android: 70 проверок</a>
+  <a href="android-back.json">Android Back: 17 проверок</a>
+  <a href="web-ui.json">Web UI: 30 проверок</a>
+  <a href="room-regressions.json">Комнаты</a>
+  <a href="server-public.json">Публичный сервер</a>
+  <a href="deployment.json">Развёртывание</a>
+</nav>
+</html>

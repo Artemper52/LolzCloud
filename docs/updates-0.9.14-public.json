@@ -1,0 +1,161 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T12:07:26.821Z",
+  "checks": [
+    {
+      "name": "Direct HTTP200 /downloads/update.json",
+      "passed": true
+    },
+    {
+      "name": "Official Windows0.9.14 metadata equals verified final artifacts",
+      "passed": true
+    },
+    {
+      "name": "Direct HTTP200 /downloads/latest.yml",
+      "passed": true
+    },
+    {
+      "name": "NSIS latest.yml exact final bytes",
+      "passed": true
+    },
+    {
+      "name": "Direct HTTP200 /downloads/SHA256SUMS.txt",
+      "passed": true
+    },
+    {
+      "name": "Direct HTTP200 /downloads/LolzCloud-0.9.14-win-x64-Setup.exe",
+      "passed": true
+    },
+    {
+      "name": "setup Content-Length matches",
+      "passed": true
+    },
+    {
+      "name": "setup full download size and SHA256",
+      "passed": true
+    },
+    {
+      "name": "setup shared checksum index",
+      "passed": true
+    },
+    {
+      "name": "Direct HTTP200 /downloads/LolzCloud-0.9.14-win-x64.zip",
+      "passed": true
+    },
+    {
+      "name": "archive Content-Length matches",
+      "passed": true
+    },
+    {
+      "name": "archive full download size and SHA256",
+      "passed": true
+    },
+    {
+      "name": "archive shared checksum index",
+      "passed": true
+    },
+    {
+      "name": "Installer SHA512 matches updater feed",
+      "passed": true
+    },
+    {
+      "name": "Direct HTTP200 /downloads/android-update.json",
+      "passed": true
+    },
+    {
+      "name": "Android0.1.4 mirror preserved by Windows snapshot",
+      "passed": true
+    },
+    {
+      "name": "Direct HTTP200 /api/health",
+      "passed": true
+    },
+    {
+      "name": "api health ready",
+      "passed": true
+    },
+    {
+      "name": "Direct HTTP200 /music/health",
+      "passed": true
+    },
+    {
+      "name": "music health ready",
+      "passed": true
+    },
+    {
+      "name": "Direct HTTP200 /telegram/health",
+      "passed": true
+    },
+    {
+      "name": "telegram health ready",
+      "passed": true
+    },
+    {
+      "name": "Main backend version0.9.14",
+      "passed": true
+    }
+  ],
+  "assets": {
+    "setup": {
+      "bytes": 146487758,
+      "sha256": "acc678affefc0a0ee8df25e258b85347f5bbfbede7b94daa6a611b9e29834a65",
+      "sha512": "GAn/2EXtuCw7fGhh+P/WkaF8toWhfDacgArTLXroEfmtDnxJP2OTa9tMQKQDWYKBj6SdW5p9EgwggZnOZ11D9g=="
+    },
+    "archive": {
+      "bytes": 196773164,
+      "sha256": "946df1edb8fcaedd8e75960252151f5feb7cf9d170a6a1cca23fb80ac812c5d5",
+      "sha512": "iyLcr9ym/Dx3+ZlVEaDqXESfIHD/261pDiA6N8LsmubkkR+gqjzv7T2oIgtJ8N+YpyBjnI8rFaH2rsyYe9D3Jg=="
+    }
+  },
+  "manifest": {
+    "version": "0.9.14",
+    "tag": "v0.9.14",
+    "channel": "latest",
+    "archive": {
+      "name": "LolzCloud-0.9.14-win-x64.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.14-win-x64.zip",
+      "size": 196773164,
+      "sha256": "946df1edb8fcaedd8e75960252151f5feb7cf9d170a6a1cca23fb80ac812c5d5"
+    },
+    "setup": {
+      "name": "LolzCloud-0.9.14-win-x64-Setup.exe",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.14-win-x64-Setup.exe",
+      "size": 146487758,
+      "sha256": "acc678affefc0a0ee8df25e258b85347f5bbfbede7b94daa6a611b9e29834a65"
+    }
+  },
+  "android": {
+    "versionName": "0.1.4",
+    "versionCode": 5,
+    "packageName": "com.lolzcloud.mobile",
+    "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.4.apk",
+    "size": 2520432,
+    "sha256": "4e4758653fdc547a28688d8cd3760c21a62d6abaef84b8cce00ba1ce2961308d",
+    "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44"
+  },
+  "services": {
+    "api": {
+      "ok": true,
+      "version": "0.9.14",
+      "roomProtocol": 2,
+      "socialProtocol": 1,
+      "oauthConfigured": true,
+      "spicyConfigured": true
+    },
+    "music": {
+      "ok": true,
+      "service": "lolzcloud-music",
+      "protocol": 1,
+      "activeDownloads": 0
+    },
+    "telegram": {
+      "ok": true,
+      "bot": "lolzcloudbot",
+      "pollAgeSeconds": 3,
+      "activeDownloads": 0,
+      "cacheTracks": 1,
+      "inlineMode": "covers-with-feedback",
+      "cacheChannelConfigured": false
+    }
+  }
+}

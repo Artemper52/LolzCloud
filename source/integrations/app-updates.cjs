@@ -1,6 +1,7 @@
 'use strict';
 const fs = require('node:fs'), path = require('node:path'), crypto = require('node:crypto'), { spawn } = require('node:child_process');
 const { newer, download, extract, REPOSITORY, MIRROR } = require('./portable-update.cjs');
+const { prepareNsisTemporary, applyTemporaryEnvironment, cacheSpaceError } = require('./update-temporary.cjs');
 const BASE = 'https://github.com/Artemper52/LolzCloud/releases/latest/download/';
 function validateManifest(value, legacy = false) {
   if (!value || !/^\d+\.\d+\.\d+$/.test(value.version) || value.tag !== 'v' + value.version || value.channel !== (legacy ? 'legacy' : 'latest')) throw new Error('Сервер вернул неподходящее обновление.');
@@ -9,8 +10,8 @@ function validateManifest(value, legacy = false) {
   return value;
 }
 class AppUpdates {
-  constructor({ app, onState = () => {}, prepareRestart, fetcher = (...args) => fetch(...args), nativeFactory = () => require('electron-updater').autoUpdater, platform = process.platform }) {
-    Object.assign(this, { app, onState, prepareRestart, fetcher, nativeFactory }); this.legacy = Number(process.versions.electron?.split('.')[0] || 99) < 23; this.busy = false; this.manifest = null; this.native = null;
+  constructor({ app, onState = () => {}, prepareRestart, fetcher = (...args) => fetch(...args), nativeFactory = () => require('electron-updater').autoUpdater, platform = process.platform, prepareInstall = prepareNsisTemporary, processEnv = process.env, execPath = process.execPath }) {
+    Object.assign(this, { app, onState, prepareRestart, fetcher, nativeFactory, prepareInstall, processEnv, execPath }); this.legacy = Number(process.versions.electron?.split('.')[0] || 99) < 23; this.busy = false; this.manifest = null; this.native = null;
     this.value = { currentVersion: app.getVersion(), version: '', status: 'idle', percent: 0, error: '', supported: platform === 'win32' && app.isPackaged, legacy: this.legacy };
     if (this.value.supported) { this.startup = setTimeout(() => { void this.check(true); }, 15000); this.startup.unref(); this.timer = setInterval(() => { void this.check(true); }, 6 * 3600000); this.timer.unref(); }
   }
@@ -41,17 +42,24 @@ class AppUpdates {
     finally { this.busy = false; }
   }
   async installNsis() {
-    const updater = this.native ||= this.nativeFactory(); updater.autoDownload = false; updater.autoInstallOnAppQuit = false; updater.allowDowngrade = false; updater.channel = this.legacy ? 'legacy' : 'latest'; updater.setFeedURL({ provider: 'generic', url: this.feed || BASE, channel: updater.channel, useMultipleRangeRequest: false });
-    const progress = value => this.set({ status: 'downloading', percent: Math.max(0, Math.min(100, value.percent || 0)) }); const error = () => {};
+    const updater = this.native ||= this.nativeFactory(); updater.autoDownload = false; updater.autoInstallOnAppQuit = false; updater.channel = this.legacy ? 'legacy' : 'latest'; updater.allowDowngrade = false; updater.setFeedURL({ provider: 'generic', url: this.feed || BASE, channel: updater.channel, useMultipleRangeRequest: false });
+    let nativeError = null;
+    const progress = value => this.set({ status: 'downloading', percent: Math.max(0, Math.min(100, value.percent || 0)) }); const error = value => { nativeError = value; };
     updater.on('download-progress', progress); updater.on('error', error);
     try {
       const result = await updater.checkForUpdates();
       if (!result || !newer(result.updateInfo.version, this.app.getVersion()) || result.updateInfo.version !== this.manifest.version || !result.updateInfo.files?.some(file => path.basename(file.url) === this.manifest.setup.name)) throw new Error('Релиз ещё публикуется. Повтори обновление чуть позже.');
-      const files = await updater.downloadUpdate(), file = files.find(file => file.toLowerCase().endsWith('.exe'));
+      let files;
+      try { files = await updater.downloadUpdate(); } catch (error) { throw cacheSpaceError(error); }
+      const file = files.find(file => file.toLowerCase().endsWith('.exe'));
       if (!file || fs.statSync(file).size !== this.manifest.setup.size) throw new Error('Размер установщика обновления не совпал.');
       const hash = crypto.createHash('sha256'); for await (const chunk of fs.createReadStream(file)) hash.update(chunk);
       if (hash.digest('hex') !== this.manifest.setup.sha256) throw new Error('Контрольная сумма установщика не совпала.');
-      this.set({ status: 'installing', percent: 100 }); await this.prepareRestart(); updater.quitAndInstall(true, true);
+      const temporary = await this.prepareInstall({ installationDirectory: path.dirname(this.execPath), tempDirectory: this.app.getPath?.('temp') || require('node:os').tmpdir(), installerSize: this.manifest.setup.size });
+      this.set({ status: 'installing', percent: 100 }); await this.prepareRestart();
+      const restoreEnvironment = applyTemporaryEnvironment(temporary.directory, this.processEnv);
+      try { nativeError = null; updater.quitAndInstall(true, true); if (nativeError) throw nativeError; }
+      catch (error) { restoreEnvironment(); throw error; }
     }
     finally { updater.removeListener('download-progress', progress); updater.removeListener('error', error); }
   }

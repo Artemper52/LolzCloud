@@ -1,6 +1,6 @@
 'use strict';
 const fs = require('node:fs'), path = require('node:path'), { execFileSync } = require('node:child_process'), yazl = require('yazl');
-const roots = ['.gitattributes', '.gitignore', '.github', 'package.json', 'package-lock.json', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'CONTRIBUTING.md', 'source', 'tests', 'tools', 'config', 'docs', 'licenses', 'server'];
+const roots = ['.gitattributes', '.gitignore', '.github', 'package.json', 'package-lock.json', 'README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'CONTRIBUTING.md', 'source', 'tests', 'tools', 'config', 'docs', 'licenses', 'server', 'telegram', 'music', 'android', 'ios', 'website'];
 async function sourceArchive({ root = path.resolve(__dirname, '..'), filename = process.env.LOLZCLOUD_SOURCE_OUTPUT || path.join(root, 'dist/LolzCloud-source.zip') } = {}) {
   const ref=process.env.LOLZCLOUD_SOURCE_REF;
   if(ref){

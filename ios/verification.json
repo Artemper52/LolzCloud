@@ -1,0 +1,98 @@
+{
+  "releaseCandidate": "0.1.1",
+  "bundleBuild": "2",
+  "checkedAt": "2026-11-14T16:16:19Z",
+  "sourceFrozen": true,
+  "toolchain": "Swift 6.2.1, Docker swift:6.2.1-bookworm on Linux",
+  "sourceHashesSha256": {
+    "LolzCloud/AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
+    "LolzCloud/App.swift": "e356b6af9774554ac41c8f3f13d022218e7c8b0c8541e7cad0491f0aa4fa9f64",
+    "LolzCloud/MediaPolicy.swift": "d18d7bfb2c521bed380fce9413a09d1fe096527763e748d039a714206c429fec",
+    "LolzCloud/NativePlayer.swift": "a4c09b963f7d09c8c4ff06cd1924c0c451b516450913bcd7895bba160d5fb9f6",
+    "LolzCloud/Info.plist": "84b23cffcee7b5c66439fa0ad3843ebd814e06a24ca375b709aa95065edf27b3",
+    "Tests/MediaPolicyTests.swift": "fc6ea87bafb7987286b934f721437874d314e5d3f1e4678f90cf53beb32f4913",
+    "tools/build.cjs": "a37111fc3c5a846fed4bda6416648a90b5263e4da3ea2f4a4578bc9d997ec7d0",
+    "tools/version.cjs": "1f564e8505eca48a781f649a3520ceceafdf0d790658243501c3f45ca62a409e"
+  },
+  "remoteSwiftInfoAndTestHashesMatch": true,
+  "policyTests": {
+    "status": "passed",
+    "tests": 34,
+    "failures": 0,
+    "completedAt": "2026-11-14T16:13:05Z",
+    "command": "swift test --package-path ios"
+  },
+  "nodeVersionTests": {
+    "status": "passed",
+    "tests": 2,
+    "failures": 0,
+    "command": "node --test ios/tools/version.test.cjs"
+  },
+  "swiftFrontendParse": {
+    "status": "passed",
+    "files": 4,
+    "scope": "syntax only; no Apple SDK type checking"
+  },
+  "projectInputs": {
+    "appleSDKBuild": "pending",
+    "backgroundAudio": true,
+    "deviceRuntime": "pending",
+    "iconHeight": 1024,
+    "iconWidth": 1024,
+    "nativeSources": [
+      "AccountLogin.swift",
+      "App.swift",
+      "MediaPolicy.swift",
+      "NativePlayer.swift"
+    ],
+    "projectObjects": 26,
+    "sharedScheme": true,
+    "status": "passed"
+  },
+  "implementation": [
+    "UIDocumentPicker audio import",
+    "security-scoped coordinated provider copy off MainActor",
+    "bounded app-owned local storage and private extensions",
+    "import journal/index recovery",
+    "legacy index compatibility",
+    "mixed local/network native queues",
+    "duplicate queue occurrences and checked explicit index",
+    "unavailable local queue references do not block valid neighbouring network tracks",
+    "tagged document/client intents reject stale selection and play commands"
+  ],
+  "limits": {
+    "maximumSelectedFiles": 20,
+    "maximumFileBytes": 20000000,
+    "maximumStoredBytes": 268435456,
+    "maximumLocalDurationSeconds": 86400
+  },
+  "appleSDKBuild": {
+    "status": "pending",
+    "reason": "Not performed by this verification; a separate macOS CI run is required."
+  },
+  "deviceRuntime": {
+    "status": "pending",
+    "includes": [
+      "real UIDocumentPicker",
+      "iCloud and third-party providers",
+      "AVURLAsset audio format and duration validation",
+      "actual AVPlayer playback",
+      "lock-screen and interruption behavior",
+      "browser pairing"
+    ]
+  },
+  "signedIPA": {
+    "status": "not produced"
+  },
+  "workflowRun": {
+    "status": "not performed in this review"
+  },
+  "artifactsDirectory": "D:/LolzCloud-Android-Toolchain/ios-review-0.1.1",
+  "scopeNote": "Foundation policy/filesystem tests use isolated fixtures. They do not prove physical iPhone/iPad UI, security-scoped provider access or AVFoundation decoding. PWA browser verification is separate.",
+  "bridgeIntent": {
+    "clientId": "lowercase per-document UUID",
+    "requestId": "monotonic safe integer >= 1; same intent may cover stop/queue/play",
+    "handshake": "first queue for a new document; previous client retired",
+    "snapshots": "selection and playback echo the current client/request; system Next retains them"
+  }
+}

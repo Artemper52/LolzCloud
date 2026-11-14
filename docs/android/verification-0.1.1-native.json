@@ -1,0 +1,35 @@
+{
+  "status": "passed",
+  "generatedAt": "2026-11-12T19:11:40.883Z",
+  "apk": "LolzCloud-Android-0.1.1.apk",
+  "apkSha256": "3cea67b5187b01a61ab0c2271b5c76de54566c06edca1d282d4feb52b84ff1d5",
+  "upgrade": {
+    "from": "0.1.1",
+    "to": "0.1.1",
+    "preservesAllPreferences": true,
+    "preservesSafReadGrants": true
+  },
+  "checks": [
+    "Default source is visibly selected SoundCloud",
+    "Online scope does not show misleading local empty results",
+    "Empty online query stays in the field with an inline error",
+    "Real accessibility text entry accepts Cyrillic",
+    "Search field exposes the keyboard Search action",
+    "Actual accessibility IME Enter action is accepted",
+    "Keyboard Search opens the complete SoundCloud results URL with the Cyrillic query",
+    "Query survives the browser action",
+    "Changing source preserves query and does not launch a page",
+    "Visible Search button opens matching YouTube Music results",
+    "Only My music displays the local no-results state",
+    "Local search finds the existing imported fixture",
+    "Real queue Next preserves search focus, selection and query while the mini-player changes",
+    "Search source and Cyrillic query survive actual activity recreation",
+    "Invitation starts empty with a short hint and disabled Open",
+    "Link field uses URI input and keyboard Go",
+    "Invalid invitation keeps the dialog, text and inline error",
+    "Unsubmitted invitation survives actual activity recreation",
+    "Keyboard Go opens the validated room URL",
+    "Remote dialog rejects a room URL instead of opening the wrong destination",
+    "Audio-link dialog retains a rejected service-page URL"
+  ]
+}

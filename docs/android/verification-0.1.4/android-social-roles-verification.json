@@ -1,0 +1,71 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Only an isolated emulator may run mutation checks",
+      "passed": true
+    },
+    {
+      "name": "Production audio service binding",
+      "passed": true
+    },
+    {
+      "name": "Open native room Activity for hardware Back test",
+      "passed": true
+    },
+    {
+      "name": "Own-origin room fixture loaded without an account",
+      "passed": true
+    },
+    {
+      "name": "Actual bundled social.js renders the declared tester profile and management entry",
+      "passed": true
+    },
+    {
+      "name": "Actual bundled stylesheet loads through the allowed same-origin asset route",
+      "passed": true
+    },
+    {
+      "name": "Tester badge is visible and styled by the APK's actual social.css",
+      "passed": true
+    },
+    {
+      "name": "Untrusted-source app role is omitted while verified forum title remains separate",
+      "passed": true
+    },
+    {
+      "name": "A real WebView touch opens the native-hosted role editor with the declared server selection",
+      "passed": true
+    },
+    {
+      "name": "Both role controls render with usable Android WebView dimensions",
+      "passed": true
+    },
+    {
+      "name": "Actual role-editor Cancel restores the management action without submitting a mutation",
+      "passed": true
+    },
+    {
+      "name": "Owner badge is shown on the own profile and self role-edit controls are absent",
+      "passed": true
+    },
+    {
+      "name": "Role rendering and Cancel remain declared read-only fixtures with no personal login or real role grant",
+      "passed": true
+    }
+  ],
+  "diagnostics": [
+    {
+      "phase": "tester-computed-style",
+      "dom": "\"{\\\"text\\\":\\\"Тестер\\\",\\\"width\\\":53.89881134033203,\\\"display\\\":\\\"flex\\\",\\\"fontWeight\\\":\\\"600\\\",\\\"border\\\":\\\"solid\\\"}\""
+    }
+  ],
+  "generatedAt": "2026-11-14T11:49:37.106Z",
+  "emulator": "emulator-5554",
+  "androidApi": "35",
+  "androidVersion": "15",
+  "deviceModel": "Android SDK built for x86_64",
+  "apk": "LolzCloud-Android-0.1.4.apk",
+  "apkSha256": "4e4758653fdc547a28688d8cd3760c21a62d6abaef84b8cce00ba1ce2961308d",
+  "scope": "Real private offline storage/MediaPlayer and real Android NotificationManager; social events are isolated fixtures, not a personal-account login."
+}

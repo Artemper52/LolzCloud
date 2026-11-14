@@ -1,0 +1,54 @@
+plugins { id 'com.android.application' }
+
+def versionInfo = new groovy.json.JsonSlurper().parse(file('../version.json'))
+
+android {
+    namespace 'com.lolzcloud.mobile'
+    compileSdk 36
+    buildToolsVersion '36.0.0'
+    defaultConfig {
+        applicationId 'com.lolzcloud.mobile'
+        minSdk 26
+        targetSdk 36
+        versionCode versionInfo.versionCode
+        versionName versionInfo.versionName
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    // The direct Windows build uses this same persistent development certificate.
+    signingConfigs {
+        debug {
+            storeFile file(System.getProperty('user.home') + '/.android/lolzcloud-development.jks')
+            storePassword 'android'
+            keyAlias 'lolzcloud-development'
+            keyPassword 'android'
+        }
+        if (System.getenv('LOLZCLOUD_KEYSTORE')) {
+            release {
+                storeFile file(System.getenv('LOLZCLOUD_KEYSTORE'))
+                storePassword System.getenv('LOLZCLOUD_STORE_PASS')
+                keyAlias System.getenv('LOLZCLOUD_KEY_ALIAS')
+                keyPassword System.getenv('LOLZCLOUD_KEY_PASS') ?: System.getenv('LOLZCLOUD_STORE_PASS')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (System.getenv('LOLZCLOUD_KEYSTORE')) signingConfig signingConfigs.release
+        }
+    }
+}
+
+// Bundle the current app-owned room client for both Studio and raw APK builds.
+// Network endpoints and provider player SDKs are intentionally not copied.
+def syncRoomAssets = tasks.register('syncRoomAssets', Sync) {
+    into layout.projectDirectory.dir('src/main/assets/room-client')
+    from(new File(rootProject.projectDir.parentFile, 'server/public')) {
+        include 'room.html', 'room.css', 'room.js', 'room-sync.js', 'room-players.js', 'media-source.js', 'site.js', 'social.html', 'social.js', 'social.css'
+    }
+    from(new File(rootProject.projectDir.parentFile, 'source/app/lib/assets/logo.svg'))
+}
+tasks.named('preBuild').configure { dependsOn syncRoomAssets }

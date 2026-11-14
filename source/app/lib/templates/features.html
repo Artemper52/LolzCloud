@@ -1,7 +1,7 @@
 <button id="lc-studio-launcher" type="button" title="Студия LolzCloud · музыкальная студия">Студия LolzCloud <span>Возможности</span></button>
 <button id="lc-wave-launcher" type="button" title="Персональные рекомендации">◉ Моя волна</button>
 <dialog id="lc-studio" aria-labelledby="lc-studio-title"><canvas id="lc-studio-gradient" aria-hidden="true"></canvas>
-  <header class="lc-studio-header"><div><small>LOLZCLOUD</small><h1 id="lc-studio-title">Твоя музыкальная студия</h1></div><div><button id="lc-room-return" type="button" hidden>В комнату</button><button data-do="mini">Мини-плеер ↗</button><button id="lc-studio-close" aria-label="Закрыть панель">✕</button></div></header>
+  <header class="lc-studio-header"><div><small>LOLZCLOUD</small><h1 id="lc-studio-title">Твоя музыкальная студия</h1></div><div><button type="button" data-social-open="profile">Профиль</button><button type="button" data-social-open="friends">Друзья</button><button type="button" data-social-open="notifications" id="lc-social-inbox">Уведомления <span id="lc-social-unread" hidden></span></button><button id="lc-social-connections" type="button">Подключения</button><button id="lc-room-return" type="button" hidden>В комнату</button><button data-do="mini">Мини-плеер ↗</button><button id="lc-studio-close" aria-label="Закрыть панель">✕</button></div></header>
   <nav id="lc-tabs" aria-label="Возможности Студия LolzCloud"><button data-tab="share" class="selected">Сейчас слушаю</button><button data-tab="wave">Моя волна</button><button data-tab="library">Моя музыка</button><button data-tab="community">Подборки Lolzteam</button><button data-tab="private">Приватность</button><button data-tab="room">Комнаты</button><button data-tab="lyrics">Текст песни</button><button data-tab="audio">Звук</button><button data-tab="keys">Клавиши</button></nav>
   <div class="lc-studio-content">
     <section data-pane="share">
@@ -78,6 +78,9 @@
       </section>
     </section>
     
+    <section data-pane="social" id="lc-social-stage" hidden aria-label="Профиль и друзья">
+      <p id="lc-social-status" role="status"></p><div id="lc-social-content"></div>
+    </section>
     <section data-pane="lyrics" hidden>
       <div class="lc-lyrics-scene">
         <div id="lc-lyric-ambience" class="lc-lyric-ambience" aria-hidden="true"><canvas id="lc-lyric-gradient"></canvas></div>

@@ -1,0 +1,79 @@
+{
+  "generatedAt": "2026-11-14T11:53:01.791Z",
+  "status": "passed",
+  "release": "0.9.14",
+  "scope": "Installed modern Windows NSIS updater preflight",
+  "evidence": "Completed node --test tests/app-updates.test.cjs after raising the temporary-space floor to 1536 MiB; 17 passed, 0 failed. No installer was launched.",
+  "command": "node --test tests/app-updates.test.cjs",
+  "testCount": 17,
+  "pass": 17,
+  "fail": 0,
+  "tests": [
+    "update manifests isolate legacy and modern channels, reject other repositories and compare versions numerically",
+    "portable updates verify both byte count and SHA-256 and never retain a bad download",
+    "portable extraction accepts a complete application and rejects traversal and symlink entries",
+    "one update click downloads, verifies, saves the profile and requests a silent restart in that order",
+    "a corrupted installer cannot trigger preflight, change the environment, shut down the profile or execute an update",
+    "the official website can deliver updates while GitHub is unavailable",
+    "C temp full with D available selects a writable installation-volume sibling outside the uninstall target",
+    "1100 MiB free on C cannot pass the real 0.9.14 NSIS temporary-space requirement and falls back to D",
+    "a usable normal temp is retained and unknown, unwritable or inside-target alternatives fail closed",
+    "legacy Node without statfs uses bounded read-only DriveInfo with the path on stdin",
+    "temporary environment restoration preserves absent variables without touching the global environment",
+    "verified cached installer can hand off with D temp while C is full, after preflight and profile preparation",
+    "no safe temp alternative leaves the app open and the original process environment intact before profile shutdown",
+    "a full download cache reports a clear recoverable error before preflight or shutdown",
+    "prepare failure never changes TEMP and a synchronous handoff failure restores both TEMP and TMP",
+    "real filesystem preflight probes only the selected temporary directory and leaves no probe file",
+    "a second desktop instance returns immediately after quit instead of registering a ghost client"
+  ],
+  "legacyFreeSpaceProbe": {
+    "status": "passed",
+    "volume": "D:",
+    "nativeStatfsBytes": 54788939776,
+    "driveInfoFallbackBytes": 54788939776,
+    "statfsDisabledForFallback": true,
+    "timeoutMs": 10000,
+    "pathPassedOnStdin": true,
+    "readOnly": true,
+    "note": "Point-in-time comparison recorded from the actual probe, not a reservation or a current free-space claim."
+  },
+  "sourceFreeze": {
+    "ready": true,
+    "productionCodeChangedDuringDocumentation": false,
+    "files": {
+      "source/integrations/app-updates.cjs": "ea3648c194c55846aa15f093cf21198ed46b7b5fe717fefec5b563241648e9f0",
+      "source/integrations/update-temporary.cjs": "6292ebd3e2bfd856212e6f6e13e10912e4352e07ec3da3fdd586d7b474987bd9",
+      "source/main.js": "274b36c520fdec33a8080b42a71fdb87450ccd6fbbe80a31daf9151081b43068",
+      "tests/app-updates.test.cjs": "7cdf2fa55f3ac29450b847ac1c3acbb339c32355423769ba515269cea56ff672"
+    }
+  },
+  "behavior": {
+    "checksumBeforePreflight": true,
+    "preflightBeforePrepareRestart": true,
+    "alternateTemporaryDirectory": "<installation-parent>/.LolzCloud-update-temp",
+    "outsideApplicationTarget": true,
+    "temporaryEnvironmentScope": "Current app/installer child processes only; TEMP and TMP applied immediately before normal quitAndInstall",
+    "restoreEnvironmentOnSynchronousFailure": true,
+    "globalWindowsEnvironmentChanged": false,
+    "userCacheMovedOrDeleted": false,
+    "downloadCacheEnospcKeepsAppOpen": true,
+    "secondInstanceReturnsAfterQuit": true
+  },
+  "relatedRealInstallationEvidence": "updates-0.9.13-installation.json",
+  "limitations": [
+    "Tests use dependency-injected native-updater and disk-space failure cases plus a real filesystem write-probe test.",
+    "The 0.9.14 installer itself was not launched by this verification.",
+    "Read-only DriveInfo compatibility code was exercised on the current Windows host; this is not a complete Windows 7 installation test.",
+    "Preflight measures available space and write access; it does not reserve disk capacity or report installation completion."
+  ],
+  "temporarySpaceRegression": {
+    "measuredAppPayloadBytes": 476120930,
+    "realNsisMinimumTempBytes": 1220677632,
+    "minimumTemporaryMiB": 1536,
+    "minimumTemporaryBytes": 1610612736,
+    "systemTempAvailableMiB": 1100,
+    "systemTempRejected": true,
+    "installationVolumeFallbackSelected": true
+  }
+}

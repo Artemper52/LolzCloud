@@ -13,6 +13,10 @@
   async function youtube(frame, track, callbacks) {
     const YT = await youtubeApi(), media = window.LolzCloudMedia;
     let player, destroyed = false;
+    function normalSpeed(target = player, reported) {
+      const rate = target?.getPlaybackRate?.() ?? reported;
+      if (!Number.isFinite(rate) || Math.abs(rate - 1) > .001) target?.setPlaybackRate?.(1);
+    }
     const adapter = {
       play: () => player?.playVideo(), pause: () => player?.pauseVideo(), seekTo: ms => player?.seekTo(ms/1000,true),
       getPosition: callback => callback((player?.getCurrentTime() || 0)*1000), isPaused: callback => callback(player?.getPlayerState() !== 1),
@@ -21,8 +25,9 @@
       destroy: () => { destroyed = true; player?.destroy(); },
     };
     player = new YT.Player(frame, { host:'https://www.youtube-nocookie.com', videoId:media.youtubeId(track.url), width:'100%', height:'100%', playerVars:{origin:location.origin,playsinline:1,autoplay:0}, events:{
-      onReady: () => { if (!destroyed) callbacks.ready(); },
+      onReady: event => { if (!destroyed) { normalSpeed(event?.target || player); callbacks.ready(); } },
       onStateChange: event => { if(destroyed)return; if(event.data===0)callbacks.ended();else if([1,2].includes(event.data))callbacks.changed(event.data===1); },
+      onPlaybackRateChange: event => { if (!destroyed) normalSpeed(event?.target || player, event?.data); },
       onError: () => { if(!destroyed)callbacks.error(); }, onAutoplayBlocked: () => { if(!destroyed)callbacks.blocked?.(); },
     } });
     return adapter;

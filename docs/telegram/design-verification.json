@@ -1,0 +1,57 @@
+{
+  "status": "passed",
+  "generatedAt": "2026-11-13T23:10:11.623Z",
+  "unitTests": {
+    "total": 283,
+    "passed": 283,
+    "telegram": 24
+  },
+  "syntaxFiles": 210,
+  "originalInlineSending": "confirmed by user",
+  "newCardUi": "payload, state and transport tests; client interaction pending",
+  "cacheChoice": "persistent server MP3 + opportunistic Telegram file IDs; no required channel",
+  "checks": [
+    {
+      "name": "Live cover mode",
+      "health": {
+        "ok": true,
+        "bot": "lolzcloudbot",
+        "pollAgeSeconds": 3,
+        "activeDownloads": 0,
+        "cacheTracks": 0,
+        "inlineMode": "covers-with-feedback",
+        "cacheChannelConfigured": false
+      }
+    },
+    {
+      "name": "Public welcome.jpg",
+      "status": 200,
+      "bytes": 51828,
+      "mime": "image/jpeg",
+      "sha256": "e5aec32e72a3eb015f5e1724da993024c75eb9e2d8b1dabbd360c84325194150"
+    },
+    {
+      "name": "Public icon.png",
+      "status": 200,
+      "bytes": 4094,
+      "mime": "image/png",
+      "sha256": "293832d473389593aa3cae77be14f6cfde6cadd209305323f736a7db9691cff4"
+    },
+    {
+      "name": "Existing MP3 cache retained",
+      "bytes": 1434133,
+      "sha256": "3013abed7a2da84fb8ea13c2bf734c9b44a4d1945cbadfd515e6cf45d342f1b9"
+    },
+    {
+      "name": "Room/social service",
+      "health": {
+        "ok": true,
+        "version": "0.9.13",
+        "roomProtocol": 2,
+        "socialProtocol": 1,
+        "oauthConfigured": true,
+        "spicyConfigured": true
+      }
+    }
+  ]
+}

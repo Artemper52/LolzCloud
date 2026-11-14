@@ -10,7 +10,8 @@ const { createServer } = require('../server/index.cjs');
 const { CloudStore } = require('../server/core.cjs');
 const {soundcloud:roomWidget,youtube:roomYoutube}=require('./fixtures/room-player-sdk.cjs');
 const temporary = process.env.LOLZCLOUD_PLAYER_TEST_PROFILE, root = path.resolve(__dirname, '..');
-fs.mkdirSync(path.join(root, '.build'), { recursive: true });
+const artifacts = process.env.LOLZCLOUD_UI_ARTIFACTS || path.join(root, '.build');
+fs.mkdirSync(artifacts, { recursive: true });
 if (!temporary || !path.basename(temporary).startsWith('LolzCloud-player-ui-')) throw new Error('An isolated test profile is required.');
 app.setPath('userData', temporary); app.setPath('downloads', temporary); app.disableHardwareAcceleration(); app.commandLine.appendSwitch('mute-audio');
 AudioDucker.prototype.start = () => {};
@@ -59,6 +60,8 @@ app.whenReady().then(async () => {
     await roomSession.protocol.handle('https', async request => {
       const url = new URL(request.url);
       if (url.origin !== roomOrigin) return new Response(url.pathname==='/iframe_api'?roomYoutube:url.pathname==='/player/api.js'?roomWidget:'<html><body>Room media fixture</body></html>', {headers:{'Content-Type':['/player/api.js','/iframe_api'].includes(url.pathname)?'text/javascript':'text/html'}});
+      const bundled = require('../source/integrations/room-client.cjs').roomClientResponse(request);
+      if (bundled) return bundled;
       if (url.pathname === '/assets/logo.svg') return new Response(fs.readFileSync(path.join(root, 'source/app/lib/assets/logo.svg')), { headers: { 'Content-Type': 'image/svg+xml' } });
       const headers = new Headers(request.headers);
       const cookie = (await roomSession.cookies.get({ url: roomOrigin, name: ROOM_COOKIE }))[0];
@@ -82,11 +85,11 @@ app.whenReady().then(async () => {
     assert.equal(await js('document.fonts.check("14px Inter")'), true);
     assert.equal(await js('document.querySelectorAll("#lc-room-cards article").length'), 1);
     await delay(400);
-    fs.writeFileSync(path.join(root, '.build/room-lobby.png'), (await host.webContents.capturePage()).toPNG());
+    fs.writeFileSync(path.join(artifacts, 'room-lobby.png'), (await host.webContents.capturePage()).toPNG());
     await js('document.querySelector("[data-room-filter=own]").click()');
     assert.equal(await js('document.querySelector("#lc-room-cards h4").textContent'), 'Своя комната');
     await js('document.querySelector("[data-room-filter=public]").click(); document.querySelector("#lc-room-cards .primary").click()');
-    await until(() => js('!!document.querySelector("#lc-room-webview") && !document.getElementById("lc-room-stage").hidden'), 'Room did not open inside the application');
+    await until(() => js('!!document.querySelector("#lc-room-stage webview") && !document.getElementById("lc-room-stage").hidden'), 'Room did not open inside the application');
     const roomView = '#lc-room-webview';
     await until(() => js(`document.querySelector('${roomView}').executeJavaScript('typeof require === "undefined" && document.querySelector("#room-name")?.textContent === "Вечерний эфир"').catch(()=>false)`).catch(() => false), 'Sandboxed room failed to load');
     const roomJs=code=>js(`(()=>{const guest=document.querySelector('${roomView}');if(!guest)return null;try{return guest.executeJavaScript(${JSON.stringify(code)},true).catch(()=>null)}catch{return null}})()`);
@@ -111,11 +114,50 @@ app.whenReady().then(async () => {
     await until(()=>roomJs('window.__fakePlayer.playing()'),'Common footer did not resume room audio');
     await js('document.getElementById("player-volume").value="31";document.getElementById("player-volume").dispatchEvent(new Event("input"))');
     await until(()=>roomJs('window.__fixtureVolume===31'),'Common room volume did not reach embedded audio');
+    phase = 'room: remember connected guest';
+    const connectedRoomId = await js(`document.querySelector('${roomView}').getWebContentsId()`);
+    const roomMembers = store.room(publicRoom.id).members.size;
+    await roomJs('document.getElementById("chat-input").value="Draft stays with the room"');
+    phase = 'room: social drawer without leaving audio';
+    await until(() => roomJs('typeof window.LolzCloudSocial?.open === "function"'), 'Shared social drawer did not load in the room');
+    assert.equal(await roomJs('window.LolzCloudDesktopSocial?.nativeNotifications'), true, 'Desktop must own system notifications without web duplicates');
+    for (const tab of ['profile', 'friends', 'notifications']) {
+      await js('document.querySelector(' + JSON.stringify('[data-social-open="' + tab + '"]') + ').click()');
+      await until(() => roomJs('window.LolzCloudSocial.isOpen() && document.querySelector(' + JSON.stringify('[data-social-tab="' + tab + '"]') + ')?.getAttribute("aria-selected")==="true"'), 'Header did not open social ' + tab + ' over the existing room');
+      assert.equal(await js(`document.querySelector('${roomView}').getWebContentsId()`), connectedRoomId, 'Social must preserve the connected room guest');
+      assert.equal(store.room(publicRoom.id).members.size, roomMembers, 'Social must not send a leave request');
+      assert.equal(await roomJs('window.__fakePlayer.playing()'), true, 'Social must preserve room audio');
+      assert.equal(await roomJs('document.getElementById("chat-input").value'), 'Draft stays with the room', 'Social must preserve the room draft');
+      if (tab === 'profile') { await delay(150); fs.writeFileSync(path.join(artifacts, 'room-social-desktop.png'), (await host.webContents.capturePage()).toPNG()); }
+      await roomJs('window.LolzCloudSocial.close()');
+    }
+    phase = 'room: open lyrics';
+    await js('document.getElementById("player-lyrics").click()');
+    await until(() => js('document.body.dataset.view==="lyrics"'), 'Room lyrics did not open');
+    phase = 'room: inspect guest while lyrics visible';
+    assert.equal(await js(`document.querySelector('${roomView}').getWebContentsId()`), connectedRoomId, 'Opening lyrics must preserve the connected room webview');
+    assert.equal(studio.getState().source, 'room', 'Opening lyrics must preserve the room playback source');
+    assert.equal(store.room(publicRoom.id).members.size, roomMembers, 'Opening lyrics must not send a room leave request');
+    assert.equal(await js('document.getElementById("lc-room-return").hidden'), false, 'Lyrics must provide an explicit return to the active room');
+    assert.equal(await js('document.body.classList.contains("room-stage-open")'), false, 'Room-only layout must not cover lyrics');
+    phase = 'room: return from lyrics';
+    await js('document.getElementById("lc-room-return").click()');
+    await until(() => js('document.body.dataset.view==="room" && document.body.classList.contains("room-stage-open")'), 'Returning from lyrics did not reveal the room');
+    assert.equal(await roomJs('document.getElementById("chat-input").value'), 'Draft stays with the room', 'Room navigation must preserve chat drafts');
+    phase = 'room: close lyrics';
+    await js('document.getElementById("player-lyrics").click(); document.getElementById("lc-studio-close").click()');
+    assert.equal(await js('document.body.dataset.view'), 'room', 'Closing lyrics must return to the active room');
+    phase = 'room: settings';
+    await js('document.querySelector("[data-view=settings]").click()');
+    assert.equal(studio.getState().source, 'room', 'Opening settings must not leave the room');
+    await js('document.getElementById("lc-room-return").click()');
+    assert.equal(await js(`document.querySelector('${roomView}').getWebContentsId()`), connectedRoomId, 'Settings must not reload the room');
     await require('./fixtures/room-navigation.cjs')({host,studio,roomJs,mediaPlaying:()=>roomJs('window.__fakePlayer.playing()'),label:'listener'});
+    phase = 'room: remaining integration';
     assert.ok(await js(`document.querySelector('${roomView}').getBoundingClientRect().height > 300`), 'Room viewport did not fill the studio');
     assert.equal((await session.defaultSession.cookies.get({ url: roomOrigin, name: ROOM_COOKIE })).length, 0);
     await delay(300);
-    fs.writeFileSync(path.join(root, '.build/room-stage.png'), (await host.webContents.capturePage()).toPNG());
+    fs.writeFileSync(path.join(artifacts, 'room-stage.png'), (await host.webContents.capturePage()).toPNG());
     phase = 'room: copy invitation';
     await js('document.getElementById("lc-room-copy-stage").click()');
     await until(() => copiedInvite === publicRoom.url, 'The invitation was not copied');
@@ -124,13 +166,14 @@ app.whenReady().then(async () => {
     await until(() => store.room(publicRoom.id).chat.some(message => message.text === 'Fixture chat'), 'The embedded client could not send a chat message');
     phase = 'room: explicit leave';
     await js('document.getElementById("lc-room-leave").click()');
-    await until(() => js('!document.querySelector("#lc-room-webview")'), 'Leaving the room did not detach its player');
+    await until(() => js('!document.querySelector("#lc-room-stage webview")'), 'Leaving the room did not detach its player');
     await until(() => store.room(publicRoom.id).members.size === 0, 'Leaving the embedded room did not remove the listener');
     await until(()=>studio.getState().source==='soundcloud','Leaving the room did not restore the previous source');
+    phase = 'room: connect while another panel is visible';
     await js('window.LolzCloudStudio.open("room");window.__roomInvoke=require("electron").ipcRenderer.invoke;require("electron").ipcRenderer.invoke=function(...args){const reply=window.__roomInvoke.apply(this,args);return args[0]==="rooms:action"&&args[1]?.type==="open"?reply.then(value=>new Promise(resolve=>setTimeout(()=>resolve(value),250))):reply};document.querySelector("#lc-room-cards article button").click();window.LolzCloudStudio.open("audio")');
     try {
       await until(()=>js('window.LolzCloudRooms.active&&!!document.getElementById("lc-room-webview")'),'Switching panels during room connection lost the completed join');
-      assert.equal(await js('document.body.dataset.view'), 'audio', 'A completed background join must not steal the current panel');
+      assert.equal(await js('document.body.dataset.view'), 'audio', 'A background join must preserve the current screen');
       await js('document.getElementById("lc-room-return").click()');
       await until(()=>roomJs('!!window.__fakePlayer'),'Background-connected room did not load its player');
       await roomJs('document.getElementById("join").click()');
@@ -138,6 +181,19 @@ app.whenReady().then(async () => {
       await js('document.getElementById("lc-room-leave").click()');
       await until(()=>js('!window.LolzCloudRooms.active&&!document.getElementById("lc-room-webview")'),'Leaving the background-connected room failed');
     } finally { await js('require("electron").ipcRenderer.invoke=window.__roomInvoke;delete window.__roomInvoke'); }
+    phase = 'social: standalone authenticated guest';
+    await js('document.getElementById("open-account").click()');
+    await until(() => js('document.body.dataset.view==="social" && !!document.querySelector("#lc-social-content webview")'), 'Sidebar profile did not open standalone social UI');
+    const socialView = await js('document.querySelector("#lc-social-content webview").getWebContentsId()');
+    const socialJs = code => webContents.fromId(socialView).executeJavaScript(code);
+    await until(() => socialJs('!!window.LolzCloudSocial && document.getElementById("social-view")?.textContent.includes("Fixture listener")').catch(() => false), 'Standalone social profile did not authenticate');
+    assert.equal(await socialJs('typeof require'), 'undefined');
+    assert.equal(await socialJs('typeof window.LolzCloudDesktopRoom'), 'undefined', 'Social UI must not gain room controller APIs');
+    await js('document.querySelector("[data-social-open=friends]").click()');
+    await until(() => socialJs('document.querySelector("[data-social-tab=friends]")?.getAttribute("aria-selected")==="true"'), 'Standalone social did not switch tabs');
+    assert.equal(await js('document.querySelector("#lc-social-content webview").getWebContentsId()'), socialView, 'Changing social tabs must not reload its guest');
+    assert.equal(studio.getState().source, 'soundcloud', 'Opening standalone social must preserve the selected music source');
+    fs.writeFileSync(path.join(artifacts, 'social-standalone-desktop.png'), (await host.webContents.capturePage()).toPNG());
     phase = 'player: remaining providers and local audio';
     await js('document.querySelector("[data-view=settings]").click(); const pref=document.getElementById("lc-pref-window");pref.value="windows";pref.dispatchEvent(new Event("change"));');
     await until(() => js('document.body.dataset.windowStyle==="windows"'), 'Windows window controls did not apply');
@@ -145,7 +201,7 @@ app.whenReady().then(async () => {
     assert.equal(savedStyle, 'windows');
     await until(() => js('document.querySelector(".window-controls").getBoundingClientRect().left > innerWidth / 2'), 'Windows controls did not finish layout');
     await delay(300);
-    fs.writeFileSync(path.join(root, '.build/interface-windows.png'), (await host.webContents.capturePage()).toPNG());
+    fs.writeFileSync(path.join(artifacts, 'interface-windows.png'), (await host.webContents.capturePage()).toPNG());
     await js('document.querySelector("[data-view=browser]").click()');
     await until(() => js('document.getElementById("webview").getWebContentsId() > 0'), 'SoundCloud fixture did not attach');
     const remote = webContents.fromId(await js('document.getElementById("webview").getWebContentsId()'));
@@ -178,14 +234,14 @@ app.whenReady().then(async () => {
     await js('document.dispatchEvent(new KeyboardEvent("keydown",{key:"k",ctrlKey:true,bubbles:true}))'); assert.equal(await js('document.getElementById("xp-palette").open'), true);
     await until(() => js('document.querySelectorAll("#xp-results [role=option]").length > 0'), 'Command palette returned no commands');
     await js('document.getElementById("xp-search").value="Сохранить момент";document.getElementById("xp-search").dispatchEvent(new Event("input"))'); await delay(200);
-    fs.writeFileSync(path.join(root, '.build/player-palette-test.png'), (await host.webContents.capturePage()).toPNG());
+    fs.writeFileSync(path.join(artifacts, 'player-palette-test.png'), (await host.webContents.capturePage()).toPNG());
     await js('document.getElementById("xp-palette").close();window.LolzCloudPlayerTools.bookmarkOpen()'); await until(() => js('document.getElementById("xp-bookmark-dialog").open'), 'Bookmark dialog did not open');
     await js('document.getElementById("xp-bookmark-position").value="0:23.45";document.getElementById("xp-bookmark-note").value="<b>My favourite chorus</b>";document.getElementById("xp-bookmark-form").requestSubmit()');
     await until(() => studio.getState().tools.bookmarks.length === 1, 'Bookmark did not persist'); assert.equal(studio.getState().tools.bookmarks[0].position, 23.45);
-    await js('window.LolzCloudPlayerTools.open("moments")'); await delay(150); assert.equal(await js('document.querySelector("#xp-moments-list b") !== null'), false); fs.writeFileSync(path.join(root, '.build/player-moments-test.png'), (await host.webContents.capturePage()).toPNG());
+    await js('window.LolzCloudPlayerTools.open("moments")'); await delay(150); assert.equal(await js('document.querySelector("#xp-moments-list b") !== null'), false); fs.writeFileSync(path.join(artifacts, 'player-moments-test.png'), (await host.webContents.capturePage()).toPNG());
     await js('window.LolzCloudPlayerTools.timingOpen()'); await js('document.getElementById("xp-timing-text").value="Original first line\\nOriginal second line";document.getElementById("xp-timing-build").click()');
     await js('(()=>{const inputs=[...document.querySelectorAll("#xp-timing-lines .xp-timing-row>input:first-child")];for(let i=0;i<inputs.length;i++){inputs[i].value=String(1.25+i*2.25);inputs[i].dispatchEvent(new Event("change"));}})()');
-    await delay(180); fs.writeFileSync(path.join(root, '.build/player-timing-test.png'), (await host.webContents.capturePage()).toPNG()); await js('document.getElementById("xp-timing-save").click()');
+    await delay(180); fs.writeFileSync(path.join(artifacts, 'player-timing-test.png'), (await host.webContents.capturePage()).toPNG()); await js('document.getElementById("xp-timing-save").click()');
     await until(() => fs.existsSync(path.join(temporary, 'lyric-timing.json')), 'Edited timings were not saved'); assert.equal(JSON.parse(fs.readFileSync(path.join(temporary, 'lyric-timing.json')))[lyricKey(fixture)].lines[1].time, 3.5);
     await js('window.LolzCloudStudio.open("lyrics")');
     await until(() => js('document.querySelectorAll("#lc-lyrics .lc-lyric").length===2'), 'Saved lyrics did not appear');
@@ -211,19 +267,19 @@ app.whenReady().then(async () => {
     await until(async () => await js('parseFloat(getComputedStyle(document.querySelector("#lc-lyrics .lc-lyric")).fontSize)') > fontBefore, 'A+ did not increase the rendered lyric size');
     assert.equal(new (require('../source/integrations/music.cjs').MusicFeatures)(path.join(temporary, 'music-library.json')).data.preferences.lyricsFontScale, 1.1);
     assert.ok(await js('document.getElementById("lc-lyric-gradient").getBoundingClientRect().height > 100'), 'Artwork gradient canvas must fill the lyric scene.');
-    await delay(120); fs.writeFileSync(path.join(root, '.build/lyrics-099.png'), (await host.webContents.capturePage()).toPNG());
+    await delay(120); fs.writeFileSync(path.join(artifacts, 'lyrics-099.png'), (await host.webContents.capturePage()).toPNG());
     await miniJs('document.getElementById("lyricsOnly").click()');
     await until(() => miniJs('document.body.classList.contains("lyrics-only")'), 'Lyrics-only mode did not open');
     assert.equal(await miniJs('getComputedStyle(document.querySelector(".mini-controls")).display'), 'none');
     assert.equal(new (require('../source/integrations/music.cjs').MusicFeatures)(path.join(temporary, 'music-library.json')).data.mini.lyricsOnly, true);
-    await delay(120); fs.writeFileSync(path.join(root, '.build/mini-lyrics-only-099.png'), (await mini.webContents.capturePage()).toPNG());
+    await delay(120); fs.writeFileSync(path.join(artifacts, 'mini-lyrics-only-099.png'), (await mini.webContents.capturePage()).toPNG());
     await miniJs('document.getElementById("lyricsBack").click()');
     await until(() => miniJs('!document.body.classList.contains("lyrics-only")'), 'Back did not restore mini controls');
     require('../source/integrations/audio-download.cjs').SoundCloudAudioSource.prototype.save = async (_url, filename) => { fs.writeFileSync(filename, wav); return { track: fixture, mp3: false }; };
     await miniJs('document.getElementById("download").click()'); await until(() => studio.getState().downloads.items[0]?.status === 'complete', 'Mini download did not save an MP3', 12000);
     await until(() => miniJs('document.getElementById("download").dataset.status==="complete"'), 'Mini did not show download completion');
     const savedDownload = studio.getState().downloads.items[0]; assert.ok(fs.statSync(path.join(temporary, 'LolzCloud', savedDownload.file)).size > 1000);
-    fs.writeFileSync(path.join(root, '.build/mini-transport-093.png'), (await mini.webContents.capturePage()).toPNG()); mini.close();
+    fs.writeFileSync(path.join(artifacts, 'mini-transport-093.png'), (await mini.webContents.capturePage()).toPNG()); mini.close();
     dialog.showOpenDialog = async () => ({ canceled: false, filePaths: [audioFile] });
     await studio.act({ type: 'voicetag-import' }); notify();
     await js('window.LolzCloudStudio.open("audio")');
@@ -235,9 +291,9 @@ app.whenReady().then(async () => {
     assert.equal(await remote.executeJavaScript('fixtureAudio.paused'), false, 'Voicetag must mix over the song without pausing it.');
     await js('document.getElementById("voicetag-stop").click()');
     assert.equal(await js('window.LolzCloudVoicetags.state().paused'), true);
-    fs.writeFileSync(path.join(root, '.build/voicetags-099.png'), (await host.webContents.capturePage()).toPNG());
+    fs.writeFileSync(path.join(artifacts, 'voicetags-099.png'), (await host.webContents.capturePage()).toPNG());
     const ytSession = session.fromPartition(YOUTUBE_PARTITION);
-    await ytSession.protocol.handle('https', () => new Response('<html><body style="background:#171719;color:white"><ytmusic-player-bar><yt-formatted-string class="title">Fixture YouTube song</yt-formatted-string><div class="byline">Fixture YouTube artist</div><button class="next-button">Next</button><button class="previous-button">Previous</button></ytmusic-player-bar><div id="movie_player"><video id="yt-audio" src="data:audio/wav;base64,' + wav.toString('base64') + '"></video></div><script>document.getElementById("movie_player").getVideoUrl=()=>"https://www.youtube.com/watch?v=fixtureYT01";</script></body></html>', { headers: { 'Content-Type': 'text/html' } }));
+    await ytSession.protocol.handle('https', () => new Response('<html><body style="background:#171719;color:white"><ytmusic-player-bar><yt-formatted-string class="title">Fixture YouTube song</yt-formatted-string><div class="byline">Fixture YouTube artist</div><button class="next-button">Next</button><button class="previous-button">Previous</button></ytmusic-player-bar><div id="movie_player"><video id="yt-audio" src="data:audio/wav;base64,' + wav.toString('base64') + '"></video></div><script>document.getElementById("movie_player").getVideoUrl=()=>new URL(location.href).searchParams.has("v")?location.href:"https://www.youtube.com/watch?v=fixtureYT01";</script></body></html>', { headers: { 'Content-Type': 'text/html' } }));
     await js('document.querySelector("[data-view=youtube]").click()');
     await until(() => js('window.LolzCloudYouTube.active && document.getElementById("youtube-webview")?.getWebContentsId()>0'), 'YouTube Music mode did not open');
     const yt = webContents.fromId(await js('document.getElementById("youtube-webview").getWebContentsId()'));
@@ -273,9 +329,9 @@ app.whenReady().then(async () => {
     await yt.executeJavaScript('(()=>{const box=document.createElement("ytmusic-like-button-renderer");box.setAttribute("like-status","INDIFFERENT");box.innerHTML="<div id=button-shape-like><button aria-pressed=false>Like</button></div>";box.querySelector("button").onclick=()=>box.setAttribute("like-status",box.getAttribute("like-status")==="LIKE"?"INDIFFERENT":"LIKE");document.querySelector("ytmusic-player-bar").append(box)})()');
     await ytMini('document.getElementById("like").click()');
     await until(()=>yt.executeJavaScript('document.querySelector("ytmusic-like-button-renderer").getAttribute("like-status")==="LIKE"'),'Mini YouTube like did not reach the current native control');
-    fs.writeFileSync(path.join(root,'.build/youtube-mini-0910.png'),(await youtubeMini.webContents.capturePage()).toPNG());
+    fs.writeFileSync(path.join(artifacts, 'youtube-mini-0910.png'),(await youtubeMini.webContents.capturePage()).toPNG());
     await studio.act({type:'room-broadcast'});
-    await until(()=>js('document.body.dataset.view==="room"&&!!document.querySelector("#lc-room-webview")'),'Broadcast did not open the in-app room');
+    await until(()=>js('document.body.dataset.view==="room"&&!!document.querySelector("#lc-room-stage webview")'),'Broadcast did not open the in-app room');
     await until(()=>roomJs('document.getElementById("host-controls")?.hidden===false'),'Native room host controls did not appear');
     assert.equal(await yt.executeJavaScript('document.querySelector("video").paused'),false,'Opening the host room must preserve the main YouTube audio');
     assert.equal(await roomJs('document.getElementById("player").hidden'),true,'Native hosting must not create a second embedded audio stream');
@@ -287,6 +343,26 @@ app.whenReady().then(async () => {
     await until(()=>yt.executeJavaScript('Math.abs(document.querySelector("video").currentTime-35)<1'),'Room host seek did not control the actual YouTube audio');
     await roomJs('document.getElementById("host-play").click()');
     await until(()=>yt.executeJavaScript('!document.querySelector("video").paused'),'Room host play did not resume YouTube');
+    phase = 'room: native queue priority and fixed speed';
+    await assert.rejects(studio.act({ type: 'dsp', settings: { enabled: true, rate: 1.2 } }), /скорость 1×/, 'A host must not change the common room speed');
+    await assert.rejects(studio.act({ type: 'dsp', settings: { preset: 'Speed Up' } }), /скорость 1×/, 'A preset must not bypass the common room speed');
+    const nativeQueue = ['https://music.youtube.com/watch?v=fixtureYT02', 'https://music.youtube.com/watch?v=fixtureYT03'];
+    const nativeRoomId = studio.getState().room.url.split('/').filter(Boolean).at(-1);
+    for (const url of nativeQueue) {
+      const response = await fetchOriginal(loopback + '/api/rooms/' + nativeRoomId + '/queue', {
+        method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'add', track: { url, title: 'Native queued track', artist: 'Fixture artist' } }),
+      });
+      assert.equal(response.status, 200, 'The room queue fixture must be accepted by the real server');
+    }
+    await until(() => studio.getState().room.queue.length === 2, 'Native host did not receive the room queue');
+    await studio.act({ type: 'media', command: 'seek', value: service.playback.duration });
+    await until(() => service.playback.url === nativeQueue[0] && service.playback.playing, 'Seeking the main player to the end must choose the first room-queue track', 12000);
+    assert.deepEqual(studio.getState().room.queue.map(row => row.track.url), nativeQueue.slice(1), 'Native seek-to-end must consume exactly one queued track');
+    await studio.act({ type: 'media', command: 'next' });
+    await until(() => service.playback.url === nativeQueue[1] && service.playback.playing, 'The main Next command must prefer the room queue over personal playback history', 12000);
+    assert.equal(studio.getState().room.queue.length, 0, 'Native Next must consume the remaining room track');
+    phase = 'room: native controller handoff';
     await roomJs('document.getElementById("release-host").click()');
     await until(()=>studio.getState().source==='room','Releasing the native controller did not become an embedded listener');
     assert.equal(await yt.executeJavaScript('document.querySelector("video").paused'),true,'Release must pause the previous main audio');
@@ -298,11 +374,12 @@ app.whenReady().then(async () => {
     assert.equal(await js('document.body.dataset.view'), 'room','Changing native tracks must keep the room screen open');
     await studio.act({type:'room-stop'});
     await until(()=>js('!window.LolzCloudRooms.active&&!document.querySelector("#lc-room-webview")'),'Stopping a room left a stale room player attached');
-    fs.writeFileSync(path.join(root,'.build/youtube-room-0910.png'),(await host.webContents.capturePage()).toPNG());
+    fs.writeFileSync(path.join(artifacts, 'youtube-room-0910.png'),(await host.webContents.capturePage()).toPNG());
     youtubeMini.close();
     await yt.executeJavaScript('void document.querySelector("video").play()', true);
     await js('document.querySelector("[data-view=browser]").click()');
     await until(() => yt.executeJavaScript('document.querySelector("video").paused'), 'Leaving YouTube Music did not pause its audio');
+    phase = 'room: SoundCloud host navigation and explicit leave';
     await remote.executeJavaScript('fixtureAudio.play()', true);
     await until(()=>studio.getState().source==='soundcloud'&&service.playback.playing,'SoundCloud did not resume before host navigation check');
     await studio.act({type:'room-broadcast'});
@@ -315,14 +392,25 @@ app.whenReady().then(async () => {
     assert.equal(store.viewRoom(store.room(departedRoom), user).controller, null, 'Leave must release shared control without closing the public room');
     assert.equal(await remote.executeJavaScript('fixtureAudio.paused'), false, 'Leaving the room must preserve personal SoundCloud playback');
     const imported = await js('(async()=>{const {ipcRenderer}=require("electron");return ipcRenderer.invoke("player-tools:action",{type:"local-files",files:[' + JSON.stringify(audioFile) + ']})})()'); assert.equal(imported.ok, true); const local = imported.state.library.tracks[0];
+    phase = 'source: delayed SoundCloud start cancelled by local playback';
+    await remote.executeJavaScript('window.savedFixturePlay=window.__lolzcloudPlayback.play;window.delayedFixtureReady=false;window.delayedFixtureCalls=0;window.__lolzcloudPlayback.play=()=>{window.delayedFixtureCalls++;if(window.delayedFixtureReady){void fixtureAudio.play();return "playing";}return "loading";};fixtureAudio.pause()');
+    await js('window.savedFixtureLoad=document.getElementById("webview").loadURL;document.getElementById("webview").loadURL=async()=>{};void 0');
+    await studio.act({type:'play-url',url:fixture.url});
+    await until(()=>remote.executeJavaScript('window.delayedFixtureCalls>0'),'The delayed SoundCloud request did not reach its retry loop');
     await js('(async()=>{const {ipcRenderer}=require("electron");return ipcRenderer.invoke("player-tools:action",{type:"local-play",id:' + JSON.stringify(local.id) + '})})()');
     await until(() => studio.snapshot().local && studio.snapshot().playback.playing && studio.snapshot().playback.position > .2, 'Offline audio did not start', 12000);
+    await remote.executeJavaScript('window.delayedFixtureReady=true'); await delay(1300);
+    const staleSoundCloudPaused=await remote.executeJavaScript('fixtureAudio.paused');
+    await remote.executeJavaScript('window.__lolzcloudPlayback.play=window.savedFixturePlay;void 0');
+    await js('document.getElementById("webview").loadURL=window.savedFixtureLoad;void 0');
+    assert.equal(staleSoundCloudPaused,true,'A delayed SoundCloud retry restarted audio after switching to local playback');
+    assert.equal(studio.snapshot().local,true,'A stale source must not replace the selected local track');
     assert.equal(studio.snapshot().private, true); assert.ok(!JSON.stringify(studio.snapshot()).includes(audioFile));
     await js('document.getElementById("player-playPause").click()'); await until(() => studio.snapshot().playback.playing === false, 'Footer pause did not control local audio');
     await js('document.getElementById("player-repeat").click()'); await until(() => studio.getState().transport.repeat.mode === 'one', 'Local repeat was not selected');
-    await js('window.LolzCloudPlayerTools.open("library")'); await delay(100); fs.writeFileSync(path.join(root, '.build/player-offline-test.png'), (await host.webContents.capturePage()).toPNG());
+    await js('window.LolzCloudPlayerTools.open("library")'); await delay(100); fs.writeFileSync(path.join(artifacts, 'player-offline-test.png'), (await host.webContents.capturePage()).toPNG());
     await js('(async()=>{const {ipcRenderer}=require("electron");await ipcRenderer.invoke("player-tools:action",{type:"profile-export"})})()'); const exported = JSON.parse(fs.readFileSync(path.join(temporary, 'exported-profile.json'))); assert.equal(exported.format, 'lolzcloud-profile'); assert.ok(!JSON.stringify(exported).includes(audioFile));
-    assert.deepEqual(errors, []); console.log('Player UI passed: shared SoundCloud/YouTube footer and mini, actual audio seek/repeat/DSP/like, room host/listener bridge and handoff without duplicate audio, local volume/pause, privacy, directory/chat, lyric seek, bookmarks, offline profile.');
+    assert.deepEqual(errors, []); console.log('Player UI passed: shared SoundCloud/YouTube footer and mini, actual audio seek/repeat/DSP/like, room host/listener bridge and handoff without duplicate audio, Profile/Friends/Inbox preserve the active room guest/audio/chat draft, isolated standalone social, local volume/pause, privacy, directory/chat, lyric seek, bookmarks, offline profile.');
   } catch (error) { console.error('Player UI phase: ' + phase); console.error(error.stack); process.exitCode = 1; }
   finally { clearInterval(timer); if (host && !host.isDestroyed()) { await host.webContents.executeJavaScript('window.LolzCloudLocal?.shutdown()').catch(() => {}); await delay(80); } if (studio) await studio.shutdown(); if (host && !host.isDestroyed()) host.destroy(); if (roomServer) { roomServer.closeAllConnections(); await new Promise(resolve => roomServer.close(resolve)); } app.exit(process.exitCode || 0); }
 });

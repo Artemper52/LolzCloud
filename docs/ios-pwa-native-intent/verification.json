@@ -1,0 +1,59 @@
+{
+  "checkedAt": "2026-11-14T16:22:25.420Z",
+  "sourceFrozen": true,
+  "swCache": "lolzcloud-app-shell-v3",
+  "sourceHashesSha256": {
+    "server/public/app/app.js": "4dc6938c7f59ecc68d59051d8465166dd88b5c240364b255da78f93df99f0524",
+    "server/public/app/sw.js": "3f16bb375f2cc174ee8559fbd9f5e1ead95f8ef2d8d17739ac69146268384784",
+    "tests/pwa-ui.cjs": "abb7b05301d7b955d6aa27a2911d40fe36fd44f782145820a5acd59465ebf088",
+    "tests/pwa-imports-ui.cjs": "9fa258c72108b5b46c645e49e27342d39c0d73e8c90d3d9b5523c47930e8180c"
+  },
+  "browser": {
+    "status": "passed",
+    "tests": 65,
+    "report": "pwa-ui-results.json",
+    "scope": "Real Chromium DOM, HTMLAudio, HTTP, IndexedDB and service worker; native message handler, LRCLIB and room SDK are controlled adapters."
+  },
+  "localImportRegression": {
+    "status": "passed",
+    "tests": 17,
+    "report": "pwa-imports-results.json"
+  },
+  "nodePolicyAndServer": {
+    "status": "passed",
+    "tests": 13,
+    "command": "node --test tests/pwa-core.test.cjs tests/pwa-server.test.cjs",
+    "scope": "10 pure core policy tests and 3 actual local HTTP server tests, observed during this run."
+  },
+  "swift": {
+    "report": "../../ios/verification-0.1.1.json",
+    "policyTests": {
+      "status": "passed",
+      "tests": 34,
+      "failures": 0,
+      "completedAt": "2026-11-14T16:13:05Z",
+      "command": "swift test --package-path ios"
+    },
+    "swiftFrontendParse": {
+      "status": "passed",
+      "files": 4,
+      "scope": "syntax only; no Apple SDK type checking"
+    },
+    "sourceHashesSha256": {
+      "LolzCloud/AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
+      "LolzCloud/App.swift": "e356b6af9774554ac41c8f3f13d022218e7c8b0c8541e7cad0491f0aa4fa9f64",
+      "LolzCloud/MediaPolicy.swift": "d18d7bfb2c521bed380fce9413a09d1fe096527763e748d039a714206c429fec",
+      "LolzCloud/NativePlayer.swift": "a4c09b963f7d09c8c4ff06cd1924c0c451b516450913bcd7895bba160d5fb9f6",
+      "LolzCloud/Info.plist": "84b23cffcee7b5c66439fa0ad3843ebd814e06a24ca375b709aa95065edf27b3",
+      "Tests/MediaPolicyTests.swift": "fc6ea87bafb7987286b934f721437874d314e5d3f1e4678f90cf53beb32f4913",
+      "tools/build.cjs": "a37111fc3c5a846fed4bda6416648a90b5263e4da3ea2f4a4578bc9d997ec7d0",
+      "tools/version.cjs": "1f564e8505eca48a781f649a3520ceceafdf0d790658243501c3f45ca62a409e"
+    }
+  },
+  "pending": [
+    "Apple SDK type check/build",
+    "Actual WKWebView and AVPlayer/device runtime",
+    "Signed native iOS IPA"
+  ],
+  "releaseNote": "Web/source follow-up to already published 0.9.16. No immutable desktop or Android artifact rebuilt by this task."
+}

@@ -35,7 +35,9 @@ module.exports = async function roomNavigation({ host, studio, roomJs, mediaPlay
   if (label === 'SoundCloud host') {
     const fs = require('node:fs'), path = require('node:path');
     await delay(150);
-    fs.writeFileSync(path.resolve(__dirname, '../../.build/room-effects-0912.png'), (await host.webContents.capturePage()).toPNG());
+    const artifacts = process.env.LOLZCLOUD_UI_ARTIFACTS || path.resolve(__dirname, '../../.build');
+    fs.mkdirSync(artifacts, { recursive: true });
+    fs.writeFileSync(path.join(artifacts, 'room-effects-0912.png'), (await host.webContents.capturePage()).toPNG());
   }
   const { preset, ...settings } = sound; await studio.act({ type: 'dsp', settings });
   for (const [open, target] of [['window.lolzShowAccount()', 'lzt-dialog'], ['window.LolzCloudPlayerTools.palette()', 'xp-palette']]) {

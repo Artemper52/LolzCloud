@@ -1,0 +1,22 @@
+{
+  "ok": true,
+  "count": 13,
+  "checks": [
+    "Anonymous music opens without mounting unauthorized shared frames",
+    "Pairing exposes only an exact same-origin verification link and a visible code",
+    "Cancel then late browser approval cannot commit a session or reopen login",
+    "Cancelled pairing does not install a cookie",
+    "A foreign verification URL never becomes a clickable login destination",
+    "Explicit retry starts a fresh pairing generation",
+    "Cancel and Escape cannot interrupt the short cookie commit phase",
+    "Production session endpoint commits a secure host-only HttpOnly cookie",
+    "A second cookie-only GET verifies the approved user identity and CSRF before success",
+    "The bearer is absent from page cookies, URLs and localStorage",
+    "Only the current explicitly approved generation commits once",
+    "Pairing and profile gate fit the 390px viewport",
+    "Pairing scenarios have no uncaught browser errors"
+  ],
+  "errors": [],
+  "failure": "",
+  "fixtureNote": "Real CloudStore start/poll/session endpoints, fresh Chromium cookie jar. Browser approval is a controlled fixture; no personal account or live OAuth approval. This does not claim Safari hardware verification."
+}

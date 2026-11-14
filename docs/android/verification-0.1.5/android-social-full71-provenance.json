@@ -1,0 +1,15 @@
+{
+  "recordedAt": "2026-11-14T16:06:47.9801396Z",
+  "avd": "LolzCloud",
+  "serial": "emulator-5554",
+  "qemu": "1",
+  "launcherPid": 11212,
+  "ownedQemuPid": 10500,
+  "versionName": "0.1.5",
+  "versionCode": 6,
+  "installedApkSha256": "ee61577bcf8b45650fad41a76715d3b532012cc949289a61dbb2adfc41db72d0",
+  "artifactSha256": "ee61577bcf8b45650fad41a76715d3b532012cc949289a61dbb2adfc41db72d0",
+  "instrumentationSha256": "04156c120e4f73e4de5bceee2e5b757c6415e7b7348b2709fcb63be91485b67d",
+  "oldFailedReportSha256": "b172e8edd99d76d84173615297edb214a38de26cb7870246c1650c87768014bb",
+  "notificationPermissionBefore": true
+}

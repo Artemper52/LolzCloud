@@ -1,0 +1,11 @@
+{
+  "stoppedAt": "2026-11-14T16:18:06.0226465Z",
+  "serial": "emulator-5554",
+  "avd": "LolzCloud",
+  "launcherPid": 11212,
+  "qemuPid": 10500,
+  "identityVerifiedBeforeStop": true,
+  "stopMethod": "adb -s emulator-5554 emu kill",
+  "qemuStillRunning": false,
+  "launcherStillRunning": false
+}

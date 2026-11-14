@@ -1,0 +1,146 @@
+{
+  "target": "Android emulator",
+  "generatedAt": "2026-11-12T17:39:45.526Z",
+  "apkReinstalledBetweenPhases": true,
+  "status": "passed",
+  "phases": [
+    {
+      "phase": "fresh",
+      "status": "passed",
+      "checks": [
+        {
+          "name": "SAF imported all four generated MP3 fixtures",
+          "passed": true
+        },
+        {
+          "name": "SAF read permissions were persisted by the production activity",
+          "passed": true
+        },
+        {
+          "name": "Real MP3 metadata imported",
+          "passed": true
+        },
+        {
+          "name": "Production SAF callback imports real LRC timestamps",
+          "passed": true
+        },
+        {
+          "name": "Native playback position advances",
+          "passed": true
+        },
+        {
+          "name": "MediaSession exposes PLAYING for lock-screen transport",
+          "passed": true
+        },
+        {
+          "name": "MediaSession contains current title",
+          "passed": true
+        },
+        {
+          "name": "Seek through MediaSession reaches requested position",
+          "passed": true
+        },
+        {
+          "name": "Paused position remains stable",
+          "passed": true
+        },
+        {
+          "name": "Pause resumes through MediaSession",
+          "passed": true
+        },
+        {
+          "name": "Playback continues while the activity is in the background",
+          "passed": true
+        },
+        {
+          "name": "Next advances to the second queued file",
+          "passed": true
+        },
+        {
+          "name": "Previous returns to the actual queued file",
+          "passed": true
+        },
+        {
+          "name": "Starting a prepared paused file records real history",
+          "passed": true
+        },
+        {
+          "name": "Private listening does not update history",
+          "passed": true
+        },
+        {
+          "name": "Imported sound settings reach the live service",
+          "passed": true
+        },
+        {
+          "name": "Privacy and liked files survive profile import and store recreation",
+          "passed": true
+        },
+        {
+          "name": "Profile import saves the previous portable profile",
+          "passed": true
+        },
+        {
+          "name": "Invalid file URI profile is rejected without changing the portable profile",
+          "passed": true
+        },
+        {
+          "name": "Paused seek is persisted at the requested position",
+          "passed": true
+        },
+        {
+          "name": "Ready for force-stop + second instrumentation restore phase",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "phase": "restore",
+      "status": "passed",
+      "checks": [
+        {
+          "name": "Previous instrumentation phase saved an expected state",
+          "passed": true
+        },
+        {
+          "name": "Queue and current track survive process restart",
+          "passed": true
+        },
+        {
+          "name": "Process restart restores position without autoplay",
+          "passed": true
+        },
+        {
+          "name": "Private setting and likes survive process restart",
+          "passed": true
+        },
+        {
+          "name": "Persisted SAF permission still permits playback after process restart",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "phase": "updates",
+      "status": "passed",
+      "checks": [
+        {
+          "name": "Updater rejects reinstalling the current APK version",
+          "passed": true
+        },
+        {
+          "name": "Updater accepts a newer same-package APK with the installed signing certificate",
+          "passed": true
+        },
+        {
+          "name": "Updater rejects a newer APK signed by a different certificate",
+          "passed": true
+        },
+        {
+          "name": "Updater rejects a malformed non-APK file",
+          "passed": true
+        }
+      ]
+    }
+  ]
+}

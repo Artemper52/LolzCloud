@@ -1,0 +1,142 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T10:43:44.793Z",
+  "checks": [
+    {
+      "name": "HTTPS direct HTTP 200 /downloads/android-update.json",
+      "passed": true
+    },
+    {
+      "name": "Android manifest JSON MIME",
+      "passed": true
+    },
+    {
+      "name": "Public Android manifest equals verified signed release metadata",
+      "passed": true
+    },
+    {
+      "name": "HTTPS direct HTTP 200 /downloads/LolzCloud-Android-0.1.3.apk",
+      "passed": true
+    },
+    {
+      "name": "Public APK Content-Length",
+      "passed": true
+    },
+    {
+      "name": "Full public APK size and SHA256",
+      "passed": true
+    },
+    {
+      "name": "HTTPS direct HTTP 200 /downloads/LolzCloud-Android-0.1.3.apk.sha256",
+      "passed": true
+    },
+    {
+      "name": "Versioned APK checksum sidecar",
+      "passed": true
+    },
+    {
+      "name": "HTTPS direct HTTP 200 /downloads/SHA256SUMS.txt",
+      "passed": true
+    },
+    {
+      "name": "Shared checksum index includes final APK",
+      "passed": true
+    },
+    {
+      "name": "HTTPS direct HTTP 200 /downloads/update.json",
+      "passed": true
+    },
+    {
+      "name": "Windows0.9.13 channel preserved by Android publication",
+      "passed": true
+    },
+    {
+      "name": "HTTPS direct HTTP 200 /downloads/latest.yml",
+      "passed": true
+    },
+    {
+      "name": "Windows NSIS feed remains0.9.13",
+      "passed": true
+    },
+    {
+      "name": "HTTPS direct HTTP 200 /music/health",
+      "passed": true
+    },
+    {
+      "name": "music service ready",
+      "passed": true
+    },
+    {
+      "name": "HTTPS direct HTTP 200 /api/health",
+      "passed": true
+    },
+    {
+      "name": "api service ready",
+      "passed": true
+    },
+    {
+      "name": "HTTPS direct HTTP 200 /telegram/health",
+      "passed": true
+    },
+    {
+      "name": "telegram service ready",
+      "passed": true
+    },
+    {
+      "name": "HTTPS direct HTTP 200 /music/search",
+      "passed": true
+    },
+    {
+      "name": "Live native catalog returns exact full-link track",
+      "passed": true
+    },
+    {
+      "name": "HTTPS direct HTTP 206 /music/audio/1930572542/bcd527cc110efa95cb49a325.mp3",
+      "passed": true
+    },
+    {
+      "name": "Live audio HTTP206 + genuine ID3 bytes",
+      "passed": true
+    }
+  ],
+  "manifest": {
+    "versionName": "0.1.3",
+    "versionCode": 4,
+    "packageName": "com.lolzcloud.mobile",
+    "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.3.apk",
+    "size": 2504048,
+    "sha256": "e5fb9fe5bd07bc5889ab3cb69ffcbfdc482440998c3b8533d108f9bf81781d77",
+    "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44"
+  },
+  "windowsVersion": "0.9.13",
+  "services": {
+    "music": {
+      "ok": true,
+      "service": "lolzcloud-music",
+      "protocol": 1,
+      "activeDownloads": 0
+    },
+    "api": {
+      "ok": true,
+      "version": "0.9.13",
+      "roomProtocol": 2,
+      "socialProtocol": 1,
+      "oauthConfigured": true,
+      "spicyConfigured": true
+    },
+    "telegram": {
+      "ok": true,
+      "bot": "lolzcloudbot",
+      "pollAgeSeconds": 7,
+      "activeDownloads": 0,
+      "cacheTracks": 1,
+      "inlineMode": "covers-with-feedback",
+      "cacheChannelConfigured": false
+    }
+  },
+  "audio": {
+    "id": "1930572542",
+    "rangeStatus": 206,
+    "bytes": 32
+  }
+}

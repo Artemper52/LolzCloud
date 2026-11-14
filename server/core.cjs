@@ -7,8 +7,19 @@ const text = (value, length = 180) => typeof value === 'string' ? value.replace(
 function profile(value) {
   const id = Number(value?.user_id || value?.id), name = text(value?.username || value?.name, 100);
   if (!Number.isSafeInteger(id) || id <= 0 || !name) throw new HttpError(401, 'Lolzteam не подтвердил аккаунт.');
-  const avatar = value.links?.avatar || value.avatar || '';
-  return { id, name, url: 'https://lolz.live/members/' + id + '/', avatar: typeof avatar === 'string' && /^https:\/\/[^/@]+(?:\/|$)/.test(avatar) ? avatar.slice(0, 1000) : '' };
+  const avatar = value.links?.avatar_big || value.links?.avatar || value.lolzAvatar || value.avatar || '';
+  const safeAvatar = typeof avatar === 'string' && /^https:\/\/[^/@]+(?:\/|$)/.test(avatar) ? avatar.slice(0, 1000) : '';
+  // Membership labels come only from /users/me, never from the editable custom_title.
+  // Keep the normalized form across session/device persistence as well.
+  const titles = [], seen = new Set();
+  for (const group of (Array.isArray(value.user_groups) ? value.user_groups : Array.isArray(value.titles) ? value.titles : []).slice(0, 40)) {
+    const groupId = Number(group.user_group_id ?? group.id), label = text(String(group.user_group_title || group.user_group_banner_text || group.label || '').replace(/<[^>]*>/g, ''), 80);
+    if (!Number.isSafeInteger(groupId) || groupId < 1 || !label || seen.has(groupId)) continue;
+    seen.add(groupId); titles.push({ id: groupId, label, source: 'lolzteam' });
+  }
+  const curatorTitles = (Array.isArray(value.curator_titles) ? value.curator_titles : Array.isArray(value.curatorTitles) ? value.curatorTitles : []).slice(0, 20).map(title => text(title, 80)).filter(Boolean);
+  if (curatorTitles.length && !titles.some(title => /куратор|curator/i.test(title.label))) titles.push({ id: 0, label: 'Куратор', source: 'lolzteam' });
+  return { id, name, url: 'https://lolz.live/members/' + id + '/', avatar: safeAvatar, lolzAvatar: safeAvatar, titles, curatorTitles };
 }
 function playback(value) {
   const hidden = !value?.fresh || value.private;
@@ -25,14 +36,14 @@ class CloudStore {
     try {
       const saved = JSON.parse(fs.readFileSync(filename, 'utf8'));
       for (const row of saved.sessions || []) if (/^[a-f0-9]{64}$/.test(row.hash) && row.expires > this.now()) {
-        this.sessions.set(row.hash, { user: profile(row.user), expires: Math.min(row.expires, this.now() + 7 * DAY), csrf: token() });
+        this.sessions.set(row.hash, { user: profile(row.user), expires: Math.min(row.expires, this.now() + 7 * DAY), verifiedAt: Number(row.verifiedAt) || row.expires - 7 * DAY, csrf: /^[\w-]{43}$/.test(row.csrf || '') ? row.csrf : token() });
       }
     } catch { /* First launch. */ }
   }
   save() {
     if (!this.filename) return;
     this.prune(); fs.mkdirSync(path.dirname(this.filename), { recursive: true, mode: 0o700 });
-    fs.writeFileSync(this.filename + '.tmp', JSON.stringify({ sessions: [...this.sessions].map(([key, row]) => ({ hash: key, user: row.user, expires: row.expires })) }), { mode: 0o600 });
+    fs.writeFileSync(this.filename + '.tmp', JSON.stringify({ sessions: [...this.sessions].map(([key, row]) => ({ hash: key, user: row.user, expires: row.expires, verifiedAt: row.verifiedAt, csrf: row.csrf })) }), { mode: 0o600 });
     fs.renameSync(this.filename + '.tmp', this.filename);
   }
   prune() {
@@ -45,7 +56,7 @@ class CloudStore {
   session(secret) { const row = typeof secret === 'string' && secret.length <= 200 ? this.sessions.get(hash(secret)) : null; if (!row || row.expires <= this.now()) return null; return row; }
   login(user) {
     this.prune(); if (this.sessions.size >= 20000) throw new HttpError(503, 'Вход временно занят.');
-    const secret = token(), row = { user: profile(user), expires: this.now() + 7 * DAY, csrf: token() }; this.sessions.set(hash(secret), row); this.save(); return { secret, ...row };
+    const secret = token(), row = { user: profile(user), expires: this.now() + 7 * DAY, verifiedAt: this.now(), csrf: token() }; this.sessions.set(hash(secret), row); this.save(); return { secret, ...row };
   }
   logout(secret) { if (secret) this.sessions.delete(hash(secret)); this.save(); }
   beginLogin(next) {
@@ -110,5 +121,12 @@ class CloudStore {
     return { id: room.id, url: this.origin + '/room/' + room.id + '/', owner: room.owner, host: room.owner.id === user.id, participants: [...people.values()], viewers: Math.max(0, people.size - 1), playback: fresh ? room.playback : playback(null), updatedAt: room.updatedAt, revision: room.revision, serverTime: this.now() };
   }
 }
-function safeNext(value) { return typeof value === 'string' && /^(?:\/room\/[a-f0-9]{32}\/?|\/remote\/[a-f0-9]{32}|\/connect\?code=[a-zA-Z0-9_-]{12}|\/rooms)$/.test(value) ? value : '/rooms'; }
+function safeNext(value) {
+  if (typeof value !== 'string' || value.length > 300) return '/rooms';
+  if (/^(?:\/room\/[a-f0-9]{32}\/?|\/remote\/[a-f0-9]{32}|\/connect\?code=[a-zA-Z0-9_-]{12}|\/rooms|\/app\/?)$/.test(value)) return value;
+  try { const url = new URL(value, 'https://lolzcloud.com'); if (!value.startsWith('/social') || url.origin !== 'https://lolzcloud.com' || url.pathname !== '/social' || url.hash) return '/rooms';
+    for (const [key, entry] of url.searchParams) if (key === 'tab' ? !['profile', 'friends', 'notifications'].includes(entry) : key === 'user' ? !/^[1-9]\d{0,14}$/.test(entry) : true) return '/rooms';
+    return url.pathname + url.search;
+  } catch { return '/rooms'; }
+}
 module.exports = { CloudStore, HttpError, profile, playback, safeNext, hash, token };

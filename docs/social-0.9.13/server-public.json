@@ -1,0 +1,53 @@
+{
+  "status": "passed",
+  "generatedAt": "2026-11-13T22:13:11.461Z",
+  "checks": [
+    {
+      "path": "/api/health",
+      "status": 200,
+      "type": "application/json; charset=utf-8",
+      "location": null,
+      "health": {
+        "ok": true,
+        "version": "0.9.13",
+        "roomProtocol": 2,
+        "socialProtocol": 1,
+        "oauthConfigured": true,
+        "spicyConfigured": true
+      }
+    },
+    {
+      "path": "/cloud/social.js",
+      "status": 200,
+      "type": "text/javascript; charset=utf-8",
+      "location": null,
+      "sourceBytesMatch": true
+    },
+    {
+      "path": "/cloud/social.css",
+      "status": 200,
+      "type": "text/css; charset=utf-8",
+      "location": null,
+      "sourceBytesMatch": true
+    },
+    {
+      "path": "/cloud/site.js",
+      "status": 200,
+      "type": "text/javascript; charset=utf-8",
+      "location": null,
+      "sourceBytesMatch": true
+    },
+    {
+      "path": "/api/social/me",
+      "status": 401,
+      "type": "application/json; charset=utf-8",
+      "location": null
+    },
+    {
+      "path": "/social?tab=notifications",
+      "status": 303,
+      "type": null,
+      "location": "/login?next=%2Fsocial%3Ftab%3Dnotifications"
+    }
+  ]
+}

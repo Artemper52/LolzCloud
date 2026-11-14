@@ -1,13 +1,14 @@
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
-const { BrowserWindow, ipcMain, globalShortcut, clipboard, ClipboardItem, dialog, shell, screen, safeStorage, session } = require('electron');
+const { BrowserWindow, Notification, ipcMain, globalShortcut, clipboard, ClipboardItem, dialog, shell, screen, safeStorage, session } = require('electron');
 const { copyCard } = require('./clipboard.cjs');
 const { RepeatIntent } = require('./repeat-intent.cjs');
 const { MusicFeatures, shareText, scUrl, PRESETS } = require('./music.cjs');
 const { presetSound } = require('./sound-settings.cjs');
 const { ListeningRoom } = require('./room.cjs');
-const { ROOM_PARTITION, ROOM_COOKIE, roomUrl, roomCard } = require('./room-view.cjs');
+const { ROOM_PARTITION, ROOM_COOKIE, roomUrl, socialUrl, roomCard } = require('./room-view.cjs');
+const { SocialNotifications } = require('./social-notifications.cjs');
 const { LyricsLibrary } = require('./lyrics.cjs');
 const { LyricPrefetcher } = require('./lyric-prefetch.cjs');
 const { LyricSettings } = require('./lyric-settings.cjs');
@@ -46,6 +47,15 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
   const repeat = new RepeatIntent();
   const playbackHistory = new PlaybackHistory();
   const room = new ListeningRoom(() => service.getState(), { filename: path.join(app.getPath('userData'), 'cloud-session.json'), safeStorage, openExternal: url => shell.openExternal(url), onControlLost: () => getWindow()?.webContents.send('lolzcloud:media', { command: 'pause' }) });
+  const socialNotifications = new SocialNotifications({
+    filename: path.join(app.getPath('userData'), 'social-notifications.json'), getSession: () => room.getState(), request: async endpoint => {
+      const id = room.user?.id, result = await room.request(endpoint);
+      try { const value = await room.request('/api/session'); if (value.authenticated && value.user?.id === id && room.user?.id === id) { room.user = value.user; getWindow()?.webContents.send('lolzcloud:cloud-identity', value.user); } } catch { /* Keep the last confirmed identity during a temporary failure. */ }
+      return result;
+    },
+    createNotification: options => new Notification({ ...options, icon: path.join(__dirname, '../app/lib/assets/logo.png') }), isSupported: () => !!Notification?.isSupported(), getWindow,
+    onState: state => getWindow()?.webContents.send('lolzcloud:social-state', state), onOpen: () => getWindow()?.webContents.send('lolzcloud:open-social', { tab: 'notifications' }),
+  });
   const shortcuts = new Set(); let hotkeyErrors = [], mini = null, audio = { attached: 0, unavailable: false };
   const ducker = new AudioDucker({ directory: path.join(app.getPath('userData'), 'runtime', 'audio'), settings: music.data.protection, onChange: config => { const host = getWindow(); if (host && !host.isDestroyed() && !host.webContents.isDestroyed()) host.webContents.send('lolzcloud:safety', config); } });
   const miniController = new MiniPlayerWindow({ BrowserWindow, screen, app, filename: path.join(app.getPath('userData'), 'mini-window.json'), html: path.resolve(__dirname, '../app/mini.html'), onClosed: () => { mini = null; } });
@@ -67,6 +77,13 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
       onStateChange(); return null;
     }
     if (!room.getState().authenticated) throw new Error('Сначала войди через Lolzteam.');
+    if (action?.type === 'social') {
+      const target = socialUrl(action.url || room.origin + '/social', room.origin);
+      if (!target) throw new Error('Неизвестный раздел профиля.');
+      await session.fromPartition(ROOM_PARTITION).cookies.set({ url: room.origin, name: ROOM_COOKIE, value: room.token, path: '/', secure: true, httpOnly: true, sameSite: 'lax', expirationDate: room.expires / 1000 });
+      void socialNotifications.poll();
+      return target;
+    }
     if (action?.type === 'list') {
       const result = await room.request('/api/rooms');
       return result.rooms.map(value => roomCard(value, room.origin)).filter(Boolean);
@@ -132,11 +149,13 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
     if (room.getState().url !== url || !room.lease) throw new Error('Управление уже передано другому ведущему.');
     if (action.type === 'release') { await media('pause'); await room.release(); }
     else if (action.type === 'play') await playTrack(action.url);
-    else if (action.type === 'next') await experience.act({ type: 'room-next' });
+    else if (action.type === 'next') await experience.act({ type: 'room-next', automatic: action.automatic === true, expectedUrl: action.expectedUrl, expectedEpoch: action.expectedEpoch, expectedController: action.expectedController });
     else if (action.type === 'media' && ['play','pause','playPause','seek'].includes(action.command)) {
       const target=Math.max(0,Math.min(14400,Number(action.value)||0)), wanted=action.command==='playPause'?!service.playback.playing:action.command==='play';
+      const previousUrl = service.playback.url;
       await media(action.command,target);
       for(let attempt=0;attempt<40;attempt++){
+        if (service.playback.url !== previousUrl || service.pendingPlayback?.url && service.pendingPlayback.url !== previousUrl) break;
         if(action.command==='seek'?Math.abs(service.playback.position-target)<1:service.playback.playing===wanted)break;
         await new Promise(resolve=>setTimeout(resolve,50));
       }
@@ -152,6 +171,13 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
     if(playbackSource==='room'&&!experience.snapshot().local){
       if(!['playPause','play','pause','volume','volumeUp','volumeDown'].includes(command))throw new Error('Порядок песен и позицию выбирает ведущий комнаты.');
       getWindow()?.webContents.send('lolzcloud:room-media',{command,value});return;
+    }
+    const shared = room.getState(), track = experience.current();
+    if (!experience.snapshot().local && shared.hosting && shared.queue.some(row => row.approved)
+      && (command === 'next' || command === 'seek' && shared.settings.autoNext !== false && track.duration > 1 && Number(value) >= track.duration - .15)) {
+      await experience.act({ type: 'room-next', automatic: command === 'seek', expectedUrl: track.url });
+      if (room.lease) await room.publish();
+      return;
     }
     if (command === 'volumeUp' || command === 'volumeDown') {
       const current = music.data.player.volume ?? audio.volume ?? 1;
@@ -190,7 +216,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
       catch { hotkeyErrors.push(key); }
     }
   }
-  function getState() { return { ...music.getState(), source:playbackSource, capabilities:capabilities(), voicetags:voicetags.state(), tools:experience.state(), transport: { repeat: experience.snapshot().local?{mode:experience.current().repeat}:repeat.read(service.playback) }, downloads: downloads.state(), ducking: ducker.state(), safetyConfig: ducker.config(), lyricCache: { ready: [...lyrics.cache.values()].filter(result => !result.loading).length, warming: lyrics.background.size }, miniWindow: miniController.state(), visuals: visuals.state(service.getState(), audio), room: room.getState(), hotkeyErrors, audio: { ...audio }, communityResults, lyrics: lyrics.state(shownTrack()), lyricSettings: lyricSettings.state(), wave: wave.state() }; }
+  function getState() { return { ...music.getState(), source:playbackSource, capabilities:capabilities(), voicetags:voicetags.state(), tools:experience.state(), transport: { repeat: experience.snapshot().local?{mode:experience.current().repeat}:repeat.read(service.playback) }, downloads: downloads.state(), ducking: ducker.state(), safetyConfig: ducker.config(), lyricCache: { ready: [...lyrics.cache.values()].filter(result => !result.loading).length, warming: lyrics.background.size }, miniWindow: miniController.state(), visuals: visuals.state(service.getState(), audio), room: room.getState(), social: socialNotifications.state(), hotkeyErrors, audio: { ...audio }, communityResults, lyrics: lyrics.state(shownTrack()), lyricSettings: lyricSettings.state(), wave: wave.state() }; }
   async function act(action) {
     if (/^wave-/.test(action?.type || '') || action?.type === 'play-url') experience.stopLocal();
     switch (action?.type) {
@@ -385,6 +411,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
     return { ...experience.snapshot(), source: playbackSource, capabilities: capabilities(), transport: experience.snapshot().local ? { repeat: { mode: experience.current().repeat } } : { repeat: repeat.read(service.playback) }, downloads: downloads.state(), wave: wave.state(), visuals: visuals.state(service.getState(), audio), mini: { ...music.data.mini }, preferences: { ...music.data.preferences }, volume: music.data.player.volume ?? audio.volume ?? 1, lyrics: music.data.mini.lyrics ? lyrics.state(shownTrack()) : null };
   });
   registerKeys();
+  void socialNotifications.poll();
   ducker.start();
   if (miniController.saved.open) openMini();
   return {
@@ -407,12 +434,13 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
       const snapshot = service.getState();
       if (lyricSettings.retry()) { lyricEngine.cooldowns.clear(); lyrics.invalidate(); if (!snapshot.private) void lyrics.load(service.playback); }
       const connected = room.getState().authenticated;
-      if (connected !== cloudAuthenticated) { cloudAuthenticated = connected; lyricEngine.cooldowns.clear(); lyrics.invalidate(); if (!snapshot.private) void lyrics.load(service.playback); }
+      if (connected !== cloudAuthenticated) { cloudAuthenticated = connected; void socialNotifications.poll(); lyricEngine.cooldowns.clear(); lyrics.invalidate(); if (!snapshot.private) void lyrics.load(service.playback); }
       music.observe(wave.active && wave.waitingUntil && snapshot.playback.url !== wave.current?.url ? { ...snapshot, fresh: false } : snapshot);
       wave.observe(snapshot); visuals.observe(snapshot);
       if (!(wave.active && wave.waitingUntil && snapshot.playback.url !== wave.current?.url)) prefetch.observe(snapshot, wave.active ? wave.queue : null);
     },
     async shutdown() {
+      socialNotifications.dispose();
       await experience.shutdown();
       wave.dispose();
       await downloads.dispose();

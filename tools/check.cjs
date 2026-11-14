@@ -16,5 +16,5 @@ function walk(folder) {
     }
   }
 }
-for (const name of ['source', 'tools', 'tests', 'server']) walk(path.join(root, name));
+for (const name of ['source', 'tools', 'tests', 'server', 'telegram', 'music', 'ios/tools', 'website']) walk(path.join(root, name));
 console.log('JavaScript syntax checked: ' + checked + ' files.');

@@ -2,14 +2,14 @@
 body[data-page=room] {
   margin: 0;
   min-height: 100vh;
-  color: #e2f3e8;
+  color: #edf4ef;
   font-family: 'Segoe UI Variable', 'Segoe UI', sans-serif;
-  background: radial-gradient(ellipse at 24% 0%, #254237, transparent 65%), #121c17;
+  background: #111813;
 }
 body[data-page=room] > header {
   padding: 11px 18px;
-  background: #1a2a22;
-  border-bottom: 1px solid #b5e8c62b;
+  background: #151e18;
+  border-bottom: 1px solid #ffffff10;
 }
 body[data-page=room] > header .brand { pointer-events: none; }
 body[data-page=room] .room-back { display: none; }
@@ -17,15 +17,15 @@ body[data-page=room] #logout { display: none; }
 body[data-page=room] .room-layout {
   width: auto;
   margin: 0 auto;
-  padding: 13px;
-  gap: 12px;
+  padding: 16px;
+  gap: 20px;
 }
 body[data-page=room]:not(.room-shell) .room-layout > section,
 body[data-page=room]:not(.room-shell) .room-layout .people {
-  background: #1c2c24;
-  border-color: #a6e5bb2e;
-  border-radius: 15px;
+  background: #19221c;
+  border-color: #ffffff12;
+  border-radius: 12px;
 }
-body[data-page=room] .room-heading h1 { font-size: clamp(24px, 4vw, 42px); }
-body[data-page=room] .now-playing { border: 1px solid #b2e7c32e; border-radius: 12px; padding: 11px; background: #b4ebc710; }
+body[data-page=room] .room-heading h1 { font-size: clamp(23px, 2.5vw, 30px); }
+body[data-page=room] .now-playing { border: 0; border-radius: 0; padding: 0; background: transparent; }
 body[data-page=room] footer { margin: 12px; }

@@ -1,0 +1,51 @@
+{
+  "status": "passed",
+  "generatedAt": "2026-11-12T19:12:31.838Z",
+  "apk": "LolzCloud-Android-0.1.1.apk",
+  "apkSha256": "3cea67b5187b01a61ab0c2271b5c76de54566c06edca1d282d4feb52b84ff1d5",
+  "assetCount": 8,
+  "canonicalRawZipPaths": true,
+  "sourceBytesMatch": true,
+  "assets": [
+    {
+      "path": "assets/room-client/logo.svg",
+      "bytes": 396,
+      "sha256": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512"
+    },
+    {
+      "path": "assets/room-client/media-source.js",
+      "bytes": 1517,
+      "sha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c"
+    },
+    {
+      "path": "assets/room-client/room-players.js",
+      "bytes": 3441,
+      "sha256": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9"
+    },
+    {
+      "path": "assets/room-client/room-sync.js",
+      "bytes": 3584,
+      "sha256": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab"
+    },
+    {
+      "path": "assets/room-client/room.css",
+      "bytes": 22790,
+      "sha256": "3692ca54c28e1c344eee0024ddd121665c43c9163faa874679fd2c39ca8e57ea"
+    },
+    {
+      "path": "assets/room-client/room.html",
+      "bytes": 7767,
+      "sha256": "7f756d3355f9725257f39c30ee9101f319c66f75adfb4d97ac3cfae56fbf6036"
+    },
+    {
+      "path": "assets/room-client/room.js",
+      "bytes": 33431,
+      "sha256": "62bb16c057bf4de4ad9346c4ab3f2d259d7fd94d82e7cdce73989c4a2532cea4"
+    },
+    {
+      "path": "assets/room-client/site.js",
+      "bytes": 5809,
+      "sha256": "0cf35658cb79d32116d2dadb363eac5b78159d217c53948cf759831657b0e801"
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T15:53:08.693555+00:00",
+  "version": "0.9.15",
+  "platform": "linux",
+  "arch": "x64",
+  "electron": "45.2.1",
+  "embeddedNode": "24.22.1",
+  "environment": "Xvfb X11 1366x768, isolated D-Bus session, unlocked GNOME Keyring; ordinary lolzcloud-build user",
+  "execution": "Development Electron executes frozen source harness; selected runtime files match immutable packaged ASAR and current repository",
+  "sourceVerification": {
+    "status": "passed",
+    "files": 141,
+    "appAsarSha256": "e0910015fb83dd3eda1becd4bc167d9b1318a97332c18d67c156a5265939e247"
+  },
+  "suites": [
+    {
+      "suite": "audio",
+      "runner": "tools/test-audio.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 3000,
+      "log": "audio.log"
+    },
+    {
+      "suite": "player",
+      "runner": "tools/test-player-ui.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 26000,
+      "log": "player.log"
+    },
+    {
+      "suite": "youtube",
+      "runner": "tools/test-youtube-ui.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 2000,
+      "log": "youtube.log"
+    }
+  ],
+  "testSourcesModified": false,
+  "productSourcesModified": false,
+  "releaseArtifactsChanged": false,
+  "artifactHashes": [
+    {
+      "name": "LolzCloud-0.9.15-linux-x64.AppImage",
+      "size": 147454456,
+      "sha256": "ab81a437bc6fe8960268efee47ab2b8e213fbee5d6549a9998e44c528824a4e4",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.15/dist/LolzCloud-0.9.15-linux-x64.AppImage"
+    },
+    {
+      "name": "LolzCloud-0.9.15-linux-x64.tar.gz",
+      "size": 160305565,
+      "sha256": "c64f12d871e8b88c9c74d4a5577dab20ec6f5c69c39a8fea9e973422c3104a1c",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.15/dist/LolzCloud-0.9.15-linux-x64.tar.gz"
+    },
+    {
+      "name": "LolzCloud-0.9.15-linux-arm64.tar.gz",
+      "size": 159401586,
+      "sha256": "d87f345e78e3892ad8392bb1ce36f15c4d887e6ab60cc97d1c6053e9cee3a4ba",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.15/dist/LolzCloud-0.9.15-linux-arm64.tar.gz"
+    }
+  ],
+  "sandboxDisabled": false,
+  "sandboxedProviderGuests": true,
+  "keyring": {
+    "status": "passed",
+    "platform": "linux",
+    "arch": "x64",
+    "electron": "45.2.1",
+    "node": "24.22.1",
+    "realSystemKeyring": true,
+    "backend": "gnome_libsecret",
+    "encryptedRoundTrip": true,
+    "personalAccountsUsed": false,
+    "rendererSandboxed": true,
+    "rendererSeccomp": 2,
+    "noSandboxSwitch": false
+  },
+  "mediaFixtures": "Generated WAV/MP3 and synthetic SoundCloud/YouTube provider pages; real Chromium HTMLMediaElement, OfflineAudioContext/AudioWorklet and application IPC",
+  "physicalAudioOutputVerified": false,
+  "personalAccountsUsed": false,
+  "externalProviderOAuthVerified": false,
+  "nativeOtherApplicationDuckingVerified": false,
+  "arm64RuntimeVerified": false,
+  "timingResolutionMs": 1000,
+  "screenshots": [
+    "player/player-offline-test.png",
+    "youtube/youtube-common-player-0911.png"
+  ]
+}

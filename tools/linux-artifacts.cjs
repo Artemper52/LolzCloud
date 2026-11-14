@@ -37,7 +37,7 @@ async function prepareLinuxFfmpeg({ buildPath, platform, arch }) {
   if (!FFMPEG[arch]) throw new Error('Linux builds support x64 and arm64.');
   const destination = path.join(buildPath, 'node_modules', 'ffmpeg-static');
   if (!path.resolve(destination).startsWith(path.resolve(buildPath) + path.sep)) throw new Error('Invalid FFmpeg staging path.');
-  const cache = path.join(root, '.build', 'linux-vendor', arch), base = 'https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/';
+  const cache = path.join(process.env.LOLZCLOUD_LINUX_VENDOR_CACHE || path.join(root, '.build', 'linux-vendor'), arch), base = 'https://github.com/eugeneware/ffmpeg-static/releases/download/b6.1.1/';
   for (const [remote, local, hash] of [[`ffmpeg-linux-${arch}`, 'ffmpeg', FFMPEG[arch].binary], [`linux-${arch}.README`, 'ffmpeg.README', FFMPEG[arch].readme], [`linux-${arch}.LICENSE`, 'ffmpeg.LICENSE', LICENSE]]) {
     const cached = await verifiedDownload(base + remote, path.join(cache, local), hash);
     fs.copyFileSync(cached, path.join(destination, local));

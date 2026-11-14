@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0c110e">
+  <title>Твоя компания · LolzCloud</title>
+  <link rel="icon" href="/assets/logo.svg">
+  <link rel="stylesheet" href="/cloud/room.css">
+  <link rel="stylesheet" href="/cloud/social.css">
+  <script src="/cloud/site.js" defer></script>
+  <script src="/cloud/social.js" defer></script>
+</head>
+<body data-page="social">
+  <header>
+    <a class="brand" href="/rooms"><img src="/assets/logo.svg" width="37" height="37" alt="">LolzCloud</a>
+    <a class="room-back" href="/rooms">Комнаты</a>
+    <div id="account"></div>
+    <button id="logout" hidden>Выйти</button>
+  </header>
+  <main id="social-root" class="social-page" aria-label="Твоя компания">
+    <p class="social-loading" role="status">Загружаем профиль…</p>
+  </main>
+  <p id="status" role="status"></p>
+</body>
+</html>

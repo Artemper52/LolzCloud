@@ -1,0 +1,53 @@
+{
+  "checkedAt": "2026-11-14T10:44:50.354Z",
+  "target": "emulator-5554",
+  "action": "Clicked profile Проверить обновление once",
+  "manifestUrl": "https://lolzcloud.com/downloads/android-update.json",
+  "manifestHttpStatus": 200,
+  "manifest": {
+    "versionName": "0.1.3",
+    "versionCode": 4,
+    "packageName": "com.lolzcloud.mobile",
+    "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.3.apk",
+    "size": 2504048,
+    "sha256": "e5fb9fe5bd07bc5889ab3cb69ffcbfdc482440998c3b8533d108f9bf81781d77",
+    "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44"
+  },
+  "observedStatus": "Установлена Android-версия 0.1.3. Более новая проверяемая версия не найдена.",
+  "observedButton": "Проверить обновление",
+  "installed": {
+    "versionName": "0.1.3",
+    "versionCode": 4
+  },
+  "apkSha256": "e5fb9fe5bd07bc5889ab3cb69ffcbfdc482440998c3b8533d108f9bf81781d77",
+  "installationRequested": false,
+  "productionChanged": false,
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Public fixed Android manifest returns HTTP200",
+      "passed": true
+    },
+    {
+      "name": "Manifest targets the installed modern package version and code",
+      "passed": true
+    },
+    {
+      "name": "Manifest SHA256 matches the verified production APK",
+      "passed": true
+    },
+    {
+      "name": "Actual native profile Check reports no newer verified version",
+      "passed": true
+    },
+    {
+      "name": "No install request was made and baseline remains versionCode4",
+      "passed": true
+    }
+  ],
+  "screenshot": "android-update-current.png",
+  "limitations": [
+    "This live UI check exercises the current-version path; it does not install or download a newer update.",
+    "The offline future-APK installer/Cancel test is recorded separately."
+  ]
+}

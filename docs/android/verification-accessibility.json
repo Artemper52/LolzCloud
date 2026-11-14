@@ -1,0 +1,41 @@
+{
+  "target": "emulator-5554",
+  "widthDp": 360,
+  "fontScale": 2,
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Home renders at 360dp / font scale 2",
+      "passed": true
+    },
+    {
+      "name": "Bottom navigation visible: Волна, выбрано",
+      "passed": true
+    },
+    {
+      "name": "Bottom navigation visible: Поиск",
+      "passed": true
+    },
+    {
+      "name": "Bottom navigation visible: Моя музыка",
+      "passed": true
+    },
+    {
+      "name": "Bottom navigation visible: Комнаты",
+      "passed": true
+    },
+    {
+      "name": "Import action remains visible at large font",
+      "passed": true
+    },
+    {
+      "name": "Native transport reachable with large font",
+      "passed": true
+    },
+    {
+      "name": "Sound action reachable by scrolling",
+      "passed": true
+    }
+  ],
+  "error": null
+}

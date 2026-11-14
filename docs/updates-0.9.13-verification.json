@@ -1,0 +1,184 @@
+{
+  "checkedAt": "2026-11-13T23:50:59.032Z",
+  "currentVersion": "0.9.12",
+  "targetVersion": "0.9.13",
+  "readOnly": true,
+  "installed": false,
+  "codeSource": "Exact verified released 0.9.12 source",
+  "upstreamFiles": {
+    "app-updates.cjs": "b6a660ff78f504511d2c70cb14605e68f357e19ef6a2d06d6aed385a5323a773",
+    "portable-update.cjs": "e6586ce7fcb8f540eb5ef83a8769f6b65422855b2813043fbd26cb0cf51498e8"
+  },
+  "requests": [
+    {
+      "url": "https://lolzcloud.com/downloads/update.json",
+      "status": 200,
+      "finalUrl": "https://lolzcloud.com/downloads/update.json",
+      "version": "0.9.13"
+    },
+    {
+      "url": "https://github.com/Artemper52/LolzCloud/releases/latest/download/update.json",
+      "status": 200,
+      "finalUrl": "https://release-assets.githubusercontent.com/github-production-release-asset/1446029268/8b72cc45-d63d-4488-a451-afe17c8c3c52",
+      "version": "0.9.12",
+      "redirectQueryOmitted": true
+    }
+  ],
+  "checks": [
+    {
+      "name": "Released 0.9.12 detects available 0.9.13 and chooses the official mirror",
+      "pass": true
+    },
+    {
+      "name": "latest.yml matches the manifest setup filename, size and channel version",
+      "pass": true
+    },
+    {
+      "name": "Public SHA256SUMS agrees with the validated old-client manifest",
+      "pass": true
+    },
+    {
+      "name": "Published installer SHA-512 agrees with electron-updater latest.yml",
+      "pass": true
+    },
+    {
+      "name": "Full public installer and ZIP byte count and SHA-256 agree with update.json",
+      "pass": true
+    },
+    {
+      "name": "Installer blockmap is public and nonempty",
+      "pass": true
+    },
+    {
+      "name": "Local release archive is byte-identical to the fully verified public archive",
+      "pass": true
+    },
+    {
+      "name": "Portable archive marker targets 0.9.13 modern LolzCloud",
+      "pass": true
+    },
+    {
+      "name": "Installed app updater modules are byte-identical to verified released 0.9.12 source",
+      "pass": true
+    },
+    {
+      "name": "Installed 0.9.12 GUI Check displays available 0.9.13 without starting installation",
+      "pass": true
+    }
+  ],
+  "limitations": [
+    "No installer or portable apply was executed.",
+    "No user profile or account was changed."
+  ],
+  "oldClientState": {
+    "currentVersion": "0.9.12",
+    "version": "0.9.13",
+    "status": "available",
+    "percent": 0,
+    "error": "",
+    "supported": true,
+    "legacy": false,
+    "available": true
+  },
+  "selectedFeed": "https://lolzcloud.com/downloads/",
+  "manifest": {
+    "version": "0.9.13",
+    "tag": "v0.9.13",
+    "channel": "latest",
+    "archive": {
+      "name": "LolzCloud-0.9.13-win-x64.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.13-win-x64.zip",
+      "size": 196657135,
+      "sha256": "cce009f7c2162811607be7a4f612cc30dd4f1df9a892ce9791f8fced497015d3"
+    },
+    "setup": {
+      "name": "LolzCloud-0.9.13-win-x64-Setup.exe",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.13-win-x64-Setup.exe",
+      "size": 146386292,
+      "sha256": "fee50dccd79ddce9030665d6ec49b5e64f45a1ce6182550d3d121220bf062cdb"
+    }
+  },
+  "latestYml": {
+    "text": "version: 0.9.13\nfiles:\n  - url: LolzCloud-0.9.13-win-x64-Setup.exe\n    sha512: QSPTCg/LSOmcIIi2+fFabcxqAkOlX9tkC0HnIyPElT4W1p6o311mKQsOA57l5TEK7qD+1wHZc3U19gyyCe5IZg==\n    size: 146386292\npath: LolzCloud-0.9.13-win-x64-Setup.exe\nsha512: QSPTCg/LSOmcIIi2+fFabcxqAkOlX9tkC0HnIyPElT4W1p6o311mKQsOA57l5TEK7qD+1wHZc3U19gyyCe5IZg==\nreleaseDate: '2026-11-13T21:28:50.788Z'\n",
+    "finalUrl": "https://lolzcloud.com/downloads/latest.yml",
+    "contentType": "text/plain",
+    "status": 200,
+    "parsed": {
+      "version": "0.9.13",
+      "files": [
+        {
+          "url": "LolzCloud-0.9.13-win-x64-Setup.exe",
+          "sha512": "QSPTCg/LSOmcIIi2+fFabcxqAkOlX9tkC0HnIyPElT4W1p6o311mKQsOA57l5TEK7qD+1wHZc3U19gyyCe5IZg==",
+          "size": 146386292
+        }
+      ],
+      "path": "LolzCloud-0.9.13-win-x64-Setup.exe",
+      "sha512": "QSPTCg/LSOmcIIi2+fFabcxqAkOlX9tkC0HnIyPElT4W1p6o311mKQsOA57l5TEK7qD+1wHZc3U19gyyCe5IZg==",
+      "releaseDate": "2026-11-13T21:28:50.788Z"
+    }
+  },
+  "assets": {
+    "setup": {
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.13-win-x64-Setup.exe",
+      "headStatus": 200,
+      "status": 200,
+      "bytes": 146386292,
+      "contentType": "application/octet-stream",
+      "sha256": "fee50dccd79ddce9030665d6ec49b5e64f45a1ce6182550d3d121220bf062cdb",
+      "sha512": "QSPTCg/LSOmcIIi2+fFabcxqAkOlX9tkC0HnIyPElT4W1p6o311mKQsOA57l5TEK7qD+1wHZc3U19gyyCe5IZg==",
+      "pass": true
+    },
+    "archive": {
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.13-win-x64.zip",
+      "headStatus": 200,
+      "status": 200,
+      "bytes": 196657135,
+      "contentType": "application/zip",
+      "sha256": "cce009f7c2162811607be7a4f612cc30dd4f1df9a892ce9791f8fced497015d3",
+      "pass": true
+    }
+  },
+  "blockmap": {
+    "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.13-win-x64-Setup.exe.blockmap",
+    "status": 200,
+    "size": 152573
+  },
+  "portableArchive": {
+    "marker": {
+      "appId": "app.lolzcloud.desktop",
+      "version": "0.9.13",
+      "legacy": false
+    },
+    "entries": 77
+  },
+  "pass": true,
+  "installedBaseline": {
+    "path": "D:/Applications/LolzCloud",
+    "version": "0.9.12",
+    "updaterFiles": [
+      {
+        "file": "source/integrations/app-updates.cjs",
+        "installedSha256": "b6a660ff78f504511d2c70cb14605e68f357e19ef6a2d06d6aed385a5323a773",
+        "releasedSha256": "b6a660ff78f504511d2c70cb14605e68f357e19ef6a2d06d6aed385a5323a773",
+        "identical": true
+      },
+      {
+        "file": "source/integrations/portable-update.cjs",
+        "installedSha256": "e6586ce7fcb8f540eb5ef83a8769f6b65422855b2813043fbd26cb0cf51498e8",
+        "releasedSha256": "e6586ce7fcb8f540eb5ef83a8769f6b65422855b2813043fbd26cb0cf51498e8",
+        "identical": true
+      }
+    ]
+  },
+  "gui": {
+    "observedAt": "2026-11-13T23:52:25.165Z",
+    "tool": "computer-use sky UIA and screenshot",
+    "initialStatus": "У тебя последняя версия.",
+    "action": "Нажата только кнопка «Проверить» один раз",
+    "result": "Доступна версия 0.9.13. Профиль сохранится при обновлении.",
+    "installButton": "Обновиться и перезапустить",
+    "installButtonClicked": false,
+    "pass": true
+  },
+  "scope": "Modern Windows x64 update channel; other platform and legacy channels were not promoted or exercised by this verification."
+}

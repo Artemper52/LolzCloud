@@ -1,0 +1,66 @@
+{
+  "status": "passed",
+  "generatedAt": "2026-11-14T13:14:37.663Z",
+  "apk": "LolzCloud-Android-0.1.5.apk",
+  "apkSha256": "ee61577bcf8b45650fad41a76715d3b532012cc949289a61dbb2adfc41db72d0",
+  "assetCount": 11,
+  "canonicalRawZipPaths": true,
+  "sourceBytesMatch": true,
+  "assets": [
+    {
+      "path": "assets/room-client/logo.svg",
+      "bytes": 396,
+      "sha256": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512"
+    },
+    {
+      "path": "assets/room-client/media-source.js",
+      "bytes": 1517,
+      "sha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c"
+    },
+    {
+      "path": "assets/room-client/room-players.js",
+      "bytes": 3441,
+      "sha256": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9"
+    },
+    {
+      "path": "assets/room-client/room-sync.js",
+      "bytes": 3584,
+      "sha256": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab"
+    },
+    {
+      "path": "assets/room-client/room.css",
+      "bytes": 26060,
+      "sha256": "6cf31a3a394ef113052cd05923def96c1ef31efcf8aed0594a2f5ef8e8a06ffc"
+    },
+    {
+      "path": "assets/room-client/room.html",
+      "bytes": 8018,
+      "sha256": "66b3669833b0a1a5d4558f637f33ce9ce1aa08a0a85169a937ff111895bf652b"
+    },
+    {
+      "path": "assets/room-client/room.js",
+      "bytes": 38880,
+      "sha256": "608fb79f4ca2616cd9da1eb1ff6d6f372669a5cb5bbb187d59b0d7d503a56455"
+    },
+    {
+      "path": "assets/room-client/site.js",
+      "bytes": 7569,
+      "sha256": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616"
+    },
+    {
+      "path": "assets/room-client/social.css",
+      "bytes": 12818,
+      "sha256": "d16d9131ad980d13e441a7ae866d2b08e7c4b58e0a387ec892a1de1aa80ffa86"
+    },
+    {
+      "path": "assets/room-client/social.html",
+      "bytes": 1011,
+      "sha256": "d905f78fe734677728c9e3d3b9e426f8d7fd984c4fdc66a7ea5318834aefd3fe"
+    },
+    {
+      "path": "assets/room-client/social.js",
+      "bytes": 38894,
+      "sha256": "c3e8b8c0c185afd7fa7f13c5692bfe8339c8e2aeeb139fb70485a1d0c50da601"
+    }
+  ]
+}

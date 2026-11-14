@@ -3,6 +3,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 function prepare() {
+  const roomClient = path.join(root, 'source/app/lib/room-client');
+  fs.mkdirSync(roomClient, { recursive: true });
+  for (const name of ['room.html', 'rooms.html', 'room.css', 'room.js', 'room-sync.js', 'room-players.js', 'media-source.js', 'site.js', 'social.html', 'social.js', 'social.css']) fs.copyFileSync(path.join(root, 'server/public', name), path.join(roomClient, name));
+  fs.copyFileSync(path.join(root, 'source/app/lib/assets/logo.svg'), path.join(roomClient, 'logo.svg'));
   fs.copyFileSync(path.join(root, 'server/public/media-source.js'), path.join(root, 'source/app/lib/js/media-source.js'));
   fs.copyFileSync(path.join(root, 'source/integrations/soundcloud-client.cjs'), path.join(root, 'server/soundcloud-client.cjs'));
   const plugin = ['verification.js', 'playback-control.js', 'repeat-control.js', 'beat-tracker.js', 'tempo-worklet.js', 'normalization-worklet.js', 'sound-effects.js'].map(file => fs.readFileSync(path.join(root, 'source/plugins', file), 'utf8')).join('\n');

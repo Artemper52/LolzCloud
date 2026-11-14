@@ -1,0 +1,32 @@
+{
+  "startedAt": "2026-11-14T15:48:40.000Z",
+  "platform": "linux",
+  "arch": "x64",
+  "suites": [
+    {
+      "suite": "audio",
+      "runner": "tools/test-audio.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 3000,
+      "log": "audio.log"
+    },
+    {
+      "suite": "player",
+      "runner": "tools/test-player-ui.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 26000,
+      "log": "player.log"
+    },
+    {
+      "suite": "youtube",
+      "runner": "tools/test-youtube-ui.cjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 2000,
+      "log": "youtube.log"
+    }
+  ],
+  "status": "passed"
+}

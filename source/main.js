@@ -3,6 +3,7 @@ const path = require('node:path')
 const { ROOM_PARTITION, roomGuestPreferences, protectRoomGuest } = require('./integrations/room-view.cjs');
 const { YOUTUBE_PARTITION, youtubeGuestPreferences, protectYouTubeGuest } = require('./integrations/youtube-music.cjs');
 require('./integrations/legacy-runtime.cjs').install();
+if (process.platform === 'win32') app.setAppUserModelId(Number(process.versions.electron?.split('.')[0] || 99) <= 22 ? 'app.lolzcloud.desktop.legacy' : 'app.lolzcloud.desktop');
 if (process.argv.includes('--self-test')) { require('./integrations/self-test.cjs').run(app); return; }
 if (process.argv.includes('--import-soundcloud-session')) {
   require('./integrations/session-import.cjs').runImportChild(app);
@@ -15,7 +16,7 @@ const { registerLolzteam } = require('./integrations/lolzteam/index.cjs');
 // Migrate the saved login and encrypted token once, then use LolzCloud's own profile.
 require('./integrations/profile-migration.cjs').configureProfile(app);
 const singleInstance = app.requestSingleInstanceLock();
-if (!singleInstance) app.quit();
+if (!singleInstance) { app.quit(); return; }
 let lolzteam;
 let finishedQuitting = false;
 let quitStarted = false;
@@ -50,7 +51,7 @@ function createWindow () {
   mainWindow.webContents.on('did-attach-webview', (_event, contents) => {
     contents.on('before-input-event', paletteKey);
     contents.on('before-input-event', zoomKey);
-    if (contents.session === session.fromPartition(ROOM_PARTITION)) protectRoomGuest(contents);
+    if (contents.session === session.fromPartition(ROOM_PARTITION)) protectRoomGuest(contents, { openExternal: url => shell.openExternal(url) });
     if (contents.session === session.fromPartition(YOUTUBE_PARTITION)) protectYouTubeGuest(contents);
   });
   mainWindow.webContents.on('will-attach-webview', (event, preferences, params) => {
@@ -102,6 +103,7 @@ function createWindow () {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
   if (!singleInstance) return;
+  await require('./integrations/room-client.cjs').installRoomClient(session.fromPartition(ROOM_PARTITION));
   if (process.argv.includes('--reuse-login')) {
     try {
       const result = await require('./integrations/session-import.cjs').importFromInstalled(app, session.defaultSession);

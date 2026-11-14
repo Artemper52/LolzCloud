@@ -1,0 +1,231 @@
+{
+  "status": "passed",
+  "checks": [
+    {
+      "name": "Only the task emulator may run private pending-code lifecycle checks",
+      "passed": true
+    },
+    {
+      "name": "Strict Android JSON parser accepts the complete device-pair contract",
+      "passed": true
+    },
+    {
+      "name": "Starting a pair performs only its fixed native API request",
+      "passed": true
+    },
+    {
+      "name": "Wrong-origin browser verification URL is rejected before any browser/cookie action",
+      "passed": true
+    },
+    {
+      "name": "Malformed device secret cannot become a persisted pending login",
+      "passed": true
+    },
+    {
+      "name": "Server cannot create an unbounded pending-code lifetime",
+      "passed": true
+    },
+    {
+      "name": "Pending=true stays pending even if an unsolicited token field is present",
+      "passed": true
+    },
+    {
+      "name": "An approved grant is accepted only after /api/session verifies the same server account",
+      "passed": true
+    },
+    {
+      "name": "Grant identity verification uses only the own opaque bearer, never forum cookies",
+      "passed": true
+    },
+    {
+      "name": "Cookie verification checks the same own session through the actual Cookie header path",
+      "passed": true
+    },
+    {
+      "name": "A failed final cookie verification remains a failure and requires rollback, never connected UI",
+      "passed": true
+    },
+    {
+      "name": "Mismatched grant/session user ids cannot produce a connected account",
+      "passed": true
+    },
+    {
+      "name": "Invalid grant token is rejected before cookie creation",
+      "passed": true
+    },
+    {
+      "name": "Expired grant is rejected before cookie creation",
+      "passed": true
+    },
+    {
+      "name": "Missing explicit pending=false is not interpreted as successful authentication",
+      "passed": true
+    },
+    {
+      "name": "A non-authenticated /api/session response cannot complete pairing",
+      "passed": true
+    },
+    {
+      "name": "Revoked grant remains an authentication error rather than a fake connected state",
+      "passed": true
+    },
+    {
+      "name": "Expired pending code remains distinguishable for explicit renewal",
+      "passed": true
+    },
+    {
+      "name": "Rate limits remain distinguishable for bounded backoff",
+      "passed": true
+    },
+    {
+      "name": "HTTP redirect is not followed into another authentication context",
+      "passed": true
+    },
+    {
+      "name": "Rejected redirect causes no second transport request",
+      "passed": true
+    },
+    {
+      "name": "Transient verification failure remains retryable",
+      "passed": true
+    },
+    {
+      "name": "Controller receives one declared pending pair asynchronously",
+      "passed": true
+    },
+    {
+      "name": "Pending code and expiry are committed to private app preferences",
+      "passed": true
+    },
+    {
+      "name": "A fresh controller restores the same unexpired pending code and bounded remaining lifetime",
+      "passed": true
+    },
+    {
+      "name": "Restoring a pending flow does not request another server/device code",
+      "passed": true
+    },
+    {
+      "name": "Explicit cancellation clears pending device credentials",
+      "passed": true
+    },
+    {
+      "name": "A stale retained controller cannot reopen a cancelled flow",
+      "passed": true
+    },
+    {
+      "name": "Pending, restore and cancel do not alter the app's authenticated cookie",
+      "passed": true
+    },
+    {
+      "name": "Short-lived declared pair is initially usable",
+      "passed": true
+    },
+    {
+      "name": "Expired code is removed without an authenticated success",
+      "passed": true
+    },
+    {
+      "name": "Expiry/return/process restore do not automatically issue or reopen a new login code",
+      "passed": true
+    },
+    {
+      "name": "Only explicit new-code action renews an expired flow",
+      "passed": true
+    },
+    {
+      "name": "Own /login opens the actual native pairing Activity instead of forum WebView",
+      "passed": true
+    },
+    {
+      "name": "Real unauthenticated start API supplies one bounded pending code",
+      "passed": true
+    },
+    {
+      "name": "Native flow retains the requested own room destination",
+      "passed": true
+    },
+    {
+      "name": "Actual native Activity persists its unapproved code privately",
+      "passed": true
+    },
+    {
+      "name": "Private pending credential and expiry follow the device API contract",
+      "passed": true
+    },
+    {
+      "name": "Explicit native browser action creates an external intent",
+      "passed": true
+    },
+    {
+      "name": "Browser receives the whole fixed-origin verification page in one browser context, with no partial OAuth URL",
+      "passed": true
+    },
+    {
+      "name": "Native account Activity survives an actual configuration recreation",
+      "passed": true
+    },
+    {
+      "name": "Rotation retains the in-flight controller rather than requesting another code",
+      "passed": true
+    },
+    {
+      "name": "Rotation keeps the same private device code and never reopens the browser automatically",
+      "passed": true
+    },
+    {
+      "name": "Recreated native login has actual window focus before system Back",
+      "passed": true
+    },
+    {
+      "name": "Actual system Back cancels native pairing",
+      "passed": true
+    },
+    {
+      "name": "Cancelling the native screen removes its pending credential",
+      "passed": true
+    },
+    {
+      "name": "Cancelled pairing returns to the existing own app screen",
+      "passed": true
+    },
+    {
+      "name": "Cancel shows an explicit sign-in/retry state rather than a generic network failure",
+      "passed": true
+    },
+    {
+      "name": "Stale login page-start/page-finished callbacks do not reopen a cancelled flow",
+      "passed": true
+    },
+    {
+      "name": "Own retry screen can be recreated after cancellation",
+      "passed": true
+    },
+    {
+      "name": "Rotation/resume of the cancelled parent does not create an automatic login loop",
+      "passed": true
+    },
+    {
+      "name": "Unapproved browser/pending/cancel lifecycle never fabricates an authenticated app cookie",
+      "passed": true
+    },
+    {
+      "name": "Only an explicit native sign-in action reopens pairing after cancellation",
+      "passed": true
+    },
+    {
+      "name": "Explicit retry has actual native window focus",
+      "passed": true
+    },
+    {
+      "name": "Explicit retry remains cancellable without approving any account",
+      "passed": true
+    }
+  ],
+  "scope": "Declared bounded protocol fixtures; real native pairing/pending persistence/rotation/cancel and captured browser intent. No real forum login, approval, user credentials or synthetic connected account.",
+  "generatedAt": "2026-11-14T10:40:32.111Z",
+  "emulator": "emulator-5554",
+  "androidApi": "35",
+  "apk": "LolzCloud-Android-0.1.3.apk",
+  "apkSha256": "e5fb9fe5bd07bc5889ab3cb69ffcbfdc482440998c3b8533d108f9bf81781d77"
+}

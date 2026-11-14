@@ -1,0 +1,21 @@
+{
+  "status": "passed",
+  "generatedAt": "2026-11-13T22:13:12.949Z",
+  "artifacts": [
+    {
+      "name": "LolzCloud-Android-0.1.2.apk",
+      "url": "https://lolzcloud.com/downloads/beta/LolzCloud-Android-0.1.2.apk",
+      "bytes": 2479469,
+      "sha256": "cd15baff03a366bdf404ca50eaa3137be212fe9df18b6df5a93e50bae7370b9f",
+      "publicHeadStatus": 200,
+      "publicDownloadedHashMatch": true
+    },
+    {
+      "name": "LolzCloud-0.9.13-win-x64-Setup.exe",
+      "url": "https://lolzcloud.com/downloads/beta/LolzCloud-0.9.13-win-x64-Setup.exe",
+      "bytes": 146386292,
+      "sha256": "fee50dccd79ddce9030665d6ec49b5e64f45a1ce6182550d3d121220bf062cdb",
+      "publicHeadStatus": 200
+    }
+  ]
+}
