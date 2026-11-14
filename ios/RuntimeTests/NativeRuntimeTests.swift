@@ -239,6 +239,14 @@ import UIKit
         XCTAssertGreaterThan(near.inputRMS,0.01)
         let nearRatio=near.outputRMS/near.inputRMS
         player.play(tracks[1],queueIndex:1)
+        player.seek(1.25);player.pause()
+        effects(player,client:client,revision:2,gains:[0,0,10,0,0])
+        XCTAssertEqual(av.rate,0)
+        player.resume()
+        try await waitFor("pending per-item prepare resumes from requested seek") {
+            av.rate>0 && (player.audioEffects.measurement?.processedFrames ?? 0)>1024
+        }
+        XCTAssertGreaterThan(av.currentTime().seconds,1.1,"Pause/resume during asynchronous tap setup must preserve the requested seek")
         try await waitFor("second local track has a new real processed tap") {
             (player.audioEffects.measurement?.processedFrames ?? 0)>6000 && player.audioEffects.status["state"] as? String == "applied"
         }
@@ -337,9 +345,13 @@ import UIKit
         try await post(play, in: web)
         let av = try avPlayer(shell.player)
         try await waitFor("WK play reaches actual AVPlayer") { av.currentTime().seconds > 0.2 && av.rate > 0 }
+        try await post(["action":"effects","clientId":a,"requestId":2,"revision":1,
+                        "config":["enabled":false,"gains":[0,0,0,0,0],"preampDb":0]],in:web)
+        try await waitFor("first document has an accepted effects owner") { shell.player.audioEffects.status["clientId"] as? String == a }
         handshake["clientId"] = b
         try await post(handshake, in: web)
         try await waitFor("new document client takes ownership") { self.records.last { $0["event"] as? String == "playback" }?["clientId"] as? String == b }
+        XCTAssertEqual(shell.player.audioEffects.status["clientId"] as? String,a,"A new transport handshake must not relabel an old configuration acknowledgement")
         try await post(["action":"pause", "clientId":a, "requestId":500], in: web)
         try await settle(0.2)
         XCTAssertGreaterThan(av.rate, 0, "Retired client's high request must not pause current playback")

@@ -74,8 +74,8 @@ import Combine
         // Settings acknowledge the current transport owner; they cannot advance
         // its request ID, change playback generation, cancel prepare or resume.
         guard clientIntent.clientID == client, clientIntent.requestID == request,
-              audioEffects.configure(config,revision:revision,client:client) else { return false }
-        transportEvent("effects",audioEffects.status); return true
+              audioEffects.configure(config,revision:revision,client:client,request:request) else { return false }
+        emit?("effects",audioEffects.status); return true
     }
     private func transportEvent(_ name: String,_ detail: [String:Any]) { emit?(name,detail.merging(clientIntent.fields) { _,new in new }) }
     func configureQueue(_ tracks: [SavedTrack], index: Int, repeatMode: String, shuffle: Bool) {
@@ -172,7 +172,7 @@ import Combine
     func pause() { intent.pause(); preparationTask?.cancel(); effectsTask?.cancel(); watchdog?.cancel(); watchdog = nil; player.pause(); state = "paused"; publish() }
     func resume() {
         guard let current else { return }
-        let position = MediaPolicy.replayPosition(ended:state == "ended",position:player.currentItem == nil ? requestedPosition : player.currentTime().seconds,duration:player.currentItem?.duration.seconds ?? 0)
+        let position = MediaPolicy.replayPosition(ended:state == "ended",position:player.currentItem == nil || needsEffectsPreparation ? requestedPosition : player.currentTime().seconds,duration:player.currentItem?.duration.seconds ?? 0)
         if player.currentItem == nil || player.currentItem?.status == .failed || needsEffectsPreparation { play(current,position:position,localQueue:offlineQueue,prepare:needsPreparation); return }
         do { try activate(); intent.resume(); if position == 0 { seek(0) }; error = ""; state = "loading"; player.defaultRate = Float(settings.rate); player.play(); watch(); publish() }
         catch { fail("Аудиосистема временно недоступна. Повтори попытку.") }
@@ -215,7 +215,9 @@ import Combine
         if settings.sleepDeadline > 0, Date().timeIntervalSince1970*1000 >= settings.sleepDeadline,
            settings.expireSleep(settings.sleepDeadline) { sleepTask?.cancel(); sleepTask = nil; error = ""; pause(); return }
         let time = player.currentTime().seconds, duration = player.currentItem?.duration.seconds ?? 0
-        transportEvent("effects",audioEffects.status)
+        // Effects acknowledge their own last accepted request, never a newly
+        // handshaken transport document that has not sent settings yet.
+        emit?("effects",audioEffects.status)
         let queueOwned = queue.current?.id == current?.id && current != nil
         if queueOwned, let selected = queue.current { transportEvent("selection",["index":queue.index,"track":selected.object,"queue":true]) }
         if !offlineQueue { transportEvent("playback",["id":current?.id ?? "","state":state,"time":time.isFinite ? max(0,time):requestedPosition,"duration":duration.isFinite && duration > 0 ? duration:(current?.duration ?? 0),"error":error,"queue":queueOwned,"rate":settings.rate,"sleepDeadline":settings.sleepDeadline]) }

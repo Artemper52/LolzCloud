@@ -8,6 +8,7 @@ import MediaToolbox
     private(set) var settings = AudioEffectsSettings()
     private(set) var revision = 0
     private var document = ""
+    private var ownerRequest = 0
     private var serial: UInt32 = 1
     private var binding: AudioEffectsBinding?
     private var unavailable = ""
@@ -20,13 +21,13 @@ import MediaToolbox
            let valid = AudioEffectsSettings(decoded.object) { settings = valid }
     }
 
-    @discardableResult func configure(_ object: [String:Any], revision next: Int, client: String) -> Bool {
+    @discardableResult func configure(_ object: [String:Any], revision next: Int, client: String, request: Int) -> Bool {
         guard next > 0, next <= 9_007_199_254_740_991, let value = AudioEffectsSettings(object) else { return false }
         if document == client {
             guard next >= revision, next != revision || value == settings else { return false }
         }
         let changed = value != settings
-        document = client; revision = next; settings = value
+        document = client; ownerRequest = request; revision = next; settings = value
         if changed {
             serial &+= 1; if serial == 0 { serial = 1 }
             binding?.configure(settings, serial: serial)
@@ -63,12 +64,14 @@ import MediaToolbox
         else if rows.contains(where: { $0.unavailableReason == 2 }) { reason = "Не удалось подготовить эквалайзер. Исходный звук сохранён." }
         else if rows.contains(where: { $0.unavailableReason == 3 }) { reason = "Выбранная полоса выше частоты этого файла. Уменьши её до нуля." }
         let state = !settings.enabled ? "bypassed" : !reason.isEmpty ? "unsupported" : matched ? "applied" : "pending"
-        return ["revision":revision,"config":settings.object,
+        var result: [String:Any] = ["revision":revision,"config":settings.object,
             "capabilities":["eq":true,"preamp":true,"reverb":false,"echo":false,"normalization":false,"pitch":false],
             "state":state,"appliedRevision":matched ? revision : 0,
             "sampleRate":metric?.sampleRate ?? 0,"channels":metric?.channels ?? 0,
             "processedFrames":frames,"activeBandMask":metric?.activeBandMask ?? 0,
             "headroomDb":metric?.headroomDb ?? 0,"error":reason]
+        if !document.isEmpty, ownerRequest > 0 { result["clientId"] = document; result["requestId"] = ownerRequest }
+        return result
     }
 }
 
