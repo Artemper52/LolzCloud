@@ -161,8 +161,8 @@ if(message.action==='importAudio'){nativeEmit('download',{state:'loading',import
     await until(() => js('navigator.serviceWorker.ready.then(()=>!!navigator.serviceWorker.controller)'), 'Service worker did not control the app'); await delay(200);
     await until(() => js('caches.keys().then(keys=>keys.includes("lolzcloud-app-shell-v1"))'), 'Legacy shell cache did not install');
     legacyWorker = false; await js('navigator.serviceWorker.getRegistration("/app/").then(registration=>registration.update())');
-    await until(() => js('caches.keys().then(keys=>keys.includes("lolzcloud-app-shell-v4")&&!keys.includes("lolzcloud-app-shell-v1"))'), 'New worker did not activate and retire its old shell');
-    check(true, 'An actual worker update from the v1 cache fixture activates v4 and removes the obsolete shell cache');
+    await until(() => js('caches.keys().then(keys=>keys.includes("lolzcloud-app-shell-v6")&&!keys.includes("lolzcloud-app-shell-v1"))'), 'New worker did not activate and retire its old shell');
+    check(true, 'An actual worker update from the v1 cache fixture activates v6 and removes the obsolete shell cache');
     await js('document.getElementById("sleep-select").value="30";document.getElementById("sleep-select").dispatchEvent(new Event("change"))'); const sleepBeforeReload = await js('LolzCloudApp.snapshot().sleepDeadline'); await delay(150);
     failShell = true; await reload(); await until(() => js('!!window.LolzCloudApp'), 'Cached shell did not survive HTTP503');
     check(await js('document.title.includes("LolzCloud")&&LolzCloudApp.snapshot().liked.includes("123")'), 'HTTP503 uses the cached shell and preserves the collection'); failShell = false;

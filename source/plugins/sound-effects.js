@@ -2,10 +2,13 @@
   if (window.__lolzcloudAudioFX) return;
   const audio = new Set(), graphs = new WeakMap(), sources = new WeakMap(), sourceNodes = new WeakMap(), settling = new WeakSet(), impulses = new WeakMap(), corsManaged = new WeakSet(), corsFallback = new WeakSet(), wantedPlayback = new WeakSet();
   const mediaTracks = new WeakMap();
+  const intentEpochs = new WeakMap(), fallbackLoading = new WeakSet();
+  function playbackIntent(media, wanted) { intentEpochs.set(media,(intentEpochs.get(media)||0)+1);if(wanted)wantedPlayback.add(media);else wantedPlayback.delete(media); }
+  const sourceIntent = media => intentEpochs.set(media,(intentEpochs.get(media)||0)+1);
   const selectActive = () => [...audio].find(media => !media.paused) || [...audio].at(-1);
   const mediaSelector=window.__lolzcloudYouTube?'audio,video':'audio';
   const isMusicMedia=media=>media?.tagName==='AUDIO'||!!window.__lolzcloudYouTube&&media?.tagName==='VIDEO';
-  const defaults = { enabled: false, gains: [0, 0, 0, 0, 0], rate: 1, preservesPitch: false, reverb: 0, echo: 0 };
+  const defaults = { enabled: false, gains: [0, 0, 0, 0, 0], preampDb: 0, rate: 1, preservesPitch: false, reverb: 0, echo: 0 };
   const status = window.__lolzcloudAudioFX = { config: { ...defaults }, attached: 0, unavailable: false, reason: '', rate: 1, mediaCount: 0, audio };
   const safety = { limiter: true, ceilingDb: -3, duckGain: 1 };
   let normalization = { enabled: false, url: '', gainDb: 0 }, normalizationMeter = { available: false };
@@ -188,7 +191,7 @@
     const config = status.config, active = config.enabled;
     const gains = active ? config.gains : defaults.gains;
     graph.filters.forEach((node, index) => target(node.gain, gains[index]));
-    target(graph.headroom.gain, active ? 10 ** (-Math.max(0, ...gains) * .65 / 20) : 1);
+    target(graph.headroom.gain, active ? 10 ** ((config.preampDb-Math.max(0, ...gains)*.65)/20) : 1);
     const reverb = active ? config.reverb : 0, echo = active ? config.echo : 0;
     target(graph.dry.gain, Math.cos(reverb * Math.PI / 2));
     target(graph.wet.gain, Math.sin(reverb * Math.PI / 2) * .7);
@@ -221,20 +224,22 @@
     media.addEventListener('ratechange', () => setTempo(media));
     media.addEventListener('volumechange', () => graphs.get(media)?.normalizer?.port.postMessage({ inputVolume: media.volume }));
     media.addEventListener('seeking', () => { if (sources.get(media) === rhythm.record) tracker?.reset(); });
-    media.addEventListener('pause', () => { const record = sources.get(media); if (record?.worklet) disconnect(record.worklet); });
-    media.addEventListener('ended', () => { window.__lolzcloudSnapshot?.(); const url = mediaTracks.get(media); if (url && window.__lolzcloudWaveActive && media.duration > 1 && media.currentTime >= media.duration - .5) console.log('LolzCloudReceive|WaveEnded|' + JSON.stringify({ url })); });
+    media.addEventListener('pause', () => { if(!fallbackLoading.has(media))playbackIntent(media,false);const record = sources.get(media); if (record?.worklet) disconnect(record.worklet); });
+    media.addEventListener('ended', () => { playbackIntent(media,false);window.__lolzcloudSnapshot?.(); const url = mediaTracks.get(media); if (url && window.__lolzcloudWaveActive && media.duration > 1 && media.currentTime >= media.duration - .5) console.log('LolzCloudReceive|WaveEnded|' + JSON.stringify({ url })); });
     media.addEventListener('error', () => {
       // Retry a CORS-incompatible source through the original media path before creating a graph.
-      if (!corsManaged.has(media) || corsFallback.has(media) || graphs.has(media) || ![2, 4].includes(media.error?.code)) return;
+      if(corsFallback.has(media)){fallbackLoading.delete(media);return;}
+      if (!corsManaged.has(media) || graphs.has(media) || ![2, 4].includes(media.error?.code)) return;
       corsFallback.add(media); status.unavailable = true; status.reason = 'cors-fallback';
-      const position = media.currentTime || 0, resume = wantedPlayback.has(media), source = media.src;
+      const position = media.currentTime || 0, resume = wantedPlayback.has(media), source = media.src, intent = intentEpochs.get(media)||0;
       media.removeAttribute('crossorigin');
       media.addEventListener('loadedmetadata', () => {
-        if (media.src !== source) return;
+        fallbackLoading.delete(media);
+        if (media.src !== source || (intentEpochs.get(media)||0)!==intent) return;
         if (position > 0 && Number.isFinite(media.duration)) media.currentTime = Math.min(position, media.duration);
-        if (resume) void Reflect.apply(nativePlay, media, []).catch(() => {});
+        if (resume && wantedPlayback.has(media)) void Reflect.apply(nativePlay, media, []).catch(() => {});
       }, { once: true });
-      media.load();
+      fallbackLoading.add(media);media.load();
     });
     setTempo(media); if (!media.paused) attach(media);
     return media;
@@ -249,15 +254,16 @@
     }
     if (context?.state === 'suspended') void context.resume().catch(() => {});
   }
-  const nativePlay = HTMLMediaElement.prototype.play;
+  const nativePlay = HTMLMediaElement.prototype.play, nativePause = HTMLMediaElement.prototype.pause;
   HTMLMediaElement.prototype.play = function(...args) {
-    if (isMusicMedia(this)) { wantedPlayback.add(this); add(this); setTempo(this); attach(this); }
+    if (isMusicMedia(this)) { playbackIntent(this,true);add(this);setTempo(this);attach(this); }
     return Reflect.apply(nativePlay, this, args);
   };
+  HTMLMediaElement.prototype.pause = function(...args) { if(isMusicMedia(this))playbackIntent(this,false);return Reflect.apply(nativePause,this,args); };
   const sourceProperty = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'src');
-  if (sourceProperty?.set && sourceProperty.configurable) Object.defineProperty(HTMLMediaElement.prototype, 'src', { ...sourceProperty, set(value) { prepareCors(this, value); return sourceProperty.set.call(this, value); } });
+  if (sourceProperty?.set && sourceProperty.configurable) Object.defineProperty(HTMLMediaElement.prototype, 'src', { ...sourceProperty, set(value) { if(isMusicMedia(this))sourceIntent(this);prepareCors(this, value); return sourceProperty.set.call(this, value); } });
   const setAttribute = HTMLMediaElement.prototype.setAttribute;
-  HTMLMediaElement.prototype.setAttribute = function(name, value) { if (String(name).toLowerCase() === 'src') prepareCors(this, value); return Reflect.apply(setAttribute, this, [name, value]); };
+  HTMLMediaElement.prototype.setAttribute = function(name, value) { if (String(name).toLowerCase() === 'src') {if(isMusicMedia(this))sourceIntent(this);prepareCors(this, value);}return Reflect.apply(setAttribute, this, [name, value]); };
   const NativeAudio = window.Audio;
   window.Audio = new Proxy(NativeAudio, { construct(target, args, newTarget) { const media = add(Reflect.construct(target, [], newTarget)); if (args[0] !== undefined) { prepareCors(media, args[0]); media.src = args[0]; } return media; } });
   const create = document.createElement.bind(document);
@@ -273,7 +279,7 @@
   window.__lolzcloudSetAudioFX = config => {
     const valid = config && Array.isArray(config.gains) && config.gains.length === 5 && config.gains.every(value => Number.isFinite(value) && Math.abs(value) <= 12);
     if (!valid) return false;
-    status.config = { ...defaults, ...config, gains: [...config.gains], rate: Math.max(.65, Math.min(1.5, Number(config.rate) || 1)),
+    status.config = { ...defaults, ...config, gains: [...config.gains], preampDb:Math.max(-12,Math.min(0,Number(config.preampDb)||0)),rate: Math.max(.5, Math.min(2, Number(config.rate) || 1)),
       reverb: Math.max(0, Math.min(.8, Number(config.reverb) || 0)), echo: Math.max(0, Math.min(.8, Number(config.echo) || 0)) };
     apply(); return true;
   };

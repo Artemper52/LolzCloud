@@ -7,7 +7,14 @@
   'use strict';
   const AUDIO = /^\/music\/audio\/([1-9][0-9]{0,15})\/([a-f0-9]{24})\.mp3$/;
   const LOCAL_ID = /^local:[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
-  const trackID = value => typeof value === 'string' && (/^[1-9][0-9]{0,15}$/.test(value) || LOCAL_ID.test(value));
+  const numericID = value => typeof value === 'string' && value.trim() === value && /^[1-9][0-9]{0,15}$/.test(value);
+  const localID = value => typeof value === 'string' && value.trim() === value && LOCAL_ID.test(value);
+  function sourceURL(value) {
+    if(typeof value!=='string'||value.length>500)return '';
+    try {const url=new URL(value);return url.protocol==='https:'&&['soundcloud.com','www.soundcloud.com'].includes(url.hostname)&&!url.port&&!url.username&&!url.password&&!url.search&&!url.hash&&/^\/[\w-]+\/[\w-]+\/?$/.test(url.pathname)?'https://soundcloud.com'+url.pathname.replace(/\/$/,''):'';}catch{return '';}
+  }
+  const referenceID=value=>typeof value==='string'&&value.startsWith('ref:')&&sourceURL(value.slice(4))===value.slice(4);
+  const trackID = value => numericID(value) || localID(value) || referenceID(value);
   function audioURL(value, origin) {
     try {
       const url = new URL(value, origin);
@@ -15,7 +22,7 @@
     } catch { return ''; }
   }
   function track(value, origin) {
-    if (!value || typeof value !== 'object' || value.local === true || value.source === 'local' || !/^[1-9][0-9]{0,15}$/.test(value.id)) return null;
+    if (!value || typeof value !== 'object' || value.local === true || value.source === 'local' || !numericID(value.id)) return null;
     const audio = audioURL(value.audioUrl, origin);
     if (!audio || AUDIO.exec(new URL(audio).pathname)[1] !== value.id || typeof value.title !== 'string' || !value.title.trim() || value.title.length > 300) return null;
     const duration = Number(value.duration);
@@ -25,13 +32,21 @@
       const url = new URL(value.cover);
       if (url.protocol === 'https:' && !url.username && !url.password && !url.hash && (url.hostname === 'lolzcloud.com' || url.hostname.endsWith('.sndcdn.com'))) cover = url.href;
     } catch { /* Covers are optional; an invalid image never invalidates audio. */ }
-    return { id: value.id, title: value.title.trim(), artist: value.artist, audioUrl: audio, duration, cover };
+    const result={ id: value.id, title: value.title.trim(), artist: value.artist, audioUrl: audio, duration, cover },url=sourceURL(value.url);
+    if(url)result.url=url;
+    return result;
   }
   function localTrack(value) {
-    if (!value || !LOCAL_ID.test(value.id) || value.local !== true && value.source !== 'local' || value.audioUrl !== '' || typeof value.title !== 'string' || !value.title.trim() || value.title.length > 300 || typeof value.artist !== 'string' || value.artist.length > 300 || !Number.isFinite(value.duration) || value.duration <= 0 || value.duration > 86400) return null;
+    if (!value || !localID(value.id) || value.local !== true && value.source !== 'local' || value.audioUrl !== '' || typeof value.title !== 'string' || !value.title.trim() || value.title.length > 300 || typeof value.artist !== 'string' || value.artist.length > 300 || !Number.isFinite(value.duration) || value.duration <= 0 || value.duration > 86400) return null;
     return { id: value.id, local: true, source: 'local', audioUrl: '', title: value.title.trim(), artist: value.artist, duration: value.duration, cover: '' };
   }
-  function savedTrack(value, origin) { return localTrack(value) || track(value, origin); }
+  function referenceTrack(value) {
+    if(!value||value.source!=='catalog'||value.audioUrl!==''||value.local===true||!(numericID(value.id)||referenceID(value.id)))return null;
+    const url=sourceURL(value.url);
+    if(referenceID(value.id)&&url!==value.id.slice(4)||value.url&&!url||typeof value.title!=='string'||!value.title.trim()||value.title.length>300||typeof value.artist!=='string'||value.artist.length>300||!Number.isFinite(value.duration)||value.duration<0||value.duration>86400)return null;
+    return{id:value.id,source:'catalog',audioUrl:'',url,title:value.title.trim(),artist:value.artist,duration:value.duration,cover:''};
+  }
+  function savedTrack(value, origin) { return localTrack(value) || referenceTrack(value) || track(value, origin); }
   function audioFileType(name, header) {
     const extension = typeof name === 'string' ? name.toLowerCase().match(/\.(mp3|wav|m4a|flac)$/)?.[1] : '';
     const text = (start, length) => String.fromCharCode(...header.slice(start, start + length));
@@ -101,5 +116,5 @@
     const synced = durationMatched ? rawSynced : '';
     return plain.trim() || synced.trim() || row.instrumental === true ? { plain, synced, instrumental: row.instrumental === true, durationMatched } : null;
   }
-  return { audioURL, track, savedTrack, localTrack, trackID, audioFileType, importedLyrics, page, preparationURL, nextIndex, roomURL, parseLyrics, formatTime, lyricsIdentity, lyricsCandidate };
+  return { audioURL, sourceURL, referenceID, referenceTrack, track, savedTrack, localTrack, trackID, audioFileType, importedLyrics, page, preparationURL, nextIndex, roomURL, parseLyrics, formatTime, lyricsIdentity, lyricsCandidate };
 });

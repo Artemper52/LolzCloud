@@ -1,0 +1,18 @@
+{
+  "format": "lolzcloud-android-profile",
+  "version": 1,
+  "liked": [
+    {
+      "title": "Portable one",
+      "artist": "Fixture artist",
+      "uri": "https://lolzcloud.com/music/audio/123/aaaaaaaaaaaaaaaaaaaaaaaa.mp3"
+    },
+    {
+      "title": "Local metadata only",
+      "artist": "Fixture artist"
+    }
+  ],
+  "speed": 0.8,
+  "bass": 350,
+  "repeat": 2
+}

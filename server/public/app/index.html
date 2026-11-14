@@ -18,6 +18,10 @@
   <script src="/app/imports.js" defer></script>
   <script src="/app/effects-policy.js" defer></script>
   <script src="/app/effects.js" defer></script>
+  <script src="/app/profile-policy.js" defer></script>
+  <script src="/app/profile-crypto.js" defer></script>
+  <script src="/app/profile-cloud.js" defer></script>
+  <script src="/app/profile.js" defer></script>
   <script src="/app/app.js" defer></script>
 </head>
 <body>
@@ -47,6 +51,7 @@
       <div id="library-filters" class="segmented" aria-label="Фильтр коллекции"><button data-filter="all" aria-pressed="true">Всё</button><button data-filter="liked" aria-pressed="false">Любимое</button><button data-filter="offline" aria-pressed="false">Загрузки</button></div>
       <p id="storage-status" class="hint"></p>
       <div id="library-results" class="track-list" aria-label="Моя коллекция"></div>
+      <button id="library-more" class="wide-button" hidden>Показать ещё</button>
       <p class="hint storage-note">Загрузки хранятся на этом устройстве. Браузер может освободить их при нехватке места или удалении данных сайта.</p>
     </section>
     <section id="view-rooms" class="view frame-view" aria-labelledby="rooms-heading" hidden>
@@ -55,7 +60,7 @@
       <iframe id="rooms-frame" class="shared-frame" title="Комнаты LolzCloud" allow="autoplay; encrypted-media; fullscreen" hidden></iframe>
     </section>
     <section id="view-profile" class="view frame-view" aria-labelledby="profile-heading" hidden>
-      <div class="frame-heading"><h1 id="profile-heading">Твоя компания</h1><button id="account-refresh" class="text-button" aria-label="Обновить статус входа">Обновить</button></div>
+      <div class="frame-heading"><h1 id="profile-heading">Твоя компания</h1><button id="portable-open" class="text-button" aria-haspopup="dialog" aria-controls="portable-dialog">Перенести профиль</button><button id="account-refresh" class="text-button" aria-label="Обновить статус входа">Обновить</button></div>
       <div id="profile-gate" class="auth-gate"></div>
       <iframe id="social-frame" class="shared-frame" title="Профиль, друзья и уведомления" hidden></iframe>
     </section>
@@ -119,6 +124,7 @@
   <dialog id="login-dialog" class="sheet" aria-labelledby="login-title"><div class="dialog-heading"><h2 id="login-title">Вход через Lolzteam</h2><button id="login-cancel" class="text-button">Отмена</button></div><p id="login-status" class="status" role="status" aria-live="polite">Готовим подключение…</p><p id="login-code" class="login-code" aria-label="Код подключения"></p><a id="login-browser" class="primary login-browser" target="_blank" rel="noopener noreferrer" hidden>Подтвердить в браузере ↗</a><p class="hint">Сверь код на странице подключения, подтверди вход и вернись сюда. Пароль Lolzteam остаётся в браузере.</p><button id="login-retry" class="wide-button" hidden>Начать вход заново</button></dialog>
   <dialog id="install-dialog" class="sheet" aria-labelledby="install-title"><div class="dialog-heading"><h2 id="install-title">LolzCloud под рукой</h2><button data-close="install-dialog" class="icon-button" aria-label="Закрыть инструкцию установки">×</button></div><p>На iPhone и iPad открой эту страницу в Safari, нажми «Поделиться», затем «На экран “Домой”».</p><p>Приложение откроется отдельным окном. Поиск, коллекция, очередь и комнаты доступны здесь же.</p><button id="install-confirm" class="primary" hidden>Установить приложение</button><p class="hint">Фоновое воспроизведение зависит от браузера и iOS. Если система остановила музыку, вернись и нажми Play. Загрузки могут занимать до 256 МБ.</p><a class="text-link" href="/">Сайт и другие версии ↗</a></dialog>
   <dialog id="room-lyrics-dialog" class="sheet room-lyrics-sheet" aria-labelledby="room-lyrics-title"><div class="dialog-heading"><h2 id="room-lyrics-title">Текст в комнате</h2><button data-close="room-lyrics-dialog" class="icon-button" aria-label="Вернуться в комнату">×</button></div><p id="room-lyrics-status" class="hint" role="status"></p><div id="room-lyrics-text" class="lyrics"></div><a class="attribution" href="https://lrclib.net" target="_blank" rel="noopener noreferrer">Тексты · LRCLIB ↗</a></dialog>
+  <dialog id="portable-dialog" class="sheet portable-dialog" aria-labelledby="portable-title"><div class="dialog-heading"><h2 id="portable-title">Перенести профиль</h2><button id="portable-close" class="text-button">Готово</button></div><div class="portable-body"><p class="hint">Любимое, моменты и настройки — между LolzCloud на телефоне и компьютере. Файл доступен без входа в аккаунт.</p><p id="portable-status" class="status" role="status" aria-live="polite"></p><button id="portable-export" class="wide-button">Подготовить файл профиля</button><label class="file-control portable-import">Добавить из файла<input id="portable-import" type="file" accept=".json,application/json"></label><details class="portable-cloud"><summary>Зашифрованная копия в аккаунте</summary><p id="cloud-account-note" class="hint"></p><label for="cloud-password">Парольная фраза копии</label><input id="cloud-password" type="password" minlength="10" maxlength="256" autocomplete="new-password" spellcheck="false" autocapitalize="off" aria-describedby="cloud-password-note"><p id="cloud-password-note" class="hint">От 10 символов. Используй ту же фразу на другом устройстве. Она не отправляется на сервер; без неё открыть копию нельзя.</p><div class="portable-cloud-actions"><button id="cloud-read" type="button">Открыть копию</button><button id="cloud-save" type="button">Сохранить в облако</button></div><label id="cloud-replace-label" class="effects-switch" hidden><span>Заменить открытую облачную копию</span><input id="cloud-replace" type="checkbox"></label></details><section id="portable-preview" hidden><p id="portable-summary"></p><label class="effects-switch" id="portable-settings-label"><span>Применить настройки звука</span><input id="portable-settings" type="checkbox"></label><p id="portable-settings-note" class="hint">Любимое и моменты объединятся. Песня, очередь и загруженные файлы сохранятся. Без галочки звук продолжит играть с твоими настройками; импортированные сохранятся для переноса.</p><button id="portable-apply" class="wide-button primary">Добавить любимое и моменты</button></section><button id="portable-cancel" class="wide-button" hidden>Отмена</button><button id="portable-undo" class="text-button" hidden>Вернуть данные до последнего импорта</button><p class="hint">Файл не содержит вход в аккаунт, пути к файлам или аудио. Настройки других клиентов сохраняются для обратного переноса.</p></div></dialog>
   <audio id="audio" preload="metadata" playsinline></audio>
   <noscript>Для музыки в LolzCloud включи JavaScript в настройках браузера.</noscript>
 </body>

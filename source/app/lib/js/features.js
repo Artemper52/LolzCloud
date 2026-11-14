@@ -170,6 +170,7 @@
     await action('dsp', { settings: { ...settings, enabled: true } }); soundDraft = null; render();
   }
   const soundCaption = {
+    preamp: value=>String(value).replace('-','−')+' дБ',
     speed: value => value < 95 ? 'Замедленно' : value > 105 ? 'Ускоренно' : 'Оригинальный',
     bass: value => value <= 0 ? 'Естественный' : value < 4 ? 'Мягкий' : value < 8 ? 'Плотный' : 'Мощный',
     reverb: value => !value ? 'Без эффекта' : value < 25 ? 'Комната' : value < 50 ? 'Объёмный' : 'Большой зал',
@@ -177,10 +178,11 @@
   };
   function controlPatch(name, value) {
     if (name === 'speed') return { rate: value / 100 };
+    if(name==='preamp')return{preampDb:value};
     if (name === 'bass') { const gains = [...(soundDraft || feature.dsp).gains]; gains[0] = value; gains[1] = Math.round(value * .55); return { gains }; }
     return { [name]: value / 100 };
   }
-  for (const name of ['speed', 'bass', 'reverb', 'echo']) {
+  for (const name of ['speed', 'preamp', 'bass', 'reverb', 'echo']) {
     el(name).oninput = () => {
       if (!feature) return;
       const value = Number(el(name).value); el(name + '-caption').textContent = soundCaption[name](value);
@@ -412,7 +414,7 @@
     el('eq-enabled').checked = feature.dsp.enabled;
     el('sound-presets').querySelectorAll('button').forEach(button => { const selected = button.dataset.preset === feature.dsp.preset; button.classList.toggle('is-selected', selected); button.setAttribute('aria-pressed', String(selected)); });
     const sound = soundDraft || feature.dsp;
-    for (const [name, value] of [['speed', sound.rate * 100], ['bass', Math.max(0, sound.gains[0])], ['reverb', sound.reverb * 100], ['echo', sound.echo * 100]]) {
+    for (const [name, value] of [['speed', sound.rate * 100], ['preamp',sound.preampDb??0],['bass', Math.max(0, sound.gains[0])], ['reverb', sound.reverb * 100], ['echo', sound.echo * 100]]) {
       if (document.activeElement !== el(name)) el(name).value = value;
       el(name + '-caption').textContent = soundCaption[name](value);
     }

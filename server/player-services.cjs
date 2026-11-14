@@ -49,8 +49,8 @@ class PlayerServices {
     const row = { userId: user.id, revision: value.revision + 1, updatedAt: this.store.now(), envelope: Object.fromEntries(['version', 'salt', 'iv', 'tag', 'ciphertext'].map(key => [key, envelope[key]])) };
     const previous = this.profiles.get(user.id); this.profiles.set(user.id, row);
     try { if (this.profileFile) { fs.mkdirSync(path.dirname(this.profileFile), { recursive: true, mode: 0o700 }); fs.writeFileSync(this.profileFile + '.tmp', JSON.stringify({ profiles: [...this.profiles.values()] }), { mode: 0o600 }); fs.renameSync(this.profileFile + '.tmp', this.profileFile); } } catch (error) { if (previous) this.profiles.set(user.id, previous); else this.profiles.delete(user.id); throw error; }
-    return { revision: row.revision, updatedAt: row.updatedAt };
+    return { ownerId: user.id, revision: row.revision, updatedAt: row.updatedAt };
   }
-  getProfile(user) { const row = this.profiles.get(user.id); return row ? { revision: row.revision, updatedAt: row.updatedAt, envelope: row.envelope } : { revision: 0, updatedAt: null, envelope: null }; }
+  getProfile(user) { const row = this.profiles.get(user.id); return row ? { ownerId: user.id, revision: row.revision, updatedAt: row.updatedAt, envelope: row.envelope } : { ownerId: user.id, revision: 0, updatedAt: null, envelope: null }; }
 }
 module.exports = { PlayerServices, track };

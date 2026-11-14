@@ -43,6 +43,11 @@ test('invalid sound changes cannot partially update or corrupt the saved setting
   assert.throws(() => validateSoundPatch({ echo: -.1 }));
   assert.equal(normalizeSound({ gains: [1, 2, 3, 2, 1], enabled: true }).rate, 1);
 });
+test('portable preamp and full mobile speed range survive a saved personal preset and restart', t => {
+  const {value,file}=model(t);value.configureDsp({enabled:true,preampDb:-6,rate:2,saveAs:'Перенос'});
+  const reopened=new MusicFeatures(file);reopened.configureDsp({preset:'Original'});assert.equal(reopened.data.dsp.preampDb,0);reopened.configureDsp({preset:'Перенос'});assert.equal(reopened.data.dsp.preampDb,-6);assert.equal(reopened.data.dsp.rate,2);
+  reopened.configureDsp({rate:.5});const before=structuredClone(reopened.data.dsp);for(const patch of[{preampDb:.1},{preampDb:-12.1},{preampDb:NaN},{rate:.49},{rate:2.01}]){assert.throws(()=>reopened.configureDsp(patch));assert.deepEqual(reopened.data.dsp,before);}assert.equal(normalizeSound({preampDb:-12,rate:.5}).preampDb,-12);
+});
 test('lyrics share pending requests and cannot mix different track versions', async () => {
   let finish, calls = 0;
   const library = new LyricsLibrary(() => { calls++; return new Promise(resolve => { finish = resolve; }); });

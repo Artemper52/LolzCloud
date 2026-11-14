@@ -7,6 +7,20 @@ test('PWA accepts only matching signed same-origin MP3 sources', () => {
   for (const address of ['https://evil.test/music/audio/123/' + 'a'.repeat(24) + '.mp3', 'data:audio/mpeg;base64,x', 'https://lolzcloud.com@evil.test/a', row().audioUrl + '?token=x', row().audioUrl + '#x', row('124').audioUrl, 'https://lolzcloud.com/music/audio/123/' + 'a'.repeat(23) + '.mp3']) assert.equal(C.track({ ...row(), audioUrl: address }, origin), null);
   assert.equal(C.preparationURL(row().audioUrl, origin), origin + '/music/prepare/123/' + 'a'.repeat(24));
 });
+
+test('PWA retains only canonical public SoundCloud permalinks for profile portability',()=>{
+  const address='https://soundcloud.com/test/song';assert.equal(C.track({...row(),url:address},origin).url,address);
+  assert.equal(C.sourceURL('https://www.soundcloud.com/test/song/'),address);
+  for(const url of ['https://evil.test/test/song','https://soundcloud.com@evil.test/test/song',address+'?token=private',address+'#secret','file:///music.mp3','http://soundcloud.com/test/song'])assert.equal(C.track({...row(),url},origin).url,undefined);
+});
+
+test('explicit catalog references are metadata and cannot become signed or local audio by parsing',()=>{
+  const url='https://soundcloud.com/test/song',reference={id:'ref:'+url,source:'catalog',audioUrl:'',url,title:'Saved song',artist:'Artist',duration:90};
+  assert.equal(C.savedTrack(reference,origin).source,'catalog');assert.equal(C.track(reference,origin),null);assert.equal(C.audioURL(reference.url,origin),'');
+  assert.equal(C.referenceTrack({...reference,id:'123'}).id,'123');assert.equal(C.referenceTrack({...reference,id:'123',url:''}).url,'');
+  for(const patch of [{id:'ref:https://evil.test/a/b'},{url:'https://evil.test/a/b'},{id:'local:12345678-1234-4567-89ab-123456789abc'},{audioUrl:'https://evil.test/song.mp3'},{source:'local'},{duration:Infinity},{title:''},{local:true}])assert.equal(C.savedTrack({...reference,...patch},origin),null);
+  assert.equal(C.trackID(reference.id),true);assert.equal(C.trackID('ref:'+url+'?token=private'),false);
+});
 test('PWA validates pages, deduplicates IDs, rejects cursor loops and malformed rows', () => {
   assert.deepEqual(C.page({ tracks: [row(), row()], nextOffset: '20' }, origin).tracks.map(t => t.id), ['123']);
   for (const nextOffset of ['0', '1', '20', '999', 40, '040']) assert.throws(() => C.page({ tracks: [row()], nextOffset }, origin, '20'));
@@ -68,4 +82,8 @@ test('imported lyrics enforce UTF8/size/extension and preserve text inertly', ()
   assert.throws(() => C.importedLyrics('song.txt', new Uint8Array([255, 254])));
   assert.throws(() => C.importedLyrics('song.txt', new Uint8Array(512 * 1024 + 1)));
   assert.throws(() => C.importedLyrics('song.html', bytes('Слова')));
+});
+test('saved identifiers reject trailing line terminators across numeric and local records',()=>{
+  const reference={id:'123',source:'catalog',audioUrl:'',url:'https://soundcloud.com/fixture/song',title:'Song',artist:'Artist',duration:60},local={id:'local:12345678-1234-4567-89ab-123456789abc',local:true,audioUrl:'',title:'Local',artist:'',duration:60};
+  for(const ending of['\n','\r','\u2028'])for(const value of[reference,local]){assert.equal(C.trackID(value.id+ending),false);assert.equal(C.savedTrack({...value,id:value.id+ending},origin),null);}
 });

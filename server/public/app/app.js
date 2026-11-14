@@ -17,22 +17,23 @@
   try { saved = JSON.parse(localStorage.getItem('LolzCloud-app-v1') || '{}'); } catch { /* An invalid local draft starts cleanly. */ }
   if (Array.isArray(saved.queue)) queue = saved.queue.slice(0, 200).map(row => C.savedTrack(row, origin)).filter(Boolean);
   if (Array.isArray(saved.collection)) for (const value of saved.collection.slice(0, 500)) { const item = C.savedTrack(value, origin); if (item) collection.set(item.id, item); }
-  if (Array.isArray(saved.liked)) liked = new Set(saved.liked.filter(C.trackID).slice(0, 500));
+  if (Array.isArray(saved.liked)) liked = new Set(saved.liked.filter(C.trackID).slice(0, 2000));
   index = Number.isInteger(saved.index) && saved.index >= 0 && saved.index < queue.length ? saved.index : -1; current = queue[index] || null;
   shuffle = saved.shuffle === true; repeat = ['off', 'all', 'one'].includes(saved.repeat) ? saved.repeat : 'off';
   let view = 'search', phase = 'paused', elapsed = current && Number.isFinite(saved.position) ? Math.min(current.duration, Math.max(0, saved.position)) : 0, duration = current?.duration || 0, loaded = false, activeBlobURL = '', playerError = '';
   let searchVersion = 0, searchController, results = [], searchedQuery = '', nextOffset = '', searching = false;
-  let playVersion = 0, preparationController, history = [], offline = new Map(), downloads = new Set(), libraryFilter = 'all', actionTrack;
+  let playVersion = 0, preparationController, history = [], offline = new Map(), downloads = new Set(), libraryFilter = 'all', libraryVisible = 300, bookmarkVisible = 100, bookmarkVisibleID = '', actionTrack;
   let lyricsVersion = 0, lyricsController, lyricsTrack = '', syncedLyrics = [], activeLyric = -1, roomLyricsVersion = 0;
   const lyricsMetadata = new Map();
   try { for (const [id, value] of Object.entries(JSON.parse(localStorage.getItem('LolzCloud-lyrics-metadata-v1') || '{}')).slice(0, 500)) if (C.trackID(id) && value && typeof value.title === 'string' && value.title.length <= 300 && typeof value.artist === 'string' && value.artist.length <= 300 && C.lyricsIdentity(value.title) && C.lyricsIdentity(value.artist)) lyricsMetadata.set(id, { title: value.title, artist: value.artist }); } catch { /* Bad metadata never blocks music. */ }
   let account = null, accountPending, accountVersion = 0, frameRoomURL = '', roomAudible = false, noticeTimer, persistTimer, installPrompt, lastSavedTime = 0;
   let loginVersion = 0, loginController, loginCommitting = false;
-  let nativeQueueSignature = '', nativeQueueOwned = false;
+  let nativeQueueSignature = '', nativeQueueOwned = false, nativeCatalogReferences = false, nativeProfileExport = false, nativeQueuePositions = [];
+  const catalogAliases = new Map();
   let rate = Number.isFinite(saved.rate) && saved.rate >= 0.5 && saved.rate <= 2 ? saved.rate : 1;
   let sleepDeadline = Number.isFinite(saved.sleepDeadline) && saved.sleepDeadline > 0 && saved.sleepDeadline <= Date.now() + 86400000 ? saved.sleepDeadline : 0, sleepInterval;
   const bookmarks = new Map();
-  if (saved.bookmarks && typeof saved.bookmarks === 'object') for (const [id, rows] of Object.entries(saved.bookmarks).slice(0, 100)) if (C.trackID(id) && Array.isArray(rows)) bookmarks.set(id, rows.filter(row => row && Number.isFinite(row.position) && row.position >= 0 && row.position <= 86400 && Number.isFinite(row.createdAt)).slice(0, 100).map(row => ({ position: row.position, createdAt: row.createdAt })));
+  if (saved.bookmarks && typeof saved.bookmarks === 'object') { let remaining = 2000; for (const [id, rows] of Object.entries(saved.bookmarks).slice(0, 2000)) if (C.trackID(id) && Array.isArray(rows)) { const valid = rows.filter(row => row && Number.isFinite(row.position) && row.position >= 0 && row.position <= 86400 && Number.isFinite(row.createdAt)).slice(0, remaining).map(row => ({ position: row.position, createdAt: row.createdAt })); if (valid.length) bookmarks.set(id, valid); remaining -= valid.length; } }
   let importingAudio = false, nativeImportCount = 0, nativeImportErrors = 0;
   const audio = $('audio');
   effectsController = window.LolzCloudEffects.createController({ audio, native, sendNative,
@@ -40,10 +41,81 @@
     wantedPlayback: () => phase === 'playing' || phase === 'loading', onState: renderEffects,
     onInterrupted: () => { if (!native && loaded && !audio.paused && ['playing', 'loading'].includes(phase)) { phase = 'blocked'; playerError = 'Звук прерван. Нажми Play, чтобы продолжить.'; audio.pause(); renderPlayback(); persist(); } },
   });
+  const portableController = window.LolzCloudProfile.create({ read: portableState, apply: applyPortable, lookup: lookupCatalog, onState: renderPortable });
+  let portableFile, portableJSON = '', portableOperation = '', portableUndo = false, portableOpener, portableHistory = false;
+  const cloud = window.LolzCloudProfileCloud.create({ owner: () => account?.id, crypto: window.LolzCloudProfileCrypto });
+  let cloudSnapshot = null, cloudBusy = false, cloudController, cloudEpoch = 0, cloudMessage = '';
   const node = (tag, text, className) => { const result = document.createElement(tag); if (text != null) result.textContent = text; if (className) result.className = className; return result; };
   const button = (label, handler, className = '') => { const result = node('button', label, className); result.type = 'button'; result.onclick = () => { try { Promise.resolve(handler()).catch(noticeError); } catch (error) { noticeError(error); } }; return result; };
   function notice(text) { clearTimeout(noticeTimer); $('notice').textContent = text; $('notice').hidden = !text; noticeTimer = setTimeout(() => { $('notice').hidden = true; }, 5000); }
   function noticeError(error) { notice(error instanceof Error ? error.message : String(error || 'Не удалось выполнить действие.')); }
+  function portableState() { return structuredClone({ liked: [...liked], bookmarks: Object.fromEntries(bookmarks), effects: effectsController.snapshot().config, rate, tracks: [...collection.values(), ...offline.values(), ...queue], collection: [...collection.values()] }); }
+  function applyPortable(next) {
+    const replacement = next.restore ? new Map((next.collection || []).map(row => { const item = C.savedTrack(row, origin); return item ? [item.id, item] : null; }).filter(Boolean)) : new Map(collection), aliases = new Map();
+    for (const raw of next.refs || []) { const ref = C.referenceTrack(raw); if (!ref) continue; const existing = [...replacement.values()].find(row => row.url === ref.url && !C.referenceTrack(row)); if (existing) aliases.set(ref.id, existing.id); else if (!replacement.has(ref.id)) replacement.set(ref.id, ref); }
+    const targetLiked = new Set((next.liked || []).filter(C.trackID).map(id => aliases.get(id) || id)), targetMoments = new Map();
+    for (const [rawID, rows] of Object.entries(next.bookmarks || {})) { const id = aliases.get(rawID) || rawID; if (!C.trackID(id) || !Array.isArray(rows)) continue; const valid = rows.filter(row => row && Number.isFinite(row.position) && row.position >= 0 && row.position <= 86400 && Number.isFinite(row.createdAt)).map(row => ({ position: row.position, createdAt: row.createdAt })), merged = targetMoments.get(id) || []; for (const row of valid) if (!merged.some(mark => Math.abs(mark.position - row.position) < .01)) merged.push(row); if (merged.length) targetMoments.set(id, merged); }
+    const settings = next.effects ? window.LolzCloudEffectsPolicy.validate(next.effects) : null, nextRate = next.rate === undefined ? rate : Number(next.rate); if (!Number.isFinite(nextRate) || nextRate < .5 || nextRate > 2) throw Error('В профиле неверная скорость воспроизведения.');
+    const oldApp = localStorage.getItem('LolzCloud-app-v1'), oldEffects = localStorage.getItem('LolzCloud-effects-v1'); clearTimeout(persistTimer);
+    try { localStorage.setItem('LolzCloud-app-v1', JSON.stringify({ ...savedState(), liked: [...targetLiked], bookmarks: Object.fromEntries(targetMoments), collection: [...replacement.values()].slice(-500), rate: nextRate })); if (settings) localStorage.setItem('LolzCloud-effects-v1', JSON.stringify(settings)); }
+    catch (error) { try { if (oldApp === null) localStorage.removeItem('LolzCloud-app-v1'); else localStorage.setItem('LolzCloud-app-v1', oldApp); if (oldEffects === null) localStorage.removeItem('LolzCloud-effects-v1'); else localStorage.setItem('LolzCloud-effects-v1', oldEffects); } catch {} throw Error('Не хватает места для переноса. Текущие данные сохранены; освободи место и повтори.'); }
+    liked = targetLiked; bookmarks.clear(); for (const [id, rows] of targetMoments) bookmarks.set(id, rows); collection = replacement;
+    if (settings) void effectsController.configure(settings).catch(noticeError); if (nextRate !== rate) setRate(nextRate);
+    renderLike(); renderBookmarks(); renderLibrary(); renderComfort();
+  }
+  async function lookupCatalog(row, signal) {
+    const url = C.sourceURL(row.url), numeric = /^[1-9][0-9]{0,15}$/.test(row.id), endpoint = numeric ? '/music/track/' + row.id : url ? '/music/search?q=' + encodeURIComponent(url) + '&offset=0' : '';
+    const cached = [...offline.values(), ...collection.values()].find(value => C.track(value, origin) && C.sourceURL(value.url) && (numeric ? value.id === row.id : url && value.url === url)); if (cached) return cached;
+    if (!endpoint) throw Error('У песни нет переносимой ссылки SoundCloud. Найди её ещё раз.');
+    const { body } = await json(endpoint, { signal, limit: 256 * 1024 }); let result;
+    if (numeric) result = C.track(body.track, origin); else result = C.page(body, origin).tracks.find(track => track.url === url);
+    if (!result || !result.url || numeric && result.id !== row.id || !numeric && url && result.url !== url) throw Error('Не удалось подтвердить эту песню. Найди её в поиске ещё раз.');
+    portableController.remember(result); return result;
+  }
+  function canonicalID(id) { const seen = new Set(); while (catalogAliases.has(id) && !seen.has(id)) { seen.add(id); id = catalogAliases.get(id); } return id; }
+  function adoptCatalog(previous, resolved, { selected = false } = {}) {
+    const numeric = /^[1-9][0-9]{0,15}$/.test(previous.id); if (!C.track(resolved, origin) || !numeric && C.sourceURL(previous.url) && previous.url !== resolved.url || numeric && previous.id !== resolved.id) return false;
+    const oldID = previous.id, id = resolved.id; if (oldID !== id) { catalogAliases.set(oldID, id); if (liked.delete(oldID)) liked.add(id); const merged = bookmarks.get(id) || []; for (const row of bookmarks.get(oldID) || []) if (!merged.some(mark => Math.abs(mark.position - row.position) < .01)) merged.push(row); if (merged.length) bookmarks.set(id, merged); bookmarks.delete(oldID); collection.delete(oldID); }
+    collection.set(id, resolved); portableController.alias(previous, resolved);
+    if (selected) { const expectedURL = C.sourceURL(previous.url); queue = queue.map(row => row.id === oldID && (!expectedURL || row.url === expectedURL) ? resolved : row); current = queue[index] || current; }
+    persist(); renderLibrary(); renderLike(); renderBookmarks(); return true;
+  }
+  function renderPortable(state = portableController.snapshot()) {
+    const busy = cloudBusy || ['reading', 'exporting', 'importing'].includes(state.phase); $('portable-status').textContent = cloudMessage || state.message; $('portable-import').disabled = $('portable-export').disabled = busy; $('portable-export').textContent = portableFile ? 'Сохранить файл профиля' : 'Подготовить файл профиля';
+    $('portable-preview').hidden = !state.preview && !portableUndo; $('portable-cancel').hidden = !busy && !state.preview && !portableUndo; $('portable-undo').hidden = !state.backup || busy;
+    $('portable-settings-label').hidden = portableUndo; $('portable-settings-note').hidden = portableUndo; $('portable-apply').disabled = busy;
+    $('portable-apply').textContent = portableUndo ? 'Вернуть данные' : $('portable-settings').checked ? 'Добавить и применить настройки' : 'Добавить любимое и моменты';
+    $('portable-summary').textContent = portableUndo ? 'Вернуть любимое, моменты и настройки до последнего импорта? Текущая песня и очередь сохранятся.' : state.preview ? 'Любимых: ' + state.preview.likes + ' · моментов: ' + state.preview.bookmarks + '. Перед переносом сохраним резервную копию на устройстве.' : '';
+    $('cloud-read').disabled = $('cloud-save').disabled = busy || !account || !cloud.supported(); $('cloud-password').disabled = busy || !account || !cloud.supported(); $('cloud-replace-label').hidden = !cloudSnapshot || cloudSnapshot.empty || !cloud.current(cloudSnapshot);
+    $('cloud-account-note').textContent = !account ? 'Для облака войди в аккаунт. Файлом можно пользоваться без входа.' : !cloud.supported() ? 'В этом браузере шифрование недоступно. Перенеси профиль файлом.' : cloudSnapshot && cloud.current(cloudSnapshot) ? cloudSnapshot.empty ? 'В аккаунте пока нет облачной копии.' : 'Открыта копия от ' + new Date(cloudSnapshot.updatedAt).toLocaleString('ru') + '.' : 'Копия привязана к твоему аккаунту LolzCloud.';
+    if (state.phase === 'ready') renderLibrary();
+  }
+  function portableError(error) { if (error?.name !== 'AbortError') { cloudMessage = ''; portableController.fail(error); } }
+  function cancelCloud() { cloudEpoch++; cloudController?.abort(); cloudController = null; cloud.cancel(); cloudBusy = false; cloudSnapshot = null; cloudMessage = ''; $('cloud-password').value = ''; $('cloud-replace').checked = false; }
+  function updateAccount(value) { if (account?.id !== value?.id) { const hadCloud = cloudBusy || !!cloudSnapshot; cancelCloud(); if (hadCloud) portableController.cancel(); } account = value; renderPortable(); }
+  async function transferCloud(action) {
+    if (cloudBusy) return;
+    if (action === 'save' && cloudSnapshot && !cloudSnapshot.empty && cloud.current(cloudSnapshot) && !$('cloud-replace').checked) { cloudMessage = 'Подтверди замену открытой копии. Если хочешь оставить её, закрой перенос.'; renderPortable(); $('cloud-replace').focus(); return; }
+    const password = $('cloud-password').value; $('cloud-password').value = '';
+    if (password.length < 10 || password.length > 256) { portableError(Error('Нужна парольная фраза от 10 до 256 символов.')); $('cloud-password').focus(); return; }
+    const token = ++cloudEpoch, owner = new AbortController(); cloudController = owner; cloudBusy = true; portableFile = null; cloudMessage = action === 'read' ? 'Открываем защищённую копию…' : 'Шифруем и сохраняем копию…'; renderPortable();
+    const options = { signal: owner.signal, onProgress: value => { if (token !== cloudEpoch) return; cloudMessage = (action === 'read' ? 'Открываем копию: ' : 'Шифруем копию: ') + Math.round(value * 100) + '%'; renderPortable(); } };
+    try {
+      if (action === 'read') { const snapshot = await cloud.read(password, options); if (token !== cloudEpoch || !cloud.current(snapshot)) return; cloudSnapshot = snapshot; portableUndo = false; $('portable-settings').checked = false; $('cloud-replace').checked = false; cloudMessage = ''; if (snapshot.empty) { portableController.cancel(); cloudMessage = 'В облаке пока нет копии. Можно сохранить текущий профиль.'; } else portableController.stage(snapshot.profile); }
+      else { const profile = await portableController.exportProfile(); if (token !== cloudEpoch || owner.signal.aborted) return; const snapshot = await cloud.push(profile, password, { ...options, overwrite: cloudSnapshot }); if (token !== cloudEpoch || !cloud.current(snapshot)) return; cloudSnapshot = snapshot; $('cloud-replace').checked = false; cloudMessage = 'Зашифрованная копия сохранена. Для открытия на другом устройстве нужна та же парольная фраза.'; }
+    } catch (error) { if (token === cloudEpoch) portableError(error); }
+    finally { if (token === cloudEpoch) { cloudBusy = false; cloudController = null; renderPortable(); } }
+  }
+  async function applyPortablePreview() {
+    portableFile = null;
+    try { if (portableUndo) { await portableController.undo(); portableUndo = false; renderPortable(); } else if (cloudSnapshot && !cloudSnapshot.empty) { const snapshot = cloudSnapshot, token = cloudEpoch, owner = new AbortController(); cloudController = owner; cloudBusy = true; cloudMessage = 'Проверяем актуальность копии…'; renderPortable(); try { const profile = await cloud.validate(snapshot, { signal: owner.signal }); if (token !== cloudEpoch || !cloud.current(snapshot)) return; portableController.stage(profile); cloudMessage = ''; await portableController.merge({ settings: $('portable-settings').checked, guard: () => token === cloudEpoch && cloud.current(snapshot) }); } finally { if (token === cloudEpoch) { cloudBusy = false; cloudController = null; renderPortable(); } } } else await portableController.merge({ settings: $('portable-settings').checked }); } catch (error) { portableError(error); }
+  }
+  async function savePortable() {
+    cloudMessage = '';
+    if (!portableFile) { try { const value = await portableController.exportProfile(); portableJSON = JSON.stringify(value); portableFile = new File([portableJSON], 'LolzCloud-profile-' + new Date().toISOString().slice(0, 10) + '.json', { type: 'application/json' }); if (portableFile.size > window.LolzCloudProfilePolicy.MAX_BYTES) { portableFile = null; throw Error('Профиль больше 750 КБ. Уменьши список для переноса.'); } renderPortable(); } catch (error) { portableError(error); } return; }
+    try { if (native && nativeProfileExport) { portableOperation = crypto.randomUUID().toLowerCase(); sendNative('exportProfile', { filename: portableFile.name, json: portableJSON, operationId: portableOperation }); } else if (navigator.canShare?.({ files: [portableFile] })) await navigator.share({ files: [portableFile], title: 'Профиль LolzCloud' }); else if (native) throw Error('Для сохранения файла обнови iOS-клиент или открой LolzCloud в Safari.'); else { const url = URL.createObjectURL(portableFile), link = node('a'); link.href = url; link.download = portableFile.name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 30000); } } catch (error) { portableError(error); }
+  }
+  function learnNativeCapabilities(value) { if (!native || !currentNativeIntent(value)) return; effectsController.capabilities(value); if (value.profileExport === 1) nativeProfileExport = true; if (value.catalogReferences === 1 && !nativeCatalogReferences) { nativeCatalogReferences = true; nativeQueueSignature = ''; queueMicrotask(syncNativeQueue); } }
   function savedState() { return { queue, index, shuffle, repeat, liked: [...liked], collection: [...collection.values()].slice(-500), position: elapsed, rate, sleepDeadline, bookmarks: Object.fromEntries(bookmarks) }; }
   function persist() {
     clearTimeout(persistTimer);
@@ -131,10 +203,12 @@
   }
   function libraryTracks() {
     const combined = new Map(collection); for (const [id, row] of offline) combined.set(id, row);
+    const importedCollections = new Set(portableController.collections().map(row => row.url)), knownURLs = new Set([...combined.values()].map(row => row.url).filter(Boolean));
+    for (const ref of portableController.refs()) if (!combined.has(ref.id) && (liked.has(canonicalID(ref.id)) || bookmarks.has(canonicalID(ref.id)) || importedCollections.has(ref.url)) && !knownURLs.has(ref.url)) { combined.set(ref.id, ref); knownURLs.add(ref.url); }
     return [...combined.values()].reverse().filter(track => libraryFilter !== 'liked' || liked.has(track.id)).filter(track => libraryFilter !== 'offline' || offline.has(track.id)).sort((a, b) => (b.savedAt || 0) - (a.savedAt || 0));
   }
   function renderLibrary() {
-    const tracks = libraryTracks(); $('library-results').replaceChildren(...tracks.map((track, i) => trackRow(track, tracks, i)));
+    const tracks = libraryTracks(); $('library-results').replaceChildren(...tracks.slice(0, libraryVisible).map((track, i) => trackRow(track, tracks, i))); $('library-more').hidden = tracks.length <= libraryVisible;
     if (!tracks.length) {
       const empty = node('div', null, 'empty-state'); empty.append(node('h2', libraryFilter === 'offline' ? 'Музыка без сети' : libraryFilter === 'liked' ? 'Твои любимые' : 'Собери свою коллекцию'), node('p', libraryFilter === 'offline' ? 'Открой действия с треком и сохрани его на устройство.' : 'Нажми на три точки рядом с треком, чтобы добавить его в любимое или сохранить.'));
       $('library-results').append(empty);
@@ -149,15 +223,15 @@
   }
   function toggleLike(track) {
     if (!track) return;
-    if (liked.has(track.id)) liked.delete(track.id); else { liked.add(track.id); collection.set(track.id, track); }
-    if (!liked.has(track.id) && !offline.has(track.id) && !bookmarks.get(track.id)?.length) collection.delete(track.id);
+    const id = canonicalID(track.id); if (liked.has(id)) liked.delete(id); else { liked.add(id); collection.set(track.id, track); }
+    if (!liked.has(id) && !offline.has(id) && !bookmarks.get(id)?.length) collection.delete(id);
     persist(); renderLibrary(); renderLike(); if (actionTrack?.id === track.id) renderActions();
   }
-  function renderLike() { const active = !!current && liked.has(current.id); $('player-like').textContent = active ? '♥' : '♡'; $('player-like').setAttribute('aria-pressed', String(active)); $('player-like').setAttribute('aria-label', active ? 'Убрать из любимого' : 'Добавить в любимое'); }
+  function renderLike() { const active = !!current && liked.has(canonicalID(current.id)); $('player-like').textContent = active ? '♥' : '♡'; $('player-like').setAttribute('aria-pressed', String(active)); $('player-like').setAttribute('aria-label', active ? 'Убрать из любимого' : 'Добавить в любимое'); }
   function enqueue(track) { if (queue.length >= 200) return notice('В очереди уже 200 треков. Убери несколько.'); queue.push(track); persist(); renderQueue(); notice('Добавлено в очередь'); }
   function syncNativeQueue() {
     if (!native) return;
-    const value = { tracks: queue, index, repeat, shuffle }, signature = JSON.stringify({ ...value, clientId: nativeClientId, requestId: nativeRequestId });
+    const positions = queue.map((track, i) => nativeCatalogReferences || !C.referenceTrack(track) ? i : -1).filter(i => i >= 0), value = { tracks: positions.map(i => queue[i]), index: positions.indexOf(index), repeat, shuffle }, signature = JSON.stringify({ ...value, positions, clientId: nativeClientId, requestId: nativeRequestId }); nativeQueuePositions = positions;
     if (signature === nativeQueueSignature) return;
     const handshake = nativeHandshake; nativeHandshake = false;
     nativeQueueSignature = signature; sendNative('queue', handshake ? { ...value, handshake: true } : value);
@@ -186,7 +260,7 @@
   }
   function stopSource() { audio.pause(); audio.removeAttribute('src'); audio.load(); if (activeBlobURL) URL.revokeObjectURL(activeBlobURL); activeBlobURL = ''; loaded = false; }
   async function playAt(position, { automatic = false, seek = 0, remember = true } = {}) {
-    const track = queue[position]; if (!track) return;
+    let track = queue[position]; if (!track) return;
     beginNativeIntent();
     const previousIndex = index; preparationController?.abort(); preparationController = new AbortController(); const signal = preparationController.signal, token = ++playVersion;
     if (remember && previousIndex >= 0 && previousIndex !== position) history.push(previousIndex);
@@ -197,6 +271,7 @@
     renderPlayer(); renderQueue(); renderSearch(); renderLibrary(); persist();
     if ($('tab-lyrics').getAttribute('aria-selected') === 'true') void loadLyrics();
     try {
+      if (C.referenceTrack(track)) { const previous = track, resolved = await lookupCatalog(track, signal); if (token !== playVersion || signal.aborted || queue[position]?.id !== previous.id || queue[position]?.url !== previous.url) return; adoptCatalog(previous, resolved, { selected: true }); track = queue[position]; duration = track.duration; effectsController.track(track.id); renderPlayer(); renderQueue(); }
       let source;
       if (native && (track.local || offline.has(track.id))) { if (track.local && !offline.has(track.id)) throw new Error('Локальный файл не найден. Добавь его заново в «Моя музыка».'); source = track.local ? 'native-local' : track.audioUrl; }
       else if (!native) { const stored = await DB.get(track.id).catch(() => null); if (token !== playVersion) return; if (stored?.blob instanceof Blob) source = activeBlobURL = URL.createObjectURL(stored.blob); }
@@ -204,7 +279,7 @@
       if (!source) { await prepare(track, signal); source = track.audioUrl; }
       if (token !== playVersion || signal.aborted) return;
       loaded = true;
-      if (native) sendNative('play', { ...track, position: seek, queueIndex: index });
+      if (native) sendNative('play', { ...track, position: seek, queueIndex: nativeQueuePositions.indexOf(index) });
       else {
         audio.src = source; audio.load();
         audio.defaultPlaybackRate = audio.playbackRate = rate;
@@ -246,16 +321,17 @@
     for (let i = 0; i < 5; i++) { const input = $('effects-gain-' + i); if (document.activeElement !== input) input.value = config.gains[i]; input.disabled = !cap.eq; input.setAttribute('aria-valuetext', db(config.gains[i])); $('effects-gain-' + i + '-value').textContent = db(config.gains[i]); }
     for (const [key, id, scale] of [['preampDb', 'preamp', 1], ['reverb', 'reverb', 100], ['echo', 'echo', 100]]) { const input = $('effects-' + id), amount = Math.round(config[key] * scale); if (document.activeElement !== input) input.value = amount; input.disabled = !cap[id]; $('effects-' + id + '-value').textContent = scale === 1 ? db(amount) : amount + '%'; }
     $('effects-normalization').checked = config.normalization; $('effects-normalization').disabled = !cap.normalization;
-    for (const section of document.querySelectorAll('[data-effects-cap]')) section.hidden = native && (section.dataset.effectsCap !== 'preamp' || !cap.preamp);
-    const presets = $('effects-preset'), options = Object.entries(window.LolzCloudEffectsPolicy.PRESETS).filter(([key]) => !native || !['lofi', 'reverb', 'echo'].includes(key)), signature = options.map(([key]) => key).join(',');
+    for (const section of document.querySelectorAll('[data-effects-cap]')) section.hidden = native && !cap[section.dataset.effectsCap];
+    const presets = $('effects-preset'), options = Object.entries(window.LolzCloudEffectsPolicy.PRESETS).filter(([key]) => !native || !(['lofi', 'reverb'].includes(key) && !cap.reverb || key === 'echo' && !cap.echo)), signature = options.map(([key]) => key).join(',');
     if (presets.dataset.options !== signature) { presets.replaceChildren(...options.map(([key, row]) => { const option = document.createElement('option'); option.value = key; option.textContent = row.label; return option; })); const custom = document.createElement('option'); custom.value = 'custom'; custom.textContent = 'Свои настройки'; custom.disabled = true; presets.append(custom); presets.dataset.options = signature; }
-    presets.value = window.LolzCloudEffectsPolicy.selectedPreset(config, native); presets.disabled = !cap.eq;
+    presets.value = window.LolzCloudEffectsPolicy.selectedPreset(config, native && value.effectsSchema !== 2); presets.disabled = !cap.eq;
     let text = value.error || ({ bypassed: 'Обработка выключена. Исходный звук.', pending: 'Настройки применятся при воспроизведении.', applied: 'Обработка применяется к этому треку.', interrupted: 'Звук прерван. Нажми Play, чтобы продолжить.', unsupported: 'Обработка звука здесь недоступна.' })[value.state] || '';
     if (roomAudible) text += ' Настройки относятся к твоему плееру; звук комнаты остаётся общим.';
+    if (native && value.effectsSchema !== 2 && (config.echo || config.reverb || config.normalization)) text += ' Дополнительные эффекты сохранены для поддерживающего клиента.';
     if ($('effects-status').textContent !== text) $('effects-status').textContent = text;
     const meter = value.normalization; $('effects-normalization-status').textContent = !config.normalization ? 'Для музыки в твоём плеере. Защита от пиков включается вместе с обработкой.' : meter?.measured ? 'Коррекция: ' + db(Math.round(meter.gainDb * 10) / 10) + '. Измерение продолжается во время музыки.' : 'Оцениваем громкость. Первые несколько секунд играют без коррекции.';
   }
-  function configureEffects(patch) { void effectsController.configure(patch).catch(noticeError); }
+  function configureEffects(patch) { portableController.editedSound(patch); portableFile = null; void effectsController.configure(patch).catch(noticeError); }
   let effectsOpener, effectsFromHistory = false;
   function openEffects(opener) { if ($('effects-dialog').open) return; effectsOpener = opener || document.activeElement; renderEffects(); $('effects-dialog').showModal(); window.history.pushState({ ...window.history.state, lolzcloudEffects: true }, '', location.href); }
   function closeEffects(fromHistory = false) { if (!$('effects-dialog').open) return; effectsFromHistory = fromHistory; $('effects-dialog').close(); }
@@ -311,9 +387,10 @@
       return;
     }
     if (track.local) { showView('library'); if (native) sendNative('importAudio'); else $('audio-import').click(); return; }
-    downloads.add(track.id); renderDownload();
+    const requestedID = track.id; downloads.add(requestedID); renderDownload();
     const controller = new AbortController(), timeout = setTimeout(() => controller.abort(), 170000); let handedToNative = false;
     try {
+      if (C.referenceTrack(track)) { const previous = track; track = await lookupCatalog(track, controller.signal); if (controller.signal.aborted) throw new DOMException('Cancelled', 'AbortError'); adoptCatalog(previous, track); downloads.add(track.id); }
       await prepare(track, controller.signal);
       if (native) { sendNative('download', { track }); handedToNative = true; return; }
       const response = await fetch(track.audioUrl, { credentials: 'omit', redirect: 'error', signal: controller.signal });
@@ -326,7 +403,7 @@
       await DB.save(track, blob); collection.set(track.id, track); await refreshOffline(); persist(); notice('Сохранено на устройстве');
       void navigator.storage?.persist?.().catch(() => {});
     } catch (error) { noticeError(error.name === 'AbortError' ? new Error('Загрузка прервана. Проверь сеть и повтори.') : error); }
-    finally { clearTimeout(timeout); if (!handedToNative) downloads.delete(track.id); renderDownload(); renderSearch(); }
+    finally { clearTimeout(timeout); downloads.delete(requestedID); if (!handedToNative) downloads.delete(track.id); renderDownload(); renderSearch(); }
   }
   function verifyDuration(blob, expected) {
     return new Promise((resolve, reject) => {
@@ -381,8 +458,9 @@
     $('sleep-active').hidden = !sleepDeadline; $('sleep-active').textContent = 'Осталось ' + Math.max(1, Math.ceil((sleepDeadline - Date.now()) / 60000)) + ' мин.';
     if (document.activeElement !== $('sleep-select')) $('sleep-select').value = sleepDeadline ? 'active' : '0';
   }
-  function setRate(value) {
+  function setRate(value, { edited = false } = {}) {
     const nextRate = Number(value); if (!Number.isFinite(nextRate) || nextRate < 0.5 || nextRate > 2) return;
+    if (edited) { portableController.editedSound({ rate: nextRate }); portableFile = null; }
     rate = nextRate; if (native) sendNative('rate', { value: rate }); else audio.defaultPlaybackRate = audio.playbackRate = rate;
     renderComfort(); updateMediaSession(); persist();
   }
@@ -396,19 +474,20 @@
     sleepDeadline = minutes ? Date.now() + minutes * 60000 : 0; if (native) sendNative('sleep', { minutes }); scheduleSleep(); persist();
   }
   function renderBookmarks() {
-    const rows = current ? bookmarks.get(current.id) || [] : []; $('bookmark-add').disabled = !current;
-    $('bookmark-list').replaceChildren(...rows.map(row => {
+    const id = current ? canonicalID(current.id) : '', rows = id ? bookmarks.get(id) || [] : []; $('bookmark-add').disabled = !current;
+    if (bookmarkVisibleID !== id) { bookmarkVisibleID = id; bookmarkVisible = 100; }
+    $('bookmark-list').replaceChildren(...rows.slice(0, bookmarkVisible).map(row => {
       const item = node('div', null, 'bookmark-row'), jump = button(C.formatTime(row.position), () => { if (loaded) seek(row.position); else { elapsed = row.position; renderTime(); persist(); notice('Момент выбран. Нажми Play.'); } }, 'bookmark-jump'); jump.setAttribute('aria-label', 'Перейти к ' + C.formatTime(row.position));
-      const remove = button('×', () => { const remaining = rows.filter(value => value !== row); if (remaining.length) bookmarks.set(current.id, remaining); else bookmarks.delete(current.id); renderBookmarks(); persist(); }, 'icon-button'); remove.setAttribute('aria-label', 'Удалить момент ' + C.formatTime(row.position)); item.append(jump, remove); return item;
+      const remove = button('×', () => { const remaining = rows.filter(value => value !== row); if (remaining.length) bookmarks.set(id, remaining); else bookmarks.delete(id); renderBookmarks(); persist(); }, 'icon-button'); remove.setAttribute('aria-label', 'Удалить момент ' + C.formatTime(row.position)); item.append(jump, remove); return item;
     }));
+    if (rows.length > bookmarkVisible) $('bookmark-list').append(button('Показать ещё моменты', () => { bookmarkVisible += 100; renderBookmarks(); }, 'wide-button'));
     if (!rows.length) $('bookmark-list').append(node('p', 'Сохрани место, к которому хочется вернуться.', 'bookmark-empty'));
   }
   function addBookmark() {
-    if (!current) return; const rows = bookmarks.get(current.id) || [];
-    if (rows.length >= 100) return notice('У этого трека уже 100 сохранённых моментов.');
-    if (!bookmarks.has(current.id) && bookmarks.size >= 100) return notice('Моменты сохранены для 100 треков. Удали ненужные.');
+    if (!current) return; const id = canonicalID(current.id), rows = bookmarks.get(id) || [];
+    if ([...bookmarks.values()].reduce((sum, list) => sum + list.length, 0) >= 2000) return notice('Уже сохранено 2000 моментов. Удали ненужные.');
     const position = Math.round(elapsed * 10) / 10; if (rows.some(row => Math.abs(row.position - position) < 1)) return notice('Этот момент уже сохранён');
-    rows.push({ position, createdAt: Date.now() }); rows.sort((a, b) => a.position - b.position); bookmarks.set(current.id, rows); collection.set(current.id, current); renderBookmarks(); renderLibrary(); persist(); notice('Момент ' + C.formatTime(position) + ' сохранён');
+    rows.push({ position, createdAt: Date.now() }); rows.sort((a, b) => a.position - b.position); bookmarks.set(id, rows); collection.set(current.id, current); renderBookmarks(); renderLibrary(); persist(); notice('Момент ' + C.formatTime(position) + ' сохранён');
   }
   async function roomLyrics() {
     const doc = $('rooms-frame').contentDocument, title = doc?.getElementById('track-title')?.textContent?.trim(), artist = doc?.getElementById('track-artist')?.textContent?.trim();
@@ -460,7 +539,7 @@
         await json('/api/desktop/session', { ...post({}), headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + grant.token } });
         const { body: verified } = await json('/api/session', { signal, timeout: 12000, limit: 128 * 1024 });
         if (ticket !== loginVersion || verified.authenticated !== true || !validAccount(verified.user) || verified.user.id !== grant.user.id || !/^[a-zA-Z0-9_-]{43}$/.test(verified.csrf)) throw new Error('Не удалось подтвердить аккаунт в приложении. Нажми «Обновить» или начни вход заново.');
-        account = verified.user; deviceCode = ''; $('login-code').textContent = ''; $('login-browser').removeAttribute('href'); $('login-dialog').close();
+        updateAccount(verified.user); deviceCode = ''; $('login-code').textContent = ''; $('login-browser').removeAttribute('href'); $('login-dialog').close();
         for (const id of ['rooms-frame', 'social-frame']) $(id).removeAttribute('src');
         await loadAccount(true); notice('Аккаунт подключён'); return;
       }
@@ -478,7 +557,7 @@
     const token = ++accountVersion;
     accountPending = (async () => {
       try {
-        const { body } = await json('/api/session', { timeout: 10000, limit: 128 * 1024 }); if (token !== accountVersion) return; account = body.authenticated === true && body.user?.id ? body.user : null;
+        const { body } = await json('/api/session', { timeout: 10000, limit: 128 * 1024 }); if (token !== accountVersion) return; updateAccount(body.authenticated === true && body.user?.id ? body.user : null);
         renderGate('rooms-gate', 'rooms'); renderGate('profile-gate', 'profile');
         if (account) {
           if (view === 'rooms' && !$('rooms-frame').getAttribute('src')) $('rooms-frame').src = '/rooms';
@@ -516,7 +595,8 @@
   $('search-more').onclick = () => { void search(true); };
   $('navigation').onclick = event => { const name = event.target.closest('[data-view]')?.dataset.view; if (name) showView(name, true); };
   document.querySelector('.brand').onclick = event => { event.preventDefault(); showView('search', true); };
-  $('library-filters').onclick = event => { const filter = event.target.closest('[data-filter]')?.dataset.filter; if (!filter) return; libraryFilter = filter; for (const button of $('library-filters').children) button.setAttribute('aria-pressed', String(button.dataset.filter === filter)); renderLibrary(); };
+  $('library-filters').onclick = event => { const filter = event.target.closest('[data-filter]')?.dataset.filter; if (!filter) return; libraryFilter = filter; libraryVisible = 300; for (const button of $('library-filters').children) button.setAttribute('aria-pressed', String(button.dataset.filter === filter)); renderLibrary(); };
+  $('library-more').onclick = () => { libraryVisible += 300; renderLibrary(); };
   $('audio-import').onchange = async () => {
     const input = $('audio-import'), files = [...input.files]; input.value = '';
     if (!files.length || importingAudio) return;
@@ -550,12 +630,12 @@
   $('effects-enabled').onchange = () => configureEffects({ enabled: $('effects-enabled').checked });
   $('effects-preset').onchange = () => { if ($('effects-preset').value !== 'custom') configureEffects(window.LolzCloudEffectsPolicy.preset($('effects-preset').value)); };
   for (let i = 0; i < 5; i++) $('effects-gain-' + i).oninput = () => { const gains = effectsController.snapshot().config.gains; gains[i] = +$('effects-gain-' + i).value; configureEffects({ enabled: true, gains }); };
-  $('effects-preamp').oninput = () => configureEffects({ preampDb: +$('effects-preamp').value });
+  $('effects-preamp').oninput = () => configureEffects({ enabled: true, preampDb: +$('effects-preamp').value });
   for (const name of ['echo', 'reverb']) $('effects-' + name).oninput = () => configureEffects({ enabled: true, [name]: +$('effects-' + name).value / 100 });
   $('effects-normalization').onchange = () => configureEffects({ enabled: true, normalization: $('effects-normalization').checked });
   $('effects-reset').onclick = () => configureEffects(window.LolzCloudEffectsPolicy.preset('original'));
   $('effects-retry').onclick = () => configureEffects({});
-  $('player-rate').oninput = () => setRate($('player-rate').value); $('rate-presets').onclick = event => { const control = event.target.closest('[data-rate]'); if (control) setRate(control.dataset.rate); };
+  $('player-rate').oninput = () => setRate($('player-rate').value, { edited: true }); $('rate-presets').onclick = event => { const control = event.target.closest('[data-rate]'); if (control) setRate(control.dataset.rate, { edited: true }); };
   $('sleep-select').onchange = () => setSleep(+$('sleep-select').value); $('bookmark-add').onclick = addBookmark;
   $('queue-clear').onclick = () => { queue = current ? [current] : []; index = current ? 0 : -1; history = []; persist(); renderQueue(); notice('В очереди остался текущий трек'); };
   $('player-tabs').onclick = event => { const tab = event.target.closest('[data-player-tab]')?.dataset.playerTab; if (tab) playerTab(tab); };
@@ -590,6 +670,18 @@
   window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); installPrompt = event; $('install-confirm').hidden = false; });
   $('install-confirm').onclick = async () => { if (!installPrompt) return; await installPrompt.prompt(); installPrompt = null; $('install-confirm').hidden = true; };
   $('account-refresh').onclick = () => { void loadAccount(true).then(() => { if (account && $('social-frame').src) $('social-frame').contentWindow.location.reload(); }); };
+  $('portable-open').onclick = event => { portableFile = null; portableJSON = ''; portableOpener = event.currentTarget; renderPortable(); $('portable-dialog').showModal(); window.history.pushState({ ...window.history.state, lolzcloudPortable: true }, '', location.href); };
+  $('portable-close').onclick = () => $('portable-dialog').close();
+  $('portable-dialog').addEventListener('cancel', event => { event.preventDefault(); $('portable-dialog').close(); });
+  $('portable-dialog').addEventListener('close', () => { const hadCloud = cloudBusy || !!cloudSnapshot; cancelCloud(); if (hadCloud || ['reading', 'exporting'].includes(portableController.snapshot().phase)) portableController.cancel(); if (!portableHistory && window.history.state?.lolzcloudPortable) window.history.back(); portableHistory = false; portableOpener?.focus(); });
+  window.addEventListener('popstate', () => { if (!window.history.state?.lolzcloudPortable && $('portable-dialog').open) { portableHistory = true; $('portable-dialog').close(); } });
+  $('portable-export').onclick = () => { void savePortable(); };
+  $('portable-import').onchange = async () => { const file = $('portable-import').files[0]; $('portable-import').value = ''; if (!file) return; cancelCloud(); portableFile = null; portableUndo = false; $('portable-settings').checked = false; try { await portableController.parseFile(file); } catch (error) { portableError(error); } };
+  $('portable-settings').onchange = () => renderPortable();
+  $('portable-apply').onclick = () => { void applyPortablePreview(); };
+  $('portable-cancel').onclick = () => { cancelCloud(); portableUndo = false; portableController.cancel(); };
+  $('portable-undo').onclick = () => { cancelCloud(); portableController.cancel(); portableUndo = true; renderPortable(); };
+  $('cloud-read').onclick = () => { void transferCloud('read'); }; $('cloud-save').onclick = () => { void transferCloud('save'); };
   $('rooms-directory').onclick = () => { $('rooms-frame').src = '/rooms'; };
   $('room-lyrics').onclick = () => { void roomLyrics(); };
   for (const id of ['rooms-frame', 'social-frame']) $(id).onload = () => frameLoaded($(id));
@@ -600,9 +692,11 @@
   audio.addEventListener('timeupdate', () => { if (!loaded || native) return; elapsed = audio.currentTime; checkSleep(); renderTime(); updateMediaSession(); if (Date.now() - lastSavedTime > 5000) { lastSavedTime = Date.now(); persist(); } });
   audio.addEventListener('ended', () => { if (loaded && !native) next(true); });
   audio.addEventListener('error', () => { if (!loaded || native) return; phase = 'error'; playerError = 'Запись не загрузилась. Проверь сеть и нажми «Повторить».'; renderPlayback(); });
-  window.addEventListener('lolzcloud:effects', event => { if (native) effectsController.receiveNative(event.detail); });
+  window.addEventListener('lolzcloud:capabilities', event => learnNativeCapabilities(event.detail));
+  window.addEventListener('lolzcloud:profileExport', event => { const value = event.detail; if (!native || !currentNativeIntent(value) || value.operationId !== portableOperation) return; if (value.state === 'error') portableError(Error(typeof value.error === 'string' ? value.error.slice(0, 300) : 'Не удалось открыть отправку файла.')); else if (value.state === 'shared' || value.state === 'cancelled') $('portable-status').textContent = 'Панель отправки закрыта. Файл можно сохранить ещё раз.'; });
+  window.addEventListener('lolzcloud:effects', event => { if (native) { learnNativeCapabilities(event.detail); effectsController.receiveNative(event.detail); } });
   window.addEventListener('lolzcloud:playback', event => {
-    if (!native || !current) return; const value = event.detail;
+    if (!native) return; const value = event.detail; learnNativeCapabilities(value); if (!current) return;
     if (!currentNativeIntent(value) || typeof value.id === 'string' && value.id !== current.id || !['loading', 'playing', 'paused', 'ended', 'error'].includes(value.state)) return;
     if (!loaded && value.id !== current.id) return; loaded = true;
     if (Number.isFinite(value.rate) && value.rate >= 0.5 && value.rate <= 2) rate = value.rate;
@@ -612,9 +706,10 @@
     if (value.state === 'ended' && !nativeQueueOwned) { next(true); return; } phase = value.state; playerError = typeof value.error === 'string' ? value.error.slice(0, 300) : ''; renderPlayback(); renderComfort(); checkSleep();
   });
   window.addEventListener('lolzcloud:selection', event => {
-    if (!native) return; const value = event.detail, position = value?.index;
+    if (!native) return; const value = event.detail, position = nativeCatalogReferences ? value?.index : nativeQueuePositions[value?.index];
     if (!currentNativeIntent(value) || !Number.isInteger(position) || position < 0 || position >= queue.length) return;
-    const received = C.savedTrack(value.track, origin), expected = queue[position];
+    const received = C.savedTrack(value.track, origin); let expected = queue[position];
+    if (C.referenceTrack(expected) && C.track(received, origin) && value.previousId === expected.id && (/^[1-9][0-9]{0,15}$/.test(expected.id) ? received.id === expected.id : received.url === expected.url)) { if (!adoptCatalog(expected, received, { selected: false })) return; queue[position] = received; expected = received; }
     if (!received || received.id !== expected.id || received.audioUrl !== expected.audioUrl) return;
     const changed = index !== position || current?.id !== expected.id;
     nativeQueueOwned = value.queue === true;
@@ -639,13 +734,13 @@
     if (value.state === 'ready' || value.state === 'error') { downloads.delete(value.id); if (value.state === 'error') notice(value.error || 'Не удалось сохранить трек.'); else if (!value.import) notice('Сохранено на устройстве'); }
     renderLibrary(); renderDownload(); renderSearch();
   });
-  window.addEventListener('lolzcloud:account', event => { if (!native) return; if (event.detail?.state === 'ready') { account = null; $('rooms-frame').removeAttribute('src'); $('social-frame').removeAttribute('src'); void loadAccount(true); } else if (event.detail?.state === 'error') notice(event.detail.error || 'Не удалось войти. Попробуй ещё раз.'); });
+  window.addEventListener('lolzcloud:account', event => { if (!native) return; if (event.detail?.state === 'ready') { updateAccount(null); $('rooms-frame').removeAttribute('src'); $('social-frame').removeAttribute('src'); void loadAccount(true); } else if (event.detail?.state === 'error') notice(event.detail.error || 'Не удалось войти. Попробуй ещё раз.'); });
   if ('mediaSession' in navigator && !native) for (const [action, handler] of Object.entries({ play: resume, pause, nexttrack: () => next(), previoustrack: previous, seekto: detail => seek(detail.seekTime), seekbackward: detail => seek(elapsed - (detail.seekOffset || 10)), seekforward: detail => seek(elapsed + (detail.seekOffset || 10)) })) { try { navigator.mediaSession.setActionHandler(action, handler); } catch { /* Optional platform command. */ } }
   function connectivity() { $('connection').hidden = navigator.onLine; }
   window.addEventListener('online', () => { connectivity(); if (['rooms', 'profile'].includes(view)) void loadAccount(true); }); window.addEventListener('offline', connectivity);
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); else { checkSleep(); connectivity(); if (['rooms', 'profile'].includes(view)) void loadAccount(); } });
   window.addEventListener('pagehide', () => { clearTimeout(persistTimer); try { localStorage.setItem('LolzCloud-app-v1', JSON.stringify(savedState())); } catch {} });
-  renderPlayer(); renderQueue(); renderLibrary(); renderComfort(); renderBookmarks(); renderEffects(); scheduleSleep(); checkSleep(); connectivity(); renderGate('rooms-gate', 'rooms'); renderGate('profile-gate', 'profile'); void refreshOffline(); if (native) sendNative('rate', { value: rate });
+  renderPlayer(); renderQueue(); renderLibrary(); renderComfort(); renderBookmarks(); renderEffects(); renderPortable(); scheduleSleep(); checkSleep(); connectivity(); renderGate('rooms-gate', 'rooms'); renderGate('profile-gate', 'profile'); void refreshOffline(); if (native) { sendNative('rate', { value: rate }); sendNative('capabilities'); }
   if (native) $('install-open').hidden = true;
   if (native) { $('audio-import-control').hidden = true; $('native-audio-import').hidden = false; }
   if (!native && (/iPad|iPhone|iPod/.test(navigator.userAgent) || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) { document.querySelector('.volume-label').hidden = true; document.querySelector('.player-actions').append(node('span', 'Громкость — кнопками устройства', 'hint')); }

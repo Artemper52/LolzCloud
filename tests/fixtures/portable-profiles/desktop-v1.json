@@ -1,0 +1,161 @@
+{
+  "format": "lolzcloud-profile",
+  "version": 1,
+  "exportedAt": 1700000000000,
+  "music": {
+    "preferences": {
+      "autoFollow": false,
+      "reduceMotion": true,
+      "density": "compact",
+      "startupView": "audio",
+      "windowStyle": "mac",
+      "lyricsFontScale": 1.25,
+      "uiScale": 1.1
+    },
+    "collections": [
+      {
+        "id": "fixture-collection-sc",
+        "title": "SC fixture",
+        "url": "https://soundcloud.com/fixture/sets/calm",
+        "addedAt": 1700000000000
+      },
+      {
+        "id": "fixture-collection-yt",
+        "title": "YT fixture",
+        "url": "https://music.youtube.com/watch?v=AbCdEfGhI12",
+        "addedAt": 1700000000000
+      }
+    ],
+    "dsp": {
+      "enabled": true,
+      "preset": "Fixture custom",
+      "gains": [
+        5.5,
+        -2,
+        3,
+        0,
+        -1
+      ],
+      "preampDb": -6,
+      "rate": 1.75,
+      "preservesPitch": true,
+      "reverb": 0.3,
+      "echo": 0.2
+    },
+    "customEffects": {
+      "Fixture night": {
+        "enabled": true,
+        "preset": "Fixture night",
+        "gains": [
+          -4,
+          -2,
+          2,
+          0,
+          -3
+        ],
+        "preampDb": -3,
+        "rate": 0.5,
+        "preservesPitch": false,
+        "reverb": 0.1,
+        "echo": 0.15
+      }
+    }
+  },
+  "wave": {
+    "likes": [
+      {
+        "id": 123,
+        "url": "https://soundcloud.com/fixture/portable-one",
+        "title": "Portable one",
+        "artist": "Fixture artist",
+        "cover": "",
+        "duration": 90,
+        "genre": "ambient",
+        "tags": "fixture",
+        "description": "A declared profile fixture",
+        "releaseYear": 2024,
+        "bpm": 90,
+        "artistUrl": "https://soundcloud.com/fixture"
+      },
+      {
+        "id": null,
+        "url": "https://soundcloud.com/fixture/portable-no-id",
+        "title": "URL-only recording",
+        "artist": "Fixture artist",
+        "cover": "",
+        "duration": 90,
+        "genre": "ambient",
+        "tags": "fixture",
+        "description": "A declared profile fixture",
+        "releaseYear": 2024,
+        "bpm": 90,
+        "artistUrl": "https://soundcloud.com/fixture"
+      }
+    ],
+    "feedback": {
+      "https://soundcloud.com/fixture/portable-blocked": {
+        "track": {
+          "id": 456,
+          "url": "https://soundcloud.com/fixture/portable-blocked",
+          "title": "Blocked fixture",
+          "artist": "Fixture artist",
+          "cover": "",
+          "duration": 90,
+          "genre": "ambient",
+          "tags": "fixture",
+          "description": "A declared profile fixture",
+          "releaseYear": 2024,
+          "bpm": 90,
+          "artistUrl": "https://soundcloud.com/fixture"
+        },
+        "skips": 3,
+        "loves": 1,
+        "banned": true,
+        "lastSkippedAt": 1700000000000
+      }
+    },
+    "adventurous": 0.35,
+    "preferences": {
+      "mood": "calm",
+      "activity": "focus",
+      "character": "discover",
+      "language": "instrumental",
+      "genre": "ambient",
+      "autoContext": false
+    },
+    "blockedArtists": [
+      "Fixture blocked artist"
+    ],
+    "played24h": {}
+  },
+  "tools": {
+    "bookmarks": [
+      {
+        "id": "fixture-bookmark-sc",
+        "url": "https://soundcloud.com/fixture/portable-one",
+        "title": "Portable one",
+        "artist": "Fixture artist",
+        "position": 42.25,
+        "note": "Keep this note",
+        "createdAt": 1700000000000
+      },
+      {
+        "id": "fixture-bookmark-yt",
+        "url": "https://music.youtube.com/watch?v=AbCdEfGhI12",
+        "title": "YT fixture",
+        "artist": "Fixture artist",
+        "position": 12,
+        "note": "Unsupported mobile source remains portable",
+        "createdAt": 1700000000000
+      }
+    ],
+    "groups": [
+      [
+        "https://soundcloud.com/fixture/portable-one",
+        "https://soundcloud.com/fixture/portable-blocked"
+      ]
+    ],
+    "normalization": true,
+    "gains": {}
+  }
+}

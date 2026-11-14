@@ -36,10 +36,10 @@
     let config=P.normalize({}),gains={};
     try{config=P.normalize(JSON.parse(storage?.getItem('LolzCloud-effects-v1')||'{}'));}catch{}
     try{for(const[key,row]of Object.entries(JSON.parse(storage?.getItem('LolzCloud-effects-gains-v1')||'{}')).slice(-500))if(/^(?:[1-9][0-9]{0,15}|local:[a-f0-9-]{36})$/.test(key)&&Number.isFinite(row?.gainDb)&&Math.abs(row.gainDb)<=8)gains[key]={gainDb:row.gainDb,at:Number(row.at)||0};}catch{}
-    let revision=1,context=null,graph=null,source=null,building=null,sourceId='',volume=Number.isFinite(audio.volume)?audio.volume:1,lastNativeKey='',nativeTimer,lastMeterAt=0,lastGainSave=0,framesBeforeRevision=0,disposed=false;
+    let revision=1,nativeSchema=1,context=null,graph=null,source=null,building=null,sourceId='',volume=Number.isFinite(audio.volume)?audio.volume:1,lastNativeKey='',nativeTimer,lastMeterAt=0,lastGainSave=0,framesBeforeRevision=0,disposed=false;
     const supported=!native&&typeof(root.AudioContext||root.webkitAudioContext)==='function'&&typeof root.AudioWorkletNode==='function';
     let value={state:native?'pending':config.enabled?'pending':'bypassed',capabilities:native?{...NO_CAPABILITIES}:supported?{...WEB_CAPABILITIES}:{...NO_CAPABILITIES},appliedRevision:0,processedFrames:0,sampleRate:0,channels:0,headroomDb:0,error:'',normalization:null,peakDb:-96,reductionDb:0};
-    function snapshot(){return{...value,config:P.validate(config),revision,engine:native?'native':'web',graphCreated:!!source,contextState:context?.state||'none',sourceId};}
+    function snapshot(){return{...value,config:P.validate(config),revision,effectsSchema:native?nativeSchema:2,engine:native?'native':'web',graphCreated:!!source,contextState:context?.state||'none',sourceId};}
     function emit(){if(!disposed)onState(snapshot());}
     function save(){try{storage?.setItem('LolzCloud-effects-v1',JSON.stringify(config));}catch{value.error='Настройки звука не сохранены: проверь свободное место.';}}
     function webState(){
@@ -72,7 +72,7 @@
         if('audioSession'in(root.navigator||{}))try{root.navigator.audioSession.type='playback';}catch{}
         context.onstatechange=()=>{webState();emit();if(source&&['suspended','interrupted','closed'].includes(context.state)&&!audio.paused)onInterrupted();};
         graph||=await createGraph(context,{onMeter:meter});
-        if(disposed||!config.enabled)return false;
+        if(disposed||!config.enabled){const unused=context;graph.disconnect();graph=null;context=null;unused.onstatechange=null;void unused.close().catch(()=>{});return false;}
         if(wantedPlayback()){if(waking)await waking;if(wakingError)throw wakingError;await resumeContext();}
         // Build and load all processors first. Until this point direct HTMLAudio
         // remains intact if a module or permission fails.
@@ -90,13 +90,14 @@
       const tag=intent(),key=tag.clientId+':'+tag.requestId+':'+revision;if(key===lastNativeKey)return;lastNativeKey=key;
       clearTimeout(nativeTimer);value.state=config.enabled?'pending':'bypassed';value.appliedRevision=0;value.error='';
       nativeTimer=setTimeout(()=>{value.state='unsupported';value.error='Обработка звука недоступна в этой версии приложения.';emit();},2200);emit();
-      sendNative('effects',{config:P.nativeConfig(config),revision});
+      sendNative('effects',{config:P.nativeConfig(config,nativeSchema),revision});
     }
     const controller={
       snapshot,
       configure(patch){config=P.validate({...config,...patch});revision++;framesBeforeRevision=value.processedFrames;value.error='';value.appliedRevision=0;save();if(native){syncNativeIntent();return Promise.resolve();}if(graph){graph.apply(config);value.headroomDb=-Math.max(0,...config.gains);webState();emit();}else{webState();emit();}return config.enabled?ensureGraph().then(()=>{}):Promise.resolve();},
       syncNativeIntent,
-      receiveNative(message){if(!native)return false;const ack=P.nativeAck(message,config,revision,intent());if(!ack)return false;clearTimeout(nativeTimer);value={...value,...ack};emit();return true;},
+      capabilities(message){if(!native||message?.effectsSchema!==2||nativeSchema===2)return false;const tag=intent();if(message.clientId!==tag.clientId||message.requestId!==tag.requestId)return false;nativeSchema=2;revision++;syncNativeIntent();return true;},
+      receiveNative(message){if(!native)return false;const ack=P.nativeAck(message,config,revision,intent(),nativeSchema);if(!ack)return false;clearTimeout(nativeTimer);value={...value,...ack,normalization:ack.normalization?.key===sourceId?ack.normalization:null};emit();return true;},
       track(id){sourceId=String(id||'').slice(0,100);value.processedFrames=0;value.normalization=null;if(graph)graph.track(sourceId,gains[sourceId]?.gainDb);webState();emit();},
       prime(){if(native)return;if(source&&wantedPlayback())void resumeContext().catch(()=>{});else if(config.enabled)void ensureGraph().catch(()=>{});},
       async beforePlay(){if(native)return;if(config.enabled)await ensureGraph();if(source){await resumeContext();webState();emit();}},

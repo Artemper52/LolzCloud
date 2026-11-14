@@ -27,16 +27,18 @@
     return result;
   }
   function normalize(value){try{return validate(value);}catch{return validate({});}}
-  function nativeConfig(value){const c=validate(value);return{enabled:c.enabled,gains:[...c.gains],preampDb:c.preampDb};}
-  function sameNative(a,b){return a?.enabled===b.enabled&&a?.preampDb===b.preampDb&&Array.isArray(a?.gains)&&a.gains.length===5&&a.gains.every((v,i)=>v===b.gains[i]);}
+  function nativeConfig(value,schema=1){const c=validate(value);return{enabled:c.enabled,gains:[...c.gains],preampDb:c.preampDb,...(schema===2?{reverb:c.reverb,echo:c.echo,normalization:c.normalization}:{})};}
+  function sameNative(a,b){return a&&Object.keys(a).sort().join(',')===Object.keys(b).sort().join(',')&&Object.keys(b).every(key=>key==='gains'?Array.isArray(a.gains)&&a.gains.length===5&&a.gains.every((v,i)=>v===b.gains[i]):a[key]===b[key]);}
   function preset(key){const value=PRESETS[key];if(!value)throw Error('Неизвестный звуковой профиль.');const{label,...config}=value;return validate(config);}
   function selectedPreset(value,native=false){const config=validate(value);return Object.keys(PRESETS).find(key=>native?sameNative(nativeConfig(config),nativeConfig(preset(key)))&&(!preset(key).reverb&&!preset(key).echo):JSON.stringify(config)===JSON.stringify(preset(key)))||'custom';}
-  function nativeAck(value,config,revision,intent){
-    if(!value||value.clientId!==intent.clientId||value.requestId!==intent.requestId||value.revision!==revision||!sameNative(value.config,nativeConfig(config))||!['pending','applied','bypassed','unsupported'].includes(value.state))return null;
+  function nativeAck(value,config,revision,intent,schema=1){
+    if(!value||value.clientId!==intent.clientId||value.requestId!==intent.requestId||value.revision!==revision||!sameNative(value.config,nativeConfig(config,schema))||!['pending','applied','bypassed','unsupported'].includes(value.state))return null;
     const capabilities=Object.fromEntries(flags.map(key=>[key,value.capabilities?.[key]===true]));
-    const applied=value.appliedRevision===revision&&capabilities.eq&&capabilities.preamp&&Number.isFinite(value.processedFrames)&&value.processedFrames>0&&Number.isFinite(value.sampleRate)&&value.sampleRate>=8000&&value.sampleRate<=384000&&Number.isInteger(value.channels)&&value.channels>=1&&value.channels<=8;
+    const supportedAdvanced=schema!==2||(!config.reverb||capabilities.reverb)&&(!config.echo||capabilities.echo)&&(!config.normalization||capabilities.normalization);
+    const applied=value.appliedRevision===revision&&capabilities.eq&&capabilities.preamp&&supportedAdvanced&&Number.isFinite(value.processedFrames)&&value.processedFrames>0&&Number.isFinite(value.sampleRate)&&value.sampleRate>=8000&&value.sampleRate<=384000&&Number.isInteger(value.channels)&&value.channels>=1&&value.channels<=8;
     if(value.state==='applied'&&(!config.enabled||!applied)||value.state==='bypassed'&&config.enabled)return null;
-    return{state:value.state,capabilities,appliedRevision:value.state==='applied'&&applied?revision:0,processedFrames:Number.isFinite(value.processedFrames)?Math.max(0,value.processedFrames):0,sampleRate:Number.isFinite(value.sampleRate)?value.sampleRate:0,channels:Number.isInteger(value.channels)?value.channels:0,headroomDb:Number.isFinite(value.headroomDb)?value.headroomDb:0,error:typeof value.error==='string'?value.error.slice(0,300):''};
+    const meter=value.normalization,normalization=schema===2&&meter&&typeof meter.key==='string'&&typeof meter.enabled==='boolean'&&typeof meter.measured==='boolean'&&Number.isFinite(meter.gainDb)&&Math.abs(meter.gainDb)<=8&&Number.isFinite(meter.targetDb)&&Math.abs(meter.targetDb)<=8&&Number.isFinite(meter.processedFrames)&&meter.processedFrames>=0?{key:meter.key.slice(0,510),enabled:meter.enabled,measured:meter.measured,gainDb:meter.gainDb,targetDb:meter.targetDb,processedFrames:meter.processedFrames,loudness:Number.isFinite(meter.loudness)?meter.loudness:null}:null;
+    return{state:value.state,capabilities,appliedRevision:value.state==='applied'&&applied?revision:0,processedFrames:Number.isFinite(value.processedFrames)?Math.max(0,value.processedFrames):0,sampleRate:Number.isFinite(value.sampleRate)?value.sampleRate:0,channels:Number.isInteger(value.channels)?value.channels:0,headroomDb:Number.isFinite(value.headroomDb)?value.headroomDb:0,normalization,peakDb:Number.isFinite(value.peakDb)?value.peakDb:-96,reductionDb:Number.isFinite(value.reductionDb)?Math.max(0,value.reductionDb):0,error:typeof value.error==='string'?value.error.slice(0,300):''};
   }
   return{FREQUENCIES,DEFAULT,PRESETS,validate,normalize,nativeConfig,nativeAck,preset,selectedPreset};
 });

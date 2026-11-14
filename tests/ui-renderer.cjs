@@ -38,6 +38,7 @@ ipcMain.handle('features:action', async (event, action) => {
   if (action.type === 'player') music.configurePlayer(action.settings);
   if (action.type === 'preferences') music.configurePreferences(action.settings);
   if (action.type === 'protection') music.configureProtection(action.settings);
+  if (action.type === 'dsp') music.configureDsp(action.settings);
   return { ok: true, state: { ...features(), lyricTrack: lyrics.key } };
 });
 ipcMain.on('lolzteam:playback', (_event, value) => { lastUpcoming = value.upNext || []; service.setPlayback(value); });
@@ -161,6 +162,10 @@ app.whenReady().then(async () => {
     await host.webContents.executeJavaScript('document.querySelector("[data-view=audio]").click()'); await delay(250);
     const panel = await host.webContents.executeJavaScript('({open:document.getElementById("lc-studio").open,view:document.body.dataset.view,cards:document.querySelectorAll(".lc-sound-preset").length})');
     assert.equal(panel.open, true); assert.equal(panel.view, 'audio'); assert.equal(panel.cards, 12);
+    await host.webContents.executeJavaScript('document.getElementById("lc-preamp").value="-6";document.getElementById("lc-preamp").dispatchEvent(new Event("input"));document.getElementById("lc-preamp").dispatchEvent(new Event("change"))');
+    await until(()=>music.data.dsp.preampDb===-6&&music.data.dsp.enabled,'Preamp slider must persist an enabled portable sound setting.');
+    const preampBridge=await host.webContents.executeJavaScript('document.getElementById("webview").executeJavaScript("window.__lolzcloudAudioFX.config.preampDb")');assert.equal(preampBridge,-6,'Preamp must reach the sandboxed audio graph.');
+    for(const speed of[50,200]){await host.webContents.executeJavaScript('document.getElementById("lc-speed").value='+speed+';document.getElementById("lc-speed").dispatchEvent(new Event("change"))');await until(()=>music.data.dsp.rate===speed/100,'Speed slider must support the portable .5–2 range.');}
     await host.webContents.executeJavaScript('document.getElementById("lc-protect-ceilingDb").value="-6";document.getElementById("lc-protect-ceilingDb").dispatchEvent(new Event("change"))'); await delay(100);
     assert.equal(music.data.protection.ceilingDb, -6);
     const safetyBridge = await host.webContents.executeJavaScript('document.getElementById("webview").executeJavaScript("window.__lolzcloudGetAudioState().safety.ceilingDb")');

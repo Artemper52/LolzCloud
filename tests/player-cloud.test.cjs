@@ -18,8 +18,8 @@ test('phone remote accepts commands only from its verified owner, hides private 
 test('encrypted profile storage is scoped to the verified user and rejects conflicting updates without overwriting', async t => {
   const f = await fixture(t), envelope = await encryptProfile({ format: 'lolzcloud-profile', version: 1 }, 'a private fixture password');
   assert.equal((await f.request('/api/profile', null)).status, 401);
-  const written = await f.request('/api/profile', f.owner, 'PUT', { revision: 0, envelope, userId: f.other.user.id }); assert.equal(written.status, 200); assert.equal(written.value.revision, 1);
-  assert.equal((await f.request('/api/profile', f.other)).value.envelope, null); const loaded = (await f.request('/api/profile')).value; assert.equal((await decryptProfile(loaded.envelope, 'a private fixture password')).format, 'lolzcloud-profile');
+  const written = await f.request('/api/profile', f.owner, 'PUT', { revision: 0, envelope, userId: f.other.user.id, ownerId:f.other.user.id }); assert.equal(written.status, 200); assert.equal(written.value.revision, 1); assert.equal(written.value.ownerId,f.owner.user.id);
+  const emptyOther=(await f.request('/api/profile',f.other)).value;assert.equal(emptyOther.envelope,null);assert.equal(emptyOther.ownerId,f.other.user.id);const loaded = (await f.request('/api/profile')).value; assert.equal(loaded.ownerId,f.owner.user.id);assert.equal((await decryptProfile(loaded.envelope, 'a private fixture password')).format, 'lolzcloud-profile');
   assert.equal((await f.request('/api/profile', f.owner, 'PUT', { revision: 0, envelope })).status, 409); assert.deepEqual((await f.request('/api/profile')).value.envelope, loaded.envelope);
   const stored = fs.readFileSync(path.join(f.directory, 'player-profiles.json'), 'utf8'); assert.ok(!stored.includes('collections')); assert.ok(!stored.includes('a private fixture password'));
 });

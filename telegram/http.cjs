@@ -4,8 +4,16 @@ const path=require('node:path');
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));}
 function createMediaServer({links,cache,botName='lolzcloudbot',health=()=>({}),prefix='/telegram',catalog=null}) {
   if(!['/telegram','/music'].includes(prefix))throw Error('Invalid media route');
-  const limits=new Map(),preparations=new Map();
+  const limits=new Map(),preparations=new Map();let metadataPending=0;
   const prepared=id=>typeof cache.exists==='function'&&cache.exists(id);
+  function allowance(req,res,kind,maximum) {
+    const now=Date.now(),peer=String(req.headers['x-real-ip']||req.socket.remoteAddress||'local').slice(0,100),key=kind+':'+peer;
+    let limit=limits.get(key);if(!limit||now-limit.start>=60000){limit={start:now,count:0};limits.set(key,limit);}
+    if(limits.size>2000)for(const [id,value]of limits)if(now-value.start>=60000)limits.delete(id);
+    if(++limit.count<=maximum)return true;
+    res.setHeader('Retry-After',String(Math.max(1,Math.ceil((60000-(now-limit.start))/1000))));json(res,429,{error:'Слишком много запросов. Подожди минуту и повтори.'});return false;
+  }
+  const publicTrack=t=>({id:String(t.id),url:t.url,title:t.title,artist:t.artist,cover:t.cover||'',duration:t.duration,audioUrl:links.audio(String(t.id))});
   function publicAudioError(error) {
     const text=String(error?.message||'');
     if(/полный поддерживаемый|защищённый|SAMPLE-AES/i.test(text))return 'Источник не отдал поддерживаемый полный поток. Выбери другую запись этой песни.';
@@ -19,6 +27,24 @@ function createMediaServer({links,cache,botName='lolzcloudbot',health=()=>({}),p
       const url=new URL(req.url,'http://localhost');
       if(!['GET','HEAD'].includes(req.method))return json(res,405,{error:'Method not allowed'});
       if(url.pathname===prefix+'/health')return json(res,200,{ok:true,...(botName?{bot:botName}:{}),...health()});
+      // Portable profiles carry a stable public identity rather than an issued
+      // audio URL. Metadata recovery never starts conversion or sends cookies.
+      const metadata=prefix==='/music'&&url.pathname.match(/^\/music\/track\/([1-9]\d{0,15})$/);
+      if(metadata&&catalog){
+        if(req.method!=='GET')return json(res,405,{error:'Method not allowed'});
+        if(url.search)return json(res,400,{error:'Некорректный адрес записи.'});
+        if(!allowance(req,res,'metadata',600))return;
+        const id=metadata[1],known=cache.state.get(id);
+        if(!known&&!allowance(req,res,'metadata-upstream',30))return;
+        if(!known&&metadataPending>=16){res.setHeader('Retry-After','2');return json(res,503,{error:'Сейчас восстанавливается много записей. Повтори через несколько секунд.'});}
+        if(!known)metadataPending++;
+        try{
+          const row=await catalog.track(id);
+          if(!row||String(row.id)!==id)return json(res,404,{error:'Полная запись сейчас недоступна у источника.'});
+          return json(res,200,{track:publicTrack(row)});
+        }catch{return json(res,503,{error:'Не удалось получить запись. Проверь соединение и повтори.'});}
+        finally{if(!known)metadataPending--;}
+      }
       const preparation=prefix==='/music'&&url.pathname.match(/^\/music\/prepare\/([1-9]\d{0,15})\/([a-f0-9]{24})$/);
       if(preparation){
         if(req.method!=='GET')return json(res,405,{error:'Method not allowed'});
@@ -55,7 +81,7 @@ function createMediaServer({links,cache,botName='lolzcloudbot',health=()=>({}),p
         if(query.length<2||query.length>140||!/^\d{1,3}$/.test(offset)||Number(offset)>300||Number(offset)%20)return json(res,400,{error:'Введи исполнителя, название или ссылку на трек SoundCloud.'});
         try{
           const found=await catalog.search(query,Number(offset));
-          return json(res,200,{tracks:found.tracks.map(t=>({id:t.id,url:t.url,title:t.title,artist:t.artist,cover:t.cover,duration:t.duration,audioUrl:links.audio(t.id)})),nextOffset:found.next});
+          return json(res,200,{tracks:found.tracks.map(publicTrack),nextOffset:found.next});
         }catch{return json(res,503,{error:'Не удалось получить музыку. Проверь соединение и повтори поиск.'});}
       }
       const asset={'/telegram/assets/welcome.jpg':['welcome.jpg','image/jpeg'],'/telegram/assets/icon.png':['icon.png','image/png']}[url.pathname];

@@ -51,3 +51,44 @@ test('public search excludes protected-only streams and full-duration previews i
   const f=fixture(t,{provider:{async request(endpoint){return endpoint.startsWith('/tracks/')?protectedTrack:{collection:[protectedTrack,preview,supported]};}}}),base=await listen(f.server);
   const result=await(await fetch(base+'/music/search?q=track')).json();assert.deepEqual(result.tracks.map(t=>t.id),['125']);assert.equal(await f.catalog.track('123'),null);
 });
+
+test('portable track metadata recovers the exact public ID without login or starting an audio conversion',async t=>{
+  let requests=0;const raw={id:321,permalink_url:'https://soundcloud.com/test/portable-song',title:'Portable song',user:{username:'Artist'},duration:90000};
+  const f=fixture(t,{provider:{async request(endpoint){requests++;assert.equal(endpoint,'/tracks/321');return raw;}}}),base=await listen(f.server);
+  f.cache.prepare=()=>{throw Error('Metadata must not download or convert audio');};
+  const response=await fetch(base+'/music/track/321');assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');
+  const {track}=await response.json();assert.equal(track.id,'321');assert.equal(track.url,raw.permalink_url);assert.equal(track.duration,90);assert.equal(track.audioUrl,f.links.audio('321'));
+  assert.equal((await fetch(base+'/music/track/321')).status,200);assert.equal(requests,1);
+});
+
+test('portable metadata rejects malformed paths, query injection, HEAD and a substituted provider ID',async t=>{
+  let calls=0;const f=fixture(t,{provider:{async request(){calls++;return{id:456,permalink_url:'https://soundcloud.com/test/other',title:'Other',user:{username:'Artist'},duration:90000};}}}),base=await listen(f.server);
+  for(const id of ['0','01','-1','abc','12345678901234567','123/extra'])assert.equal((await fetch(base+'/music/track/'+id)).status,404);
+  assert.equal((await fetch(base+'/music/track/123?url=https://evil.test')).status,400);
+  assert.equal((await fetch(base+'/music/track/123',{method:'HEAD'})).status,405);assert.equal(calls,0);
+  assert.equal((await fetch(base+'/music/track/123')).status,404);assert.equal(f.state.get('456'),undefined);assert.equal(calls,1);
+});
+
+test('portable metadata hides upstream diagnostics and protected-only recordings',async t=>{
+  let mode='fail';const raw={id:123,permalink_url:'https://soundcloud.com/test/song',title:'Song',user:{username:'Artist'},duration:90000,media:{transcodings:[{url:'https://api-v2.soundcloud.com/media/secret',duration:90000,format:{protocol:'cbc-encrypted-hls',mime_type:'audio/mp4'}}]}};
+  const f=fixture(t,{provider:{async request(){if(mode==='fail')throw Error('private-provider-token=secret');return raw;}}}),base=await listen(f.server);
+  const failed=await fetch(base+'/music/track/123');assert.equal(failed.status,503);assert.ok(!(await failed.text()).includes('secret'));
+  mode='protected';assert.equal((await fetch(base+'/music/track/123')).status,404);
+});
+
+test('metadata bounds unknown upstream work while known identities remain usable',async t=>{
+  let requests=0;const f=fixture(t,{provider:{async request(endpoint){requests++;const id=Number(endpoint.split('/').at(-1));return{id,permalink_url:'https://soundcloud.com/test/song-'+id,title:'Song',user:{username:'Artist'},duration:90000};}}}),base=await listen(f.server);
+  for(let id=1;id<=30;id++)assert.equal((await fetch(base+'/music/track/'+id)).status,200);
+  const limited=await fetch(base+'/music/track/31');assert.equal(limited.status,429);assert.ok(Number(limited.headers.get('retry-after'))>0);assert.equal(requests,30);
+  assert.equal((await fetch(base+'/music/track/1')).status,200);assert.equal(requests,30);
+});
+
+test('concurrent metadata has a bounded preparation budget and releases every slot after completion',async t=>{
+  let release,entered,lookups=0,calls=0;const gate=new Promise(r=>{release=r;}),allEntered=new Promise(r=>{entered=r;});t.after(()=>release());
+  const f=fixture(t,{provider:{async request(){calls++;await gate;return{id:123,permalink_url:'https://soundcloud.com/test/song',title:'Song',user:{username:'Artist'},duration:90000};}}}),base=await listen(f.server),original=f.catalog.track.bind(f.catalog);
+  f.catalog.track=(id)=>{if(++lookups===16)entered();return original(id);};
+  const pending=Array.from({length:16},()=>fetch(base+'/music/track/123'));await allEntered;
+  const busy=await fetch(base+'/music/track/124');assert.equal(busy.status,503);assert.equal(busy.headers.get('retry-after'),'2');assert.equal(calls,1);
+  release();for(const response of await Promise.all(pending))assert.equal(response.status,200);
+  assert.equal((await fetch(base+'/music/track/123')).status,200);assert.equal(calls,1);
+});
