@@ -52,3 +52,27 @@ jobs:
           name: LolzCloud-iOS-${{ steps.version.outputs.value }}
           path: ${{ runner.temp }}/ios-artifacts/*
           if-no-files-found: error
+  simulator-runtime:
+    needs: ios
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify native audio and WebKit in a fresh iOS Simulator
+        env:
+          LOLZCLOUD_IOS_RUNTIME_OUTPUT: ${{ runner.temp }}/ios-runtime
+        run: node ios/tools/runtime-test.cjs
+      - name: Upload runtime results separately from published builds
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LolzCloud-iOS-runtime-${{ github.run_id }}
+          path: |
+            ${{ runner.temp }}/ios-runtime/runtime-verification.json
+            ${{ runner.temp }}/ios-runtime/NativeRuntime.xcresult
+          if-no-files-found: warn
