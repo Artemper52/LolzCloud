@@ -1,0 +1,293 @@
+# Materialize BOTH placeholders from one reviewed compact UTF-8 JSON string.
+# The plan lives in YAML comments, never in an Actions expression or shell code.
+# ARTIFACT_PLAN_JSON: {"owner":"Artemper52","repo":"LolzCloud","tag":"v0.9.15","commit":"e2c0212b3eb209b777a2477261ca4a4043340b1d","notes":"LolzCloud 0.9.15 для Windows/Linux, Android 0.1.5 и iOS 0.1.1.\n\nИсправлены отложенные запуски после паузы, переключение источников, переходы по очереди и сохранение офлайн-музыки. Сервер защищает играющие MP3 от очистки кэша и ограничивает общее время подготовки. Комната сохраняется при открытии текста, профиля и настроек.\n\nВеб-приложение iPhone/iPad получило импорт MP3/WAV/M4A/FLAC и TXT/LRC, сохранение библиотеки при обновлении и защиту от устаревших событий плеера. Установка: https://lolzcloud.com/app/ → Safari → «На экран Домой».\n\nНативный iOS-клиент собран в Xcode 16.4 / SDK 18.5: 34 теста, simulator build и device archive прошли. IPA в этом релизе не подписан и требует собственной подписи Apple. Физический iPhone/iPad ещё не проверен. ARM64 Linux проверен статически.\n\nФайлы: Setup.exe — Windows; APK — Android; AppImage/tar.gz — Linux; unsigned.ipa — iOS с собственной подписью; simulator.zip — iOS Simulator на Mac. Исходники всех платформ: LolzCloud-0.9.15-r2-source.zip.\n\n[Контрольные суммы](https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-0.9.15-SHA256SUMS.txt) · [Матрица функций и проверок](https://github.com/Artemper52/LolzCloud/blob/v0.9.15/docs/platforms-0.9.15.md) · [Apple SDK CI](https://github.com/Artemper52/LolzCloud/actions/runs/43617605003)\n","files":[{"name":"android-update.json","url":"https://lolzcloud.com/downloads/android-update.json","size":438,"sha256":"cba16c1e9525feea7cf1aef5ef85f0ad507ffaebf9dd26610cc8e6d65ea66a1f"},{"name":"latest.yml","url":"https://lolzcloud.com/downloads/latest.yml","size":366,"sha256":"6a04a0bc430395b4656b6a898cac7eaec4dab6a190c43fadfbeccf70ff15ae34"},{"name":"legacy.yml","url":"https://lolzcloud.com/downloads/legacy.yml","size":373,"sha256":"19ac90c93a8f0ef322c367ed983f4dc7c4102e9f78fc1aa7de8cf5a79fa519ed"},{"name":"LolzCloud-0.9.15-linux-arm64.tar.gz","url":"https://lolzcloud.com/downloads/LolzCloud-0.9.15-linux-arm64.tar.gz","size":159401586,"sha256":"d87f345e78e3892ad8392bb1ce36f15c4d887e6ab60cc97d1c6053e9cee3a4ba"},{"name":"LolzCloud-0.9.15-linux-x64.AppImage","url":"https://lolzcloud.com/downloads/LolzCloud-0.9.15-linux-x64.AppImage","size":147454456,"sha256":"ab81a437bc6fe8960268efee47ab2b8e213fbee5d6549a9998e44c528824a4e4"},{"name":"LolzCloud-0.9.15-linux-x64.tar.gz","url":"https://lolzcloud.com/downloads/LolzCloud-0.9.15-linux-x64.tar.gz","size":160305565,"sha256":"c64f12d871e8b88c9c74d4a5577dab20ec6f5c69c39a8fea9e973422c3104a1c"},{"name":"LolzCloud-0.9.15-r2-source.zip","url":"https://lolzcloud.com/downloads/LolzCloud-0.9.15-r2-source.zip","size":21599535,"sha256":"de0c473fb2876b21a07cd075a979dc9bff39bdb0c9988ace6136b43860c64dcb"},{"name":"LolzCloud-0.9.15-win-x64-Setup.exe","url":"https://lolzcloud.com/downloads/LolzCloud-0.9.15-win-x64-Setup.exe","size":146389460,"sha256":"41cdd42420c0207f515dabb9ccde7813c1ed1612e983bfb571230316f863cf7d"},{"name":"LolzCloud-0.9.15-win-x64-Setup.exe.blockmap","url":"https://lolzcloud.com/downloads/LolzCloud-0.9.15-win-x64-Setup.exe.blockmap","size":152641,"sha256":"c2684b557843cb2e1f04659bea563911d26ce57697de0de3a8674e4fe0968c41"},{"name":"LolzCloud-0.9.15-win-x64.zip","url":"https://lolzcloud.com/downloads/LolzCloud-0.9.15-win-x64.zip","size":196662170,"sha256":"94319eedd7efe0892d00e1d8e73f4252f7f7074e2194da23c08dd12b5193aacb"},{"name":"LolzCloud-0.9.15-win7-legacy-Setup.exe","url":"https://lolzcloud.com/downloads/LolzCloud-0.9.15-win7-legacy-Setup.exe","size":99534477,"sha256":"b771c74e62da42495c07e38def2d2dd152f72b68cde9202823ec800a15eb513c"},{"name":"LolzCloud-0.9.15-win7-legacy-Setup.exe.blockmap","url":"https://lolzcloud.com/downloads/LolzCloud-0.9.15-win7-legacy-Setup.exe.blockmap","size":105130,"sha256":"e24a84daebec8cf47ca53e6c12f95dae9a6e79baf5e46c0acbae606b308b651f"},{"name":"LolzCloud-0.9.15-win7-legacy-x64.zip","url":"https://lolzcloud.com/downloads/LolzCloud-0.9.15-win7-legacy-x64.zip","size":134379244,"sha256":"93df017ac1a84d32884c8276ff8c283b68a584bfab03f4b8fc52e8097db5dd4c"},{"name":"LolzCloud-Android-0.1.5.apk","url":"https://lolzcloud.com/downloads/LolzCloud-Android-0.1.5.apk","size":2520432,"sha256":"ee61577bcf8b45650fad41a76715d3b532012cc949289a61dbb2adfc41db72d0"},{"name":"LolzCloud-iOS-0.1.1-simulator.zip","url":"https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.1-simulator.zip","size":826608,"sha256":"e664f211324bc6abee7bbe7ddac4aaf779899a293ce7243d5d14c16aeb8f40a6"},{"name":"LolzCloud-iOS-0.1.1-source.zip","url":"https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.1-source.zip","size":74894,"sha256":"1407903af7cdb7bcf7579b9ca33a28232c2068dfef1fb96cfccdfca3cda2c1e4"},{"name":"LolzCloud-iOS-0.1.1-unsigned.ipa","url":"https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.1-unsigned.ipa","size":218523,"sha256":"6a3d7b4d36e328aa3a961c63b43fd4453f7a678655235c23e25fc0744e0c479e"},{"name":"update-legacy.json","url":"https://lolzcloud.com/downloads/update-legacy.json","size":588,"sha256":"933b249b3eccf20fc04eb6c0d85e292cc11f8677e26a45a0290c86f83acc79fe"},{"name":"update.json","url":"https://lolzcloud.com/downloads/update.json","size":565,"sha256":"e764fb268105cc1cad66c8aa51d7153e78cc7b57f51aaf705bfbba5aa9398d62"},{"name":"LolzCloud-0.9.15-SHA256SUMS.txt","url":"https://lolzcloud.com/downloads/LolzCloud-0.9.15-SHA256SUMS.txt","size":1822,"sha256":"7732962ee5a143ee02ad46dd4001e7a56de6170ef9631e5c0f025d7903e58376"}]}
+# ARTIFACT_PLAN_SHA256: e8511de9f70f8147900d6f2985f9e646ecd0e4af56bd61a491be82c691d45e61
+name: Mirror verified LolzCloud 0.9.15 artifacts
+run-name: Mirror reviewed 0.9.15 artifacts (${{ github.sha }})
+on:
+  push:
+    branches: [codex/recover-platforms-0.9.15]
+    paths: [.github/workflows/mirror-verified.yml]
+permissions: {}
+concurrency:
+  group: lolzcloud-release-0.9.15-verified-mirror
+  cancel-in-progress: false
+jobs:
+  mirror:
+    if: github.repository == 'Artemper52/LolzCloud' && github.ref == 'refs/heads/codex/recover-platforms-0.9.15' && github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      - name: Download, verify every byte, reconcile assets, then publish
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_HOST: github.com
+          GH_PROMPT_DISABLED: '1'
+          GH_NO_UPDATE_NOTIFIER: '1'
+          GH_DEBUG: ''
+        run: |
+          set -euo pipefail
+          umask 077
+          cat > "$RUNNER_TEMP/lolzcloud-verified-mirror.cjs" <<'NODE'
+          'use strict';
+          const fs = require('node:fs'), path = require('node:path'), https = require('node:https');
+          const { createHash } = require('node:crypto'), { spawn } = require('node:child_process');
+          const { pipeline } = require('node:stream/promises'), { Transform } = require('node:stream');
+          const REPOSITORY = 'Artemper52/LolzCloud';
+          const BRANCH = 'refs/heads/codex/recover-platforms-0.9.15';
+          const WORKFLOW = '.github/workflows/mirror-verified.yml';
+          const MAX_FILE = 350_000_000, MAX_TOTAL = 2_000_000_000, MAX_FILES = 32;
+          const USER_AGENT = 'LolzCloud-ReleaseVerification/0.9.15 (+https://github.com/Artemper52/LolzCloud)';
+          const SHA = /^[a-f0-9]{64}$/, COMMIT = /^[a-f0-9]{40}$/;
+          const NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,179}$/;
+          const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
+          function ensure(value, message) { if (!value) throw new Error(message); }
+          function validatePlan(plan) {
+            ensure(plan && typeof plan === 'object' && !Array.isArray(plan), 'Plan must be an object');
+            ensure(Object.keys(plan).every(key => ['owner','repo','tag','commit','notes','files'].includes(key)), 'Unexpected plan field');
+            ensure(plan.owner === 'Artemper52' && plan.repo === 'LolzCloud', 'Wrong target repository');
+            ensure(plan.tag === 'v0.9.15' && COMMIT.test(plan.commit), 'Wrong tag or non-pinned commit');
+            ensure(typeof plan.notes === 'string' && Buffer.byteLength(plan.notes) <= 50_000 && !plan.notes.includes('\0'), 'Invalid release notes');
+            ensure(Array.isArray(plan.files) && plan.files.length > 0 && plan.files.length <= MAX_FILES, 'Invalid file count');
+            const names = new Set(); let total = 0;
+            for (const file of plan.files) {
+              ensure(file && Object.keys(file).sort().join(',') === 'name,sha256,size,url', 'Unexpected artifact fields');
+              ensure(typeof file.name === 'string' && NAME.test(file.name) && !file.name.includes('..'), 'Unsafe artifact name');
+              ensure(!names.has(file.name.toLowerCase()), 'Duplicate or case-conflicting artifact name'); names.add(file.name.toLowerCase());
+              ensure(file.url === 'https://lolzcloud.com/downloads/' + file.name, 'Artifact URL must be the exact official HTTPS basename');
+              const url = new URL(file.url);
+              ensure(url.origin === 'https://lolzcloud.com' && !url.username && !url.password && !url.search && !url.hash, 'Unexpected artifact URL component');
+              ensure(Number.isSafeInteger(file.size) && file.size > 0 && file.size <= MAX_FILE && typeof file.sha256 === 'string' && SHA.test(file.sha256), 'Invalid size or SHA-256');
+              total += file.size; ensure(total <= MAX_TOTAL, 'Artifact set exceeds 2 GB');
+            }
+            return { plan, total };
+          }
+          function decodePinnedPlan(workflow) {
+            const lines = workflow.split(/\r?\n/), p = '# ARTIFACT_PLAN_JSON: ', h = '# ARTIFACT_PLAN_SHA256: ';
+            const plans = lines.filter(line => line.startsWith(p)), hashes = lines.filter(line => line.startsWith(h));
+            ensure(plans.length === 1 && hashes.length === 1, 'Exactly one embedded plan and plan SHA are required');
+            const raw = plans[0].slice(p.length), expected = hashes[0].slice(h.length);
+            ensure(raw === raw.trim() && raw.length <= 100_000 && SHA.test(expected), 'Unmaterialized or malformed plan pin');
+            ensure(sha256(Buffer.from(raw, 'utf8')) === expected, 'Embedded plan SHA mismatch');
+            return { ...validatePlan(JSON.parse(raw)), planSha256: expected };
+          }
+          async function hashFile(file, expected) {
+            const stat = fs.lstatSync(file); ensure(stat.isFile() && stat.size === expected.size, 'Actual file size mismatch: ' + expected.name);
+            const hash = createHash('sha256'); for await (const chunk of fs.createReadStream(file)) hash.update(chunk);
+            const actual = hash.digest('hex'); ensure(actual === expected.sha256, 'Actual SHA-256 mismatch: ' + expected.name);
+            return { size: stat.size, sha256: actual };
+          }
+          async function parallelThree(values, worker) {
+            const abort = new AbortController(); let index = 0, failure;
+            await Promise.all(Array.from({ length: Math.min(3, values.length) }, async () => {
+              while (!failure && index < values.length) {
+                const value = values[index++];
+                try { await worker(value, abort.signal); } catch (error) { if (!failure) { failure = error; abort.abort(); } }
+              }
+            }));
+            if (failure) throw failure;
+          }
+          async function downloadOfficial(file, destination, signal) {
+            ensure(file.url === 'https://lolzcloud.com/downloads/' + file.name, 'Unexpected download origin');
+            const controller = new AbortController(), abort = () => controller.abort();
+            if (signal.aborted) controller.abort(); else signal.addEventListener('abort', abort, { once: true });
+            const deadline = setTimeout(() => controller.abort(), 300_000);
+            try {
+              const response = await new Promise((resolve, reject) => {
+                const request = https.get(file.url, { signal: controller.signal, headers: { 'User-Agent': USER_AGENT, Accept: 'application/octet-stream, application/json;q=0.8, */*;q=0.1', 'Accept-Encoding': 'identity' } }, resolve);
+                request.on('error', reject);
+              });
+              // https.get does not follow redirects. Refuse them explicitly.
+              if (response.statusCode !== 200 || response.headers.location) { response.destroy(); throw new Error('Official mirror HTTP ' + response.statusCode + ': ' + file.name); }
+              const advertised = response.headers['content-length'], encoding = response.headers['content-encoding'];
+              if (advertised !== undefined && (!/^\d+$/.test(advertised) || Number(advertised) !== file.size) || encoding && encoding !== 'identity') { response.destroy(); throw new Error('Unexpected mirror response size/encoding: ' + file.name); }
+              let bytes = 0; const hash = createHash('sha256');
+              const verify = new Transform({ transform(chunk, _encoding, callback) { bytes += chunk.length; if (bytes > file.size) return callback(new Error('Mirror exceeded pinned size: ' + file.name)); hash.update(chunk); callback(null, chunk); } });
+              await pipeline(response, verify, fs.createWriteStream(destination, { flags: 'wx', mode: 0o600 }), { signal: controller.signal });
+              const actual = hash.digest('hex'); ensure(bytes === file.size && actual === file.sha256, 'Mirror bytes/hash mismatch: ' + file.name);
+              fs.chmodSync(destination, 0o400); return { size: bytes, sha256: actual };
+            } finally { clearTimeout(deadline); signal.removeEventListener('abort', abort); }
+          }
+          async function api(endpoint) {
+            ensure(endpoint.startsWith('/repos/' + REPOSITORY + '/'), 'API endpoint escaped the fixed repository');
+            return new Promise((resolve, reject) => {
+              const request = https.get({ hostname: 'api.github.com', path: endpoint, headers: { Authorization: 'Bearer ' + process.env.GH_TOKEN, Accept: 'application/vnd.github+json', 'User-Agent': USER_AGENT, 'X-GitHub-Api-Version': '2022-11-28' } }, response => {
+                if (![200,404].includes(response.statusCode) || response.headers.location) { response.destroy(); reject(new Error('GitHub read API HTTP ' + response.statusCode)); return; }
+                let bytes = 0; const parts = [];
+                response.on('data', chunk => { bytes += chunk.length; if (bytes > 2_000_000) { response.destroy(new Error('GitHub API response exceeded its limit')); return; } parts.push(chunk); });
+                response.on('error', reject); response.on('end', () => { try { resolve({ status: response.statusCode, value: JSON.parse(Buffer.concat(parts).toString('utf8')) }); } catch { reject(new Error('Invalid GitHub JSON response')); } });
+              });
+              request.setTimeout(30_000, () => request.destroy(new Error('GitHub API timeout'))); request.on('error', reject);
+            });
+          }
+          async function createMissingTag(plan) {
+            ensure(plan.tag === 'v0.9.15' && COMMIT.test(plan.commit), 'Only the reviewed v0.9.15 tag may be created');
+            const body = Buffer.from(JSON.stringify({ ref: 'refs/tags/v0.9.15', sha: plan.commit }), 'utf8');
+            return new Promise((resolve, reject) => {
+              const request = https.request({ hostname: 'api.github.com', path: '/repos/' + REPOSITORY + '/git/refs', method: 'POST', headers: { Authorization: 'Bearer ' + process.env.GH_TOKEN, Accept: 'application/vnd.github+json', 'User-Agent': USER_AGENT, 'X-GitHub-Api-Version': '2022-11-28', 'Content-Type': 'application/json', 'Content-Length': body.length } }, response => {
+                if (![201,422].includes(response.statusCode) || response.headers.location) { response.destroy(); reject(new Error('GitHub tag creation HTTP ' + response.statusCode)); return; }
+                let bytes = 0; const parts = [];
+                response.on('data', chunk => { bytes += chunk.length; if (bytes > 2_000_000) { response.destroy(new Error('GitHub tag response exceeded its limit')); return; } parts.push(chunk); });
+                response.on('error', reject); response.on('end', () => { try { resolve({ status: response.statusCode, value: JSON.parse(Buffer.concat(parts).toString('utf8')) }); } catch { reject(new Error('Invalid GitHub tag JSON response')); } });
+              });
+              request.setTimeout(30_000, () => request.destroy(new Error('GitHub tag creation timeout'))); request.on('error', reject); request.end(body);
+            });
+          }
+          async function verifyTag(plan, previous, allowMissing = false) {
+            const ref = await api('/repos/' + REPOSITORY + '/git/ref/tags/' + encodeURIComponent(plan.tag));
+            if (ref.status === 404) { ensure(allowMissing && !previous, 'Reviewed tag is missing or disappeared'); return null; }
+            ensure(ref.status === 200 && ref.value.ref === 'refs/tags/' + plan.tag, 'Unexpected reviewed tag identity');
+            const refSha = ref.value.object?.sha; let object = ref.value.object; const seen = new Set();
+            for (let depth = 0; object?.type === 'tag' && depth < 6; depth++) {
+              ensure(COMMIT.test(object.sha) && !seen.has(object.sha), 'Invalid or cyclic annotated tag'); seen.add(object.sha);
+              const annotated = await api('/repos/' + REPOSITORY + '/git/tags/' + object.sha); ensure(annotated.status === 200, 'Cannot resolve annotated tag'); object = annotated.value.object;
+            }
+            ensure(object?.type === 'commit' && object.sha === plan.commit, 'Tag does not resolve to the reviewed commit');
+            if (previous) ensure(previous.refSha === refSha && previous.commit === object.sha, 'Tag changed during verification');
+            return { refSha, commit: object.sha };
+          }
+          async function findRelease(tag) {
+            const found = [];
+            // Listing also discovers authenticated draft releases, unlike relying
+            // on published-release-by-tag behavior alone.
+            for (let page = 1; page <= 5; page++) {
+              const response = await api('/repos/' + REPOSITORY + '/releases?per_page=100&page=' + page);
+              ensure(response.status === 200 && Array.isArray(response.value), 'Cannot list releases');
+              found.push(...response.value.filter(release => release.tag_name === tag));
+              if (response.value.length < 100) { ensure(found.length <= 1, 'Multiple releases use this tag'); return found[0] || null; }
+            }
+            throw new Error('Release enumeration exceeded 500 releases; refusing an ambiguous create');
+          }
+          async function assetsFor(release, plan) {
+            ensure(Number.isSafeInteger(release.id) && release.id > 0 && release.tag_name === plan.tag && !release.prerelease, 'Unexpected release identity/type');
+            const response = await api('/repos/' + REPOSITORY + '/releases/' + release.id + '/assets?per_page=100');
+            ensure(response.status === 200 && Array.isArray(response.value) && response.value.length <= MAX_FILES, 'Invalid or excessive release assets');
+            const expected = new Map(plan.files.map(file => [file.name, file])), seen = new Set();
+            for (const asset of response.value) {
+              const file = expected.get(asset.name);
+              ensure(file && !seen.has(asset.name.toLowerCase()), 'Unexpected or conflicting existing asset name'); seen.add(asset.name.toLowerCase());
+              ensure(Number.isSafeInteger(asset.id) && asset.id > 0 && asset.state === 'uploaded' && asset.size === file.size, 'Existing asset state/size conflict: ' + asset.name);
+            }
+            return response.value;
+          }
+          async function gh(args, { output, size, signal } = {}) {
+            if (signal?.aborted) throw new Error('GitHub verification was cancelled');
+            await new Promise((resolve, reject) => {
+              // Bash's file-size limit bounds gh's direct output file to the
+              // pinned byte count plus at most one 1024-byte block.
+              const executable = output ? 'bash' : 'gh';
+              const argv = output ? ['-c', 'ulimit -c 0; ulimit -f "$1"; shift; exec "$@"', 'bounded-gh', String(Math.ceil(size / 1024)), 'gh', ...args] : args;
+              const child = spawn(executable, argv, { stdio: ['ignore','ignore','ignore'], env: { ...process.env, GH_HOST: 'github.com', GH_DEBUG: '', GH_PROMPT_DISABLED: '1', GH_NO_UPDATE_NOTIFIER: '1' } });
+              let settled = false;
+              const stop = () => child.kill('SIGTERM'); signal?.addEventListener('abort', stop, { once: true });
+              const timer = setTimeout(() => child.kill('SIGKILL'), 300_000);
+              const finish = error => { if (settled) return; settled = true; clearTimeout(timer); signal?.removeEventListener('abort', stop); error ? reject(error) : resolve(); };
+              child.on('error', () => finish(new Error('Unable to start GitHub CLI')));
+              child.on('close', (code, killed) => finish(code === 0 ? null : new Error('GitHub CLI ' + args.slice(0,2).join(' ') + ' failed (' + (killed || code) + ')')));
+            });
+          }
+          async function main() {
+            const temp = process.env.RUNNER_TEMP; ensure(temp && path.isAbsolute(temp), 'RUNNER_TEMP is required');
+            const reports = path.join(temp, 'lolzcloud-mirror-reports'); fs.mkdirSync(reports, { recursive: true });
+            const report = { status: 'failed', stage: 'validate-context', runId: process.env.GITHUB_RUN_ID, runAttempt: process.env.GITHUB_RUN_ATTEMPT, workflowCommit: process.env.GITHUB_SHA, sourceChecks: [], githubChecks: [], mutations: [] };
+            const save = () => fs.writeFileSync(path.join(reports, 'verification.json'), JSON.stringify(report, null, 2) + '\n');
+            const checked = new Map(); let plan, root;
+            try {
+              ensure(process.env.GITHUB_REPOSITORY === REPOSITORY && process.env.GITHUB_REF === BRANCH && process.env.GITHUB_EVENT_NAME === 'push' && COMMIT.test(process.env.GITHUB_SHA || ''), 'Unexpected repository/branch/event/commit');
+              ensure(process.env.GITHUB_WORKFLOW_REF === REPOSITORY + '/' + WORKFLOW + '@' + BRANCH, 'Unexpected workflow path/ref');
+              ensure(process.env.GH_TOKEN, 'The job token is required');
+              const workflow = await api('/repos/' + REPOSITORY + '/contents/' + WORKFLOW + '?ref=' + process.env.GITHUB_SHA);
+              ensure(workflow.status === 200 && workflow.value.encoding === 'base64' && workflow.value.size < 200_000, 'Cannot read this exact workflow revision');
+              const pinned = decodePinnedPlan(Buffer.from(workflow.value.content, 'base64').toString('utf8')); plan = pinned.plan;
+              Object.assign(report, { planSha256: pinned.planSha256, repository: REPOSITORY, tag: plan.tag, expectedCommit: plan.commit, totalPlannedBytes: pinned.total });
+              fs.writeFileSync(path.join(reports, 'reviewed-plan.json'), JSON.stringify(plan, null, 2) + '\n');
+              root = fs.mkdtempSync(path.join(temp, 'lolzcloud-verified-assets-')); const source = path.join(root, 'official'), remote = path.join(root, 'github'); fs.mkdirSync(source); fs.mkdirSync(remote);
+              report.stage = 'verify-commit-and-tag';
+              const commit = await api('/repos/' + REPOSITORY + '/git/commits/' + plan.commit);
+              ensure(commit.status === 200 && commit.value.sha === plan.commit, 'Reviewed commit must exist in the target repository');
+              let tag = await verifyTag(plan, undefined, true); report.preexistingTag = tag; report.tagResolution = tag; save();
+              let release = await findRelease(plan.tag); report.preexistingRelease = release ? { id: release.id, draft: release.draft, immutable: release.immutable === true, metadataPreserved: true } : null;
+              let existing = release ? await assetsFor(release, plan) : [];
+              report.stage = 'download-and-hash-official'; save();
+              await parallelThree(plan.files, async (file, signal) => { const actual = await downloadOfficial(file, path.join(source, file.name), signal); report.sourceChecks.push({ name: file.name, url: file.url, expectedSize: file.size, expectedSha256: file.sha256, actualSize: actual.size, actualSha256: actual.sha256, passed: true }); save(); console.log('Verified official artifact: ' + file.name + ' (' + actual.size + ' bytes)'); });
+              ensure(report.sourceChecks.length === plan.files.length, 'Not all source artifacts were verified');
+              async function verifyExisting(assets) {
+                await parallelThree(assets, async (asset, signal) => {
+                  const file = plan.files.find(item => item.name === asset.name), earlier = checked.get(asset.name);
+                  if (earlier) { ensure(earlier.id === asset.id && earlier.size === asset.size, 'An already verified GitHub asset changed'); return; }
+                  const destination = path.join(remote, file.name);
+                  await gh(['release','download',plan.tag,'--repo',REPOSITORY,'--pattern',file.name,'--output',destination], { output: destination, size: file.size, signal });
+                  const actual = await hashFile(destination, file); checked.set(file.name, { id: asset.id, size: actual.size, sha256: actual.sha256 });
+                  report.githubChecks.push({ name: file.name, assetId: asset.id, expectedSize: file.size, expectedSha256: file.sha256, actualSize: actual.size, actualSha256: actual.sha256, passed: true }); save();
+                });
+              }
+              report.stage = 'verify-preexisting-github-assets'; save(); await verifyExisting(existing);
+              if (release?.immutable) ensure(existing.length === plan.files.length, 'Immutable release is missing planned assets; refusing uploads');
+              const observedTag = await verifyTag(plan, tag, !tag);
+              if (!observedTag) {
+                // The only ref write is an absent, fixed release tag, after ALL
+                // official and preexisting GitHub bytes have passed hashing.
+                report.stage = 'create-missing-tag-after-all-hashes'; save();
+                const created = await createMissingTag(plan);
+                if (created.status === 201) {
+                  report.mutations.push({ action: 'created-missing-tag', ref: 'refs/tags/v0.9.15', commit: plan.commit }); save();
+                  tag = await verifyTag(plan, { refSha: plan.commit, commit: plan.commit });
+                } else {
+                  // 422 is not assumed to be success: a concurrent existing ref
+                  // must independently resolve to exactly the reviewed commit.
+                  report.tagCreation = 'concurrent-422-rechecked'; save(); tag = await verifyTag(plan);
+                }
+              } else tag = observedTag;
+              report.tagResolution = tag; save();
+              // Draft creation also waits for the byte checks and exact tag.
+              if (!release) {
+                report.stage = 'create-draft-after-all-hashes'; save();
+                const notes = path.join(root, 'release-notes.md'); fs.writeFileSync(notes, plan.notes, 'utf8');
+                await gh(['release','create',plan.tag,'--repo',REPOSITORY,'--verify-tag','--draft','--latest=false','--title','LolzCloud 0.9.15','--notes-file',notes]);
+                release = await findRelease(plan.tag); ensure(release && release.draft, 'Created draft is not discoverable'); report.mutations.push({ action: 'created-draft', releaseId: release.id }); save();
+              }
+              const releaseId = release.id;
+              async function confirmReleaseIdentity() {
+                const found = await findRelease(plan.tag); ensure(found?.id === releaseId, 'Release identity changed before a write');
+                ensure(!found.prerelease, 'Release changed to prerelease'); return found;
+              }
+              for (const file of plan.files) {
+                release = await confirmReleaseIdentity(); existing = await assetsFor(release, plan); await verifyExisting(existing);
+                if (existing.some(asset => asset.name === file.name)) continue;
+                ensure(!release.immutable, 'Refusing to mutate an immutable release'); await verifyTag(plan, tag);
+                await hashFile(path.join(source, file.name), file); report.stage = 'upload-missing-assets'; save();
+                // Deliberately NO --clobber. A concurrent same-name upload fails.
+                await gh(['release','upload',plan.tag,path.join(source,file.name),'--repo',REPOSITORY]); report.mutations.push({ action: 'uploaded-missing-asset', name: file.name }); save();
+              }
+              report.stage = 'verify-final-github-asset-set'; save();
+              const current = await findRelease(plan.tag); ensure(current?.id === releaseId, 'Release identity changed'); release = current;
+              existing = await assetsFor(release, plan); ensure(existing.length === plan.files.length, 'Final asset set is incomplete'); await verifyExisting(existing);
+              ensure(checked.size === plan.files.length, 'Not every GitHub asset has actual verified bytes'); await verifyTag(plan, tag);
+              await confirmReleaseIdentity();
+              report.stage = 'publish-and-mark-latest'; save();
+              await gh(['release','edit',plan.tag,'--repo',REPOSITORY,'--draft=false','--latest']); report.mutations.push({ action: 'published-latest', releaseId });
+              const published = await findRelease(plan.tag), latest = await api('/repos/' + REPOSITORY + '/releases/latest');
+              ensure(published?.id === releaseId && !published.draft && !published.prerelease && latest.status === 200 && latest.value.id === releaseId, 'Publication/latest confirmation failed');
+              await verifyTag(plan, tag); report.release = { id: releaseId, url: published.html_url, draft: false, latest: true }; report.status = 'passed'; report.stage = 'complete';
+              fs.writeFileSync(path.join(reports, 'actual-SHA256SUMS.txt'), plan.files.map(file => checked.get(file.name).sha256 + '  ' + file.name).join('\n') + '\n');
+            } catch (error) { report.error = String(error.message || error).replace(/[\r\n]/g,' ').slice(0,500); throw error; }
+            finally {
+              report.finishedAt = new Date().toISOString(); save();
+              if (process.env.GITHUB_STEP_SUMMARY) fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## LolzCloud verified artifact mirror\n\nStatus: **' + report.status + '** · stage: `' + report.stage + '`\n\nPlan SHA-256: `' + (report.planSha256 || 'not accepted') + '`\n\n| Artifact | Actual bytes | Actual SHA-256 |\n| --- | ---: | --- |\n' + report.sourceChecks.map(file => '| ' + file.name + ' | ' + file.actualSize + ' | `' + file.actualSha256 + '` |').join('\n') + '\n\nSee the verification artifact for GitHub asset byte hashes and any partial draft state.\n');
+            }
+          }
+          if (process.env.LOLZCLOUD_TEMPLATE_TEST === '1') module.exports = { validatePlan, decodePinnedPlan, parallelThree, downloadOfficial, main };
+          else main().catch(error => { console.error('Verified mirror stopped: ' + String(error.message || error).replace(/[\r\n]/g,' ').slice(0,500)); process.exitCode = 1; });
+          NODE
+          node "$RUNNER_TEMP/lolzcloud-verified-mirror.cjs"
+      - name: Preserve actual checksum reports even on a failed mirror
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2, official action
+        with:
+          name: lolzcloud-0.9.15-verified-mirror-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/lolzcloud-mirror-reports/
+          if-no-files-found: error
+          retention-days: 14
