@@ -231,6 +231,7 @@ import UIKit
         subjects.append(shell.player)
         shell.player.emit = { [weak self] name, detail in var row = detail; row["event"] = name; self?.records.append(row) }
         defer {
+            shell.login.cancel()
             web.stopLoading(); web.configuration.userContentController.removeScriptMessageHandler(forName: "lolzcloud")
             web.navigationDelegate = nil; web.uiDelegate = nil
         }
@@ -281,11 +282,13 @@ import UIKit
         web.configuration.userContentController.removeScriptMessageHandler(forName: "runtime_probe")
         _ = try await javascript("document.getElementById('runtime-child').remove();true", in: web)
         records.removeAll()
-        web.load(URLRequest(url: MediaPolicy.origin.appendingPathComponent("social")))
-        try await waitFor("non-bridge own page finishes", timeout: 30) { web.url?.path == "/social" && !web.isLoading }
+        // /social intentionally redirects unauthenticated visitors to native
+        // login. Use a public own page so this read-only test never starts auth.
+        web.load(URLRequest(url: MediaPolicy.origin.appendingPathComponent("install.html")))
+        try await waitFor("public non-bridge own page finishes", timeout: 30) { web.url?.path == "/install.html" && !web.isLoading }
         try await post(["action":"rate", "clientId":b, "requestId":3, "value":1.75], in: web)
         try await settle(0.2)
-        XCTAssertEqual(av.defaultRate, 1, "Same-origin /social must not acquire the /app bridge")
+        XCTAssertEqual(av.defaultRate, 1, "A public same-origin page must not acquire the /app bridge")
         XCTAssertFalse(records.contains { $0["requestId"] as? Int == 3 })
     }
 }
