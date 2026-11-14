@@ -23,8 +23,8 @@ jobs:
           fetch-depth: 0
       - name: Import the verified source snapshot
         env:
-          SNAPSHOT_NAME: 'LolzCloud-0.9.15-r2-candidate-source.zip'
-          SNAPSHOT_SHA256: '377033c6bd7d8be2a1c3efee7b8d57441a2a2eebcab1a6bb563f53290ce49d93'
+          SNAPSHOT_NAME: 'LolzCloud-0.9.15-r2-candidate2-source.zip'
+          SNAPSHOT_SHA256: '48b2300599edd8b959a68d09df787a148659b2027aafee55994de3ea1e279a5c'
         run: |
           python3 - <<'PY'
           import hashlib, io, json, os, re, stat, urllib.request, zipfile
