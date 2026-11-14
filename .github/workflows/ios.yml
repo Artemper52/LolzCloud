@@ -1,0 +1,54 @@
+name: iPhone and iPad
+on:
+  push:
+    branches-ignore: ['codex/recover-*']
+    paths: ['ios/**', '.github/workflows/ios.yml']
+  pull_request:
+    paths: ['ios/**', '.github/workflows/ios.yml']
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      source_ref:
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Read the application version
+        id: version
+        run: node -e 'console.log("value=" + require("./ios/tools/version.cjs").version())' >> "$GITHUB_OUTPUT"
+      - name: Validate archive version parsing
+        run: node --test ios/tools/version.test.cjs
+      - name: Validate media and account policy
+        run: swift test --package-path ios
+      - name: Generate project
+        run: node ios/tools/project.cjs
+      - name: Compile iPhone and iPad simulator application
+        run: xcodebuild -project ios/LolzCloud.xcodeproj -scheme LolzCloud -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath "$RUNNER_TEMP/ios-simulator" CODE_SIGNING_ALLOWED=NO build
+      - name: Compile device archive without distribution credentials
+        run: xcodebuild -project ios/LolzCloud.xcodeproj -scheme LolzCloud -configuration Release -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/LolzCloud.xcarchive" CODE_SIGNING_ALLOWED=NO archive
+      - name: Package simulator and unsigned device build
+        run: |
+          mkdir -p "$RUNNER_TEMP/ios-artifacts/Payload"
+          cp -R "$RUNNER_TEMP/LolzCloud.xcarchive/Products/Applications/LolzCloud.app" "$RUNNER_TEMP/ios-artifacts/Payload/"
+          cd "$RUNNER_TEMP/ios-artifacts"
+          ditto -c -k --sequesterRsrc --keepParent Payload "LolzCloud-iOS-${IOS_VERSION}-unsigned.ipa"
+          ditto -c -k --sequesterRsrc --keepParent "$RUNNER_TEMP/ios-simulator/Build/Products/Debug-iphonesimulator/LolzCloud.app" "LolzCloud-iOS-${IOS_VERSION}-simulator.zip"
+          rm -r Payload
+        env:
+          IOS_VERSION: ${{ steps.version.outputs.value }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LolzCloud-iOS-${{ steps.version.outputs.value }}
+          path: ${{ runner.temp }}/ios-artifacts/*
+          if-no-files-found: error

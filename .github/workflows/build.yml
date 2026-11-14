@@ -1,9 +1,11 @@
 # Upload this file to Artemper52/LolzCloud as .github/workflows/build.yml on main.
-# The first run imports the pinned 0.9.12 source and publishes only after all checks pass.
+# The first run imports the pinned 0.9.10 source and publishes only after all checks pass.
 # Subsequent runs retain normal Windows Setup / Legacy / Linux release builds.
 name: Build and release
 'on':
-  push: null
+  push:
+    branches-ignore:
+      - 'codex/recover-*'
   pull_request: null
   release:
     types:
@@ -31,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Import the verified 0.9.12 source once, retaining this workflow
+      - name: Import the verified 0.9.10 source once, retaining this workflow
         id: source
         shell: bash
         run: >
@@ -42,11 +44,11 @@ jobs:
           version=$(python3 -c 'import json; print(json.load(open("package.json"))["version"])')
 
           if [ "$GITHUB_REF" = refs/heads/main ] && { [ "$GITHUB_EVENT_NAME" = push ] || [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; } &&
-          [ "$version" = 0.9.12 ] && [ "$(sha256sum server/public/room.js | cut -d' ' -f1)" = 7f3eafa04877a873a799aad7c29d071207bded4add049a0f2da951d26713cd01 ]; then
-            git diff --quiet 900e454503ccef858738bf99e010ab8e2602c76d HEAD -- . ':(exclude).github'
-            release_archive="$RUNNER_TEMP/lolzcloud-source-0912.zip"
-            curl --fail --silent --show-error --retry 3 https://lolzcloud.com/downloads/LolzCloud-0.9.12-import-source-r3.zip -o "$release_archive"
-            printf '%s  %s\n' ef21339ffd262ac7fa10b777110e190694b96c7583752d76c6ab5f24dc7c3be8 "$release_archive" | sha256sum -c -
+          [ "$version" = 0.9.9 ]; then
+            git diff --quiet 548acac9529c93f49c58696c15927562caad42c8 HEAD -- . ':(exclude).github'
+            release_archive="$RUNNER_TEMP/lolzcloud-source-0910.zip"
+            curl --fail --silent --show-error --retry 3 https://lolzcloud.com/downloads/LolzCloud-0.9.10-import-source.zip -o "$release_archive"
+            printf '%s  %s\n' 456ec5b7f9325b8f2ad34b2023f222e68d008daca4854471ad915cfe6ffe7ce5 "$release_archive" | sha256sum -c -
             python3 - <<'PY'
           import json, os, shutil, zipfile
 
@@ -54,11 +56,11 @@ jobs:
 
           temporary = Path(os.environ['RUNNER_TEMP'])
 
-          source = temporary / 'lolzcloud-source-0912'
+          source = temporary / 'lolzcloud-source-0910'
 
           destination = Path(os.environ['GITHUB_WORKSPACE'])
 
-          with zipfile.ZipFile(temporary / 'lolzcloud-source-0912.zip') as archive:
+          with zipfile.ZipFile(temporary / 'lolzcloud-source-0910.zip') as archive:
               for entry in archive.infolist():
                   relative = Path(entry.filename.replace('\\', '/'))
                   assert not relative.is_absolute() and '..' not in relative.parts and ':' not in str(relative)
@@ -68,7 +70,7 @@ jobs:
                   else:
                       target.parent.mkdir(parents=True, exist_ok=True)
                       target.write_bytes(archive.read(entry))
-          assert json.loads((source / 'package.json').read_text())['version'] == '0.9.12'
+          assert json.loads((source / 'package.json').read_text())['version'] == '0.9.10'
 
           names = ['.gitattributes', '.gitignore', 'CONTRIBUTING.md', 'LICENSE', 'README.md', 'THIRD_PARTY_NOTICES.md', 'package.json',
           'package-lock.json', 'config', 'docs', 'licenses', 'server', 'source', 'tests', 'tools']
@@ -84,7 +86,7 @@ jobs:
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git add -A -- . ':(exclude).github'
-            if ! git diff --cached --quiet; then git commit -m 'Import verified LolzCloud 0.9.12 source'; fi
+            if ! git diff --cached --quiet; then git commit -m 'Import verified LolzCloud 0.9.10 source'; fi
             git push origin HEAD:main
             bootstrapped=true
           fi
@@ -138,6 +140,27 @@ jobs:
           if-no-files-found: error
     needs:
       - source
+  android:
+    runs-on: ubuntu-24.04
+    needs:
+      - source
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.source.outputs.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify the device-tested Android APK against source and its update certificate
+        run: node tools/verify-published-android.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LolzCloud-android
+          path: |
+            dist/github-android/*.apk
+            dist/github-android/*.sha256
+            dist/github-android/android-update.json
+          if-no-files-found: error
   linux:
     strategy:
       fail-fast: false
@@ -203,6 +226,7 @@ jobs:
       - source
       - windows
       - linux
+      - android
     if: >-
       needs.source.outputs.bootstrapped == 'true' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release' ||
       (github.event_name == 'workflow_dispatch' && inputs.publish)
@@ -251,8 +275,8 @@ jobs:
 
           cd release-assets
 
-          sha256sum LolzCloud-*.zip LolzCloud-*.tar.gz LolzCloud-*.AppImage LolzCloud-*-Setup.exe LolzCloud-*.blockmap latest.yml legacy.yml
-          update*.json > SHA256SUMS.txt
+          sha256sum LolzCloud-*.zip LolzCloud-*.tar.gz LolzCloud-*.AppImage LolzCloud-*.apk LolzCloud-*.sha256 LolzCloud-*-Setup.exe LolzCloud-*.blockmap latest.yml legacy.yml
+          update*.json android-update.json > SHA256SUMS.txt
 
           if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --draft --title "LolzCloud ${RELEASE_TAG#v}" --notes-file "../docs/releases/${RELEASE_TAG#v}.md"
