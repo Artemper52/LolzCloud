@@ -309,6 +309,17 @@ import UIKit
             return sum+Double(input ? value.inputEnergy : value.outputEnergy)
         }
     }
+    private func attachEnergyTrace(_ player: NativePlayer, name: String) throws {
+        let rows: [[String:Any]] = (0..<256).compactMap { index in
+            guard let value = player.audioEffects.energyWindow(index), value.frames>0 else { return nil }
+            return ["bin":index,"samples":value.frames,"inputEnergy":value.inputEnergy,"outputEnergy":value.outputEnergy]
+        }
+        let metric = try XCTUnwrap(player.audioEffects.measurement)
+        let detail: [String:Any] = ["sampleRate":metric.sampleRate,"channels":metric.channels,
+            "windowFrames":metric.energyWindowFrames,"processedFrames":metric.processedFrames,"windows":rows]
+        let attachment = XCTAttachment(data:try JSONSerialization.data(withJSONObject:detail,options:[.prettyPrinted,.sortedKeys]),uniformTypeIdentifier:"public.json")
+        attachment.name = name; attachment.lifetime = .keepAlways; add(attachment)
+    }
 
     func testActualTapEchoImpulseAndReverbTail() async throws {
         let player = subject(), client = UUID().uuidString.lowercased(), rate = 48_000
@@ -322,12 +333,14 @@ import UIKit
             guard let m = player.audioEffects.measurement else { return false }
             return m.processedFrames > UInt64(m.sampleRate)*2 && av.rate>0 && player.audioEffects.status["state"] as? String == "applied"
         }
-        let inputBins = (0..<25).map { self.energy(player,$0..<($0+1),input:true) }
+        try attachEnergyTrace(player,name:"actual-avplayer-echo-energy")
+        let inputBins = (0..<100).map { self.energy(player,$0..<($0+1),input:true) }
         let impulse = try XCTUnwrap(inputBins.indices.max { inputBins[$0]<inputBins[$1] })
         XCTAssertGreaterThan(inputBins[impulse],0.001)
+        let inputEnergy = energy(player,max(0,impulse-1)..<(impulse+2),input:true)
         let echo = energy(player,(impulse+27)..<(impulse+30))
         XCTAssertEqual(energy(player,(impulse+27)..<(impulse+30),input:true),0,accuracy:0.000001)
-        XCTAssertEqual(echo/inputBins[impulse],pow(0.8*0.6,2),accuracy:0.04,"Actual decoded PCM must echo about 280 ms after the impulse")
+        XCTAssertEqual(echo/inputEnergy,pow(0.8*0.6,2),accuracy:0.04,"Actual decoded PCM must echo about 280 ms after its measured input impulse")
         XCTAssertGreaterThan(energy(player,(impulse+55)..<(impulse+58)),0.00001)
         XCTAssertTrue((player.audioEffects.status["capabilities"] as? [String:Bool])?["echo"] == true)
         player.stop(); advancedEffects(player,client:client,revision:2,reverb:0.8)
@@ -336,8 +349,17 @@ import UIKit
             guard let m = player.audioEffects.measurement else { return false }
             return m.processedFrames > UInt64(m.sampleRate)*2 && player.audioEffects.status["state"] as? String == "applied"
         }
-        let early = energy(player,20..<50), late = energy(player,100..<130)
-        XCTAssertEqual(energy(player,20..<130,input:true),0,accuracy:0.000001)
+        try attachEnergyTrace(player,name:"actual-avplayer-reverb-energy")
+        // A tap's first block is not an absolute WAV/AVPlayer clock origin.
+        // Locate the source impulse in this real render, then test output in
+        // subsequent source-silent windows. No synthetic frames or callbacks.
+        let reverbInput = (0..<130).map { self.energy(player,$0..<($0+1),input:true) }
+        let reverbImpulse = try XCTUnwrap(reverbInput.indices.max { reverbInput[$0]<reverbInput[$1] })
+        XCTAssertGreaterThan(reverbInput[reverbImpulse],0.001)
+        try await waitFor("tap has processed the complete relative reverb tail") { (player.audioEffects.energyWindow(reverbImpulse+119)?.frames ?? 0)>0 }
+        try attachEnergyTrace(player,name:"actual-avplayer-reverb-complete-relative-tail")
+        let early = energy(player,(reverbImpulse+10)..<(reverbImpulse+40)), late = energy(player,(reverbImpulse+90)..<(reverbImpulse+120))
+        XCTAssertEqual(energy(player,(reverbImpulse+2)..<(reverbImpulse+120),input:true),0,accuracy:0.000001)
         XCTAssertGreaterThan(early,0.000001); XCTAssertGreaterThan(late,0); XCTAssertLessThan(late,early*0.1)
         XCTAssertTrue((player.audioEffects.status["capabilities"] as? [String:Bool])?["reverb"] == true)
     }
