@@ -115,6 +115,31 @@ test('MP3 cover is embedded and an actual multipart upload stores the Telegram f
  let uploads=0;const api={async call(method,body){assert.equal(method,'sendAudio');assert.ok(body instanceof FormData);assert.equal(body.get('chat_id'),'10');assert.equal(body.get('title'),'гной');assert.equal(body.get('performer'),'тёмный принц');assert.deepEqual(Buffer.from(await body.get('audio').arrayBuffer()),fs.readFileSync(audio.file));uploads++;return {audio:{file_id:'test_MultipartFileId123456'}};}};
  const bot=new MusicBot({api,state:s,cache,links:new MediaLinks('https://lolzcloud.com','x'.repeat(64))});await bot.upload(s.get(song.id),10);assert.equal(uploads,1);assert.equal(s.get(song.id).fileId,'test_MultipartFileId123456');
 });
+test('concurrent cached reads cannot invalidate an in-flight file-backed multipart upload',async t=>{
+ const directory=dir(t),s=state(t),file=path.join(directory,song.id+'.mp3'),bytes=Buffer.concat([Buffer.from('ID3'),Buffer.alloc(4096,7)]);fs.writeFileSync(file,bytes);
+ const cache=new AudioCache({directory,state:s,source:{save(){throw Error('A cached upload must not convert audio');}}});t.after(()=>cache.close());
+ let secondStarted,firstStarted,call=0,first;
+ const firstReady=new Promise(resolve=>{firstStarted=resolve;}),secondReady=new Promise(resolve=>{secondStarted=resolve;});
+ const api={async call(method,body){assert.equal(method,'sendAudio');const index=call++;if(index===0){firstStarted();await secondReady;}else{secondStarted();await first;}
+  const before=fs.statSync(file).mtimeMs;
+  for(let i=0;i<3;i++){await cache.prepare(song.id);const reader=await cache.open(song.id);await reader.handle.close();reader.release();}
+  await new Promise(resolve=>setTimeout(resolve,15));
+  assert.equal(fs.statSync(file).mtimeMs,before,'LRU hits may not change the metadata of an upload Blob');
+  assert.deepEqual(Buffer.from(await body.get('audio').arrayBuffer()),bytes);return{audio:{file_id:'test_ConcurrentUploadFileId'+index}};
+ }};
+ const bot=new MusicBot({api,state:s,cache,links:new MediaLinks('https://lolzcloud.com','x'.repeat(64))});
+ first=bot.upload(s.get(song.id),10);await firstReady;const second=bot.upload(s.get(song.id),11);await Promise.all([first,second]);
+ assert.equal(call,2);assert.equal(cache.readers.size,0,'Both upload leases must be released');await cache.files;
+});
+
+test('a failed multipart upload closes the cache file and releases its read lease',async t=>{
+ const directory=dir(t),s=state(t);fs.writeFileSync(path.join(directory,song.id+'.mp3'),Buffer.alloc(2048,2));
+ const cache=new AudioCache({directory,state:s});t.after(()=>cache.close());const open=cache.open.bind(cache);let reader;
+ cache.open=async id=>{reader=await open(id);return reader;};
+ const bot=new MusicBot({api:{async call(){throw Error('Fixture upload failure');}},state:s,cache,links:new MediaLinks('https://lolzcloud.com','x'.repeat(64))});
+ await assert.rejects(bot.upload(s.get(song.id),10),/Fixture upload failure/);assert.equal(reader.handle.fd,-1);assert.equal(cache.readers.size,0);await cache.files;
+});
+
 test('welcome sends the real branded image once and reuses its persistent Telegram photo ID',async t=>{
  const {bot,s}=fixture(t);let uploaded=0,reused=0;
  bot.api.call=async(method,body)=>{assert.equal(method,'sendPhoto');if(body instanceof FormData){uploaded++;assert.ok(body.get('photo').size>1000);assert.match(body.get('caption'),/@lolzcloudbot/);const buttons=JSON.parse(body.get('reply_markup'));assert.equal(buttons.inline_keyboard[0][0].switch_inline_query,'');return {photo:[{file_id:'test_WelcomePhotoId123456'}]};}reused++;assert.equal(body.photo,'test_WelcomePhotoId123456');return true;};

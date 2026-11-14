@@ -23,9 +23,9 @@ function convert(executable,args,signal) {
   });
 }
 class AudioCache {
-  constructor({directory,state,provider,executable='/usr/bin/ffmpeg',fetcher=fetch,source,maxBytes=20000000,maxCacheBytes=2*1024**3,maxDuration=1200,prepareTimeoutMs=110000}) {
-    Object.assign(this,{directory:path.resolve(directory),state,executable,fetcher,maxBytes,maxCacheBytes,maxDuration,prepareTimeoutMs});
-    this.source=source||new SoundCloudAudioSource(provider,fetcher);this.pending=new Map();this.active=0;this.waiters=[];this.closed=false;this.controllers=new Set();this.readers=new Map();this.files=Promise.resolve();
+  constructor({directory,state,provider,executable='/usr/bin/ffmpeg',fetcher=fetch,source,maxBytes=20000000,maxCacheBytes=2*1024**3,maxDuration=1200,prepareTimeoutMs=110000,now=Date.now}) {
+    Object.assign(this,{directory:path.resolve(directory),state,executable,fetcher,maxBytes,maxCacheBytes,maxDuration,prepareTimeoutMs,now});
+    this.source=source||new SoundCloudAudioSource(provider,fetcher);this.pending=new Map();this.active=0;this.waiters=[];this.closed=false;this.controllers=new Set();this.readers=new Map();this.accessed=new Map();this.files=Promise.resolve();
     fs.mkdirSync(this.directory,{recursive:true,mode:0o700});
     for(const name of fs.readdirSync(this.directory))if(/^\d+\.[a-f0-9-]{36}\.(?:source|cover|thumb\.jpg|mp3\.part)$/.test(name))fs.rmSync(path.join(this.directory,name),{force:true});
   }
@@ -43,20 +43,27 @@ class AudioCache {
   }
   leave() {const next=this.waiters.shift();if(next)next.resolve();else this.active--;}
   withFiles(work) {const result=this.files.then(work);this.files=result.catch(()=>{});return result;}
+  async touchFile(id) {
+    id=String(id);const time=this.now();this.accessed.set(id,time);
+    // A file-backed multipart Blob validates mtime before reading. Other cache
+    // hits must not mutate that metadata until the last active reader finishes.
+    if(!this.readers.has(id))await fsp.utimes(this.filename(id),new Date(time),new Date(time)).catch(()=>{});
+  }
   async open(id) {
     id=String(id);
     return this.withFiles(async()=>{
       const handle=await fsp.open(this.filename(id),'r');let released=false;
-      this.readers.set(id,(this.readers.get(id)||0)+1);
-      const release=()=>{if(released)return;released=true;const count=this.readers.get(id)||0;if(count<=1)this.readers.delete(id);else this.readers.set(id,count-1);};
-      try {const stat=await handle.stat();if(stat.size<=128)throw Error('Аудиофайл ещё не готов.');await fsp.utimes(this.filename(id),new Date(),new Date()).catch(()=>{});return {handle,stat,release};}
+      await this.touchFile(id);this.readers.set(id,(this.readers.get(id)||0)+1);
+      const release=()=>{if(released)return;released=true;const count=this.readers.get(id)||0;if(count<=1){this.readers.delete(id);void this.withFiles(()=>this.touchFile(id));}else this.readers.set(id,count-1);};
+      try {const stat=await handle.stat();if(stat.size<=128)throw Error('Аудиофайл ещё не готов.');return {handle,stat,release};}
       catch(error){release();await handle.close();throw error;}
     });
   }
   async prepare(id) {
     const track=this.state.get(id);if(!track||!track.duration||track.duration>this.maxDuration)throw Error('Трек недоступен или слишком длинный. Выберите другой результат.');
     const file=this.filename(id);
-    if(this.exists(id)){fsp.utimes(file,new Date(),new Date()).catch(()=>{});return {file,track,cached:true};}
+    const cached=await this.withFiles(async()=>{if(!this.exists(id))return false;await this.touchFile(id);return true;});
+    if(cached)return {file,track,cached:true};
     if(this.pending.has(String(id)))return this.pending.get(String(id));
     if(this.closed)throw Error('Сервис перезапускается. Повторите загрузку.');
     const control=new AbortController(),timer=setTimeout(()=>control.abort(Error('Подготовка заняла слишком много времени. Повторите попытку.')),this.prepareTimeoutMs);this.controllers.add(control);
@@ -88,12 +95,12 @@ class AudioCache {
   }
   prune(incoming=0,protectedIds=new Set()) {return this.withFiles(()=>this.pruneFiles(incoming,protectedIds));}
   async pruneFiles(incoming=0,protectedIds=new Set()) {
-    const rows=[];for(const name of await fsp.readdir(this.directory)){const m=name.match(/^([1-9]\d{0,15})\.mp3$/);if(!m)continue;const stat=await fsp.stat(path.join(this.directory,name));rows.push({name,id:m[1],size:stat.size,time:stat.mtimeMs});}
+    const rows=[];for(const name of await fsp.readdir(this.directory)){const m=name.match(/^([1-9]\d{0,15})\.mp3$/);if(!m)continue;const stat=await fsp.stat(path.join(this.directory,name));rows.push({name,id:m[1],size:stat.size,time:Math.max(stat.mtimeMs,this.accessed.get(m[1])||0)});}
     let total=rows.reduce((n,r)=>n+r.size,0)+incoming;
     for(const row of rows.sort((a,b)=>a.time-b.time)) {
       if(total<=this.maxCacheBytes)break;
-      if(protectedIds.has(row.id)||this.pending.has(row.id)||this.readers.has(row.id)||Date.now()-row.time<180000)continue;
-      await fsp.rm(path.join(this.directory,row.name),{force:true});total-=row.size;
+      if(protectedIds.has(row.id)||this.pending.has(row.id)||this.readers.has(row.id)||this.now()-row.time<180000)continue;
+      await fsp.rm(path.join(this.directory,row.name),{force:true});this.accessed.delete(row.id);total-=row.size;
     }
     if(total>this.maxCacheBytes)throw Error('Кэш временно заполнен. Повторите загрузку чуть позже.');
   }

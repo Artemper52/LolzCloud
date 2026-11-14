@@ -41,10 +41,13 @@ class MusicBot {
     const audio=await this.cache.prepare(track.id),form=new FormData();
     form.set('chat_id',String(chat));form.set('title',audio.track.title);form.set('performer',audio.track.artist);form.set('duration',String(audio.track.duration));
     for(const [key,value]of Object.entries(extra))form.set(key,typeof value==='string'?value:JSON.stringify(value));
-    form.set('audio',await fs.openAsBlob(audio.file,{type:'audio/mpeg'}),`LolzCloud-${track.id}.mp3`);
-    const sent=await this.api.call('sendAudio',form,{timeout:90000});
-    if(sent.audio?.file_id)this.state.file(track.id,sent.audio.file_id);
-    return sent;
+    const reader=typeof this.cache.open==='function'?await this.cache.open(track.id):null;
+    try {
+      form.set('audio',await fs.openAsBlob(audio.file,{type:'audio/mpeg'}),`LolzCloud-${track.id}.mp3`);
+      const sent=await this.api.call('sendAudio',form,{timeout:90000});
+      if(sent.audio?.file_id)this.state.file(track.id,sent.audio.file_id);
+      return sent;
+    } finally { if(reader){await reader.handle.close().catch(()=>{});reader.release();} }
   }
   async telegramFile(track) {
     track=this.state.get(track.id)||track;

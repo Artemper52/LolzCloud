@@ -29,14 +29,16 @@ test('service shutdown rejects queued work immediately and drains worker account
   cache.close();const settled=await Promise.allSettled(work);assert.ok(settled.every(row=>row.status==='rejected'));assert.equal(calls,2);assert.equal(cache.active,0);assert.equal(cache.waiters.length,0);assert.equal(cache.pending.size,0);
 });
 test('an open cached audio file stays readable during eviction and refreshes its access time',async t=>{
-  const {cache}=fixture(t,{maxCacheBytes:300}),file=cache.filename('1');fs.writeFileSync(file,Buffer.alloc(200,7));const old=new Date(Date.now()-600000);fs.utimesSync(file,old,old);
+  let now=Date.now();const {cache}=fixture(t,{maxCacheBytes:300,now:()=>now}),file=cache.filename('1');fs.writeFileSync(file,Buffer.alloc(200,7));const old=new Date(now-600000);fs.utimesSync(file,old,old);
   const opened=await cache.open('1');assert.ok(fs.statSync(file).mtimeMs>Date.now()-5000);
   // Age the fixture while its real descriptor is held, so the reader lease is
   // the only protection rather than the separate recently-used grace period.
-  fs.utimesSync(file,old,old);
+  fs.utimesSync(file,old,old);now+=600000;
   try {await assert.rejects(cache.prune(200),/Кэш временно заполнен/);assert.ok(fs.existsSync(file));const bytes=Buffer.alloc(5);await opened.handle.read(bytes,0,5,0);assert.deepEqual(bytes,Buffer.alloc(5,7));}
   finally {await opened.handle.close();opened.release();opened.release();}
-  assert.equal(cache.readers.size,0);await cache.prune(200);assert.equal(fs.existsSync(file),false);
+  assert.equal(cache.readers.size,0);await cache.files;
+  await assert.rejects(cache.prune(200),/Кэш временно заполнен/,'A completed read refreshes the ordinary cache grace period');
+  now+=180001;await cache.prune(200);assert.equal(fs.existsSync(file),false);
 });
 test('simultaneous real MP3 conversions cannot publish beyond the cache quota',async t=>{
   const executable=require('ffmpeg-static');let wave;
