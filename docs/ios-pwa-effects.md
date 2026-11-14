@@ -42,7 +42,7 @@ Service Worker v4 устанавливает целиком 15 публичны�
 | Полный PWA: музыка, комнаты, native intent, комфорт | 66 PASS | [pwa-ui-results.json](./ios-pwa-effects/pwa-ui-results.json) |
 | Файлы, TXT/LRC, IndexedDB, приоритет своего текста | 17 PASS | [pwa-imports-results.json](./ios-pwa-effects/pwa-imports-results.json) |
 | Выбор после 200-й записи и точная копия в очереди | 11 PASS | [pwa-queue-selection-results.json](./ios-pwa-effects/pwa-queue-selection-results.json) |
-| Policy/core/static/CSP | 19 PASS, включая 6 новых policy tests | [policy.log](./ios-pwa-effects/policy.log) |
+| Policy/core/static/CSP | 19 PASS, включая 6 новых policy tests | [policy.txt](./ios-pwa-effects/policy.txt) |
 
 Измерялись выходные PCM-данные настоящих OfflineAudioContext/AudioWorklet: срез каждой полосы, изменение амплитуды предусилителем, повторы эха, хвост свёртки, сходимость громкости и конечные ограниченные пики. Проверялся также настоящий HTMLMediaElement с MP3 по локальному HTTP и офлайн Blob; смена настроек во время подготовки и паузы. Native-сценарии в этом наборе являются строгим IPC-адаптером, а не испытанием AVPlayer.
 

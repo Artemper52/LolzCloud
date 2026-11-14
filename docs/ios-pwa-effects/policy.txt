@@ -1,0 +1,27 @@
+✔ PWA accepts only matching signed same-origin MP3 sources (1.2076ms)
+✔ PWA validates pages, deduplicates IDs, rejects cursor loops and malformed rows (0.8269ms)
+✔ PWA queue end, repeat-one automatic only, and shuffle avoid the current track (0.2524ms)
+✔ PWA room routing refuses external, credential, query and non-room navigation (0.2291ms)
+✔ PWA lyrics parse repeated timestamps in time order and keep text inert (0.4466ms)
+✔ PWA lyric identity normalizes Unicode and case while preserving recording versions (1.5502ms)
+✔ PWA timed lyrics require exact own identity and duration within two seconds (0.2939ms)
+✔ local track parsing cannot weaken signed network catalogue policy (0.3565ms)
+✔ local audio sniffing requires a supported extension and matching container header (0.2977ms)
+✔ imported lyrics enforce UTF8/size/extension and preserve text inertly (0.7385ms)
+✔ effects start disabled; normalized data is isolated and five canonical frequencies remain stable (1.0551ms)
+✔ invalid/nonfinite settings and unrelated DSP claims are rejected (0.2952ms)
+✔ presets produce independent validated gains and real effect settings (0.2235ms)
+✔ native settings include only supported canonical EQ and preamp keys (1.0706ms)
+✔ native applied status needs actual PCM frames and exact revision/config/client/transport binding (0.4234ms)
+✔ pending/unsupported never claim a processed revision; enabled settings cannot be acknowledged bypassed (0.2812ms)
+✔ installed app exposes only its public shell, install manifest and scoped service worker (67.2762ms)
+✔ embedded room/profile retains same-origin framing and strict API authentication (14.9599ms)
+✔ account return to the installed app is exact and cannot become an open redirect (0.3205ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 177.221

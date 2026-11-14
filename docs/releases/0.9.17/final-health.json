@@ -1,0 +1,37 @@
+{
+  "checkedAt": "2026-11-14T21:14:44.924Z",
+  "services": [
+    {
+      "url": "https://lolzcloud.com/api/health",
+      "body": {
+        "ok": true,
+        "version": "0.9.19",
+        "roomProtocol": 2,
+        "socialProtocol": 1,
+        "oauthConfigured": true,
+        "spicyConfigured": true
+      }
+    },
+    {
+      "url": "https://lolzcloud.com/music/health",
+      "body": {
+        "ok": true,
+        "service": "lolzcloud-music",
+        "protocol": 1,
+        "activeDownloads": 0
+      }
+    },
+    {
+      "url": "https://lolzcloud.com/telegram/health",
+      "body": {
+        "ok": true,
+        "bot": "lolzcloudbot",
+        "pollAgeSeconds": 20,
+        "activeDownloads": 0,
+        "cacheTracks": 1,
+        "inlineMode": "covers-with-feedback",
+        "cacheChannelConfigured": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "sourceCommit": "f09778bcbc3977e770c7de51f5cb0f7531759af8",
+  "files": 817,
+  "unsafeOrPrivatePaths": [],
+  "credentialPatternMatches": [],
+  "runtimeCanonicalFiles": 153,
+  "runtimeMismatches": [],
+  "payloadEquivalentZipContainers": [
+    "source/app/session-transfer/helper-firefox.zip",
+    "source/app/session-transfer/helper.zip"
+  ],
+  "nativeFrozenSourceHashes": 15,
+  "entries": 918
+}
