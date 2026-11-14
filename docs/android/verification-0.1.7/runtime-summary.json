@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "checkedAt": "2026-11-14T20:20:10.171Z",
+  "version": "0.1.7",
+  "versionCode": 8,
+  "apkSha256": "ca58d0d794f47858e055cbe5ae76921dcd12c50380588719e0d402028304000f",
+  "androidApi": 35,
+  "sourceHashesUnchanged": true,
+  "productionShaUnchanged": true,
+  "preferencesRestored": true,
+  "reports": {
+    "audioComfort": {
+      "file": "android-audio-comfort-verification.json",
+      "checks": 25,
+      "deviceCapabilities": {
+        "eqAvailable": true,
+        "eqBandCount": 5,
+        "bassAvailable": true,
+        "bassStrengthSupported": true,
+        "reverbAvailable": true,
+        "eqFirstHz": 60,
+        "eqAppliedMillibels": 600,
+        "bassActualStrength": 333,
+        "bassNativeStrengthSupported": true
+      }
+    },
+    "audioAudit": {
+      "file": "android-audio-audit-verification.json",
+      "checks": 20,
+      "injectedFocusCallbacks": true
+    },
+    "catalog": {
+      "file": "android-catalog-verification.json",
+      "checks": 58,
+      "realPublicHttps": true,
+      "nativeMediaPlayer": true
+    },
+    "socialCore": {
+      "file": "android-social-core-verification.json",
+      "checks": 50,
+      "withoutPicker": true,
+      "isolatedSocialFixtures": true
+    }
+  },
+  "pureJvm": {
+    "fxPolicy": 17,
+    "sleepPolicy": 14,
+    "report": "audio-settings-policy-verification.json"
+  },
+  "earlierAttempt": {
+    "file": "audio-comfort-initial-early-snapshot.json",
+    "status": "passed-but-capability-snapshot-superseded",
+    "reason": "The test thread observed prepared=true before the main-thread onPrepared callback created AudioEffects. A test-only main-looper barrier now snapshots capabilities after that complete callback; production APK unchanged."
+  },
+  "limitations": [
+    "Generated silent PCM fixtures test real native state/readback, not audible or physical-frequency response.",
+    "Physical Android device and manufacturer-specific effect implementations were not tested.",
+    "Focus callbacks in audio-audit are injected into the real service; this is not physical competing-app focus QA.",
+    "Service recreation was tested; process-kill lifecycle was not.",
+    "EQ/sleep scope is native MediaPlayer only, not rooms or YouTube Music WebView.",
+    "Social notification API events use isolated fixtures; no personal account, external message or real profile change.",
+    "Checks overlap across suites; counts are reported separately."
+  ]
+}

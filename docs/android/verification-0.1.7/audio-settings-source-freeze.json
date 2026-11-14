@@ -1,0 +1,17 @@
+{
+  "checkedAt": "2026-11-14T20:01:23.041Z",
+  "nativeJavaCompile": {
+    "status": "passed",
+    "files": 31,
+    "release": 8,
+    "compileSdk": 36
+  },
+  "instrumentationCompile": "passed-not-executed",
+  "sourceHashesSha256": {
+    "android/app/src/main/java/com/lolzcloud/mobile/MainActivity.java": "225d8b15f6644a4f7bd76877a46f8750cb26db6342be1abf439fd6e6305d0b5f",
+    "android/app/src/main/java/com/lolzcloud/mobile/PlaybackService.java": "9245a1295ef516ed405fc0ba9acbfe25c0566578c25e855e7a5fba3c1bd42214",
+    "android/app/src/main/java/com/lolzcloud/mobile/LibraryStore.java": "8530b4b0d5cf88278ff71910bc86dd06c8809ce502127d77ac30960b0d578c31",
+    "android/app/src/main/java/com/lolzcloud/mobile/AudioEffectsPolicy.java": "607a4d194334f121037d67a871e6d4d855c7094801846e901872bd4b99334d7b",
+    "android/app/src/main/java/com/lolzcloud/mobile/SleepTimerPolicy.java": "d485f965fca458abc9955750b6b41d87ceadc6804a1618d75913e12adb58573e"
+  }
+}

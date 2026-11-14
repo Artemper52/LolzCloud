@@ -5,8 +5,12 @@
   // A native snapshot may have been queued before a newer UI choice. Document
   // identity also prevents a previous page from winning after a WebView reload.
   const nativeClientId = native ? crypto.randomUUID().toLowerCase() : '';
-  let nativeRequestId = 1, nativeHandshake = true;
-  const sendNative = (action, value = {}) => window.webkit.messageHandlers.lolzcloud.postMessage({ action, ...value, clientId: nativeClientId, requestId: nativeRequestId });
+  let nativeRequestId = 1, nativeHandshake = true, effectsController;
+  const sendNative = (action, value = {}) => {
+    window.webkit.messageHandlers.lolzcloud.postMessage({ action, ...value, clientId: nativeClientId, requestId: nativeRequestId });
+    // Playback owns this binding. An effects edit never selects a new intent.
+    if (['queue', 'play', 'pause', 'resume', 'stop'].includes(action)) effectsController?.syncNativeIntent();
+  };
   const currentNativeIntent = value => value?.clientId === nativeClientId && value.requestId === nativeRequestId;
   function beginNativeIntent() { if (native) nativeRequestId++; }
   let saved = {}, queue = [], index = -1, current = null, shuffle = false, repeat = 'off', liked = new Set(), collection = new Map();
@@ -31,6 +35,11 @@
   if (saved.bookmarks && typeof saved.bookmarks === 'object') for (const [id, rows] of Object.entries(saved.bookmarks).slice(0, 100)) if (C.trackID(id) && Array.isArray(rows)) bookmarks.set(id, rows.filter(row => row && Number.isFinite(row.position) && row.position >= 0 && row.position <= 86400 && Number.isFinite(row.createdAt)).slice(0, 100).map(row => ({ position: row.position, createdAt: row.createdAt })));
   let importingAudio = false, nativeImportCount = 0, nativeImportErrors = 0;
   const audio = $('audio');
+  effectsController = window.LolzCloudEffects.createController({ audio, native, sendNative,
+    intent: () => ({ clientId: nativeClientId, requestId: nativeRequestId }),
+    wantedPlayback: () => phase === 'playing' || phase === 'loading', onState: renderEffects,
+    onInterrupted: () => { if (!native && loaded && !audio.paused && ['playing', 'loading'].includes(phase)) { phase = 'blocked'; playerError = 'Звук прерван. Нажми Play, чтобы продолжить.'; audio.pause(); renderPlayback(); persist(); } },
+  });
   const node = (tag, text, className) => { const result = document.createElement(tag); if (text != null) result.textContent = text; if (className) result.className = className; return result; };
   const button = (label, handler, className = '') => { const result = node('button', label, className); result.type = 'button'; result.onclick = () => { try { Promise.resolve(handler()).catch(noticeError); } catch (error) { noticeError(error); } }; return result; };
   function notice(text) { clearTimeout(noticeTimer); $('notice').textContent = text; $('notice').hidden = !text; noticeTimer = setTimeout(() => { $('notice').hidden = true; }, 5000); }
@@ -86,7 +95,7 @@
     const result = node('img'); result.src = track.cover || '/app/icon.svg'; result.width = result.height = size; result.alt = ''; result.loading = 'lazy'; result.referrerPolicy = 'no-referrer'; result.onerror = () => { result.onerror = null; result.src = '/app/icon.svg'; }; return result;
   }
   function trackRow(track, source, position, queueRow = false) {
-    const row = node('article', null, 'track-row'); row.dataset.trackId = track.id; row.dataset.current = String(current?.id === track.id);
+    const row = node('article', null, 'track-row'); row.dataset.trackId = track.id; row.dataset.current = String(queueRow ? position === index : current?.id === track.id);
     const play = button('', () => playFrom(track, source, position), 'track-play');
     const info = node('span', null, 'track-meta'); info.append(node('strong', track.title), node('small', [track.artist || (track.local ? 'Локальный файл' : 'Без исполнителя'), offline.has(track.id) ? track.local ? '' : 'На устройстве' : track.local ? 'Файл не найден' : ''].filter(Boolean).join(' · ')));
     play.append(image(track), info); play.setAttribute('aria-label', 'Слушать: ' + track.title + (track.artist ? ' — ' + track.artist : ''));
@@ -157,7 +166,12 @@
   function removeQueue(position) { if (position === index) return; queue.splice(position, 1); if (position < index) index--; history = []; persist(); renderQueue(); }
   function playFrom(track, source, position) {
     if (source === queue) { playAt(position); return; }
-    queue = source.slice(0, 200); const selected = queue.findIndex(row => row.id === track.id); history = []; playAt(Math.max(0, selected));
+    const selected = Number.isInteger(position) && source[position]?.id === track.id ? position : source.indexOf(track);
+    if (selected < 0) { notice('Эта запись больше недоступна в списке. Выбери песню ещё раз.'); return; }
+    // Keep the chosen occurrence and its neighbours when a list exceeds the
+    // bounded queue. A contiguous window preserves next/previous source order.
+    const start = Math.max(0, Math.min(selected - 100, source.length - 200));
+    queue = source.slice(start, start + 200); history = []; playAt(selected - start);
   }
   function pauseRoom() { roomAudible = false; $('rooms-frame').contentWindow?.postMessage({ type: 'lolzcloud:app-audio', action: 'pause' }, origin); }
   // The same audio element survives every route and track change. The first
@@ -178,7 +192,8 @@
     if (remember && previousIndex >= 0 && previousIndex !== position) history.push(previousIndex);
     if (history.length > 200) history.shift();
     index = position; current = track; phase = 'loading'; playerError = ''; elapsed = seek; duration = track.duration; loaded = false; pauseRoom();
-    if (native) sendNative('stop'); else { stopSource(); if (!automatic) primeAudio(); }
+    effectsController.track(track.id);
+    if (native) sendNative('stop'); else { stopSource(); effectsController.prime(); if (!automatic) primeAudio(); }
     renderPlayer(); renderQueue(); renderSearch(); renderLibrary(); persist();
     if ($('tab-lyrics').getAttribute('aria-selected') === 'true') void loadLyrics();
     try {
@@ -194,6 +209,8 @@
         audio.src = source; audio.load();
         audio.defaultPlaybackRate = audio.playbackRate = rate;
         if (seek > 0) audio.addEventListener('loadedmetadata', () => { if (token === playVersion) audio.currentTime = Math.min(seek, Math.max(0, audio.duration - 0.1)); }, { once: true });
+        await effectsController.beforePlay();
+        if (token !== playVersion || signal.aborted) return;
         await audio.play();
       }
       if (token !== playVersion) return;
@@ -218,9 +235,30 @@
     beginNativeIntent();
     playerError = ''; phase = 'loading'; renderPlayback();
     if (native) sendNative('resume');
-    else { const token = playVersion; audio.play().then(() => { if (token !== playVersion) return; phase = 'playing'; renderPlayback(); }).catch(error => { if (token !== playVersion) return; phase = 'blocked'; playerError = error.name === 'NotAllowedError' ? 'Нажми Play ещё раз, чтобы разрешить звук.' : 'Не удалось включить запись. Нажми «Повторить».'; renderPlayback(); }); }
+    else { const token = playVersion; effectsController.prime(); effectsController.beforePlay().then(() => { if (token === playVersion) return audio.play(); }).then(() => { if (token !== playVersion) return; phase = 'playing'; renderPlayback(); }).catch(error => { if (token !== playVersion) return; phase = 'blocked'; playerError = error.name === 'NotAllowedError' ? 'Нажми Play ещё раз, чтобы разрешить звук.' : 'Не удалось включить запись. Нажми «Повторить».'; renderPlayback(); }); }
   }
   function togglePlayback() { if (phase === 'playing' || phase === 'loading') pause(); else resume(); }
+  function renderEffects(value = effectsController.snapshot()) {
+    const cap = value.capabilities, config = value.config;
+    $('effects-enabled').checked = config.enabled; $('effects-enabled').disabled = !cap.eq;
+    $('effects-retry').hidden = native || value.state !== 'unsupported' || !cap.eq || !config.enabled;
+    const db = n => (n > 0 ? '+' : '') + n + ' дБ';
+    for (let i = 0; i < 5; i++) { const input = $('effects-gain-' + i); if (document.activeElement !== input) input.value = config.gains[i]; input.disabled = !cap.eq; input.setAttribute('aria-valuetext', db(config.gains[i])); $('effects-gain-' + i + '-value').textContent = db(config.gains[i]); }
+    for (const [key, id, scale] of [['preampDb', 'preamp', 1], ['reverb', 'reverb', 100], ['echo', 'echo', 100]]) { const input = $('effects-' + id), amount = Math.round(config[key] * scale); if (document.activeElement !== input) input.value = amount; input.disabled = !cap[id]; $('effects-' + id + '-value').textContent = scale === 1 ? db(amount) : amount + '%'; }
+    $('effects-normalization').checked = config.normalization; $('effects-normalization').disabled = !cap.normalization;
+    for (const section of document.querySelectorAll('[data-effects-cap]')) section.hidden = native && (section.dataset.effectsCap !== 'preamp' || !cap.preamp);
+    const presets = $('effects-preset'), options = Object.entries(window.LolzCloudEffectsPolicy.PRESETS).filter(([key]) => !native || !['lofi', 'reverb', 'echo'].includes(key)), signature = options.map(([key]) => key).join(',');
+    if (presets.dataset.options !== signature) { presets.replaceChildren(...options.map(([key, row]) => { const option = document.createElement('option'); option.value = key; option.textContent = row.label; return option; })); const custom = document.createElement('option'); custom.value = 'custom'; custom.textContent = 'Свои настройки'; custom.disabled = true; presets.append(custom); presets.dataset.options = signature; }
+    presets.value = window.LolzCloudEffectsPolicy.selectedPreset(config, native); presets.disabled = !cap.eq;
+    let text = value.error || ({ bypassed: 'Обработка выключена. Исходный звук.', pending: 'Настройки применятся при воспроизведении.', applied: 'Обработка применяется к этому треку.', interrupted: 'Звук прерван. Нажми Play, чтобы продолжить.', unsupported: 'Обработка звука здесь недоступна.' })[value.state] || '';
+    if (roomAudible) text += ' Настройки относятся к твоему плееру; звук комнаты остаётся общим.';
+    if ($('effects-status').textContent !== text) $('effects-status').textContent = text;
+    const meter = value.normalization; $('effects-normalization-status').textContent = !config.normalization ? 'Для музыки в твоём плеере. Защита от пиков включается вместе с обработкой.' : meter?.measured ? 'Коррекция: ' + db(Math.round(meter.gainDb * 10) / 10) + '. Измерение продолжается во время музыки.' : 'Оцениваем громкость. Первые несколько секунд играют без коррекции.';
+  }
+  function configureEffects(patch) { void effectsController.configure(patch).catch(noticeError); }
+  let effectsOpener, effectsFromHistory = false;
+  function openEffects(opener) { if ($('effects-dialog').open) return; effectsOpener = opener || document.activeElement; renderEffects(); $('effects-dialog').showModal(); window.history.pushState({ ...window.history.state, lolzcloudEffects: true }, '', location.href); }
+  function closeEffects(fromHistory = false) { if (!$('effects-dialog').open) return; effectsFromHistory = fromHistory; $('effects-dialog').close(); }
   function next(automatic = false) {
     const target = C.nextIndex(queue.length, index, { shuffle, repeat, automatic });
     if (target < 0) { phase = 'ended'; if (native) sendNative('pause'); else audio.pause(); renderPlayback(); persist(); return; }
@@ -504,7 +542,19 @@
   $('player-repeat').onclick = () => { repeat = repeat === 'off' ? 'all' : repeat === 'all' ? 'one' : 'off'; persist(); renderPlayer(); notice(repeat === 'off' ? 'Повтор выключен' : repeat === 'all' ? 'Повтор всей очереди' : 'Повтор одного трека'); };
   $('player-like').onclick = () => toggleLike(current); $('player-download').onclick = () => { void download(current); };
   $('player-seek').oninput = () => { $('player-time').textContent = C.formatTime($('player-seek').value); }; $('player-seek').onchange = () => seek($('player-seek').value);
-  $('player-volume').oninput = () => { const value = +$('player-volume').value; if (native) sendNative('volume', { value }); else audio.volume = value; };
+  $('player-volume').oninput = () => { const value = +$('player-volume').value; if (native) sendNative('volume', { value }); else effectsController.volume(value); };
+  $('effects-open').onclick = event => openEffects(event.currentTarget); $('effects-close').onclick = () => closeEffects();
+  $('effects-dialog').addEventListener('cancel', event => { event.preventDefault(); closeEffects(); });
+  $('effects-dialog').addEventListener('close', () => { if (!effectsFromHistory && window.history.state?.lolzcloudEffects) window.history.back(); effectsFromHistory = false; if (effectsOpener?.isConnected) effectsOpener.focus(); });
+  window.addEventListener('popstate', () => { if (!window.history.state?.lolzcloudEffects) closeEffects(true); });
+  $('effects-enabled').onchange = () => configureEffects({ enabled: $('effects-enabled').checked });
+  $('effects-preset').onchange = () => { if ($('effects-preset').value !== 'custom') configureEffects(window.LolzCloudEffectsPolicy.preset($('effects-preset').value)); };
+  for (let i = 0; i < 5; i++) $('effects-gain-' + i).oninput = () => { const gains = effectsController.snapshot().config.gains; gains[i] = +$('effects-gain-' + i).value; configureEffects({ enabled: true, gains }); };
+  $('effects-preamp').oninput = () => configureEffects({ preampDb: +$('effects-preamp').value });
+  for (const name of ['echo', 'reverb']) $('effects-' + name).oninput = () => configureEffects({ enabled: true, [name]: +$('effects-' + name).value / 100 });
+  $('effects-normalization').onchange = () => configureEffects({ enabled: true, normalization: $('effects-normalization').checked });
+  $('effects-reset').onclick = () => configureEffects(window.LolzCloudEffectsPolicy.preset('original'));
+  $('effects-retry').onclick = () => configureEffects({});
   $('player-rate').oninput = () => setRate($('player-rate').value); $('rate-presets').onclick = event => { const control = event.target.closest('[data-rate]'); if (control) setRate(control.dataset.rate); };
   $('sleep-select').onchange = () => setSleep(+$('sleep-select').value); $('bookmark-add').onclick = addBookmark;
   $('queue-clear').onclick = () => { queue = current ? [current] : []; index = current ? 0 : -1; history = []; persist(); renderQueue(); notice('В очереди остался текущий трек'); };
@@ -550,6 +600,7 @@
   audio.addEventListener('timeupdate', () => { if (!loaded || native) return; elapsed = audio.currentTime; checkSleep(); renderTime(); updateMediaSession(); if (Date.now() - lastSavedTime > 5000) { lastSavedTime = Date.now(); persist(); } });
   audio.addEventListener('ended', () => { if (loaded && !native) next(true); });
   audio.addEventListener('error', () => { if (!loaded || native) return; phase = 'error'; playerError = 'Запись не загрузилась. Проверь сеть и нажми «Повторить».'; renderPlayback(); });
+  window.addEventListener('lolzcloud:effects', event => { if (native) effectsController.receiveNative(event.detail); });
   window.addEventListener('lolzcloud:playback', event => {
     if (!native || !current) return; const value = event.detail;
     if (!currentNativeIntent(value) || typeof value.id === 'string' && value.id !== current.id || !['loading', 'playing', 'paused', 'ended', 'error'].includes(value.state)) return;
@@ -569,7 +620,7 @@
     nativeQueueOwned = value.queue === true;
     if (!changed && loaded) return;
     if (changed) { if (index >= 0) history.push(index); if (history.length > 200) history.shift(); elapsed = 0; duration = expected.duration; }
-    ++playVersion; preparationController?.abort(); index = position; current = expected; loaded = true; playerError = ''; nativeQueueOwned = value.queue === true; phase = 'loading';
+    ++playVersion; preparationController?.abort(); index = position; current = expected; loaded = true; playerError = ''; nativeQueueOwned = value.queue === true; phase = 'loading'; effectsController.track(expected.id);
     renderPlayer(); renderQueue(); persist();
     if (changed && $('tab-lyrics').getAttribute('aria-selected') === 'true') void loadLyrics();
   });
@@ -594,11 +645,11 @@
   window.addEventListener('online', () => { connectivity(); if (['rooms', 'profile'].includes(view)) void loadAccount(true); }); window.addEventListener('offline', connectivity);
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); else { checkSleep(); connectivity(); if (['rooms', 'profile'].includes(view)) void loadAccount(); } });
   window.addEventListener('pagehide', () => { clearTimeout(persistTimer); try { localStorage.setItem('LolzCloud-app-v1', JSON.stringify(savedState())); } catch {} });
-  renderPlayer(); renderQueue(); renderLibrary(); renderComfort(); renderBookmarks(); scheduleSleep(); checkSleep(); connectivity(); renderGate('rooms-gate', 'rooms'); renderGate('profile-gate', 'profile'); void refreshOffline(); if (native) sendNative('rate', { value: rate });
+  renderPlayer(); renderQueue(); renderLibrary(); renderComfort(); renderBookmarks(); renderEffects(); scheduleSleep(); checkSleep(); connectivity(); renderGate('rooms-gate', 'rooms'); renderGate('profile-gate', 'profile'); void refreshOffline(); if (native) sendNative('rate', { value: rate });
   if (native) $('install-open').hidden = true;
   if (native) { $('audio-import-control').hidden = true; $('native-audio-import').hidden = false; }
   if (!native && (/iPad|iPhone|iPod/.test(navigator.userAgent) || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) { document.querySelector('.volume-label').hidden = true; document.querySelector('.player-actions').append(node('span', 'Громкость — кнопками устройства', 'hint')); }
   if ('serviceWorker' in navigator && !native) navigator.serviceWorker.register('/app/sw.js', { scope: '/app/' }).catch(() => { /* Streaming remains available when private browsing denies a worker. */ });
   // Read-only diagnostic surface is useful to the isolated regression harness.
-  window.LolzCloudApp = Object.freeze({ snapshot: () => ({ view, phase, current: current?.id || '', queue: queue.map(track => track.id), index, liked: [...liked], offline: [...offline.keys()], elapsed, duration, roomAudible, native, rate, sleepDeadline, bookmarks: current ? (bookmarks.get(current.id) || []).map(row => row.position) : [] }), openRoom });
+  window.LolzCloudApp = Object.freeze({ snapshot: () => ({ view, phase, current: current?.id || '', queue: queue.map(track => track.id), index, liked: [...liked], offline: [...offline.keys()], elapsed, duration, roomAudible, native, rate, sleepDeadline, effects: effectsController.snapshot(), bookmarks: current ? (bookmarks.get(current.id) || []).map(row => row.position) : [] }), openRoom });
 })();

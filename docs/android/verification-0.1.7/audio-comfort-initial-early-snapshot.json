@@ -1,0 +1,49 @@
+{
+  "status": "passed",
+  "runId": "f1afd03e-2ff9-4513-a198-2ce633ee129a",
+  "checks": [
+    "Reset without an audio session confirms the saved neutral state",
+    "Reset clears every persisted device band, not only the current zero-band engine",
+    "Reset includes loudness, speed and pitch",
+    "Reset preserves volume, sleep and the queue",
+    "Real WAV prepares without autoplay",
+    "Unavailable native EQ is reported as unavailable",
+    "Unavailable native bass has no editable fake strength",
+    "Applying and resetting effects preserves real MediaPlayer pause",
+    "Current-track moment preserves pause and the complete queue",
+    "A queued moment selects its existing occurrence without replacing entries or starting audio",
+    "An absent track appends at the end and preserves the remaining queue and pause",
+    "A real bookmark click followed immediately by Next cannot apply the old 12s seek to the next prepared WAV",
+    "Generated WAV playback advances the real MediaPlayer clock",
+    "A genuinely recreated Service restores the bounded saved sleep deadline",
+    "Service restoration never autoplays the saved queue",
+    "Expired saved sleep clears on Service recreation without autoplay",
+    "Actual expiry pauses the current recording and clears its durable deadline",
+    "Near-duplicate bookmark storage does not add another row",
+    "Older larger bookmark arrays remain readable without destructive migration",
+    "New bookmark additions are bounded while preserving legacy records",
+    "A saved moment can be removed without clearing its track or other moments"
+  ],
+  "screenshots": [
+    "audio-effects.png",
+    "bookmarks.png"
+  ],
+  "deviceCapabilities": {
+    "eqAvailable": false,
+    "eqBandCount": 0,
+    "bassAvailable": false,
+    "bassStrengthSupported": false,
+    "reverbAvailable": false
+  },
+  "version": "0.1.7",
+  "versionCode": 8,
+  "apkSha256": "ca58d0d794f47858e055cbe5ae76921dcd12c50380588719e0d402028304000f",
+  "androidApi": 35,
+  "scope": "Actual native MediaPlayer/AudioEffect readback/SharedPreferences/MainActivity and genuine Service recreation using generated 30s silent WAV files. Pure host driver tests cover fixed/rounded/failed hardware variants separately. No physical acoustic response, WebView-room timer, process-kill test or personal account is claimed.",
+  "preferencesRestored": true,
+  "personalAccountsUsed": false,
+  "generatedAt": "2026-11-14T20:14:07.791Z",
+  "emulator": "emulator-5554",
+  "avd": "LolzCloud",
+  "productionShaUnchanged": true
+}

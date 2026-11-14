@@ -1,0 +1,89 @@
+{
+  "checkedAt": "2026-11-14T20:40:18.788Z",
+  "status": "passed",
+  "version": "0.9.17",
+  "input": {
+    "inputZipSha256": "0233aa31985a2e535d00c9514ba32281fa9106d35538a15699966a8ec1907882",
+    "pathValidation": "strict raw ZIP names, no backslashes/absolute/traversal/duplicate/symlinks",
+    "runtimeFiles": 153,
+    "lockEquivalentExceptRootVersion": true,
+    "dependencyDeclarationsIdentical": true,
+    "sourceVersion": "0.9.17"
+  },
+  "artifacts": [
+    {
+      "name": "LolzCloud-0.9.17-linux-x64.AppImage",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.17/dist/LolzCloud-0.9.17-linux-x64.AppImage",
+      "size": 147458552,
+      "sha256": "71c958c6cacd3bb168968ad904f5214c5b2c84f67a6cf2908db2f2f64fc030e5"
+    },
+    {
+      "name": "LolzCloud-0.9.17-linux-x64.tar.gz",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.17/dist/LolzCloud-0.9.17-linux-x64.tar.gz",
+      "size": 160328836,
+      "sha256": "6fe82c8c70d56bbca4dc4c8db9edf6c310cefa56219f45ce0429707faa319ee5"
+    },
+    {
+      "name": "LolzCloud-0.9.17-linux-arm64.tar.gz",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.17/dist/LolzCloud-0.9.17-linux-arm64.tar.gz",
+      "size": 159410384,
+      "sha256": "49792539bbc8cac1f9d7bce8685f31ce5fb9a86e2f2ec5ce6bdb981b9e0e6f4b"
+    }
+  ],
+  "runtime": {
+    "checkedAt": "2026-11-14T20:37:20.345Z",
+    "status": "passed",
+    "version": "0.9.17",
+    "platform": "linux",
+    "arch": "x64",
+    "uid": 986,
+    "packagedX64TarSelfTest": "passed",
+    "appImageNormalFuseSelfTest": "passed",
+    "realKeyring": {
+      "status": "passed",
+      "platform": "linux",
+      "arch": "x64",
+      "electron": "45.2.1",
+      "node": "24.22.1",
+      "realSystemKeyring": true,
+      "backend": "gnome_libsecret",
+      "encryptedRoundTrip": true,
+      "personalAccountsUsed": false,
+      "rendererSandboxed": true,
+      "rendererSeccomp": 2,
+      "noSandboxSwitch": false
+    },
+    "personalAccountsUsed": false,
+    "arm64Runtime": "not-tested-static-only",
+    "physicalAudio": false,
+    "scope": "Native packaged self-test + real OS keyring and sandbox. No repeat of previous full music/provider/UI suites, no user installation or deploy."
+  },
+  "sourceProvenance": [
+    {
+      "label": "x64",
+      "verifiedByteForByte": 150,
+      "equivalentGenerated": 3,
+      "mismatches": 0
+    },
+    {
+      "label": "arm64",
+      "verifiedByteForByte": 150,
+      "equivalentGenerated": 3,
+      "mismatches": 0
+    },
+    {
+      "label": "AppDir-x64",
+      "verifiedByteForByte": 150,
+      "equivalentGenerated": 3,
+      "mismatches": 0
+    }
+  ],
+  "fullNode": {
+    "tests": 388,
+    "pass": 388,
+    "fail": 0,
+    "skipped": 0,
+    "report": "linux-full-node.tap"
+  },
+  "published": false
+}

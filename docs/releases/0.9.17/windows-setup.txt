@@ -1,0 +1,31 @@
+
+Setup profile save passed: settings, collections, history, bookmarks, wave, encrypted SoundCloud/forum/room sessions.
+  • electron-builder  version=26.18.0 os=10.0.26200
+  • building        target=nsis file=D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\setup-0.9.16\LolzCloud-0.9.16-win-x64-Setup.exe archs=x64 oneClick=true perMachine=false
+  • no code signing certificate configured, signing is skipped  path=D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\setup-0.9.16\LolzCloud-0.9.16-win-x64-Setup.__uninstaller.exe
+  • no code signing certificate configured, signing is skipped  path=D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\setup-0.9.16\LolzCloud-0.9.16-win-x64-Setup.exe
+  • building block map  blockMapFile=D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\setup-0.9.16\LolzCloud-0.9.16-win-x64-Setup.exe.blockmap
+Installer: D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\setup-0.9.16\LolzCloud-0.9.16-win-x64-Setup.exe.blockmap
+Installer: D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\setup-0.9.16\LolzCloud-0.9.16-win-x64-Setup.exe
+Real silent Setup installed and verified: 0.9.16
+  • electron-builder  version=26.18.0 os=10.0.26200
+  • building        target=nsis file=D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\insufficient-space\LolzCloud-0.9.17-win-x64-Setup.exe archs=x64 oneClick=true perMachine=false
+  • no code signing certificate configured, signing is skipped  path=D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\insufficient-space\LolzCloud-0.9.17-win-x64-Setup.__uninstaller.exe
+  • no code signing certificate configured, signing is skipped  path=D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\insufficient-space\LolzCloud-0.9.17-win-x64-Setup.exe
+  • building block map  blockMapFile=D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\insufficient-space\LolzCloud-0.9.17-win-x64-Setup.exe.blockmap
+Installer: D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\insufficient-space\LolzCloud-0.9.17-win-x64-Setup.exe.blockmap
+Installer: D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\insufficient-space\LolzCloud-0.9.17-win-x64-Setup.exe
+Low-space Setup stopped before changing the previous application or profile.
+  • electron-builder  version=26.18.0 os=10.0.26200
+  • building        target=nsis file=D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\setup-0.9.17\LolzCloud-0.9.17-win-x64-Setup.exe archs=x64 oneClick=true perMachine=false
+  • no code signing certificate configured, signing is skipped  path=D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\setup-0.9.17\LolzCloud-0.9.17-win-x64-Setup.__uninstaller.exe
+  • no code signing certificate configured, signing is skipped  path=D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\setup-0.9.17\LolzCloud-0.9.17-win-x64-Setup.exe
+  • building block map  blockMapFile=D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\setup-0.9.17\LolzCloud-0.9.17-win-x64-Setup.exe.blockmap
+Installer: D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\setup-0.9.17\LolzCloud-0.9.17-win-x64-Setup.exe.blockmap
+Installer: D:\LolzCloud-Android-Toolchain\tmp\LolzCloud-setup-check-lyghug\setup-0.9.17\LolzCloud-0.9.17-win-x64-Setup.exe
+Real silent Setup installed and verified: 0.9.17
+
+Setup profile restore passed: settings, collections, history, bookmarks, wave, encrypted SoundCloud/forum/room sessions.
+
+Compatibility self-test passed: Electron 45.2.1, Node 24.22.1, binary fetch/streams, session cookies, stored bookmarks and native renderer.
+Setup upgrade passed from 0.9.16: exact application files, native launch and complete saved profile.

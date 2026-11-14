@@ -73,6 +73,8 @@ public final class MainActivity extends Activity {
     private View audioRetryButton;
     private AlertDialog lyricsDialog;
     private Drawable forestArtwork;
+    private String soundCapabilities = "";
+    private TextView sleepTimerLabel;
     private static final int IMPORT_AUDIO=41, IMPORT_LYRICS=42, EXPORT_PROFILE=43, IMPORT_PROFILE=44;
     private String pendingLyricsId;
     private final ServiceConnection connection = new ServiceConnection() {
@@ -128,6 +130,7 @@ public final class MainActivity extends Activity {
     @Override public void onBackPressed(){if(!backStack.isEmpty()){page=backStack.pop();render();}else if(!page.equals("wave")){selectTab("wave");}else super.onBackPressed();}
 
     private void render(){
+        sleepTimerLabel=null;
         boolean restoreSearchFocus=page.equals("search")&&searchInput!=null&&searchInput.hasFocus();
         int selectionStart=restoreSearchFocus?searchInput.getSelectionStart():0,selectionEnd=restoreSearchFocus?searchInput.getSelectionEnd():0;
         boolean restoreIme=restoreSearchFocus&&Build.VERSION.SDK_INT>=30&&searchInput.getRootWindowInsets()!=null&&searchInput.getRootWindowInsets().isVisible(WindowInsets.Type.ime());
@@ -338,20 +341,27 @@ public final class MainActivity extends Activity {
     private void sound(){
         heading("Настрой под себя","Эффекты нативного плеера");
         if(player==null){paragraph("Плеер подключается…");return;}
-        LinearLayout presets=row();presets.addView(chip("Оригинал",false,()->preset(1f,1f,0)));presets.addView(chip("Slowed",false,()->preset(.85f,.9f,0)));presets.addView(chip("Speed up",false,()->preset(1.2f,1.1f,0)));content.addView(horizontal(presets));
+        soundCapabilities=player.effectsCapabilitiesKey();
+        LinearLayout presets=row();presets.addView(chip("Обычная скорость",false,()->tempoPreset(1f,1f)));presets.addView(chip("Slowed",false,()->tempoPreset(.85f,.9f)));presets.addView(chip("Speed up",false,()->tempoPreset(1.2f,1.1f)));content.addView(horizontal(presets));
         section("Скорость");slider(String.format(Locale.ROOT,"%.2f×",player.speed()),150,Math.round((player.speed()-.5f)*100),value->{player.setSpeed(.5f+value/100f);},value->String.format(Locale.ROOT,"%.2f×",.5f+value/100f));
-        section("Низкие частоты");if(player.bassAvailable())slider("Bass Boost · "+player.bass()/10+"%",100,player.bass()/10,value->player.setBass(value*10),value->"Bass Boost · "+value+"%");else paragraph("Эффект станет доступен после запуска трека, если его поддерживает устройство.");
-        section("Эквалайзер");if(player.eqAvailable()){short[] range=player.eqRange();for(int i=0;i<player.eqBandCount();i++){final int band=i;int hz=player.eqCenterHz(i);String frequency=hz>=1000?String.format(Locale.ROOT,"%.1f кГц",hz/1000f):hz+" Гц";slider(frequency,range[1]-range[0],player.eqBandLevel(i)-range[0],value->player.setEqBand(band,(short)(value+range[0])),value->frequency+"  "+String.format(Locale.ROOT,"%+.1f dB",(value+range[0])/100f));}}else paragraph("Количество полос зависит от аудиосистемы телефона.");
-        if(player.reverbAvailable())switchRow("Лёгкий Reverb","Пространство для наушников",player.reverb(),enabled->player.setReverb(enabled));
-        section("Таймер сна");long sleep=player.sleepRemainingMillis();actionRow("moon",sleep>0?"Осталось "+(sleep/60000+1)+" мин":"Остановить музыку по таймеру","15, 30, 45 или 60 минут",()->sleepDialog());
-        gap(12);content.addView(button("Сбросить эффекты",false,()->{player.setSpeed(1);player.setPitch(1);player.setBass(0);player.setReverb(false);for(int i=0;i<player.eqBandCount();i++)player.setEqBand(i,(short)0);render();}));
+        section("Низкие частоты");if(player.bassAvailable()){if(player.bassStrengthSupported())effectSlider("Bass Boost · "+player.bass()/10+"%",100,player.bass()/10,value->player.setBass(value*10),()->player.bass()/10,value->"Bass Boost · "+value+"%");else switchRow("Bass Boost",player.bassStatus(),player.bassEnabled(),enabled->{if(!player.setBass(enabled?1000:0))toast("Аудиосистема не применила эффект.");render();});}else paragraph(player.bassStatus());
+        section("Эквалайзер");if(player.eqAvailable()){short[] range=player.eqRange();for(int i=0;i<player.eqBandCount();i++){final int band=i;int hz=player.eqCenterHz(i);String frequency=hz>=1000?String.format(Locale.ROOT,"%.1f кГц",hz/1000f):hz+" Гц";effectSlider(frequency,range[1]-range[0],player.eqBandLevel(i)-range[0],value->player.setEqBand(band,(short)(value+range[0])),()->player.eqBandLevel(band)-range[0],value->frequency+"  "+String.format(Locale.ROOT,"%+.1f dB",(value+range[0])/100f));}}else paragraph("Эквалайзер недоступен до запуска трека или не поддерживается аудиосистемой. Полосы зависят от устройства.");
+        if(player.reverbAvailable())switchRow("Лёгкий Reverb","Пространство для наушников",player.reverb(),enabled->{if(!player.setReverb(enabled))toast("Аудиосистема не применила эффект.");render();});
+        section("Таймер личной музыки");sleepTimerLabel=actionRow("moon",sleepTitle(),"15, 30, 45 или 60 минут",()->sleepDialog());paragraph("Таймер действует на файлы и каталог SoundCloud. Комнаты и YouTube Music он не останавливает.");
+        gap(12);content.addView(button("Сбросить эффекты",false,()->{boolean applied=player.resetEffects();toast(applied?"Эффекты сброшены":"Настройки сброшены. Устройство не подтвердило отключение части эффектов.");render();}));
     }
     private interface ValueAction {void accept(int value);}private interface ValueLabel{String label(int value);}
+    private interface EffectAction {boolean apply(int value);}private interface AppliedValue {int read();}
+    private void effectSlider(String title,int max,int value,EffectAction action,AppliedValue read,ValueLabel formatter){
+        TextView label=text(title,14,ink,false);content.addView(label);SeekBar control=new SeekBar(this);control.setMax(Math.max(1,max));control.setProgress(Math.max(0,value));control.setProgressTintList(ColorStateList.valueOf(accent));control.setThumbTintList(ColorStateList.valueOf(accent));control.setContentDescription(title);
+        control.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar bar,int requested,boolean user){if(!user)return;boolean applied=action.apply(requested);int actual=Math.max(0,Math.min(bar.getMax(),read.read()));bar.setProgress(actual);label.setText(formatter.label(actual)+(applied?"":" · не применено"));if(!applied){bar.setEnabled(false);toast("Аудиосистема не применила настройку. Показано фактическое значение.");}}public void onStartTrackingTouch(SeekBar bar){}public void onStopTrackingTouch(SeekBar bar){}});content.addView(control,new LinearLayout.LayoutParams(-1,dp(48)));
+    }
     private void slider(String title,int max,int value,ValueAction action,ValueLabel formatter){
         TextView label=text(title,14,ink,false);content.addView(label);SeekBar s=new SeekBar(this);s.setMax(Math.max(1,max));s.setProgress(Math.max(0,value));s.setProgressTintList(ColorStateList.valueOf(accent));s.setThumbTintList(ColorStateList.valueOf(accent));s.setContentDescription(title);s.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){public void onProgressChanged(SeekBar s,int v,boolean user){if(user){action.accept(v);label.setText(formatter.label(v));}}public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){}});content.addView(s,new LinearLayout.LayoutParams(-1,dp(48)));
     }
-    private void preset(float speed,float pitch,int bass){player.setSpeed(speed);player.setPitch(pitch);player.setBass(bass);render();}
+    private void tempoPreset(float speed,float pitch){player.setSpeed(speed);player.setPitch(pitch);render();}
     private void sleepDialog(){final int[] minutes={15,30,45,60,0};new AlertDialog.Builder(this).setTitle("Таймер сна").setItems(new String[]{"15 минут","30 минут","45 минут","60 минут","Выключить таймер"},(d,i)->{if(player!=null)player.setSleepMinutes(minutes[i]);render();}).setNegativeButton("Отмена",null).show();}
+    private String sleepTitle(){long remaining=player==null?0:player.sleepRemainingMillis();return remaining>0?"Осталось "+SleepTimerPolicy.minutesRemaining(remaining)+" мин":"Остановить этот плеер по таймеру";}
     private void profile(){
         String version="";try{version=getPackageManager().getPackageInfo(getPackageName(),0).versionName;}catch(Exception ignored){}
         heading("Твой LolzCloud","Android · версия "+version);
@@ -384,8 +394,9 @@ public final class MainActivity extends Activity {
     private void switchRow(String title,String subtitle,boolean checked,ToggleAction action){LinearLayout r=row();r.setGravity(Gravity.CENTER_VERTICAL);r.setPadding(0,dp(10),0,dp(10));LinearLayout labels=column();labels.addView(text(title,15,ink,true));TextView s=text(subtitle,12,muted,false);s.setPadding(0,dp(5),0,0);labels.addView(s);r.addView(labels,new LinearLayout.LayoutParams(0,-2,1));Switch toggle=new Switch(this);toggle.setButtonTintList(ColorStateList.valueOf(accent));toggle.setThumbTintList(ColorStateList.valueOf(accent));toggle.setContentDescription(title);toggle.setChecked(checked);toggle.setOnCheckedChangeListener((b,v)->action.accept(v));r.addView(toggle);content.addView(r);}
     private void bookmarks(){
         heading("Любимые моменты","Позиции, к которым хочется вернуться");boolean any=false;
-        for(Track t:store.tracks()){JSONArray marks;try{marks=new JSONArray(store.preferences().getString("bookmarks_"+t.id,"[]"));}catch(JSONException e){continue;}
-            for(int i=0;i<marks.length();i++){long time=marks.optLong(i);any=true;actionRow("bookmark",t.title,format(time)+" · "+t.artist,()->{playList(Collections.singletonList(t),0);handler.postDelayed(()->{if(player!=null)player.seekTo(time);},100);navigate("player");});}}
+        java.util.Set<String> queued=new java.util.HashSet<>();if(player!=null)for(Track item:player.queue())queued.add(item.id);
+        for(Track t:store.tracks()){
+            for(long time:store.bookmarks(t.id)){any=true;actionRow("bookmark",t.title,format(time)+" · "+t.artist+(queued.contains(t.id)?"":" · добавится в конец очереди"),()->{if(player==null){toast("Плеер подключается. Попробуй ещё раз.");return;}boolean appended=player.openBookmark(t,time);if(appended)toast("Трек добавлен в конец очереди");navigate("player");},()->{store.removeBookmark(t.id,time);render();});}}
         if(!any)empty("bookmark","Сохрани любимый момент","В меню трека на экране плеера выбери «Сохранить момент».");
     }
 
@@ -403,6 +414,8 @@ public final class MainActivity extends Activity {
         if(player==null)return;Track t=current();String id=t==null?"":t.id;
         if(!id.equals(shownTrack)){shownTrack=id;render();return;}
         if(page.equals("lyrics")&&t!=null&&lyricsDuration!=lyricDuration(t)){render();return;}
+        if(page.equals("sound")&&!soundCapabilities.equals(player.effectsCapabilitiesKey())){render();return;}
+        if(sleepTimerLabel!=null&&!sleepTitle().contentEquals(sleepTimerLabel.getText())){String title=sleepTitle();sleepTimerLabel.setText(title);android.view.ViewParent labels=sleepTimerLabel.getParent();if(labels!=null&&labels.getParent() instanceof View)((View)labels.getParent()).setContentDescription(title+". 15, 30, 45 или 60 минут");}
         String playLabel=player.isLoading()?"Отменить загрузку":player.isPlaying()?"Пауза":"Продолжить воспроизведение";
         if(miniTitle!=null){miniTitle.setText(t==null?"Твоя музыка здесь":t.title);miniArtist.setText(player.isLoading()?player.loadingMessage():t==null?"Добавь файлы с телефона":t.artist);if(miniPlay!=null){miniPlay.setGlyph(player.isPlaying()?"pause":"play");miniPlay.setContentDescription(playLabel);}}
         if(bigPlay!=null){bigPlay.setGlyph(player.isLoading()?"loading":player.isPlaying()?"pause":"play");bigPlay.setContentDescription(playLabel);}
@@ -427,7 +440,8 @@ public final class MainActivity extends Activity {
             return true;
         });
         if(current()!=null&&current().id.equals(t.id))menu.getMenu().add("Сохранить момент").setOnMenuItemClickListener(v->{
-            try{JSONArray marks=new JSONArray(store.preferences().getString("bookmarks_"+t.id,"[]"));marks.put(player.position());store.preferences().edit().putString("bookmarks_"+t.id,marks.toString()).apply();toast("Момент сохранён · "+format(player.position()));}catch(JSONException e){toast("Не удалось сохранить момент");}return true;
+            if(player==null||current()==null||!current().id.equals(t.id)){toast("Трек сменился. Открой меню текущей записи.");return true;}
+            long position=player.position();try{boolean added=store.addBookmark(t.id,position);toast(added?"Момент сохранён · "+format(position):"Этот момент уже сохранён");}catch(IOException e){toast(e.getMessage());}return true;
         });
         if(store.find(t.id)==null)menu.getMenu().add("Добавить в мою музыку").setOnMenuItemClickListener(v->{rememberTrack(t);toast("Трек добавлен в мою музыку");render();return true;});
         else menu.getMenu().add("Удалить из библиотеки").setOnMenuItemClickListener(v->{new AlertDialog.Builder(this).setTitle("Убрать «"+t.title+"»?").setMessage("Исходный файл останется на телефоне.").setPositiveButton("Убрать",(d,w)->{store.remove(t.id);render();}).setNegativeButton("Отмена",null).show();return true;});
@@ -499,7 +513,8 @@ public final class MainActivity extends Activity {
     private void section(String title){TextView t=text(title,17,ink,true);t.setPadding(0,dp(24),0,dp(12));content.addView(t);}
     private void paragraph(String value){TextView t=text(value,13,muted,false);t.setLineSpacing(dp(5),1);t.setPadding(0,dp(14),0,dp(4));content.addView(t);}
     private void empty(String icon,String title,String message){Glyph art=new Glyph(icon,accent);LinearLayout.LayoutParams a=new LinearLayout.LayoutParams(dp(56),dp(56));a.topMargin=dp(30);a.bottomMargin=dp(20);content.addView(art,a);content.addView(text(title,21,ink,true));paragraph(message);gap(18);}
-    private void actionRow(String icon,String title,String subtitle,Runnable action){LinearLayout r=row();r.setGravity(Gravity.CENTER_VERTICAL);r.setPadding(0,dp(12),0,dp(12));r.setMinimumHeight(dp(76));Glyph g=new Glyph(icon,accent);r.addView(g,new LinearLayout.LayoutParams(dp(26),dp(26)));LinearLayout labels=column();labels.addView(text(title,14,ink,true));TextView s=text(subtitle,12,muted,false);s.setPadding(0,dp(6),0,0);labels.addView(s);LinearLayout.LayoutParams l=new LinearLayout.LayoutParams(0,-2,1);l.leftMargin=dp(16);l.rightMargin=dp(8);r.addView(labels,l);Glyph arrow=new Glyph("chevron",muted);r.addView(arrow,new LinearLayout.LayoutParams(dp(18),dp(18)));r.setOnClickListener(v->action.run());r.setContentDescription(title+". "+subtitle);content.addView(r);}
+    private TextView actionRow(String icon,String title,String subtitle,Runnable action){return actionRow(icon,title,subtitle,action,null);}
+    private TextView actionRow(String icon,String title,String subtitle,Runnable action,Runnable remove){LinearLayout r=row();r.setGravity(Gravity.CENTER_VERTICAL);r.setPadding(0,dp(12),0,dp(12));r.setMinimumHeight(dp(76));Glyph g=new Glyph(icon,accent);r.addView(g,new LinearLayout.LayoutParams(dp(26),dp(26)));LinearLayout labels=column();TextView titleLabel=text(title,14,ink,true);labels.addView(titleLabel);TextView s=text(subtitle,12,muted,false);s.setPadding(0,dp(6),0,0);labels.addView(s);LinearLayout.LayoutParams l=new LinearLayout.LayoutParams(0,-2,1);l.leftMargin=dp(16);l.rightMargin=dp(8);r.addView(labels,l);if(remove==null){Glyph arrow=new Glyph("chevron",muted);r.addView(arrow,new LinearLayout.LayoutParams(dp(18),dp(18)));}else{TextView delete=button("Удалить",false,remove);delete.setContentDescription("Удалить момент: "+title+". "+subtitle);r.addView(delete,new LinearLayout.LayoutParams(-2,dp(48)));}r.setOnClickListener(v->action.run());r.setContentDescription(title+". "+subtitle);content.addView(r);return titleLabel;}
     private void smallAction(LinearLayout parent,String icon,String label,Runnable action){LinearLayout item=column();item.setGravity(Gravity.CENTER);item.setMinimumHeight(dp(64));Glyph glyph=new Glyph(icon,muted);item.addView(glyph,new LinearLayout.LayoutParams(dp(24),dp(24)));TextView text=text(label,11,muted,false);text.setGravity(Gravity.CENTER);text.setPadding(0,dp(8),0,0);item.addView(text);item.setOnClickListener(v->action.run());item.setContentDescription(label);parent.addView(item,new LinearLayout.LayoutParams(0,-2,1));}
     private static String format(long millis){long seconds=Math.max(0,millis)/1000;return String.format(Locale.ROOT,"%d:%02d",seconds/60,seconds%60);}
     private static String plural(int value,String one,String few,String many){int mod=value%100;if(mod>=11&&mod<=14)return many;switch(value%10){case 1:return one;case 2:case 3:case 4:return few;default:return many;}}

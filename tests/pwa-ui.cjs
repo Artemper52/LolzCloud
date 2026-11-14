@@ -30,7 +30,7 @@ app.whenReady().then(async () => {
       const json = (body, status = 200) => { res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(body)); };
       if (legacyWorker && url.pathname === '/app/sw.js') {
         res.writeHead(200, { 'Content-Type': 'text/javascript', 'Cache-Control': 'no-store', 'Service-Worker-Allowed': '/app/' });
-        res.end(fs.readFileSync(path.join(__dirname, '../server/public/app/sw.js'), 'utf8').replace('lolzcloud-app-shell-v3', 'lolzcloud-app-shell-v1')); return;
+        res.end(fs.readFileSync(path.join(__dirname, '../server/public/app/sw.js'), 'utf8').replace(/lolzcloud-app-shell-v\d+/, 'lolzcloud-app-shell-v1')); return;
       }
       if (url.pathname === '/app/native-test.html') {
         res.writeHead(200, { 'Content-Type': 'text/html', 'Content-Security-Policy': "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https: blob:; media-src 'self' blob:; connect-src 'self' https://lrclib.net; frame-src 'self'" });
@@ -140,6 +140,10 @@ if(message.action==='importAudio'){nativeEmit('download',{state:'loading',import
     assert.ok(liveRoomFrame, 'Actual room frame missing');
     await liveRoomFrame.executeJavaScript('parent.postMessage({type:"lolzcloud:room-audio",playing:true},location.origin)'); await until(() => js('LolzCloudApp.snapshot().phase==="paused"'), 'Valid room message did not pause local audio');
     check(true, 'A trusted room-frame playback message pauses the local audio');
+    const roomBeforeEffects = JSON.stringify(store.room(room.id).playback);
+    await js('__roomPauses=0;__roomFrame.document.getElementById("chat-input").value="Черновик во время настройки";document.getElementById("mini-open").click();document.getElementById("effects-open").click();document.getElementById("effects-preset").value="bass";document.getElementById("effects-preset").dispatchEvent(new Event("change"))'); await delay(170);
+    check(await js('LolzCloudApp.snapshot().phase==="paused"&&LolzCloudApp.snapshot().roomAudible&&__roomPauses===0&&document.getElementById("rooms-frame").contentWindow===__roomFrame&&__roomFrame.document.getElementById("chat-input").value==="Черновик во время настройки"&&document.getElementById("effects-status").textContent.includes("звук комнаты остаётся общим")') && JSON.stringify(store.room(room.id).playback) === roomBeforeEffects, 'Personal EQ edit preserves the exact live room, chat draft and common1x playback without pausing the room or starting personal audio');
+    await js('document.getElementById("effects-reset").click();document.getElementById("effects-close").click()'); await delay(120); await js('document.getElementById("player-dialog").close()');
     await js('__roomPauses=0');
     await click('mini-play'); await until(() => js('LolzCloudApp.snapshot().phase==="playing"&&__roomPauses>0'), 'App did not pause room');
     check(await js('__roomPauses===1'), 'One explicit local playback sends one pause only to the persistent room frame');
@@ -157,8 +161,8 @@ if(message.action==='importAudio'){nativeEmit('download',{state:'loading',import
     await until(() => js('navigator.serviceWorker.ready.then(()=>!!navigator.serviceWorker.controller)'), 'Service worker did not control the app'); await delay(200);
     await until(() => js('caches.keys().then(keys=>keys.includes("lolzcloud-app-shell-v1"))'), 'Legacy shell cache did not install');
     legacyWorker = false; await js('navigator.serviceWorker.getRegistration("/app/").then(registration=>registration.update())');
-    await until(() => js('caches.keys().then(keys=>keys.includes("lolzcloud-app-shell-v3")&&!keys.includes("lolzcloud-app-shell-v1"))'), 'New worker did not activate and retire its old shell');
-    check(true, 'An actual worker update from the v1 cache fixture activates v3 and removes the obsolete shell cache');
+    await until(() => js('caches.keys().then(keys=>keys.includes("lolzcloud-app-shell-v4")&&!keys.includes("lolzcloud-app-shell-v1"))'), 'New worker did not activate and retire its old shell');
+    check(true, 'An actual worker update from the v1 cache fixture activates v4 and removes the obsolete shell cache');
     await js('document.getElementById("sleep-select").value="30";document.getElementById("sleep-select").dispatchEvent(new Event("change"))'); const sleepBeforeReload = await js('LolzCloudApp.snapshot().sleepDeadline'); await delay(150);
     failShell = true; await reload(); await until(() => js('!!window.LolzCloudApp'), 'Cached shell did not survive HTTP503');
     check(await js('document.title.includes("LolzCloud")&&LolzCloudApp.snapshot().liked.includes("123")'), 'HTTP503 uses the cached shell and preserves the collection'); failShell = false;
@@ -194,11 +198,11 @@ if(message.action==='importAudio'){nativeEmit('download',{state:'loading',import
     await js('nativeEmit("playback",{id:"123",state:"error",time:0,duration:60,error:"stale"})');
     check(await js('LolzCloudApp.snapshot().phase==="playing"&&!document.getElementById("player-state").textContent.includes("stale")'), 'A late native error from another track cannot replace the current playback state');
     await js('window.__playingB={...__nativeTag}');
-    await click('mini-open'); await click('player-play'); check(await js('__nativeCalls.at(-1).action==="pause"&&LolzCloudApp.snapshot().phase==="paused"'), 'Native pause follows the bridge contract');
+    await click('mini-open'); await click('player-play'); check(await js('__nativeCalls.filter(call=>call.action!=="effects").at(-1).action==="pause"&&LolzCloudApp.snapshot().phase==="paused"'), 'Native pause follows the bridge contract');
     await js('window.__pausedB={...__nativeTag};nativeEmit("playback",{...__playingB,id:"124",state:"playing",time:12,duration:60,queue:true})');
     check(await js('LolzCloudApp.snapshot().phase==="paused"&&LolzCloudApp.snapshot().elapsed===0&&__pausedB.requestId>__playingB.requestId'), 'An old playing snapshot cannot undo a newer explicit pause of the same track');
     await click('player-play');
-    check(await js('__nativeCalls.at(-1).action==="resume"&&LolzCloudApp.snapshot().phase==="playing"'), 'Native resume follows the bridge contract');
+    check(await js('__nativeCalls.filter(call=>call.action!=="effects").at(-1).action==="resume"&&LolzCloudApp.snapshot().phase==="playing"'), 'Native resume follows the bridge contract');
     await js('nativeEmit("playback",{...__pausedB,id:"124",state:"paused",time:12,duration:60,queue:true});window.dispatchEvent(new CustomEvent("lolzcloud:playback",{detail:{id:"124",state:"error",error:"untagged"}}));window.dispatchEvent(new CustomEvent("lolzcloud:selection",{detail:{index:0,track:__trackA,queue:true}}))');
     check(await js('LolzCloudApp.snapshot().phase==="playing"&&LolzCloudApp.snapshot().current==="124"&&__nativeTag.requestId>__pausedB.requestId'), 'A resumed intent ignores delayed paused snapshots and untagged playback or selection events');
     await click('player-download'); await until(() => js('LolzCloudApp.snapshot().offline.includes("124")'), 'Native download event not consumed');

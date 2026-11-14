@@ -60,8 +60,19 @@ async function main() {
   fs.mkdirSync(build, { recursive: true }); fs.mkdirSync(output, { recursive: true });
   const tools = path.join(sdk, 'build-tools/36.0.0');
   const androidJar = path.join(sdk, 'platforms/android-36/android.jar');
-  const generated = path.join(build, 'generated'); const classes = path.join(build, 'classes'); const dex = path.join(build, 'dex');
-  for (const dir of [generated, classes, dex]) fs.mkdirSync(dir, { recursive: true });
+  const resolvedBuild = fs.realpathSync(build);
+  const outputs = ['generated', 'classes', 'dex'].map(name => {
+    const dir = path.join(resolvedBuild, name);
+    if (path.dirname(dir) !== resolvedBuild) throw new Error('Compilation output escaped the Android build directory');
+    if (fs.existsSync(dir)) {
+      if (fs.lstatSync(dir).isSymbolicLink() || fs.realpathSync(dir) !== dir) throw new Error('Compilation output must be an ordinary build directory');
+      const previous = path.join(resolvedBuild, name + '-previous-' + crypto.randomBytes(8).toString('hex'));
+      if (path.dirname(previous) !== resolvedBuild) throw new Error('Previous compilation output escaped the build directory');
+      fs.renameSync(dir, previous);
+    }
+    fs.mkdirSync(dir); return dir;
+  });
+  const [generated, classes, dex] = outputs;
   run(path.join(tools, 'aapt2.exe'), ['compile', '--dir', path.join(root, 'app/src/main/res'), '-o', path.join(build, 'resources.zip')]);
   const unsigned = path.join(build, 'unsigned.apk');
   const manifest = path.join(build, 'AndroidManifest.xml');

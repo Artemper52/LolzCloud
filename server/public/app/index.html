@@ -16,6 +16,8 @@
   <script src="/app/core.js" defer></script>
   <script src="/app/offline.js" defer></script>
   <script src="/app/imports.js" defer></script>
+  <script src="/app/effects-policy.js" defer></script>
+  <script src="/app/effects.js" defer></script>
   <script src="/app/app.js" defer></script>
 </head>
 <body>
@@ -81,13 +83,36 @@
       <label class="sr-only" for="player-seek">Позиция в треке</label><input id="player-seek" class="seek" type="range" min="0" max="1" value="0" step="0.1" disabled>
       <div class="times"><span id="player-time">0:00</span><span id="player-duration">0:00</span></div>
       <div class="transport"><button id="player-shuffle" class="icon-button" aria-label="Случайный порядок" aria-pressed="false">⇄</button><button id="player-previous" class="icon-button" aria-label="Предыдущий трек">|‹</button><button id="player-play" class="play-button" aria-label="Воспроизвести">▶</button><button id="player-next" class="icon-button" aria-label="Следующий трек">›|</button><button id="player-repeat" class="icon-button" aria-label="Повтор выключен" aria-pressed="false">↻</button></div>
-      <div class="player-actions"><button id="player-download" class="text-button">Сохранить офлайн</button><label class="volume-label">Громкость<input id="player-volume" type="range" min="0" max="1" step="0.05" value="1" aria-label="Громкость"></label></div>
+      <div class="player-actions"><button id="player-download" class="text-button">Сохранить офлайн</button><button id="effects-open" class="text-button" aria-haspopup="dialog" aria-controls="effects-dialog">Звук</button><label class="volume-label">Громкость<input id="player-volume" type="range" min="0" max="1" step="0.05" value="1" aria-label="Громкость"></label></div>
       <details id="player-options" class="player-options"><summary>Скорость, таймер и моменты</summary><div class="option-block"><label for="player-rate">Скорость <output id="player-rate-value">1×</output></label><input id="player-rate" type="range" min="0.5" max="2" value="1" step="0.05" aria-label="Скорость воспроизведения"><div id="rate-presets" class="rate-presets"><button data-rate="0.85">0.85×</button><button data-rate="1">1×</button><button data-rate="1.2">1.2×</button></div></div><div class="option-block"><label for="sleep-select">Таймер сна</label><select id="sleep-select"><option value="0">Выключен</option><option id="sleep-active" value="active" hidden>Таймер включён</option><option value="15">15 минут</option><option value="30">30 минут</option><option value="45">45 минут</option><option value="60">60 минут</option></select><p id="sleep-status" class="hint" role="status"></p></div><div class="option-block"><div class="queue-heading"><strong>Моменты</strong><button id="bookmark-add" class="text-button">Сохранить момент</button></div><div id="bookmark-list"></div></div></details>
     </div>
     <div class="player-detail">
       <div id="player-tabs" class="segmented" role="tablist" aria-label="В плеере"><button id="tab-queue" role="tab" data-player-tab="queue" aria-selected="true" aria-controls="panel-queue">Очередь <span id="queue-count">0</span></button><button id="tab-lyrics" role="tab" data-player-tab="lyrics" aria-selected="false" aria-controls="panel-lyrics" tabindex="-1">Текст песни</button></div>
       <section id="panel-queue" role="tabpanel" aria-labelledby="tab-queue"><div class="queue-heading"><p class="hint">Дальше играет</p><button id="queue-clear" class="text-button">Очистить</button></div><div id="queue-list" class="track-list"></div></section>
       <section id="panel-lyrics" role="tabpanel" aria-labelledby="tab-lyrics" hidden><p id="lyrics-status" class="hint" role="status"></p><div id="lyrics-text" class="lyrics" aria-label="Текст песни"></div><div class="lyrics-import"><label class="file-control">Свой текст TXT / LRC<input id="lyrics-import" type="file" accept=".txt,.lrc,text/plain"></label><button id="lyrics-import-remove" class="text-button" hidden>Убрать свой текст</button><p id="lyrics-import-status" class="status" role="status"></p></div><button id="lyrics-retry" class="wide-button" hidden>Найти текст ещё раз</button><button id="lyrics-edit" class="wide-button" hidden>Уточнить данные песни</button><form id="lyrics-metadata-form" class="lyrics-metadata" hidden><label for="lyrics-title-input">Название<input id="lyrics-title-input" type="text" maxlength="300" required autocomplete="off"></label><label for="lyrics-artist-input">Исполнитель<input id="lyrics-artist-input" type="text" maxlength="300" required autocomplete="off" enterkeyhint="search"></label><div><button class="primary" type="submit">Найти</button><button id="lyrics-metadata-cancel" type="button" class="text-button">Отмена</button></div></form><a class="attribution" href="https://lrclib.net" target="_blank" rel="noopener noreferrer">Тексты · LRCLIB ↗</a></section>
+    </div>
+  </dialog>
+  <dialog id="effects-dialog" class="sheet effects-dialog" aria-labelledby="effects-title">
+    <div class="dialog-heading"><h2 id="effects-title">Звук</h2><button id="effects-close" class="text-button" aria-label="Закрыть настройки звука">Готово</button></div>
+    <p id="effects-status" class="status" role="status" aria-live="polite"></p>
+    <div class="effects-body">
+      <button id="effects-retry" class="wide-button" hidden>Повторить обработку</button>
+      <label class="effects-switch"><span>Обработка звука</span><input id="effects-enabled" type="checkbox" role="switch"></label>
+      <label class="effects-preset" for="effects-preset">Профиль звучания<select id="effects-preset"></select></label>
+      <div class="equalizer" aria-label="Эквалайзер">
+        <div class="eq-control"><label for="effects-gain-0">60 Гц</label><input id="effects-gain-0" type="range" min="-12" max="12" step="1" value="0" aria-label="Бас, 60 герц"><output id="effects-gain-0-value" for="effects-gain-0">0 дБ</output></div>
+        <div class="eq-control"><label for="effects-gain-1">230 Гц</label><input id="effects-gain-1" type="range" min="-12" max="12" step="1" value="0" aria-label="Низкие частоты, 230 герц"><output id="effects-gain-1-value" for="effects-gain-1">0 дБ</output></div>
+        <div class="eq-control"><label for="effects-gain-2">910 Гц</label><input id="effects-gain-2" type="range" min="-12" max="12" step="1" value="0" aria-label="Середина, 910 герц"><output id="effects-gain-2-value" for="effects-gain-2">0 дБ</output></div>
+        <div class="eq-control"><label for="effects-gain-3">3.6 кГц</label><input id="effects-gain-3" type="range" min="-12" max="12" step="1" value="0" aria-label="Верхняя середина, 3600 герц"><output id="effects-gain-3-value" for="effects-gain-3">0 дБ</output></div>
+        <div class="eq-control"><label for="effects-gain-4">14 кГц</label><input id="effects-gain-4" type="range" min="-12" max="12" step="1" value="0" aria-label="Высокие частоты, 14000 герц"><output id="effects-gain-4-value" for="effects-gain-4">0 дБ</output></div>
+      </div>
+      <details id="effects-advanced" class="effects-advanced"><summary>Дополнительно</summary>
+        <div class="effect-control" data-effects-cap="preamp"><label for="effects-preamp">Уровень до обработки <output id="effects-preamp-value">0 дБ</output></label><input id="effects-preamp" type="range" min="-12" max="0" step="1" value="0"></div>
+        <div class="effect-control" data-effects-cap="reverb"><label for="effects-reverb">Реверберация <output id="effects-reverb-value">0%</output></label><input id="effects-reverb" type="range" min="0" max="80" step="1" value="0"></div>
+        <div class="effect-control" data-effects-cap="echo"><label for="effects-echo">Эхо <output id="effects-echo-value">0%</output></label><input id="effects-echo" type="range" min="0" max="80" step="1" value="0"></div>
+        <div data-effects-cap="normalization"><label class="effects-switch"><span>Выравнивание громкости</span><input id="effects-normalization" type="checkbox" role="switch"></label><p id="effects-normalization-status" class="hint" role="status"></p></div>
+      </details>
+      <button id="effects-reset" class="wide-button">Сбросить настройки звука</button>
     </div>
   </dialog>
   <dialog id="track-dialog" class="sheet" aria-labelledby="track-action-title"><div class="dialog-heading"><h2 id="track-action-title">Трек</h2><button data-close="track-dialog" class="icon-button" aria-label="Закрыть действия с треком">×</button></div><button id="track-like" class="wide-button">Добавить в любимое</button><button id="track-queue" class="wide-button">Добавить в очередь</button><button id="track-download" class="wide-button">Сохранить офлайн</button></dialog>

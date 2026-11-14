@@ -1,0 +1,30 @@
+✔ Linux manifest selects exact architecture, versioned basename and official origin (3.597725ms)
+✔ AppImage architecture requires ELF64 little endian and AI Type2 magic (10.172748ms)
+✔ Linux start-time parsing handles process names with spaces and closing parentheses (0.387002ms)
+✔ unpackaged Linux archive stays unsupported and never requests shutdown (0.838767ms)
+✔ Linux manifest is bounded while reading and cancels an oversized stream (13.645708ms)
+✔ manifest redirect/final origin is rejected even when the response body looks valid (2.885217ms)
+✔ Linux download refuses final-origin redirects before preparation; Windows downloader is unchanged (12.275486ms)
+✔ destination changed during download is preserved and cannot reach profile preparation (51.813913ms)
+✔ corrupt downloaded bytes cannot spawn a helper or shut down the running app (16.862593ms)
+✔ download size mismatch and wrong architecture fail before helper/profile shutdown (35.335469ms)
+✔ a current/older Linux release never becomes available or triggers install (4.549415ms)
+✔ real helper confirms backup/ready before prepare; prepare failure cancels without quitting (1033.69217ms)
+✔ an unavailable helper lock fails before profile shutdown and keeps the previous AppImage (67.229111ms)
+✔ real helper waits exact parent PID/startTime, backs up and replaces only after exit; quoted paths/args survive (3129.564796ms)
+✔ PID reuse/start-time mismatch does not wait for an unrelated living process (2023.288259ms)
+✔ failed new launch rolls back original bytes and starts the previous fixture (3030.994566ms)
+✔ explicit cancellation after readiness keeps parent open and never replaces destination (1022.672787ms)
+✔ staged bytes corrupted after readiness cannot replace the old AppImage (1023.233253ms)
+✔ destination changed after readiness is never clobbered by the helper (1021.138474ms)
+✔ destination changed into a symlink leaves the outside file untouched (1022.617964ms)
+✔ pre-existing helper lock prevents readiness and keeps destination/backup state safe (17.024124ms)
+✔ malformed, empty, zero or noncanonical parent/startTime never confirms ready or replaces a living parent image (71.33455ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 22601.488184

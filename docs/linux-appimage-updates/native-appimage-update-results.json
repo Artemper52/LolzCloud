@@ -1,0 +1,39 @@
+{
+  "ok": true,
+  "checkedAt": "2026-11-14T20:31:30.961Z",
+  "count": 5,
+  "checks": [
+    "Verified real AppImage15 remains untouched while the exact owned parent is alive",
+    "Helper confirms ready only after an exact verified real AppImage15 backup exists",
+    "After exact parent exit the real helper atomically installs frozen AppImage16 and launches it",
+    "Real AppImage16 native self-test passes under isolated Xvfb/D-Bus/keyring without a no-sandbox flag",
+    "Both source release15/16 AppImage artifacts retain their original pinned hashes"
+  ],
+  "failure": "",
+  "result": {
+    "state": "updated",
+    "exit": {
+      "code": 0,
+      "signal": null,
+      "stderr": ""
+    },
+    "working": "/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2/cases/Real AppImage's transaction-Rbpi5i/.lolzcloud-update-0bbd62cbaf6657d33ad61fccd5a9fdfd-qKaGca",
+    "profile": "/tmp/LolzCloud-self-test-1oSkIYyC"
+  },
+  "uid": 986,
+  "platform": "linux",
+  "arch": "x64",
+  "sources": [
+    {
+      "version": "0.9.15",
+      "sha256": "ab81a437bc6fe8960268efee47ab2b8e213fbee5d6549a9998e44c528824a4e4",
+      "file": "/opt/lolzcloud-builds/release-0.9.15/dist/LolzCloud-0.9.15-linux-x64.AppImage"
+    },
+    {
+      "version": "0.9.16",
+      "sha256": "3242003d61d123325a9b2b16445e12fe2bc1b17933233e6d0ecdb5855fea5301",
+      "file": "/opt/lolzcloud-builds/release-0.9.16/dist/LolzCloud-0.9.16-linux-x64.AppImage"
+    }
+  ],
+  "note": "Transaction uses only copied frozen AppImages and an owned sleeping parent. New AppImage16 is genuine and runs its packaged native self-test; updater controller/Windows policy and tiny ELF fixture tests are separate. No physical DAC/Wayland/ARM64 or user profile was tested."
+}

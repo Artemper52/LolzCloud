@@ -1,0 +1,83 @@
+{
+  "checkedAt": "2026-11-14T20:33:12.220Z",
+  "status": "source-frozen-not-published",
+  "remoteRoot": "/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2",
+  "uid": 986,
+  "linux": {
+    "tests": 22,
+    "pass": 22,
+    "skipped": 0,
+    "report": "linux22.log"
+  },
+  "baseline": {
+    "tests": 3,
+    "expectedFailures": 3,
+    "report": "baseline3-failures.log"
+  },
+  "realAppImage": {
+    "checks": 5,
+    "pass": true,
+    "report": "native-appimage-update-results.json",
+    "scope": "Transaction uses only copied frozen AppImages and an owned sleeping parent. New AppImage16 is genuine and runs its packaged native self-test; updater controller/Windows policy and tiny ELF fixture tests are separate. No physical DAC/Wayland/ARM64 or user profile was tested."
+  },
+  "windows": {
+    "tests": 17,
+    "pass": 17,
+    "report": "windows17.log"
+  },
+  "sources": [
+    {
+      "version": "0.9.15",
+      "sha256": "ab81a437bc6fe8960268efee47ab2b8e213fbee5d6549a9998e44c528824a4e4",
+      "file": "/opt/lolzcloud-builds/release-0.9.15/dist/LolzCloud-0.9.15-linux-x64.AppImage"
+    },
+    {
+      "version": "0.9.16",
+      "sha256": "3242003d61d123325a9b2b16445e12fe2bc1b17933233e6d0ecdb5855fea5301",
+      "file": "/opt/lolzcloud-builds/release-0.9.16/dist/LolzCloud-0.9.16-linux-x64.AppImage"
+    }
+  ],
+  "files": [
+    {
+      "file": "source/integrations/linux-appimage-update.cjs",
+      "bytes": 9954,
+      "sha256": "d8c7da02a5ffec48e0e724369b47b5c7c05d80d0eaf5ca18bc9efb8577ba3ee5"
+    },
+    {
+      "file": "source/integrations/linux-appimage-update.sh",
+      "bytes": 2842,
+      "sha256": "b583923be0f97cd701c5d24fefb21d5a2aaf263ab918dd285f42ca5e4bc61204"
+    },
+    {
+      "file": "source/main.js",
+      "bytes": 12533,
+      "sha256": "0e9fae9dba7ec655bbf9aa0c9db3335817889cc3ec6018346c371f2e9e444410"
+    },
+    {
+      "file": "source/app/lib/js/app-updates.js",
+      "bytes": 4219,
+      "sha256": "e1cef35302ea7c317c45e84338a3fe4d57bc2024cd3b4cad04bfb681ec324c2f"
+    },
+    {
+      "file": "source/integrations/portable-update.cjs",
+      "bytes": 5592,
+      "sha256": "e6586ce7fcb8f540eb5ef83a8769f6b65422855b2813043fbd26cb0cf51498e8"
+    },
+    {
+      "file": "tests/linux-appimage-update.test.cjs",
+      "bytes": 19179,
+      "sha256": "f4df125e9c315ed5dc84bfaf41e962f075e168cde94ad1194fd0480a127458ac"
+    },
+    {
+      "file": "tools/test-linux-appimage-update.cjs",
+      "bytes": 5517,
+      "sha256": "2cca507f7ce56f9940da7a44e80fb41b3d1512173a6e542325b29edd1f9d869b"
+    }
+  ],
+  "limitations": [
+    "AppImage16 is a genuine immutable executable; candidate17 packaged update GUI is not yet built/tested",
+    "Small compiled ELF files are explicit transactional fixtures",
+    "No physical DAC, Wayland, ARM64 runtime, personal profiles or live app installation",
+    "Failure after arbitrary power loss is not guaranteed"
+  ]
+}

@@ -237,6 +237,46 @@ public final class LibraryStore {
     public boolean privateMode() { return prefs.getBoolean("private_mode", false); }
     public void setPrivateMode(boolean enabled) { prefs.edit().putBoolean("private_mode", enabled).apply(); }
 
+    public List<Long> bookmarks(String id) {
+        synchronized (LOCK) {
+            List<Long> result = new ArrayList<>();
+            try {
+                JSONArray data = new JSONArray(prefs.getString("bookmarks_" + id, "[]"));
+                for (int i = 0; i < data.length(); i++) {
+                    Object value = data.opt(i);
+                    if (!(value instanceof Number)) continue;
+                    long position = ((Number) value).longValue();
+                    if (position >= 0 && position <= Integer.MAX_VALUE) result.add(position);
+                }
+            } catch (JSONException invalid) { /* Ignore corrupt local bookmark data. */ }
+            return result;
+        }
+    }
+
+    public boolean addBookmark(String id, long position) throws IOException {
+        if (id == null || id.isEmpty() || position < 0 || position > Integer.MAX_VALUE) throw new IOException("Некорректная позиция момента");
+        synchronized (LOCK) {
+            List<Long> saved = bookmarks(id);
+            for (long value : saved) if (Math.abs(value - position) < 500) return false;
+            // Existing larger lists remain intact; only new additions are bounded.
+            if (saved.size() >= 100) throw new IOException("Для трека уже сохранено 100 моментов. Удали ненужные.");
+            saved.add(position); writeBookmarks(id, saved); return true;
+        }
+    }
+
+    public void removeBookmark(String id, long position) {
+        synchronized (LOCK) {
+            List<Long> saved = bookmarks(id);
+            for (int i = saved.size() - 1; i >= 0; i--) if (saved.get(i) == position) saved.remove(i);
+            writeBookmarks(id, saved);
+        }
+    }
+
+    private void writeBookmarks(String id, List<Long> positions) {
+        JSONArray data = new JSONArray(); for (long position : positions) data.put(position);
+        prefs.edit().putString("bookmarks_" + id, data.toString()).apply();
+    }
+
     public void saveQueue(List<Track> queue, int index, long position) {
         synchronized (LOCK) {
             JSONArray array = new JSONArray();

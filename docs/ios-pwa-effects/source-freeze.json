@@ -1,0 +1,141 @@
+{
+  "createdAt": "2026-11-14T20:08:16.430Z",
+  "status": "source-frozen-not-published",
+  "productFiles": [
+    "server/public/app/effects-policy.js",
+    "server/public/app/effects.js",
+    "server/public/app/normalization-worklet.js",
+    "server/public/app/limiter-worklet.js",
+    "server/public/app/app.js",
+    "server/public/app/index.html",
+    "server/public/app/app.css",
+    "server/public/app/sw.js"
+  ],
+  "backendChanged": false,
+  "checks": {
+    "dsp": 35,
+    "pwa": 66,
+    "imports": 17,
+    "queue": 11,
+    "nodePolicyCoreStatic": 19,
+    "totalAcrossSuites": 148
+  },
+  "files": [
+    {
+      "file": "server/public/app/effects-policy.js",
+      "bytes": 4414,
+      "sha256": "c30a63f60fb4608f5083fbba1451cefa3edb0eb8f5fb168254a3a2ac50ae8143"
+    },
+    {
+      "file": "server/public/app/effects.js",
+      "bytes": 13552,
+      "sha256": "0719a4697e9980544cb9a75ff8164c37e1f6f344a7799cb4b230f200a24e8713"
+    },
+    {
+      "file": "server/public/app/normalization-worklet.js",
+      "bytes": 3376,
+      "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664"
+    },
+    {
+      "file": "server/public/app/limiter-worklet.js",
+      "bytes": 2197,
+      "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112"
+    },
+    {
+      "file": "server/public/app/app.js",
+      "bytes": 74796,
+      "sha256": "ba4e25001dd70d056635ba3a2072343bab270d71383dff93734230196e37d70f"
+    },
+    {
+      "file": "server/public/app/index.html",
+      "bytes": 19419,
+      "sha256": "00200d5dad65e67682a72e7a89ba6b953d395d4fe9c3e096cfdec1bde21ec48e"
+    },
+    {
+      "file": "server/public/app/app.css",
+      "bytes": 17766,
+      "sha256": "84b5927a39062f74fcd68256ee968ecbbc378d493b76533ae5f5e8bbd77ab4e0"
+    },
+    {
+      "file": "server/public/app/sw.js",
+      "bytes": 1635,
+      "sha256": "1b431c14ce7497c8383660cb972e87f3936d7aa4ed327ba514d8fef509bd42aa"
+    },
+    {
+      "file": "tests/pwa-effects-policy.test.cjs",
+      "bytes": 2811,
+      "sha256": "f28aaa8f10e22e531a274fcfd7027e3389eafa8a06caf0988d55cbb69afcdb89"
+    },
+    {
+      "file": "tests/pwa-effects-ui.cjs",
+      "bytes": 27284,
+      "sha256": "0526771e02d247917c7d56c9ec41966fc5c9e460812df7478d2dd6c8712999a7"
+    },
+    {
+      "file": "tests/pwa-ui.cjs",
+      "bytes": 42706,
+      "sha256": "0063f0adf10be51db6a71079ee930dbbef9feb15dd67449cb9468405eeba5034"
+    },
+    {
+      "file": "tests/pwa-queue-selection-ui.cjs",
+      "bytes": 13368,
+      "sha256": "750080e0c483b58522c606b6c2955da384fdd66f3dd44e8da3009233391a2222"
+    },
+    {
+      "file": "tests/run-pwa-ui.cjs",
+      "bytes": 1318,
+      "sha256": "57ab30b10be899388cbeb7ce241bf238723e129d6fb9ad5e8cc7fbf695bc86b6"
+    }
+  ],
+  "evidence": [
+    {
+      "file": "docs/ios-pwa-effects/effects-1024.png",
+      "bytes": 47775,
+      "sha256": "1255720ce86b11f695297fa7aa27ed26a52a2caf464cf5c82f4ac454a1563556"
+    },
+    {
+      "file": "docs/ios-pwa-effects/effects-360.png",
+      "bytes": 24690,
+      "sha256": "b60ec4c5d957dbf91858faebd209caefbcecca04a24215b406ee06880b08354d"
+    },
+    {
+      "file": "docs/ios-pwa-effects/effects-offline-1024.png",
+      "bytes": 35326,
+      "sha256": "1b669dc59bb169637d21352a0108d4d211576456807e44aa5674d17091761b58"
+    },
+    {
+      "file": "docs/ios-pwa-effects/policy.log",
+      "bytes": 1914,
+      "sha256": "f9914788e792777923f82f4e35a3b63f2418f5049c2086bfbfb92071c8c48b2a"
+    },
+    {
+      "file": "docs/ios-pwa-effects/pwa-effects-results.json",
+      "bytes": 18833,
+      "sha256": "2501248b3082702135d40c30b20aafc3ef14438612ae65ca0d81f5f846dc4882"
+    },
+    {
+      "file": "docs/ios-pwa-effects/pwa-imports-results.json",
+      "bytes": 1970,
+      "sha256": "9a0a13b2eab11580c0068b93cbd58500ca36e95f1acde5274971d81907009aa4"
+    },
+    {
+      "file": "docs/ios-pwa-effects/pwa-queue-selection-results.json",
+      "bytes": 1406,
+      "sha256": "5a258595ed328ead8e6987c4cb500eb276d8fbf078092a8f0e107eff47b25c81"
+    },
+    {
+      "file": "docs/ios-pwa-effects/pwa-ui-results.json",
+      "bytes": 6258,
+      "sha256": "10a1cc9bed958abdf1e7534efe48dc7f43f552f0a58e58cd1d69b6711e6d565a"
+    }
+  ],
+  "retainedFailureEvidence": [
+    "D:/LolzCloud-Android-Toolchain/pwa-effects/first/pwa-effects-results.json",
+    "D:/LolzCloud-Android-Toolchain/pwa-effects/module-retry-uncached/pwa-effects-results.json"
+  ],
+  "limitations": [
+    "Chromium actual OfflineAudioContext and HTMLAudio PCM; no physical Safari/iPhone/iPad or DAC proof",
+    "Native ACK scenarios are controlled IPC adapter fixtures; actual AVPlayer tap QA is separate",
+    "Published server18 and desktop/Android/native archives were not changed by this task"
+  ]
+}

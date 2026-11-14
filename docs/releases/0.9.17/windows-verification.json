@@ -1,0 +1,197 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T20:40:47.843Z",
+  "version": "0.9.17",
+  "builds": [
+    {
+      "flavor": "modern",
+      "asarSha256": "04f87b1e8dacdf23e822b386f64df02db4a6601d2d564f9b008718573d07300e",
+      "sourceChecks": [
+        {
+          "path": "source/package.json",
+          "sha256": "e6b1886da2ada2ff9e3b3a0201b431f187234d50be159dfbe4adc68345a120b4"
+        },
+        {
+          "path": "source/main.js",
+          "sha256": "0e9fae9dba7ec655bbf9aa0c9db3335817889cc3ec6018346c371f2e9e444410"
+        },
+        {
+          "path": "source/room-preload.cjs",
+          "sha256": "000e04f19ad1ee1c330f1ce62e01e2ce0070108e72de1bbf465c1a041b252ea2"
+        },
+        {
+          "path": "source/integrations/room.cjs",
+          "sha256": "761bdadfc815d15386e664ec613820f3445d5b64df083ad4084cbdb5f9064c43"
+        },
+        {
+          "path": "source/integrations/player-experience.cjs",
+          "sha256": "16aeac3fe467b45476248e7c870b05fbef1b1f3d2b5d6d242e3571b16e072f67"
+        },
+        {
+          "path": "source/integrations/studio.cjs",
+          "sha256": "a3e890a65a714aa2e709db403b9b599d3676b2101622cecb2c2869ecf6768d4b"
+        },
+        {
+          "path": "source/integrations/linux-appimage-update.cjs",
+          "sha256": "d8c7da02a5ffec48e0e724369b47b5c7c05d80d0eaf5ca18bc9efb8577ba3ee5"
+        },
+        {
+          "path": "source/integrations/linux-appimage-update.sh",
+          "sha256": "b583923be0f97cd701c5d24fefb21d5a2aaf263ab918dd285f42ca5e4bc61204"
+        },
+        {
+          "path": "source/app/lib/js/app-updates.js",
+          "sha256": "e1cef35302ea7c317c45e84338a3fe4d57bc2024cd3b4cad04bfb681ec324c2f"
+        },
+        {
+          "path": "source/app/lib/room-client/room.html",
+          "sha256": "a195898b4526c70d68f8b2627d61ba98902daefb7472ad3cf990cc2cc9807af1"
+        },
+        {
+          "path": "source/app/lib/room-client/room.css",
+          "sha256": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340"
+        },
+        {
+          "path": "source/app/lib/room-client/room.js",
+          "sha256": "1bbaf4f4580e43c00a731efbc9dd1dc6c3cf57a1a570c50a30a3852d23fb4e08"
+        },
+        {
+          "path": "source/app/lib/room-client/room-sync.js",
+          "sha256": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab"
+        },
+        {
+          "path": "source/app/lib/room-client/room-players.js",
+          "sha256": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9"
+        },
+        {
+          "path": "source/app/lib/room-client/site.js",
+          "sha256": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616"
+        },
+        {
+          "path": "source/app/lib/room-client/media-source.js",
+          "sha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c"
+        }
+      ]
+    },
+    {
+      "flavor": "legacy",
+      "asarSha256": "04f87b1e8dacdf23e822b386f64df02db4a6601d2d564f9b008718573d07300e",
+      "sourceChecks": [
+        {
+          "path": "source/package.json",
+          "sha256": "e6b1886da2ada2ff9e3b3a0201b431f187234d50be159dfbe4adc68345a120b4"
+        },
+        {
+          "path": "source/main.js",
+          "sha256": "0e9fae9dba7ec655bbf9aa0c9db3335817889cc3ec6018346c371f2e9e444410"
+        },
+        {
+          "path": "source/room-preload.cjs",
+          "sha256": "000e04f19ad1ee1c330f1ce62e01e2ce0070108e72de1bbf465c1a041b252ea2"
+        },
+        {
+          "path": "source/integrations/room.cjs",
+          "sha256": "761bdadfc815d15386e664ec613820f3445d5b64df083ad4084cbdb5f9064c43"
+        },
+        {
+          "path": "source/integrations/player-experience.cjs",
+          "sha256": "16aeac3fe467b45476248e7c870b05fbef1b1f3d2b5d6d242e3571b16e072f67"
+        },
+        {
+          "path": "source/integrations/studio.cjs",
+          "sha256": "a3e890a65a714aa2e709db403b9b599d3676b2101622cecb2c2869ecf6768d4b"
+        },
+        {
+          "path": "source/integrations/linux-appimage-update.cjs",
+          "sha256": "d8c7da02a5ffec48e0e724369b47b5c7c05d80d0eaf5ca18bc9efb8577ba3ee5"
+        },
+        {
+          "path": "source/integrations/linux-appimage-update.sh",
+          "sha256": "b583923be0f97cd701c5d24fefb21d5a2aaf263ab918dd285f42ca5e4bc61204"
+        },
+        {
+          "path": "source/app/lib/js/app-updates.js",
+          "sha256": "e1cef35302ea7c317c45e84338a3fe4d57bc2024cd3b4cad04bfb681ec324c2f"
+        },
+        {
+          "path": "source/app/lib/room-client/room.html",
+          "sha256": "a195898b4526c70d68f8b2627d61ba98902daefb7472ad3cf990cc2cc9807af1"
+        },
+        {
+          "path": "source/app/lib/room-client/room.css",
+          "sha256": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340"
+        },
+        {
+          "path": "source/app/lib/room-client/room.js",
+          "sha256": "1bbaf4f4580e43c00a731efbc9dd1dc6c3cf57a1a570c50a30a3852d23fb4e08"
+        },
+        {
+          "path": "source/app/lib/room-client/room-sync.js",
+          "sha256": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab"
+        },
+        {
+          "path": "source/app/lib/room-client/room-players.js",
+          "sha256": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9"
+        },
+        {
+          "path": "source/app/lib/room-client/site.js",
+          "sha256": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616"
+        },
+        {
+          "path": "source/app/lib/room-client/media-source.js",
+          "sha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c"
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "latest.yml",
+      "size": 366,
+      "sha256": "e99697d27407882b2901e347f63d13a2e5ad7847643b7928bc5ac184979ca0a4"
+    },
+    {
+      "name": "legacy.yml",
+      "size": 373,
+      "sha256": "1cd9ec1becfb17e82fa7a3f4361dff7f3e3152ca24fc00fcad99ad850d04e372"
+    },
+    {
+      "name": "LolzCloud-0.9.17-win-x64-Setup.exe",
+      "size": 146397770,
+      "sha256": "2c21cf476f0b2590922d7ab445223e96c207cf145914d15cbbd0414e2182792f"
+    },
+    {
+      "name": "LolzCloud-0.9.17-win-x64-Setup.exe.blockmap",
+      "size": 152666,
+      "sha256": "3cd964e5594d8c26e9fb97deec722d30747a2a3f8367fef1dfdad27b0612c91f"
+    },
+    {
+      "name": "LolzCloud-0.9.17-win-x64.zip",
+      "size": 196673839,
+      "sha256": "4cae1090775f685985ef60759e8cca8f53f66fc85958bc44ae7067b43a8fe04d"
+    },
+    {
+      "name": "LolzCloud-0.9.17-win7-legacy-Setup.exe",
+      "size": 99542824,
+      "sha256": "1819323798649e837f81ffd1d87eda1a819be3f521f8f648737001137447d0f8"
+    },
+    {
+      "name": "LolzCloud-0.9.17-win7-legacy-Setup.exe.blockmap",
+      "size": 105076,
+      "sha256": "f6d41a7701d36bb84b1a3824f5661282b0a9c7539556a46ed1cf111e4722133f"
+    },
+    {
+      "name": "LolzCloud-0.9.17-win7-legacy-x64.zip",
+      "size": 134390914,
+      "sha256": "d1bdb815fafa8edd0408d958ea028c62d26399783c80fe97118e49149bfd4671"
+    }
+  ],
+  "modernNativeSelfTest": "passed",
+  "legacyNativeSelfTestOnModernWindows": "passed",
+  "upgrade016to017": "passed",
+  "lowDiskGuard": "passed",
+  "limitations": [
+    "Legacy build executed on modern Windows; no physical Windows 7 device.",
+    "Linux updater source is packaged here but Linux execution is verified separately."
+  ]
+}

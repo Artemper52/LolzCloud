@@ -1,0 +1,80 @@
+✖ Linux manifest is bounded while reading and cancels an oversized stream (17.678217ms)
+✖ Linux download refuses final-origin redirects before preparation; Windows downloader is unchanged (77.412772ms)
+✖ destination changed during download is preserved and cannot reach profile preparation (68.831716ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 0
+ℹ fail 3
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 218.446967
+
+✖ failing tests:
+
+test at baseline/tests/linux-appimage-update.test.cjs:16:1
+✖ Linux manifest is bounded while reading and cancels an oversized stream (17.678217ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /больш/. Input:
+  
+  'Read beyond the JSON bound'
+  
+      at TestContext.<anonymous> (/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2/baseline/tests/linux-appimage-update.test.cjs:16:552)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Read beyond the JSON bound',
+    expected: /больш/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+test at baseline/tests/linux-appimage-update.test.cjs:18:1
+✖ Linux download refuses final-origin redirects before preparation; Windows downloader is unchanged (77.412772ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /перенаправ|источник|адрес/. Input:
+  
+  'Error: TEST_GUARD_UNEXPECTED_PREPARE'
+  
+      at async TestContext.<anonymous> (/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2/baseline/tests/linux-appimage-update.test.cjs:18:704)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: TEST_GUARD_UNEXPECTED_PREPARE
+        at prepareRestart (/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2/baseline/tests/linux-appimage-update.test.cjs:18:327)
+        at LinuxAppImageUpdates.prepareRestart (/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2/baseline/tests/linux-appimage-update.test.cjs:15:365)
+        at LinuxAppImageUpdates.install (/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2/baseline/source/integrations/linux-appimage-update.cjs:70:59)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2/baseline/tests/linux-appimage-update.test.cjs:18:704)
+        at async Test.run (node:internal/test_runner/test:1409:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:974:7),
+    expected: /перенаправ|источник|адрес/,
+    operator: 'rejects',
+    diff: 'simple'
+  }
+
+test at baseline/tests/linux-appimage-update.test.cjs:19:1
+✖ destination changed during download is preserved and cannot reach profile preparation (68.831716ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /изменил/. Input:
+  
+  'Error: TEST_GUARD_UNEXPECTED_PREPARE'
+  
+      at async TestContext.<anonymous> (/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2/baseline/tests/linux-appimage-update.test.cjs:19:575)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: Error: TEST_GUARD_UNEXPECTED_PREPARE
+        at prepareRestart (/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2/baseline/tests/linux-appimage-update.test.cjs:19:352)
+        at LinuxAppImageUpdates.prepareRestart (/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2/baseline/tests/linux-appimage-update.test.cjs:15:365)
+        at LinuxAppImageUpdates.install (/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2/baseline/source/integrations/linux-appimage-update.cjs:70:59)
+        at async waitForActual (node:assert:646:5)
+        at async strict.rejects (node:assert:769:25)
+        at async TestContext.<anonymous> (/opt/lolzcloud-builds/.build/appimage-update-qa-10758ba6-fe27-4aa2-89c8-b422468f2ca2/baseline/tests/linux-appimage-update.test.cjs:19:575)
+        at async Test.run (node:internal/test_runner/test:1409:7)
+        at async Test.processPendingSubtests (node:internal/test_runner/test:974:7),
+    expected: /изменил/,
+    operator: 'rejects',
+    diff: 'simple'
+  }

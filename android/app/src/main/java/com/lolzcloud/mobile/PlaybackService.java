@@ -92,6 +92,14 @@ public final class PlaybackService extends Service {
     private AudioManager.OnAudioFocusChangeListener focusCallback;
     private Equalizer equalizer;
     private BassBoost bassBoost;
+    private final AudioEffectsPolicy.BassDriver bassDriver = new AudioEffectsPolicy.BassDriver() {
+        public boolean hasControl() { return bassBoost.hasControl(); }
+        public boolean strengthSupported() { return bassBoost.getStrengthSupported(); }
+        public int roundedStrength() { return bassBoost.getRoundedStrength(); }
+        public boolean enabled() { return bassBoost.getEnabled(); }
+        public void strength(int value) { bassBoost.setStrength((short) value); }
+        public boolean enable(boolean value) { return bassBoost.setEnabled(value) == android.media.audiofx.AudioEffect.SUCCESS; }
+    };
     private PresetReverb reverb;
     private LoudnessEnhancer loudness;
     private Listener listener;
@@ -114,6 +122,7 @@ public final class PlaybackService extends Service {
     private long pendingSeek;
     private long lastSave;
     private long sleepAt;
+    private static final String SLEEP_DEADLINE = "sleep_deadline";
     private String error = "";
     private String metadataId = "";
     private long metadataDuration = -1;
@@ -127,6 +136,10 @@ public final class PlaybackService extends Service {
         shuffle = prefs.getBoolean("shuffle", false);
         speed = prefs.getFloat("speed", 1f);
         pitch = prefs.getFloat("pitch", 1f);
+        long savedSleep = prefs.getLong(SLEEP_DEADLINE, 0);
+        SleepTimerPolicy.Deadline sleep = SleepTimerPolicy.restore(savedSleep, System.currentTimeMillis(), SystemClock.elapsedRealtime());
+        sleepAt = sleep.elapsed;
+        if (savedSleep != sleep.wall) prefs.edit().putLong(SLEEP_DEADLINE, sleep.wall).apply();
         queue.addAll(store.savedQueue());
         if (!queue.isEmpty()) index = Math.min(Math.max(store.savedIndex(), 0), queue.size() - 1);
         pendingSeek = store.savedPosition();
@@ -262,6 +275,27 @@ public final class PlaybackService extends Service {
         loadCurrent(true);
     }
 
+    /** Select a saved moment without replacing the queue or changing play/pause intent.
+     * Returns true only when the track was appended to the end of the queue. */
+    public boolean openBookmark(Track requested, long milliseconds) {
+        if (requested == null) return false;
+        Track stored = store.find(requested.id), track = stored == null ? requested : stored;
+        boolean currentRecording = current() != null && current().id.equals(track.id);
+        int selected = currentRecording ? index : -1;
+        if (selected < 0) for (int item = 0; item < queue.size(); item++) if (queue.get(item).id.equals(track.id)) { selected = item; break; }
+        boolean appended = selected < 0;
+        if (appended) { selected = queue.size(); queue.add(track); }
+        else queue.set(selected, track);
+        if (currentRecording && selected == index) { seekTo(milliseconds); return appended; }
+        boolean resume = isPlaying() || playWhenReady;
+        if (index >= 0) previousIndices.add(index);
+        index = selected; pendingSeek = Math.max(0, milliseconds);
+        // The existing load generation/media identity owns this pending seek.
+        // Next/previous invalidate it synchronously before another player prepares.
+        loadCurrent(resume);
+        return appended;
+    }
+
     public void toggle() { if (isPlaying() || isLoading()) pause(); else play(); }
 
     public void play() {
@@ -377,16 +411,35 @@ public final class PlaybackService extends Service {
     }
 
     public boolean setBass(int strength) {
-        int value = Math.max(0, Math.min(1000, strength));
+        int value = AudioEffectsPolicy.bassRequest(strength);
         store.preferences().edit().putInt("bass", value).apply();
-        if (bassBoost == null) return false;
-        try { bassBoost.setStrength((short) value); bassBoost.setEnabled(value > 0); return true; }
-        catch (RuntimeException ignored) { return false; }
+        return AudioEffectsPolicy.applyBass(bassBoost == null ? null : bassDriver, value);
     }
 
-    public int bass() { return store.preferences().getInt("bass", 0); }
-    public boolean bassAvailable() { return bassBoost != null; }
-    public boolean eqAvailable() { return equalizer != null; }
+    AudioEffectsPolicy.BassState bassState() { return AudioEffectsPolicy.readBass(bassBoost == null ? null : bassDriver); }
+    public int bass() { return bassState().strength; }
+    public boolean bassAvailable() { return bassState().editable(); }
+    public boolean bassStrengthSupported() { return bassState().adjustable; }
+    public boolean bassEnabled() { return bassState().enabled; }
+    public String bassStatus() {
+        AudioEffectsPolicy.BassState state = bassState();
+        if (!state.available) return media == null || !prepared ? "Включи трек, чтобы проверить поддержку эффекта." : "Аудиосистема этого устройства не поддерживает эффект.";
+        if (!state.controllable) return "Эффект сейчас управляется другой аудиосистемой. Настройка недоступна.";
+        return state.adjustable ? "Показана фактически применённая сила эффекта." : "Устройство поддерживает только включение и выключение. Сила фиксирована.";
+    }
+    public String effectsCapabilitiesKey() {
+        AudioEffectsPolicy.BassState bass = bassState(); int audioSession = 0;
+        try { if (media != null) audioSession = media.getAudioSessionId(); } catch (RuntimeException unavailable) { }
+        StringBuilder key = new StringBuilder().append(audioSession).append(':').append(bass.available).append(':')
+                .append(bass.controllable).append(':').append(bass.adjustable).append(':').append(eqAvailable()).append(':').append(reverbAvailable());
+        short[] range = eqRange(); key.append(':').append(range[0]).append(':').append(range[1]);
+        for (int band = 0; band < eqBandCount(); band++) key.append(':').append(eqCenterHz(band));
+        return key.toString();
+    }
+    public boolean eqAvailable() {
+        try { return equalizer != null && equalizer.hasControl() && equalizer.getNumberOfBands() > 0; }
+        catch (RuntimeException unavailable) { return false; }
+    }
     public int eqBandCount() {
         try { return equalizer == null ? 0 : equalizer.getNumberOfBands(); }
         catch (RuntimeException ignored) { return 0; }
@@ -409,8 +462,8 @@ public final class PlaybackService extends Service {
             short[] range = equalizer.getBandLevelRange();
             short value = (short) Math.max(range[0], Math.min(range[1], level));
             equalizer.setBandLevel((short) band, value);
-            equalizer.setEnabled(true);
-            store.preferences().edit().putInt("eq_" + band, value).apply();
+            if (equalizer.setEnabled(true) != android.media.audiofx.AudioEffect.SUCCESS || !equalizer.getEnabled()) return false;
+            store.preferences().edit().putInt("eq_" + band, value).putBoolean("eq_enabled", true).apply();
             return true;
         } catch (RuntimeException ignored) { return false; }
     }
@@ -420,14 +473,14 @@ public final class PlaybackService extends Service {
         if (reverb == null || media == null) return false;
         try {
             reverb.setPreset(PresetReverb.PRESET_SMALLROOM);
-            reverb.setEnabled(enabled);
+            if (reverb.setEnabled(enabled) != android.media.audiofx.AudioEffect.SUCCESS) return false;
             media.attachAuxEffect(enabled ? reverb.getId() : 0);
             media.setAuxEffectSendLevel(enabled ? .2f : 0f);
-            return true;
+            return reverb.getEnabled() == enabled;
         } catch (RuntimeException ignored) { return false; }
     }
-    public boolean reverbAvailable() { return reverb != null; }
-    public boolean reverb() { return store.preferences().getBoolean("reverb", false); }
+    public boolean reverbAvailable() { try { return reverb != null && reverb.hasControl(); } catch (RuntimeException unavailable) { return false; } }
+    public boolean reverb() { try { return reverb != null && reverb.getEnabled(); } catch (RuntimeException unavailable) { return false; } }
 
     public boolean setLoudness(int millibels) {
         int value = Math.max(0, Math.min(1000, millibels));
@@ -438,8 +491,43 @@ public final class PlaybackService extends Service {
     }
 
     public void setSleepMinutes(int minutes) {
-        sleepAt = minutes <= 0 ? 0 : SystemClock.elapsedRealtime() + Math.min(minutes, 24 * 60) * 60_000L;
+        SleepTimerPolicy.Deadline deadline = SleepTimerPolicy.minutes(minutes, System.currentTimeMillis(), SystemClock.elapsedRealtime());
+        sleepAt = deadline.elapsed;
+        store.preferences().edit().putLong(SLEEP_DEADLINE, deadline.wall).apply();
         changed(false);
+    }
+
+    /** Includes stored bands from an earlier device/session, without changing queue or timer. */
+    public boolean resetEffects() {
+        SharedPreferences prefs = store.preferences();
+        SharedPreferences.Editor edit = prefs.edit().putFloat("speed", 1f).putFloat("pitch", 1f)
+                .putInt("bass", 0).putBoolean("reverb", false).putInt("loudness", 0).putBoolean("eq_enabled", false);
+        for (String key : AudioEffectsPolicy.storedEqBands(prefs.getAll().keySet())) edit.remove(key);
+        edit.apply(); speed = 1f; pitch = 1f; applySpeed();
+        boolean applied = bassBoost == null || AudioEffectsPolicy.applyBass(bassDriver, 0);
+        if (equalizer != null) try {
+            for (short band = 0; band < equalizer.getNumberOfBands(); band++) equalizer.setBandLevel(band, (short) 0);
+            applied &= equalizer.setEnabled(false) == android.media.audiofx.AudioEffect.SUCCESS && !equalizer.getEnabled();
+        } catch (RuntimeException unavailable) { applied = false; }
+        if (reverb != null) try {
+            if (media != null) { media.setAuxEffectSendLevel(0f); media.attachAuxEffect(0); }
+            applied &= reverb.setEnabled(false) == android.media.audiofx.AudioEffect.SUCCESS && !reverb.getEnabled();
+        } catch (RuntimeException unavailable) { applied = false; }
+        if (loudness != null) try {
+            applied &= loudness.setEnabled(false) == android.media.audiofx.AudioEffect.SUCCESS && !loudness.getEnabled();
+        } catch (RuntimeException unavailable) { applied = false; }
+        changed(false); return applied;
+    }
+
+    private void applyEqPreferences() {
+        if (equalizer == null) return;
+        SharedPreferences prefs = store.preferences();
+        for (short band = 0; band < equalizer.getNumberOfBands(); band++) {
+            short[] range = equalizer.getBandLevelRange();
+            equalizer.setBandLevel(band, (short) Math.max(range[0], Math.min(range[1], prefs.getInt("eq_" + band, 0))));
+        }
+        // Old installations had no bypass preference; preserve that behaviour.
+        equalizer.setEnabled(prefs.getBoolean("eq_enabled", true));
     }
 
     /** Reapply portable preferences after a profile import without restarting playback. */
@@ -453,7 +541,7 @@ public final class PlaybackService extends Service {
         setBass(prefs.getInt("bass", 0));
         setReverb(prefs.getBoolean("reverb", false));
         setLoudness(prefs.getInt("loudness", 0));
-        for (int band = 0; band < eqBandCount(); band++) setEqBand(band, (short) prefs.getInt("eq_" + band, 0));
+        try { applyEqPreferences(); } catch (RuntimeException unavailable) { /* Keep honest device availability. */ }
         changed(true);
     }
 
@@ -622,12 +710,7 @@ public final class PlaybackService extends Service {
         SharedPreferences prefs = store.preferences();
         try {
             equalizer = new Equalizer(0, audioSession);
-            for (short band = 0; band < equalizer.getNumberOfBands(); band++) {
-                short[] range = equalizer.getBandLevelRange();
-                short level = (short) Math.max(range[0], Math.min(range[1], prefs.getInt("eq_" + band, 0)));
-                equalizer.setBandLevel(band, level);
-            }
-            equalizer.setEnabled(true);
+            applyEqPreferences();
         } catch (RuntimeException ignored) { if (equalizer != null) equalizer.release(); equalizer = null; }
         try { bassBoost = new BassBoost(0, audioSession); setBass(prefs.getInt("bass", 0)); }
         catch (RuntimeException ignored) { if (bassBoost != null) bassBoost.release(); bassBoost = null; }
@@ -836,6 +919,7 @@ public final class PlaybackService extends Service {
         @Override public void run() {
             if (sleepAt > 0 && SystemClock.elapsedRealtime() >= sleepAt) {
                 sleepAt = 0;
+                store.preferences().edit().putLong(SLEEP_DEADLINE, 0).apply();
                 pause();
             }
             if (isPlaying()) {

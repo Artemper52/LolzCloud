@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "count": 11,
+  "checks": [
+    "Search obtains all 240 entries through twelve real validated HTTP pages",
+    "Selecting search row201 retains the chosen track inside a bounded ordered200-entry queue",
+    "Next and previous preserve source order around a selection beyond row200",
+    "Selecting library row201 plays its actual audio and keeps the original library order",
+    "A delayed preparation beyond row200 cannot replace the newer actual audio selection",
+    "Only the exact selected duplicate queue occurrence is highlighted",
+    "Only the current duplicate occurrence is protected from removal",
+    "The native adapter receives the exact chosen window index and signed track without parallel HTMLAudio",
+    "A stale native selection and matching-ID old playback cannot overwrite a newer large-library choice",
+    "Native same-ID stale callbacks retain the exact highlighted duplicate index and original intent",
+    "Targeted queue scenarios have no uncaught JavaScript errors"
+  ],
+  "errors": [],
+  "failure": "",
+  "screenshots": [
+    "D:\\LolzCloud-Android-Toolchain\\pwa-effects\\final-queue\\queue-duplicate-360.png"
+  ],
+  "fixtureNote": "Actual isolated Chromium HTTP pagination, real generated MP3 and HTMLMediaElement. Library restoration is a controlled localStorage fixture. Native bridge events are a tagged contract adapter, not AVPlayer/Safari hardware."
+}

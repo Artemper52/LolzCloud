@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "generatedAt": "2026-11-14T20:01:23.772Z",
+  "suites": [
+    {
+      "suite": "AudioEffectsPolicyTest",
+      "passed": true,
+      "checks": 17
+    },
+    {
+      "suite": "SleepTimerPolicyTest",
+      "passed": true,
+      "checks": 14
+    }
+  ],
+  "total": 31,
+  "scope": "Pure JVM production policy with declared rounded/fixed/released/lost-control native driver adapters and dual-clock persistence inputs. No actual AudioEffect, MediaPlayer, device or APK execution."
+}

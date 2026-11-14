@@ -113,7 +113,8 @@ app.whenReady().then(async () => {
   lolzteam = registerLolzteam(app, () => mainWindow);
   await lolzteam.ready;
   createWindow()
-  updates = new (require('./integrations/app-updates.cjs').AppUpdates)({ app, onState: state => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('updates:state', state); }, prepareRestart: async () => { quitStarted = true; await lolzteam.shutdown(); finishedQuitting = true; } });
+  const UpdateController = process.platform === 'linux' ? require('./integrations/linux-appimage-update.cjs').LinuxAppImageUpdates : require('./integrations/app-updates.cjs').AppUpdates;
+  updates = new UpdateController({ app, onState: state => { if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('updates:state', state); }, prepareRestart: async () => { quitStarted = true; await lolzteam.shutdown(); finishedQuitting = true; } });
   ipcMain.handle('updates:action', async (event, action) => {
     if (event.sender !== mainWindow?.webContents || event.senderFrame !== event.sender.mainFrame || event.senderFrame.url.split(/[?#]/)[0] !== require('node:url').pathToFileURL(path.join(__dirname, 'app/index.html')).href) return { ok: false, error: 'Недоверенное окно.' };
     try { if (action?.type === 'check') await updates.check(); else if (action?.type === 'install') await updates.install(); else if (action?.type !== 'state') throw new Error('Неизвестная команда обновления.'); return { ok: true, state: updates.state() }; }

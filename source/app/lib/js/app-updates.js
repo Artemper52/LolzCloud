@@ -16,17 +16,17 @@
   announce.setAttribute('role', 'status');
   chip.after(announce);
   function render(value) {
-    const busy = ['checking', 'downloading', 'installing'].includes(value.status);
+    const busy = ['checking', 'downloading', 'preparing', 'installing'].includes(value.status);
     const available = value.available === true || value.status === 'available';
-    const applying = ['downloading', 'installing'].includes(value.status);
-    el('version').textContent = 'Версия ' + value.currentVersion + (value.legacy ? ' · Windows 7 Legacy' : '');
-    const labels = { idle: 'Проверяем новые версии при запуске приложения.', checking: 'Проверяем новую версию…', current: 'У тебя последняя версия.', available: 'Доступна версия ' + value.version + '. Профиль сохранится при обновлении.', downloading: 'Скачиваем обновление · ' + Math.round(value.percent || 0) + '%', installing: 'Сохраняем профиль. Приложение сейчас перезапустится…', unsupported: 'Установи новую версию с lolzcloud.com.' };
+    const applying = ['downloading', 'preparing', 'installing'].includes(value.status);
+    el('version').textContent = 'Версия ' + value.currentVersion + (value.legacy ? ' · Windows 7 Legacy' : value.kind === 'appimage' ? ' · Linux AppImage' : '');
+    const labels = { idle: 'Проверяем новые версии при запуске приложения.', checking: 'Проверяем новую версию…', current: 'У тебя последняя версия.', available: 'Доступна версия ' + value.version + '. Профиль сохранится при обновлении.', downloading: 'Скачиваем обновление · ' + Math.round(value.percent || 0) + '%', preparing: 'Готовим обновление. Профиль и прежняя версия сохранятся.', installing: 'Сохраняем профиль. Приложение сейчас перезапустится…', unsupported: 'Установи новую версию с lolzcloud.com.' };
     el('status').textContent = value.error || labels[value.status] || ''; el('check').disabled = busy || !value.supported;
     el('install').hidden = !available && !applying; el('install').disabled = busy;
     el('progress').hidden = value.status !== 'downloading'; el('progress').value = value.percent || 0;
     chip.hidden = !available && !applying;
     chip.disabled = busy;
-    chipLabel.textContent = value.status === 'downloading' ? 'Загрузка ' + Math.round(value.percent || 0) + '%' : value.status === 'installing' ? 'Перезапуск…' : 'Есть обновление';
+    chipLabel.textContent = value.status === 'downloading' ? 'Загрузка ' + Math.round(value.percent || 0) + '%' : value.status === 'preparing' ? 'Подготовка…' : value.status === 'installing' ? 'Перезапуск…' : 'Есть обновление';
     chip.title = value.error || (applying ? labels[value.status] : 'Обновить до ' + value.version + ' и перезапустить');
     chip.setAttribute('aria-label', applying ? chip.title : chipLabel.textContent + ' ' + value.version + '. Обновить и перезапустить.');
     const announcement = available ? 'Доступно обновление LolzCloud ' + value.version : '';
