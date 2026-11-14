@@ -7,10 +7,10 @@ function select({directory='/Applications',env=process.env,execute=execFileSync}
  if(process.platform!=='darwin')throw Error('Xcode selection must run on the macOS builder.');
  const choices=candidates(fs.readdirSync(directory));if(!choices.length)throw Error('No installed stable Xcode 26 or newer. Use a current macOS runner image.');
  const selected=path.join(directory,choices[0].name,'Contents/Developer'),scoped={...env,DEVELOPER_DIR:selected};
- const read=args=>execute('/usr/bin/xcodebuild',args,{encoding:'utf8',env:scoped,timeout:60000}).trim();
- const description=read(['-version']),match=/^Xcode (\d+(?:\.\d+){0,2})$/m.exec(description);
+ const read=(tool,args)=>execute('/usr/bin/'+tool,args,{encoding:'utf8',env:scoped,timeout:60000}).trim();
+ const description=read('xcodebuild',['-version']),match=/^Xcode (\d+(?:\.\d+){0,2})$/m.exec(description);
  if(!match||version(match[1])[0]<26)throw Error('Selected Xcode does not meet the current App Store Connect minimum.');
- const deviceSDK=read(['-sdk','iphoneos','-show-sdk-version']),simulatorSDK=read(['-sdk','iphonesimulator','-show-sdk-version']);
+ const deviceSDK=read('xcrun',['--sdk','iphoneos','--show-sdk-version']),simulatorSDK=read('xcrun',['--sdk','iphonesimulator','--show-sdk-version']);
  if(!version(deviceSDK)||version(deviceSDK)[0]<26||!version(simulatorSDK)||version(simulatorSDK)[0]<26)throw Error('Both Apple SDKs must be version 26 or newer.');
  if(env.GITHUB_ENV)fs.appendFileSync(env.GITHUB_ENV,'DEVELOPER_DIR='+selected+'\n');
  const report={developerDirectory:selected,xcode:match[1],deviceSDK,simulatorSDK,minimumDeployment:'16.4'};
