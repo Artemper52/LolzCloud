@@ -10,7 +10,8 @@
   const playbackKey = () => [state?.epoch || 0, state?.controller?.connection || '', generation, loaded].join('|');
   const activeLease = () => !state?.reconnecting && (!Number.isFinite(state?.controller?.expires) || state.controller.expires > clock.time());
   const atEnd = (position, tolerance = 150) => Number.isFinite(position) && state?.playback.duration > 0 && position >= state.playback.duration * 1000 - tolerance;
-  let autoplayBlocked = false;
+  let autoplayBlocked = false, autoplayTimer;
+  let selectingTrack = false, selectionCommitted = false, requestedPlaybackUrl = '', searchTracks = [], searchActionsSignature = '';
   let chatSending = false, chatUnread = 0, chatInitialized = false;
   const chatRows = new Map();
   const pendingToggles=new Set();
@@ -19,7 +20,7 @@
     if(window.parent===window||event.source!==window.parent||event.origin!==location.origin||event.data?.type!=='lolzcloud:app-audio'||event.data.action!=='pause')return;
     started=false;lastApplied=performance.now();widget?.pause();updateControls();updateBadge();
   });
-  const message = error => { el('status').textContent = error instanceof Error ? error.message : String(error || ''); };
+  const message = error => { const text = error instanceof Error ? error.message : String(error || ''); el('status').textContent = text; if (el('room-sheet-status')) el('room-sheet-status').textContent = text; };
   const node = (tag, value, className) => { const result = document.createElement(tag); result.textContent = value; if (className) result.className = className; return result; };
   const button = (label, handler) => { const result = node('button', label); result.type = 'button'; result.onclick = () => Promise.resolve(handler()).catch(message); return result; };
   async function call(action, data, method = 'POST') {
@@ -48,6 +49,21 @@
   }
   async function calibrate() { for (let attempt = 0; attempt < 3; attempt++) { const sent = performance.now(); try { const value = await request('/api/clock'); clock.sample(value.serverTime, sent); } catch { break; } } }
   function seekNow(position) { if (!widget || !ready) return; lastApplied = performance.now(); widget.seekTo(position); }
+  function playHere() {
+    if (!widget || !ready || stopped) return;
+    const player = widget, token = generation, url = loaded;
+    player.play();
+    if (autoplayTimer) return;
+    autoplayTimer = setTimeout(() => {
+      autoplayTimer = null;
+      if (stopped || !started || !ready || player !== widget || token !== generation || state?.playback.url !== url || !state.playback.playing) return;
+      player.isPaused(paused => {
+        if (!paused || stopped || !started || player !== widget || token !== generation || !state?.playback.playing) return;
+        autoplayBlocked = true; health.status = 'autoplay'; updateBadge(); updateControls();
+        message('Браузер ждёт разрешения звука. Нажми «Разрешить звук здесь» или Play внутри плеера.');
+      });
+    }, 1200);
+  }
   function samplePlayer(callback) {
     if (stopped || !ready || !widget) return;
     const player = widget, token = generation, url = loaded;
@@ -61,11 +77,11 @@
     if (stopped || !widget || !ready || !state || !loaded) return;
     if (nativeHost()) { health.status = 'ready'; health.driftMs = 0; updateBadge(); return; }
     if (!activeLease() || lastStateAt && performance.now() - lastStateAt > 15000) { lastApplied = performance.now(); widget.pause(); health.status = 'buffering'; updateBadge(); return; }
-    if (isController() && advanceGate.pending) { lastApplied = performance.now(); widget.pause(); return; }
+    if (isController() && (advanceGate.pending || selectingTrack)) { lastApplied = performance.now(); widget.pause(); return; }
     if (!started) { lastApplied = performance.now(); widget.pause(); health.status = 'autoplay'; health.driftMs = null; updateBadge(); return; }
     const source = loaded, token = generation, player = widget;
     const current = () => !stopped && started && ready && player === widget && token === generation && source === loaded && state?.playback.url === source && activeLease();
-    player.isPaused(paused => { if (!current()) return; if (state.playback.playing === paused) { lastApplied = performance.now(); state.playback.playing ? player.play() : player.pause(); } });
+    player.isPaused(paused => { if (!current()) return; if (state.playback.playing === paused) { lastApplied = performance.now(); if (state.playback.playing) { if (!autoplayBlocked) playHere(); } else player.pause(); } });
     player.getPosition(position => { if (!current()) return; const decision = correction.decide(position, target(), performance.now(), playbackKey(), force, scheduled); health.driftMs = Number.isFinite(decision.drift) ? Math.round(decision.drift) : null; if (decision.seek) seekNow(Math.max(0, decision.position)); health.status = autoplayBlocked ? 'autoplay' : 'ready'; updateBadge(); });
   }
   function widgetReady(token) {
@@ -85,7 +101,7 @@
     updateBadge(); sync(true);
   }
   function nativeUpdate() {
-    if (!started || !isController() || !activeLease() || advanceGate.pending || performance.now() - lastApplied < 800 || !ready) return;
+    if (!started || !isController() || !activeLease() || advanceGate.pending || selectingTrack || performance.now() - lastApplied < 800 || !ready) return;
     const key = playbackKey();
     samplePlayer((position, paused) => {
       if (!started || key !== playbackKey() || !isController() || !activeLease() || advanceGate.pending) return;
@@ -94,14 +110,14 @@
     });
   }
   function sourceEnded(token) {
-    if (token !== generation || !ready || stopped || !isController() || !activeLease() || !state.playback.playing) return;
+    if (token !== generation || !ready || stopped || selectingTrack || !isController() || !activeLease() || !state.playback.playing) return;
     const key = playbackKey();
     const finish = () => { if (key === playbackKey()) void finishTrack().catch(message); };
     if (atEnd(target(), 1500)) finish();
     else widget.getPosition(position => { if (atEnd(position, 1500)) finish(); });
   }
   async function finishTrack(explicit = false) {
-    if (stopped || !isController() || !activeLease() || !explicit && !ready) return false;
+    if (stopped || selectingTrack || !isController() || !activeLease() || !explicit && !ready) return false;
     lastApplied = performance.now(); widget?.pause();
     if (state.settings.autoNext) return nextTrack(!explicit);
     return publish({ position: state.playback.duration || clock.position(state), playing: false });
@@ -142,6 +158,7 @@
     // SDK pause/destroy can synchronously emit state changes. Invalidate the
     // outgoing recording before teardown so it cannot publish into the new one.
     const token = ++generation;
+    clearTimeout(autoplayTimer); autoplayTimer = null;
     ready = false; lastApplied = performance.now();
     if (widget && (kind !== playerKind || kind === 'youtube')) { const old=el('player'), parent=old?.parentElement;widget.pause();widget.destroy?.();widget=null;const replacement=document.createElement('iframe');replacement.id='player';replacement.title='Плеер комнаты';replacement.allow='autoplay; encrypted-media; fullscreen';if(old?.isConnected)old.replaceWith(replacement);else parent?.append(replacement); }
     playerKind = kind;
@@ -162,7 +179,7 @@
       if (kind === 'youtube') {
         widget?.destroy?.();
         playerTimeout = setTimeout(()=>playerFailed(token),18000);
-        const next = await window.LolzCloudRoomPlayers.youtube(frame,track,{ready:()=>widgetReady(token),changed:playing=>{if(token!==generation)return;if(playing){autoplayBlocked=false;if(started)appAudioPlaying();}nativeUpdate();},ended:()=>sourceEnded(token),error:()=>playerFailed(token),blocked:()=>{if(token!==generation)return;autoplayBlocked=true;health.status='autoplay';updateBadge();message('Нажми Play в плеере YouTube, чтобы разрешить звук.');}});
+        const next = await window.LolzCloudRoomPlayers.youtube(frame,track,{ready:()=>widgetReady(token),changed:playing=>{if(token!==generation)return;if(playing){autoplayBlocked=false;if(started)appAudioPlaying();updateControls();}nativeUpdate();},ended:()=>sourceEnded(token),error:()=>playerFailed(token),blocked:()=>{if(token!==generation)return;autoplayBlocked=true;health.status='autoplay';updateBadge();updateControls();message('Нажми «Разрешить звук здесь» или Play в плеере YouTube.');}});
         if(token!==generation){next.destroy?.();return;} widget=next;
         if(token!==generation)widget.destroy?.(); return;
       }
@@ -175,7 +192,7 @@
         frame.src = 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) + '&auto_play=false&show_comments=false&show_reposts=false';
         widget = Widget(frame);
         widget.bind(Widget.Events.READY, () => widgetReady(token));
-        widget.bind(Widget.Events.PLAY,()=>{if(started)appAudioPlaying();nativeUpdate();});
+        widget.bind(Widget.Events.PLAY,()=>{autoplayBlocked=false;if(started)appAudioPlaying();updateControls();nativeUpdate();});
         for (const name of ['PAUSE', 'SEEK']) widget.bind(Widget.Events[name], nativeUpdate);
         widget.bind(Widget.Events.FINISH, () => sourceEnded(generation));
         widget.bind(Widget.Events.ERROR, () => playerFailed(generation));
@@ -183,9 +200,35 @@
     } catch { playerFailed(token); }
   }
   function renderQueue() {
-    const signature = JSON.stringify([state.queue, state.canControl]); if (signature === queueSignature) return; queueSignature = signature; el('queue-list').replaceChildren(); el('queue-count').textContent = state.queue.length + ' / 50';
+    const signature = JSON.stringify([state.queue, state.canControl, isController(), selectingTrack]); if (signature === queueSignature) return; queueSignature = signature; el('queue-list').replaceChildren(); el('queue-count').textContent = state.queue.length + ' / 50';
     if (!state.queue.length) el('queue-list').append(node('p', 'Предложи первую песню — выберем следующую вместе.', 'empty-state'));
-    for (const row of state.queue) { const item = node('article', '', 'queue-item'), info = node('div', '', 'queue-info'); info.append(node('strong', row.track.title), node('small', row.proposedBy.name + ' · ' + (row.approved ? 'В очереди' : 'Ждёт одобрения'))); item.append(info, button((row.voted ? '♥ ' : '♡ ') + row.votes, () => queue({ type: 'vote', id: row.id }))); if (state.canControl) item.append(button(row.approved ? 'Отложить' : 'Одобрить', () => queue({ type: 'approve', id: row.id }))); if (state.canControl || row.proposedBy.id === window.LolzCloudSession?.user.id) item.append(button('Убрать', () => queue({ type: 'remove', id: row.id }))); el('queue-list').append(item); }
+    for (const row of state.queue) {
+      const item = node('article', '', 'queue-item'), info = node('div', '', 'queue-info'), actions = node('div', '', 'room-track-actions'); item.dataset.queueId = row.id;
+      info.append(node('strong', row.track.title), node('small', row.proposedBy.name + ' · ' + (row.approved ? 'В очереди' : 'Ждёт одобрения')));
+      if (state.canControl) actions.append(playNowButton(row.track, row.id));
+      actions.append(button((row.voted ? '♥ ' : '♡ ') + row.votes, () => queue({ type: 'vote', id: row.id })));
+      if (state.canControl) actions.append(button(row.approved ? 'Отложить' : 'Одобрить', () => queue({ type: 'approve', id: row.id })));
+      if (state.canControl || row.proposedBy.id === window.LolzCloudSession?.user.id) actions.append(button('Убрать', () => queue({ type: 'remove', id: row.id })));
+      item.append(info, actions); el('queue-list').append(item);
+    }
+  }
+  function playNowButton(track, queueId) {
+    const result = button('Включить сейчас', () => chooseTrack(track, queueId)); result.dataset.roomPlay = queueId || track.url;
+    result.disabled = selectingTrack || stopped; result.className = 'button primary';
+    if (!isController()) result.title = state.host ? 'Взять пульт на этом устройстве и включить трек' : 'Взять свободный пульт и включить трек';
+    return result;
+  }
+  function renderSearchActions() {
+    if (!state) return;
+    const signature = JSON.stringify([state.canControl, isController(), selectingTrack, stopped, searchTracks]);
+    if (signature === searchActionsSignature) return; searchActionsSignature = signature;
+    if (el('room-search-status').dataset.results === 'true') el('room-search-status').textContent = state.canControl ? 'Включи сейчас или добавь в общую очередь.' : 'Предложи песню в общую очередь.';
+    for (const [position, row] of [...el('room-search-results').children].entries()) {
+      const track = searchTracks[position]; if (!track) continue;
+      const actions = row.querySelector('.room-track-actions'); if (!actions) continue;
+      actions.replaceChildren(); if (state.canControl) actions.append(playNowButton(track));
+      actions.append(button(state.canControl ? 'В очередь' : 'Предложить', () => queue({ type: 'add', track })));
+    }
   }
   function renderPeople() {
     const signature = JSON.stringify(state.participants); if (signature === peopleSignature) return; peopleSignature = signature; el('participants').replaceChildren(); el('people-count').textContent = state.participants.length;
@@ -248,15 +291,20 @@
     el('track-title').textContent = value.playback.url ? value.playback.title || 'Трек SoundCloud' : 'Выбираем первую песню'; el('track-artist').textContent = value.playback.artist;
     el('playback-label').textContent = !value.playback.url ? 'СЦЕНА' : value.playback.playing ? 'СЕЙЧАС ИГРАЕТ' : 'НА ПАУЗЕ';
     el('room-status').textContent = value.reconnecting ? 'Ведущий переподключается. Позиция сохранена.' : value.playback.url && !value.playback.playing ? 'Общая пауза' : '';
-    el('claim-host').hidden = !value.canControl || isController(); el('release-host').hidden = !isController(); el('host-controls').hidden = !isController(); el('controller-info').textContent = value.controller ? value.controller.user.name + ' · ' + value.controller.name : 'Пульт свободен. Владелец или диджей может продолжить.';
+    el('claim-host').hidden = !value.canControl || isController(); el('release-host').hidden = !isController(); el('host-controls').hidden = !isController(); el('host-track-form').hidden = !value.canControl; el('controller-info').textContent = value.controller ? value.controller.user.name + ' · ' + value.controller.name : 'Пульт свободен. Владелец или диджей может продолжить.';
     updateControls();
     el('host-seek').max = value.playback.duration || 1; if (document.activeElement !== el('host-seek')) el('host-seek').value = clock.position(value); el('room-settings').hidden = !value.host;
     if (!settingsFilled && value.host) { settingsFilled = true; el('settings-name').value = value.settings.name; el('settings-description').value = value.settings.description; el('settings-public').checked = value.settings.public; el('settings-chat').checked = value.settings.chat; el('settings-auto').checked = value.settings.autoNext; el('settings-capacity').value = value.settings.capacity; }
     for(const [key,id]of [['public','settings-public'],['chat','settings-chat'],['autoNext','settings-auto']])if(!pendingToggles.has(key))el(id).checked=value.settings[key]===true;
-    void load(value.playback); renderQueue(); renderPeople(); renderConversation(); updateBadge(); sync();
+    void load(value.playback); renderQueue(); renderSearchActions(); renderPeople(); renderConversation(); updateBadge(); sync();
   }
   function updateControls() {
-    el('join').textContent = isController() && state.playback.playing ? 'Пауза для всех' : !isController() && started ? 'Выключить звук у меня' : 'Слушать вместе';
+    const controller = isController();
+    el('join').hidden = controller;
+    el('join').textContent = autoplayBlocked ? 'Разрешить звук здесь' : started ? 'Выключить звук у меня' : 'Слушать вместе';
+    el('host-play').textContent = autoplayBlocked && state?.playback.playing ? 'Разрешить звук здесь' : state?.playback.playing ? 'Пауза у всех' : 'Включить всем';
+    el('host-play').disabled = el('host-next').disabled = selectingTrack || stopped;
+    el('player').parentElement.dataset.autoplayBlocked = String(autoplayBlocked);
     el('join').disabled = el('resync').disabled = stopped || !state?.playback.url;
     el('queue-url').disabled = el('queue-form').querySelector('button').disabled = stopped || !state;
     document.querySelectorAll('[data-reaction]').forEach(button => { button.disabled = stopped || !state; });
@@ -291,8 +339,37 @@
     return publishing;
   }
   async function queue(data) { const value = await call('queue', { ...data, lease, connection }); render(value.room); return value; }
+  async function chooseTrack(track, queueId) {
+    if (selectingTrack || stopped) return false;
+    if (!state?.canControl) throw new Error('Слушатель может предложить песню в общую очередь.');
+    if (!media.mediaUrl(track?.url)) throw new Error('Нужна ссылка SoundCloud или YouTube Music.');
+    selectingTrack = true; selectionCommitted = false; autoplayBlocked = false; lastApplied = performance.now();
+    // Stop local audio without playing the outgoing recording to unlock media.
+    widget?.pause(); updateControls(); renderQueue(); renderSearchActions();
+    try {
+      message(isController() ? 'Готовим выбранный трек…' : state.host ? 'Переносим пульт на это устройство…' : 'Подключаем свободный пульт…');
+      if (publishing) await publishing;
+      if (!isController()) await control({ type: 'claim', connection, force: state.host === true, name: /Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Телефон' : 'Браузер' });
+      if (!isController() || !activeLease()) throw new Error('Не удалось взять пульт. Обнови состояние и повтори выбор.');
+      started = true; appAudioPlaying();
+      let result;
+      if (queueId && nativeHost()) {
+        if (typeof desktop.playQueued !== 'function') throw new Error('Обнови приложение, чтобы включать конкретный трек очереди.');
+        desktopState = await desktop.playQueued(queueId); if (desktopState?.room) render(desktopState.room); result = true;
+      } else if (queueId) {
+        const selected = await control({ type: 'play-queue', id: queueId, connection, lease, sequence: ++sequence });
+        selectionCommitted = true; result = await openTrack(selected.track.url, selected.track, true);
+      } else {
+        selectionCommitted = true; result = await openTrack(track.url, track);
+      }
+      if (result !== false) { message(''); closeRoomSheet(); }
+      return result;
+    } finally {
+      selectingTrack = false; selectionCommitted = false; updateControls(); renderQueue(); renderSearchActions(); sync(true);
+    }
+  }
   function nextTrack(automatic = false) {
-    if (stopped || !isController() || !activeLease()) return Promise.resolve(false);
+    if (stopped || selectingTrack || !isController() || !activeLease()) return Promise.resolve(false);
     const key = playbackKey();
     return advanceGate.run(key, automatic, async () => {
       if (key !== playbackKey() || stopped || !isController() || !activeLease()) return false;
@@ -308,22 +385,23 @@
       return publish({ playing: false, ...(automatic && state.playback.duration > 0 ? { position: state.playback.duration } : {}) });
     }).finally(() => { if (!stopped && isController()) sync(true); });
   }
-  async function openTrack(url, selected = {}) {
+  async function openTrack(url, selected = {}, alreadySelected = false) {
     if (!isController()) throw new Error('Сначала нажми «Вести здесь».');
     url = media.mediaUrl(url); if(!url)throw new Error('Нужна ссылка SoundCloud или YouTube Music.');
-    if(nativeHost()){desktopState=await desktop.play(url);if(desktopState?.room)render(desktopState.room);return;}
-    const sameRecording = loaded === url;
-    if (!await publish({ url, title: selected.title || url.split('/').pop(), artist: selected.artist || '', duration: selected.duration || 0, position: 0, playing: false }) || state.playback.url !== url) return false;
+    requestedPlaybackUrl = url;
+    if(nativeHost()){desktopState=await desktop.play(url);if(desktopState?.room)render(desktopState.room);requestedPlaybackUrl='';return true;}
+    const sameRecording = loaded === url && (ready || health.status === 'error');
+    if (!alreadySelected && !await publish({ url, title: selected.title || url.split('/').pop(), artist: selected.artist || '', duration: selected.duration || 0, position: 0, playing: false }) || state.playback.url !== url) return false;
     if (sameRecording) await load(state.playback, true);
     const token = generation, deadline = performance.now() + 23000;
-    await new Promise((resolve, reject) => { const timer = setInterval(() => { if (token !== generation || stopped || !isController()) { clearInterval(timer); reject(new Error('Трек или ведущий сменился.')); } else if (ready) { clearInterval(timer); resolve(); } else if (health.status === 'error' || performance.now() > deadline) { clearInterval(timer); reject(new Error('SoundCloud не открыл трек. Попробуй загрузить звук ещё раз.')); } }, 100); });
+    await new Promise((resolve, reject) => { const timer = setInterval(() => { if (token !== generation || stopped || !isController()) { clearInterval(timer); reject(new Error('Трек или ведущий сменился.')); } else if (ready) { clearInterval(timer); resolve(); } else if (health.status === 'error' || performance.now() > deadline) { clearInterval(timer); reject(new Error('Источник не открыл трек. Нажми «Повторить» или выбери другую запись.')); } }, 100); });
     return new Promise((resolve, reject) => {
       let complete = false;
       const timer = setTimeout(() => { complete = true; reject(new Error('Источник не подтвердил сведения о треке. Повтори выбор.')); }, 5000);
       widget.getCurrentSound(sound => {
         if (complete) return; complete = true; clearTimeout(timer);
         if (token !== generation || !isController() || !activeLease() || state.playback.url !== url) return resolve(false);
-        resolve(publish({ title: sound?.title || state.playback.title, artist: sound?.user?.username || state.playback.artist || '', duration: (sound?.duration || 0) / 1000 || state.playback.duration, position: 0, playing: true }));
+        resolve(publish({ title: sound?.title || state.playback.title, artist: sound?.user?.username || state.playback.artist || '', duration: (sound?.duration || 0) / 1000 || state.playback.duration, position: 0, playing: true }).then(result => { if (result) requestedPlaybackUrl = ''; return result; }));
       });
     });
   }
@@ -355,14 +433,27 @@
     } finally { busyJoin = false; }
   }
   el('join').onclick = () => {
-    if (isController()) { started = true; if(!state.playback.playing){appAudioPlaying();if(ready)widget?.play();} void publish({ playing: !state.playback.playing }); return; }
-    started = !started; updateControls();
+    if (isController()) { toggleHostPlayback(); return; }
+    started = autoplayBlocked || !started; autoplayBlocked = false; updateControls();
     if(started)appAudioPlaying();
-    if (started && ready && state.playback.playing) { lastApplied = performance.now(); widget.play(); }
+    if (started && ready && state.playback.playing) { lastApplied = performance.now(); playHere(); }
     sync(started); void poll();
   };
-  el('resync').onclick = () => { started = true; appAudioPlaying(); updateControls(); sync(true); };
-  el('retry-player').onclick = () => { if (state && !stopped) void load(state.playback, true); };
+  function toggleHostPlayback() {
+    if (selectingTrack || stopped || !isController()) return;
+    if (state.playback.playing && (autoplayBlocked || !started)) {
+      started = true; autoplayBlocked = false; appAudioPlaying(); playHere(); updateControls(); sync(true); return;
+    }
+    started = true;
+    if (!state.playback.playing) { autoplayBlocked = false; appAudioPlaying(); if (ready) playHere(); }
+    void publish({ playing: !state.playback.playing });
+  }
+  el('resync').onclick = () => { started = true; autoplayBlocked = false; appAudioPlaying(); updateControls(); sync(true); };
+  el('retry-player').onclick = () => {
+    if (!state || stopped) return;
+    if (isController() && requestedPlaybackUrl === state.playback.url) void chooseTrack(state.playback).catch(message);
+    else void load(state.playback, true);
+  };
   el('volume').oninput = () => widget?.setVolume(Number(el('volume').value));
   el('copy-invite').onclick = async () => {
     if (window.LolzCloudSocial) { await window.LolzCloudSocial.open('friends', { roomId: id }); return; }
@@ -371,20 +462,62 @@
     catch { message('Ссылка для приглашения: ' + invite); }
   };
   el('claim-host').onclick = () => control({ type: 'claim', connection, force: state?.host === true, name: 'Браузер' }).catch(message); el('release-host').onclick = () => control({ type: 'release', connection, lease }).then(() => { lease = ''; }).catch(message);
-  el('host-track-form').onsubmit = event => { event.preventDefault(); void openTrack(el('host-track').value.trim()).catch(message); }; el('host-play').onclick = () => { if(!state.playback.playing){started=true;appAudioPlaying();if(ready)widget?.play();}return publish({ playing: !state.playback.playing }); }; el('host-next').onclick = () => nextTrack().catch(message); el('host-seek').onchange = () => seekRoom(el('host-seek').value).catch(message);
+  el('host-track-form').onsubmit = event => { event.preventDefault(); void chooseTrack({ url: el('host-track').value.trim() }).catch(message); }; el('host-play').onclick = toggleHostPlayback; el('host-next').onclick = () => nextTrack().catch(message); el('host-seek').onchange = () => seekRoom(el('host-seek').value).catch(message);
   let searchRevision = 0;
   el('room-search-form').onsubmit = async event => {
-    event.preventDefault();const revision=++searchRevision,query=el('room-search-query').value.trim();el('room-search-status').textContent='Ищем музыку…';
+    event.preventDefault();const revision=++searchRevision,query=el('room-search-query').value.trim();el('room-search-status').dataset.results='false';el('room-search-status').textContent='Ищем музыку…';
     try {
       const result=await request('/api/music/search?q='+encodeURIComponent(query));if(revision!==searchRevision)return;
-      el('room-search-results').replaceChildren();el('room-search-status').textContent=result.tracks.length?'Выбери песню для общей очереди':'Ничего не найдено. Можно вставить ссылку SoundCloud или YouTube.';
-      for(const track of result.tracks){const row=node('article','','room-search-result'),info=node('div','');info.append(node('strong',track.title),node('small',track.artist));row.append(info);
-        if(isController())row.append(button('Включить всем',()=>openTrack(track.url)));
-        row.append(button(isController()?'В очередь':'Предложить',()=>queue({type:'add',track})));el('room-search-results').append(row);
+      searchTracks=(Array.isArray(result.tracks)?result.tracks:[]).filter(track=>media.mediaUrl(track?.url)).slice(0,20);
+      el('room-search-results').replaceChildren();el('room-search-status').dataset.results=String(searchTracks.length>0);el('room-search-status').textContent=searchTracks.length?'':'Ничего не найдено. Можно вставить ссылку SoundCloud или YouTube.';
+      for(const track of searchTracks){const row=node('article','','room-search-result'),info=node('div','');row.dataset.trackUrl=track.url;info.append(node('strong',track.title),node('small',track.artist));row.append(info,node('div','','room-track-actions'));el('room-search-results').append(row);
       }
+      searchActionsSignature='';renderSearchActions();
     } catch(error){if(revision===searchRevision)el('room-search-status').textContent=error.message;}
   };
   el('queue-form').onsubmit = async event => { event.preventDefault(); try { await queue({ type: 'add', track: { url: el('queue-url').value } }); el('queue-url').value = ''; } catch (error) { message(error); } };
+  const roomSheet = el('room-sheet'); let sheetReturnFocus = null;
+  function roomTab(tab, focus = false) {
+    if (!['music', 'queue', 'people'].includes(tab)) tab = 'music';
+    for (const name of ['music', 'queue', 'people']) {
+      const selected = name === tab, button = el('room-tab-' + name);
+      el('room-panel-' + name).hidden = !selected; button.setAttribute('aria-selected', String(selected)); button.tabIndex = selected ? 0 : -1;
+    }
+    if (history.state?.lolzcloudRoomSheet === id) history.replaceState({ ...history.state, tab }, '', location.href);
+    if (focus) el('room-tab-' + tab).focus({ preventScroll: true });
+    return tab;
+  }
+  function openRoomSheet(tab = 'music', fromHistory = false, opener = null) {
+    if (!roomSheet) return;
+    const opening = !roomSheet.open;
+    if (opening) { sheetReturnFocus = opener || document.activeElement; roomSheet.showModal(); }
+    tab = roomTab(tab);
+    if (!fromHistory && history.state?.lolzcloudRoomSheet !== id) history.pushState({ lolzcloudRoomSheet: id, tab }, '', location.href);
+    document.querySelectorAll('[data-room-open]').forEach(button => button.setAttribute('aria-expanded', 'true'));
+    if (opening && !fromHistory) (tab === 'music' ? el('room-search-query') : el('room-tab-' + tab)).focus({ preventScroll: true });
+  }
+  function closeRoomSheet(fromHistory = false) {
+    if (!roomSheet?.open) return;
+    roomSheet.close(); document.querySelectorAll('[data-room-open]').forEach(button => button.setAttribute('aria-expanded', 'false'));
+    if (!fromHistory && history.state?.lolzcloudRoomSheet === id) history.back();
+    if (sheetReturnFocus?.isConnected) sheetReturnFocus.focus({ preventScroll: true });
+  }
+  if (roomSheet) {
+    for (const button of document.querySelectorAll('[data-room-open]')) { button.setAttribute('aria-expanded', 'false'); button.onclick = () => openRoomSheet(button.dataset.roomOpen, false, button); }
+    for (const button of document.querySelectorAll('[data-room-tab]')) {
+      button.onclick = () => roomTab(button.dataset.roomTab);
+      button.onkeydown = event => {
+        const names = ['music', 'queue', 'people'], index = names.indexOf(button.dataset.roomTab);
+        const next = event.key === 'ArrowRight' ? (index + 1) % 3 : event.key === 'ArrowLeft' ? (index + 2) % 3 : event.key === 'Home' ? 0 : event.key === 'End' ? 2 : -1;
+        if (next >= 0) { event.preventDefault(); roomTab(names[next], true); }
+      };
+    }
+    el('room-sheet-close').onclick = () => closeRoomSheet();
+    roomSheet.addEventListener('cancel', event => { event.preventDefault(); closeRoomSheet(); });
+    window.addEventListener('popstate', () => { if (history.state?.lolzcloudRoomSheet === id) openRoomSheet(history.state.tab, true); else closeRoomSheet(true); });
+    const viewportHeight = () => document.documentElement.style.setProperty('--room-viewport-height', (window.visualViewport?.height || innerHeight) + 'px');
+    window.visualViewport?.addEventListener('resize', viewportHeight); window.addEventListener('resize', viewportHeight); viewportHeight();
+  }
   el('chat-form').onsubmit = async event => {
     event.preventDefault(); if (chatSending || !state?.settings.chat) return;
     const input = el('chat-input'), submitted = input.value; if (!submitted.trim()) return;
@@ -410,13 +543,13 @@
   setInterval(() => {
     if (stopped) return;
     updateBadge(); sync();
-    if(isController()&&!nativeHost()&&!started&&ready&&state.playback.playing&&atEnd(target(),0)&&!advanceGate.pending)void finishTrack().catch(message);
-    if (isController() && !nativeHost() && performance.now() - lastHeartbeat > 4000) {
+    if(isController()&&!nativeHost()&&!selectingTrack&&!started&&ready&&state.playback.playing&&atEnd(target(),0)&&!advanceGate.pending)void finishTrack().catch(message);
+    if (isController() && !nativeHost() && (!selectingTrack || selectionCommitted) && performance.now() - lastHeartbeat > 4000) {
       lastHeartbeat = performance.now();
       const token = generation, revision = state.revision;
       // Keep the controller lease alive during a slow source load without
       // sampling the outgoing player's position into the incoming recording.
-      if (advanceGate.pending || !started || !ready || !widget) void publish({});
+      if (selectingTrack || advanceGate.pending || !started || !ready || !widget) void publish({});
       else samplePlayer(position => {
         if (token === generation && revision === state.revision && started && isController() && !advanceGate.pending) void publish({ position: position / 1000 });
       });

@@ -113,6 +113,13 @@ function createPlayerExperience({ app, service, music, wave, lyrics, room, disco
       case 'remote-stop': { const old = remote; remote = null; if (old) await room.request('/api/remotes/' + old.id, { method: 'DELETE' }); break; }
       case 'room-queue': await room.queueAction(action.action); break;
       case 'room-next': await roomNext(action); break;
+      case 'room-play-queue': {
+        if (roomNextBusy) throw new Error('Предыдущая песня ещё открывается.');
+        roomNextBusy = true;
+        try { await room.playQueued(action.id, async track => { stopLocal(); await play(track.url, track); }); }
+        finally { roomNextBusy = false; }
+        break;
+      }
       default: throw new Error('Неизвестное действие плеера.');
     }
     notify(); return null;

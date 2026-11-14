@@ -3,6 +3,7 @@ const { storageAvailable } = require('./secure-storage.cjs');
 const fs = require('node:fs'), path = require('node:path');
 const { writeJson } = require('./durable-json.cjs');
 const { randomUUID } = require('node:crypto');
+const { mediaUrl } = require('../app/lib/js/media-source.js');
 class ListeningRoom {
   constructor(getSnapshot, { filename = null, safeStorage = null, fetcher = fetch, openExternal = async () => {}, onControlLost = () => {}, origin = 'https://lolzcloud.com' } = {}) {
     if (origin !== 'https://lolzcloud.com' && !/^http:\/\/127\.0\.0\.1:\d+$/.test(origin)) throw new Error('Недоверенный сервер комнат.');
@@ -97,7 +98,7 @@ class ListeningRoom {
       await this.request('/api/rooms/' + id + '/control', { method: 'POST', body: { type: 'release', connection: this.connection, lease: result.lease } }).catch(() => {});
       throw new Error('Подключение к комнате отменено.');
     }
-    this.lease = result.lease; this.sequence = 0; this.room = result.room;
+    this.lease = result.lease; this.sequence = 0; this.queueSelection = null; this.room = result.room;
   }
   async attach(url) {
     const id = new URL(url).pathname.split('/')[2], version = this.version;
@@ -108,7 +109,7 @@ class ListeningRoom {
     if (this.room?.id !== id) { await this.release(); if (version !== this.version || this.closed) throw new Error('Подключение к комнате отменено.'); this.room = next; }
     await this.claim();
   }
-  async release() { const lease = this.lease, id = this.room?.id, version = this.version; this.lease = ''; if (id && lease) { const result = await this.request('/api/rooms/' + id + '/control', { method: 'POST', body: { type: 'release', connection: this.connection, lease } }); if (version === this.version && this.room?.id === id && !this.lease) this.room = result.room; } }
+  async release() { const lease = this.lease, id = this.room?.id, version = this.version; this.lease = ''; this.queueSelection = null; if (id && lease) { const result = await this.request('/api/rooms/' + id + '/control', { method: 'POST', body: { type: 'release', connection: this.connection, lease } }); if (version === this.version && this.room?.id === id && !this.lease) this.room = result.room; } }
   observePlayback(value) {
     const previous = this.observed, now = Date.now(), track = value || {};
     const position = Number(track.position) || 0, playing = track.playing === true, expected = previous ? previous.position + (previous.playing ? (now - previous.at) / 1000 : 0) : position;
@@ -120,24 +121,44 @@ class ListeningRoom {
     this.eventPublish = setTimeout(() => { this.eventPublish = null; if (this.closed || !this.room || !this.lease) return; if (this.busy) this.queuePublish(); else void this.tick(); }, 50); this.eventPublish.unref?.();
   }
   async publish() {
-    if (!this.room) return;
-    const id = this.room.id, version = this.version, lease = this.lease, source = this.getSnapshot(), current = source.playback || {};
+    if (!this.room || this.queueSelection) return;
+    const id = this.room.id, version = this.version, lease = this.lease, source = this.getSnapshot();
+    // A provider may still report the previous song while the selected song loads.
+    const current = source.transitioning && source.displayPlayback?.url ? { ...source.displayPlayback, playing: false } : source.playback || {};
     const currentSession = () => version === this.version && this.room?.id === id && this.lease === lease;
     if (this.room.protocol === 2 && !lease) { const next = await this.request('/api/rooms/' + id); if (currentSession()) this.room = next; return; }
     const playback = source.fresh && !source.private ? Object.fromEntries(['url', 'title', 'artist', 'duration', 'position', 'playing', 'rate'].map(key => [key, current[key]])) : {};
     if (playback.url && Math.abs((playback.rate || 1) - 1) > .001) throw new Error('Для общей комнаты верни обычную скорость 1×.');
     let value;
-    try { value = await this.request('/api/rooms/' + id + '/state', { method: 'PUT', body: { fresh: source.fresh === true, private: source.private === true, playback, ...(this.room.protocol === 2 ? { lease: this.lease, connection: this.connection, sequence: ++this.sequence, sampleAgeMs: source.sampledAt ? Math.max(0, Math.min(3000, Date.now() - source.sampledAt)) : 0 } : {}) } }); }
+    const sequence = this.room.protocol === 2 ? ++this.sequence : null;
+    const currentRequest = () => currentSession() && (sequence === null || sequence === this.sequence);
+    try { value = await this.request('/api/rooms/' + id + '/state', { method: 'PUT', body: { fresh: source.fresh === true, private: source.private === true, playback, ...(sequence === null ? {} : { lease, connection: this.connection, sequence, sampleAgeMs: source.sampledAt ? Math.max(0, Math.min(3000, Date.now() - source.sampledAt)) : 0 }) } }); }
     catch (error) {
-      if (!currentSession()) return;
+      if (!currentRequest()) return;
       if (error.status === 409) {
         const next = await this.request('/api/rooms/' + id);
-        if (currentSession()) { this.lease = ''; this.room = next; this.onControlLost(); }
+        if (currentRequest()) { this.lease = ''; this.room = next; this.onControlLost(); }
         return;
       }
       throw error;
     }
-    if (currentSession()) this.room = value;
+    if (currentRequest()) this.room = value;
+  }
+  async playQueued(id, play) {
+    if (!/^[a-f0-9]{24}$/.test(id || '')) throw new Error('Неверная песня в очереди.');
+    if (!this.room || !this.lease) throw new Error('Сначала возьми управление комнатой.');
+    if (this.queueSelection) throw new Error('Предыдущая песня ещё открывается.');
+    const roomId = this.room.id, lease = this.lease, version = this.version;
+    const selection = this.queueSelection = {}, sequence = ++this.sequence;
+    const currentSession = () => version === this.version && this.room?.id === roomId && this.lease === lease;
+    try {
+      const result = await this.request('/api/rooms/' + roomId + '/control', { method: 'POST', body: { type: 'play-queue', id, connection: this.connection, lease, sequence } });
+      if (!currentSession() || sequence !== this.sequence) throw new Error('Подключение к комнате изменилось. Выбери песню ещё раз.');
+      if (result.room?.id !== roomId || !mediaUrl(result.track?.url) || result.room.playback?.url !== result.track.url) throw new Error('Сервер не подтвердил выбранную песню.');
+      this.room = result.room;
+      await play(result.track);
+      return result;
+    } finally { if (this.queueSelection === selection) this.queueSelection = null; }
   }
   async tick() {
     if (this.closed || this.busy) return; this.busy = true;
@@ -184,7 +205,7 @@ class ListeningRoom {
     const room = this.room, lease = this.lease;
     const canClose=close && (!room?.owner || room.owner.id===this.user?.id);
     this.version++; this.wantStart = false; this.pair = null;
-    this.room = null; this.lease = '';
+    this.room = null; this.lease = ''; this.queueSelection = null;
     if (!canClose && room && lease) await this.request('/api/rooms/' + room.id + '/control', { method: 'POST', body: { type: 'release', connection: this.connection, lease } }).catch(() => {});
     if (canClose && room && this.token) await this.request('/api/rooms/' + room.id, { method: 'DELETE' });
   }

@@ -136,7 +136,8 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
     if (!url || event.senderFrame !== event.sender.mainFrame || event.sender.session !== session.fromPartition(ROOM_PARTITION)) throw new Error('Недоверенная комната.');
     const snapshot = () => {
       const hosting = room.getState().url === url && !!room.lease, state = experience.snapshot();
-      return { hosting, connection: hosting ? room.connection : '', playback: hosting && !state.private ? state.playback : null, sampledAt: state.sampledAt || Date.now(), room: hosting ? room.room : null };
+      const playback = state.transitioning && state.displayPlayback?.url ? { ...state.displayPlayback, playing: false } : state.playback;
+      return { hosting, connection: hosting ? room.connection : '', playback: hosting && !state.private ? playback : null, sampledAt: state.sampledAt || Date.now(), room: hosting ? room.room : null };
     };
     if (action?.type === 'state') return snapshot();
     if (action?.type === 'claim') {
@@ -149,6 +150,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
     if (room.getState().url !== url || !room.lease) throw new Error('Управление уже передано другому ведущему.');
     if (action.type === 'release') { await media('pause'); await room.release(); }
     else if (action.type === 'play') await playTrack(action.url);
+    else if (action.type === 'play-queue') await experience.act({ type: 'room-play-queue', id: action.id });
     else if (action.type === 'next') await experience.act({ type: 'room-next', automatic: action.automatic === true, expectedUrl: action.expectedUrl, expectedEpoch: action.expectedEpoch, expectedController: action.expectedController });
     else if (action.type === 'media' && ['play','pause','playPause','seek'].includes(action.command)) {
       const target=Math.max(0,Math.min(14400,Number(action.value)||0)), wanted=action.command==='playPause'?!service.playback.playing:action.command==='play';

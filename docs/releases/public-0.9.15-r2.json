@@ -1,0 +1,218 @@
+{
+  "revision": "0.9.15-r2",
+  "checkedAt": "2026-11-14T18:07:04.377646+00:00",
+  "sourceCommit": "e2c0212b3eb209b777a2477261ca4a4043340b1d",
+  "published": true,
+  "website": "https://lolzcloud.com/#download",
+  "webServiceVersion": "0.9.17",
+  "iosNative": {
+    "version": "0.1.1",
+    "build": 2,
+    "status": "unsigned-sdk-build",
+    "source": {
+      "name": "LolzCloud-iOS-0.1.1-source.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.1-source.zip",
+      "size": 74894,
+      "sha256": "1407903af7cdb7bcf7579b9ca33a28232c2068dfef1fb96cfccdfca3cda2c1e4"
+    },
+    "unsignedIPA": {
+      "name": "LolzCloud-iOS-0.1.1-unsigned.ipa",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.1-unsigned.ipa",
+      "size": 218523,
+      "sha256": "6a3d7b4d36e328aa3a961c63b43fd4453f7a678655235c23e25fc0744e0c479e"
+    },
+    "simulator": {
+      "name": "LolzCloud-iOS-0.1.1-simulator.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.1-simulator.zip",
+      "size": 826608,
+      "sha256": "e664f211324bc6abee7bbe7ddac4aaf779899a293ce7243d5d14c16aeb8f40a6"
+    },
+    "appleSDKBuild": true,
+    "deviceTest": false,
+    "signedIPA": false,
+    "compiledCommit": "4def8a9f69c612f7a319f47830bb66d1e8f007b1",
+    "verification": "https://github.com/Artemper52/LolzCloud/actions/runs/43617605003"
+  },
+  "github": {
+    "tag": "v0.9.15",
+    "releaseId": 445467528,
+    "latest": true,
+    "url": "https://github.com/Artemper52/LolzCloud/releases/tag/v0.9.15",
+    "checkedAt": "2026-11-14T17:46:52.7263260Z",
+    "draft": false,
+    "files": [
+      {
+        "name": "android-update.json",
+        "size": 438,
+        "sha256": "cba16c1e9525feea7cf1aef5ef85f0ad507ffaebf9dd26610cc8e6d65ea66a1f",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/android-update.json",
+        "digestVerified": true
+      },
+      {
+        "name": "latest.yml",
+        "size": 366,
+        "sha256": "6a04a0bc430395b4656b6a898cac7eaec4dab6a190c43fadfbeccf70ff15ae34",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/latest.yml",
+        "digestVerified": true
+      },
+      {
+        "name": "legacy.yml",
+        "size": 373,
+        "sha256": "19ac90c93a8f0ef322c367ed983f4dc7c4102e9f78fc1aa7de8cf5a79fa519ed",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/legacy.yml",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-0.9.15-linux-arm64.tar.gz",
+        "size": 159401586,
+        "sha256": "d87f345e78e3892ad8392bb1ce36f15c4d887e6ab60cc97d1c6053e9cee3a4ba",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-0.9.15-linux-arm64.tar.gz",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-0.9.15-linux-x64.AppImage",
+        "size": 147454456,
+        "sha256": "ab81a437bc6fe8960268efee47ab2b8e213fbee5d6549a9998e44c528824a4e4",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-0.9.15-linux-x64.AppImage",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-0.9.15-linux-x64.tar.gz",
+        "size": 160305565,
+        "sha256": "c64f12d871e8b88c9c74d4a5577dab20ec6f5c69c39a8fea9e973422c3104a1c",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-0.9.15-linux-x64.tar.gz",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-0.9.15-r2-source.zip",
+        "size": 21599535,
+        "sha256": "de0c473fb2876b21a07cd075a979dc9bff39bdb0c9988ace6136b43860c64dcb",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-0.9.15-r2-source.zip",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-0.9.15-win-x64-Setup.exe",
+        "size": 146389460,
+        "sha256": "41cdd42420c0207f515dabb9ccde7813c1ed1612e983bfb571230316f863cf7d",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-0.9.15-win-x64-Setup.exe",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-0.9.15-win-x64-Setup.exe.blockmap",
+        "size": 152641,
+        "sha256": "c2684b557843cb2e1f04659bea563911d26ce57697de0de3a8674e4fe0968c41",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-0.9.15-win-x64-Setup.exe.blockmap",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-0.9.15-win-x64.zip",
+        "size": 196662170,
+        "sha256": "94319eedd7efe0892d00e1d8e73f4252f7f7074e2194da23c08dd12b5193aacb",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-0.9.15-win-x64.zip",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-0.9.15-win7-legacy-Setup.exe",
+        "size": 99534477,
+        "sha256": "b771c74e62da42495c07e38def2d2dd152f72b68cde9202823ec800a15eb513c",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-0.9.15-win7-legacy-Setup.exe",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-0.9.15-win7-legacy-Setup.exe.blockmap",
+        "size": 105130,
+        "sha256": "e24a84daebec8cf47ca53e6c12f95dae9a6e79baf5e46c0acbae606b308b651f",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-0.9.15-win7-legacy-Setup.exe.blockmap",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-0.9.15-win7-legacy-x64.zip",
+        "size": 134379244,
+        "sha256": "93df017ac1a84d32884c8276ff8c283b68a584bfab03f4b8fc52e8097db5dd4c",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-0.9.15-win7-legacy-x64.zip",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-Android-0.1.5.apk",
+        "size": 2520432,
+        "sha256": "ee61577bcf8b45650fad41a76715d3b532012cc949289a61dbb2adfc41db72d0",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-Android-0.1.5.apk",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-iOS-0.1.1-simulator.zip",
+        "size": 826608,
+        "sha256": "e664f211324bc6abee7bbe7ddac4aaf779899a293ce7243d5d14c16aeb8f40a6",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-iOS-0.1.1-simulator.zip",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-iOS-0.1.1-source.zip",
+        "size": 74894,
+        "sha256": "1407903af7cdb7bcf7579b9ca33a28232c2068dfef1fb96cfccdfca3cda2c1e4",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-iOS-0.1.1-source.zip",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-iOS-0.1.1-unsigned.ipa",
+        "size": 218523,
+        "sha256": "6a3d7b4d36e328aa3a961c63b43fd4453f7a678655235c23e25fc0744e0c479e",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-iOS-0.1.1-unsigned.ipa",
+        "digestVerified": true
+      },
+      {
+        "name": "update-legacy.json",
+        "size": 588,
+        "sha256": "933b249b3eccf20fc04eb6c0d85e292cc11f8677e26a45a0290c86f83acc79fe",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/update-legacy.json",
+        "digestVerified": true
+      },
+      {
+        "name": "update.json",
+        "size": 565,
+        "sha256": "e764fb268105cc1cad66c8aa51d7153e78cc7b57f51aaf705bfbba5aa9398d62",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/update.json",
+        "digestVerified": true
+      },
+      {
+        "name": "LolzCloud-0.9.15-SHA256SUMS.txt",
+        "size": 1822,
+        "sha256": "7732962ee5a143ee02ad46dd4001e7a56de6170ef9631e5c0f025d7903e58376",
+        "url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.15/LolzCloud-0.9.15-SHA256SUMS.txt",
+        "digestVerified": true
+      }
+    ],
+    "workflow": "https://github.com/Artemper52/LolzCloud/actions/runs/43622324105"
+  },
+  "publicNewDownloadChecks": {
+    "checkedAt": "2026-11-14T17:25:15.2025455Z",
+    "files": [
+      {
+        "name": "LolzCloud-0.9.15-r2-source.zip",
+        "size": 21599535,
+        "sha256": "de0c473fb2876b21a07cd075a979dc9bff39bdb0c9988ace6136b43860c64dcb",
+        "verified": true
+      },
+      {
+        "name": "LolzCloud-iOS-0.1.1-source.zip",
+        "size": 74894,
+        "sha256": "1407903af7cdb7bcf7579b9ca33a28232c2068dfef1fb96cfccdfca3cda2c1e4",
+        "verified": true
+      },
+      {
+        "name": "LolzCloud-iOS-0.1.1-unsigned.ipa",
+        "size": 218523,
+        "sha256": "6a3d7b4d36e328aa3a961c63b43fd4453f7a678655235c23e25fc0744e0c479e",
+        "verified": true
+      },
+      {
+        "name": "LolzCloud-iOS-0.1.1-simulator.zip",
+        "size": 826608,
+        "sha256": "e664f211324bc6abee7bbe7ddac4aaf779899a293ce7243d5d14c16aeb8f40a6",
+        "verified": true
+      }
+    ],
+    "websiteNativeLinksVerified": true,
+    "networkAttempts": []
+  }
+}

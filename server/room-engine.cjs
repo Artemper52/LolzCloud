@@ -45,6 +45,23 @@ class RoomEngine {
       this.changed(id); return { room: this.store.viewRoom(room, user), lease: room.controller.secret };
     }
     if (value.type === 'release') { const controller = this.requireLease(room, user, value); room.playback.position = positionAt(room.playback, room.updatedAt, this.store.now()); room.playback.playing = false; room.updatedAt = this.store.now(); controller.expires = 0; room.revision++; this.changed(id); return { room: this.store.viewRoom(room, user) }; }
+    if (value.type === 'play-queue') {
+      if (!this.canControl(room, user)) throw new HttpError(403, 'Включить трек может владелец или назначенный диджей.');
+      const controller = this.requireLease(room, user, value);
+      if (!Number.isSafeInteger(value.sequence) || value.sequence <= controller.sequence) throw new HttpError(409, 'Состояние пульта изменилось. Повтори выбор трека.');
+      const position = typeof value.id === 'string' && /^[a-f0-9]{24}$/.test(value.id) ? (room.queue || []).findIndex(row => row.id === value.id) : -1;
+      if (position < 0) throw new HttpError(404, 'Эта запись уже убрана из очереди. Выбери другую.');
+      const selected = room.queue[position], next = playback({ fresh: true, playback: { ...selected.track, position: 0, playing: false, rate: 1 } });
+      if (!next.url) throw new HttpError(422, 'Источник записи в очереди недоступен.');
+      if (room.playback.url && room.playback.url !== next.url) room.history.push({ ...room.playback, at: this.store.now() });
+      room.history = room.history.slice(-30);
+      // One synchronous commit: subscribers never see the selected entry removed
+      // while the old recording is still current. IDs distinguish equal URLs.
+      room.playback = next; room.queue.splice(position, 1); room.updatedAt = this.store.now();
+      controller.sequence = value.sequence; controller.expires = this.store.now() + LEASE_MS;
+      room.revision++; this.changed(id);
+      return { room: this.store.viewRoom(room, user), track: next };
+    }
     if (room.owner.id !== user.id) throw new HttpError(403, 'Настройки меняет владелец комнаты.');
     if (value.type === 'settings') { const settings = value.settings || {}; room.settings = { ...room.settings, ...(typeof settings.name === 'string' ? { name: clean(settings.name, 80) || 'Музыка вместе' } : {}), ...(typeof settings.description === 'string' ? { description: clean(settings.description, 240) } : {}) }; for (const key of ['public', 'autoNext', 'chat']) if (typeof settings[key] === 'boolean') room.settings[key] = settings[key]; if (Number.isInteger(settings.capacity)) room.settings.capacity = Math.max(2, Math.min(200, settings.capacity)); }
     else if (value.type === 'role') { const target = Number(value.userId); if (!Number.isSafeInteger(target) || target === room.owner.id || ![...room.members.values()].some(row => row.user.id === target)) throw new HttpError(400, 'Выбери участника комнаты.'); if (!['dj', 'listener'].includes(value.role)) throw new HttpError(400, 'Неизвестная роль.'); room.roles.set(target, value.role); if (room.controller?.user.id === target && value.role !== 'dj') room.controller.expires = 0; }

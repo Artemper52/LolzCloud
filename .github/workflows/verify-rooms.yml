@@ -1,0 +1,43 @@
+name: Verify room playback and mobile controls
+'on':
+  push:
+    branches: ['codex/recover-rooms-0.9.16']
+    paths-ignore: ['docs/**', 'README.md']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: verify-rooms-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  rooms:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify release ancestry and version
+        run: |
+          set -eu
+          test "$GITHUB_REF" = refs/heads/codex/recover-rooms-0.9.16
+          git merge-base --is-ancestor 98f046de60ff34d310bb5fbfda7d22f511bd250c HEAD
+          test "$(node -p 'require("./package.json").version')" = 0.9.16
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - name: Exercise phone and desktop room controls with real HTTP and SSE
+        env:
+          LOLZCLOUD_ROOMS_TEST_OUTPUT: ${{ runner.temp }}/room-mobile
+        run: xvfb-run -a node tools/test-rooms-mobile-ui.cjs
+      - name: Save room test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: LolzCloud-room-controls-${{ github.run_id }}
+          path: ${{ runner.temp }}/room-mobile
+          if-no-files-found: warn

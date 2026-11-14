@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-11-14T18:28:53.650Z",
+  "productSourceFrozen": true,
+  "sourceSha256": {
+    "server/public/room.js": "1bbaf4f4580e43c00a731efbc9dd1dc6c3cf57a1a570c50a30a3852d23fb4e08",
+    "server/public/room.html": "a195898b4526c70d68f8b2627d61ba98902daefb7472ad3cf990cc2cc9807af1",
+    "server/public/room.css": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340",
+    "server/room-engine.cjs": "0cad6c58218f3d5cc27bc2722f0db6e475063e98fd20cb81207828876a673ec8",
+    "android/app/src/main/java/com/lolzcloud/mobile/OnlineActivity.java": "d0942f47db0bfdf81cfee2842d4ebacb715150400e7d869805e20eabd4153e81"
+  },
+  "mobileBrowser": {
+    "status": "passed",
+    "checks": 22,
+    "widths": [
+      360,
+      420,
+      1366
+    ],
+    "report": "rooms-mobile-results.json"
+  },
+  "layoutBrowser": {
+    "status": "passed",
+    "checks": 24,
+    "report": "room-layout-results.json"
+  },
+  "sharedPlaybackRegression": {
+    "status": "passed",
+    "scenarios": 12,
+    "report": "rooms-ui-results.json"
+  },
+  "newNodeAndHttp": {
+    "status": "passed",
+    "tests": 7,
+    "command": "node --test tests/room-mobile.test.cjs"
+  },
+  "existingEngine": {
+    "status": "passed",
+    "tests": 7,
+    "command": "node --test tests/room-engine.test.cjs"
+  },
+  "androidWebView": {
+    "status": "pending",
+    "note": "Actual cross-origin media regression will run on the coordinator-built new APK; no production APK rebuilt by this task."
+  },
+  "scope": "Real isolated Chromium DOM/mouse, HTTP/SSE, sessions/roles/lease/queue APIs. Music search and SC/YT SDK are declared deterministic fixtures. No physical iOS/Android or real external-provider media is claimed by these browser suites."
+}

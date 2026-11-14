@@ -16,4 +16,5 @@
     <instrumentation android:name="com.lolzcloud.mobile.test.LoginInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
     <instrumentation android:name="com.lolzcloud.mobile.test.CatalogInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
     <instrumentation android:name="com.lolzcloud.mobile.test.LyricsInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
+    <instrumentation android:name="com.lolzcloud.mobile.test.RoomMediaInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
 </manifest>

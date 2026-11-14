@@ -180,7 +180,9 @@ public final class OnlineActivity extends Activity {
         settings.setAllowUniversalAccessFromFileURLs(false);
         settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         settings.setSafeBrowsingEnabled(true);
-        settings.setMediaPlaybackRequiresUserGesture(true);
+        // Room playback is explicitly enabled by Join/Play in the shared UI.
+        // Its claim/SDK/next requests finish after transient touch activation.
+        settings.setMediaPlaybackRequiresUserGesture(!SocialPolicy.roomPage(initialUrl));
         settings.setJavaScriptCanOpenWindowsAutomatically(false);
         settings.setSupportMultipleWindows(false);
         CookieManager.getInstance().setAcceptCookie(true);
@@ -214,6 +216,7 @@ public final class OnlineActivity extends Activity {
             }
 
             @Override public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
+                view.getSettings().setMediaPlaybackRequiresUserGesture(!SocialPolicy.roomPage(url));
                 if (imageCallback != null && !sameDocument(imagePage, url)) cancelImageChooser();
                 if (AccountPolicy.loginNavigation(url)) { view.stopLoading(); requestAccountLogin(url, false); return; }
                 if (AccountPolicy.provider(url)) { view.stopLoading(); openBrowser(url); return; }

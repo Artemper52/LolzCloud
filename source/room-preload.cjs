@@ -19,7 +19,7 @@ if (location.origin === 'https://lolzcloud.com' && /^\/room\/[a-f0-9]{32}\/?$/.t
   const call = (type, data = {}) => ipcRenderer.invoke('rooms:desktop', { type, ...data });
   contextBridge.exposeInMainWorld('LolzCloudDesktopRoom', {
     state: () => call('state'), claim: () => call('claim'), release: () => call('release'),
-    play: url => call('play', { url }), media: (command,value) => call('media',{command,value}), next: input => call('next', { automatic: input?.automatic === true, expectedUrl: input?.expectedUrl, expectedEpoch: input?.expectedEpoch, expectedController: input?.expectedController }),
+    play: url => call('play', { url }), playQueued: id => call('play-queue', { id }), media: (command,value) => call('media',{command,value}), next: input => call('next', { automatic: input?.automatic === true, expectedUrl: input?.expectedUrl, expectedEpoch: input?.expectedEpoch, expectedController: input?.expectedController }),
     listen: playback => ipcRenderer.send('rooms:playback',playback),
   });
 }

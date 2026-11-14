@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
   <meta name="theme-color" content="#111813">
   <title>Слушаем вместе · LolzCloud</title>
   <link rel="stylesheet" href="/cloud/room.css">
@@ -16,10 +16,9 @@
 </head>
 <body data-page="room" class="room-shell">
   <header>
-    <a class="brand" href="/rooms"><img src="/assets/logo.svg" width="37" height="37" alt="">LolzCloud</a>
-    <a class="room-back" href="/rooms">Все комнаты</a>
+    <a class="brand" href="/rooms" aria-label="LolzCloud — комнаты"><img src="/assets/logo.svg" width="37" height="37" alt=""><span>LolzCloud</span></a>
+    <a class="room-back" href="/rooms">Комнаты</a>
     <div id="account"></div>
-    <button id="logout" hidden>Выйти</button>
   </header>
   <main class="room-layout">
     <article class="stage">
@@ -27,7 +26,6 @@
         <div><span class="eyebrow">СЛУШАЕМ ВМЕСТЕ</span><h1 id="room-name">Комната LolzCloud</h1></div>
         <span id="connection-status" class="sync-badge" role="status">Подключаемся</span>
       </div>
-      <p id="room-description"></p>
       <div class="stage-track">
         <div class="stage-art" aria-hidden="true">
           <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M5 14v4m5-8v12m6-17v22m6-18v14m5-9v4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
@@ -39,55 +37,61 @@
         <iframe id="player" title="Плеер комнаты" allow="autoplay; encrypted-media; fullscreen" referrerpolicy="strict-origin-when-cross-origin"></iframe>
         <div id="empty-player"><p id="player-placeholder">Ведущий скоро включит музыку</p><button id="retry-player" class="button" hidden>Повторить</button></div>
       </div>
-      <div class="listening-controls">
+      <div id="host-controls" class="host-transport" hidden>
+        <div class="transport-buttons"><button id="host-play" class="button primary">Включить всем</button><button id="host-next" class="button" aria-label="Следующий трек у всех">Далее</button></div>
+        <label class="host-position">Позиция у всех<input id="host-seek" type="range" min="0" max="1" value="0" step="1" aria-label="Позиция трека у всех"></label>
+      </div>
+      <div class="listening-controls room-actions">
         <button id="join" class="button primary" disabled>Слушать вместе</button>
-        <button id="resync" class="button" disabled>Выровнять со всеми</button>
-        <button id="copy-invite" class="button">Пригласить</button>
-        <label class="local-volume">Громкость <input id="volume" type="range" min="0" max="100" value="80" aria-label="Моя громкость"></label>
+        <button id="open-music" class="button" data-room-open="music" aria-haspopup="dialog" aria-controls="room-sheet">Музыка</button>
+        <button id="open-queue" class="button" data-room-open="queue" aria-haspopup="dialog" aria-controls="room-sheet">Очередь <span id="queue-count"></span></button>
+        <button id="copy-invite" class="button invite-button" aria-label="Пригласить в комнату" title="Пригласить в комнату"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20v-2a6 6 0 0 1 12 0v2M19 8v6m-3-3h6"/></svg></button>
       </div>
       <p id="room-status" role="status"></p>
       <p id="status" role="status"></p>
     </article>
     <aside class="room-social">
       <section class="people chat-panel">
-        <div class="people-heading"><h2>Чат</h2></div>
+        <div class="people-heading"><h2>Чат комнаты</h2><button id="open-people" class="button people-shortcut" data-room-open="people" aria-haspopup="dialog" aria-controls="room-sheet">Участники <span id="people-count">0</span></button></div>
         <button id="chat-unread" class="chat-unread" hidden>Новые сообщения ↓</button>
         <div id="chat-messages" role="log" aria-label="Сообщения комнаты" aria-live="polite" aria-relevant="additions"></div>
         <div id="reactions" aria-live="polite"></div>
-        <div class="reaction-buttons" aria-label="Реакции">
-          <button data-reaction="🔥" aria-label="Огонь">🔥</button><button data-reaction="❤️" aria-label="Сердце">❤️</button><button data-reaction="👏" aria-label="Аплодисменты">👏</button><button data-reaction="🎵" aria-label="Музыка">🎵</button><button data-reaction="💀" aria-label="Череп">💀</button><button data-reaction="✨" aria-label="Искры">✨</button>
-        </div>
-        <form id="chat-form">
-          <input id="chat-input" maxlength="400" placeholder="Написать в комнату…" aria-label="Сообщение в комнату" required disabled>
-          <button class="button" disabled>Отправить</button>
-        </form>
-      </section>
-      <details class="people listeners" open>
-        <summary class="people-heading"><span>Участники</span><span id="people-count">0</span></summary>
-        <div id="participants"></div>
-      </details>
-    </aside>
-    <div class="room-tools">
-      <section class="host-panel">
-        <div class="section-title"><h2>Пульт ведущего</h2><button id="claim-host" class="button" hidden>Вести здесь</button><button id="release-host" class="button" hidden>Передать пульт</button></div>
-        <p id="controller-info">Управляй комнатой из приложения или браузера.</p>
-        <div id="host-controls" hidden>
-          <form id="host-track-form">
-            <label>Ссылка на трек<input id="host-track" type="url" required placeholder="SoundCloud или YouTube Music"></label>
-            <button class="button">Включить всем</button>
+        <div class="chat-composer">
+          <details class="chat-reactions"><summary aria-label="Выбрать реакцию" title="Реакции"><svg aria-hidden="true" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M8 14a4.5 4.5 0 0 0 8 0M8 9h.01M16 9h.01"/></svg></summary><div class="reaction-buttons" aria-label="Реакции"><button data-reaction="🔥" aria-label="Огонь">🔥</button><button data-reaction="❤️" aria-label="Сердце">❤️</button><button data-reaction="👏" aria-label="Аплодисменты">👏</button><button data-reaction="🎵" aria-label="Музыка">🎵</button><button data-reaction="💀" aria-label="Череп">💀</button><button data-reaction="✨" aria-label="Искры">✨</button></div></details>
+          <form id="chat-form">
+            <input id="chat-input" maxlength="400" placeholder="Сообщение…" aria-label="Сообщение в комнату" enterkeyhint="send" autocomplete="off" required disabled>
+            <button class="button" aria-label="Отправить сообщение" disabled>Отправить</button>
           </form>
-          <div class="listening-controls"><button id="host-play" class="button primary">Пуск / пауза у всех</button><button id="host-next" class="button">Следующий трек</button></div>
-          <label>Перемотать у всех<input id="host-seek" type="range" min="0" max="1" value="0" step="1"></label>
         </div>
       </section>
-      <section>
-        <div class="section-title"><h2>Общая очередь</h2><span id="queue-count"></span></div>
-        <form id="room-search-form"><input id="room-search-query" type="search" minlength="2" maxlength="120" required placeholder="Название песни или исполнитель" aria-label="Поиск музыки для комнаты"><button class="button">Найти</button></form><p id="room-search-status" role="status"></p><div id="room-search-results"></div><form id="queue-form">
-          <input id="queue-url" type="url" required placeholder="Ссылка SoundCloud или YouTube Music" aria-label="Ссылка на песню для очереди" disabled>
-          <button class="button" disabled>Предложить</button>
-        </form>
-        <div id="queue-list" class="queue-list"></div>
+    </aside>
+  </main>
+  <dialog id="room-sheet" class="room-sheet" aria-labelledby="room-sheet-title">
+    <div class="room-sheet-heading"><h2 id="room-sheet-title">Музыка и комната</h2><button id="room-sheet-close" class="button" aria-label="Закрыть и вернуться в комнату">Закрыть</button></div>
+    <div class="room-sheet-tabs" role="tablist" aria-label="В комнате">
+      <button id="room-tab-music" data-room-tab="music" role="tab" aria-controls="room-panel-music" aria-selected="true">Музыка</button>
+      <button id="room-tab-queue" data-room-tab="queue" role="tab" aria-controls="room-panel-queue" aria-selected="false" tabindex="-1">Очередь</button>
+      <button id="room-tab-people" data-room-tab="people" role="tab" aria-controls="room-panel-people" aria-selected="false" tabindex="-1">Комната</button>
+    </div>
+    <p id="room-sheet-status" role="status" aria-live="polite"></p>
+    <div class="room-sheet-body room-tools">
+      <section id="room-panel-music" class="room-sheet-panel" role="tabpanel" aria-labelledby="room-tab-music">
+        <h3>Выбери музыку</h3>
+        <form id="room-search-form"><input id="room-search-query" type="search" minlength="2" maxlength="120" required placeholder="Песня или исполнитель" aria-label="Поиск музыки для комнаты" enterkeyhint="search" autocomplete="off"><button class="button primary">Найти</button></form>
+        <p id="room-search-status" role="status"></p><div id="room-search-results"></div>
+        <details class="track-link"><summary>Добавить по ссылке</summary><form id="queue-form"><input id="queue-url" type="url" required placeholder="SoundCloud или YouTube Music" aria-label="Ссылка на песню для очереди" inputmode="url" disabled><button class="button" disabled>В очередь</button></form><form id="host-track-form" hidden><label>Для ведущего<input id="host-track" type="url" required placeholder="SoundCloud или YouTube Music" aria-label="Ссылка на песню для всех" inputmode="url"></label><button class="button">Включить сейчас</button></form></details>
       </section>
+      <section id="room-panel-queue" class="room-sheet-panel" role="tabpanel" aria-labelledby="room-tab-queue" hidden>
+        <h3>Общая очередь</h3><div id="queue-list" class="queue-list"></div>
+      </section>
+      <section id="room-panel-people" class="room-sheet-panel" role="tabpanel" aria-labelledby="room-tab-people" hidden>
+        <p id="room-description"></p>
+        <h3>Участники</h3><div id="participants"></div>
+      <section class="host-panel">
+        <div class="section-title"><h3>Управление музыкой</h3><button id="claim-host" class="button" hidden>Вести здесь</button><button id="release-host" class="button" hidden>Передать пульт</button></div>
+        <p id="controller-info">Управляй комнатой из приложения или браузера.</p>
+      </section>
+      <div class="personal-listening"><button id="resync" class="button" disabled>Выровнять со всеми</button><label class="local-volume">Моя громкость <input id="volume" type="range" min="0" max="100" value="80" aria-label="Моя громкость"></label></div>
       <details id="room-settings" hidden>
         <summary>Настройки комнаты</summary>
         <form id="settings-form">
@@ -101,8 +105,10 @@
         </form>
       </details>
       <details><summary>Что звучало</summary><div id="room-history"></div></details>
+      <button id="logout" class="button account-signout" hidden>Выйти из аккаунта</button>
+      </section>
     </div>
-  </main>
+  </dialog>
   <footer>SoundCloud и YouTube Music · Общий трек и позиция · Скорость 1×</footer>
 </body>
 </html>
