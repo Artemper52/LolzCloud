@@ -111,10 +111,10 @@ jobs:
               fs.chmodSync(destination, 0o400); return { size: bytes, sha256: actual };
             } finally { clearTimeout(deadline); signal.removeEventListener('abort', abort); }
           }
-          async function api(endpoint) {
+          async function api(endpoint, signal) {
             ensure(endpoint.startsWith('/repos/' + REPOSITORY + '/'), 'API endpoint escaped the fixed repository');
             return new Promise((resolve, reject) => {
-              const request = https.get({ hostname: 'api.github.com', path: endpoint, headers: { Authorization: 'Bearer ' + process.env.GH_TOKEN, Accept: 'application/vnd.github+json', 'User-Agent': USER_AGENT, 'X-GitHub-Api-Version': '2022-11-28' } }, response => {
+              const request = https.get({ hostname: 'api.github.com', path: endpoint, signal, headers: { Authorization: 'Bearer ' + process.env.GH_TOKEN, Accept: 'application/vnd.github+json', 'User-Agent': USER_AGENT, 'X-GitHub-Api-Version': '2022-11-28', 'Cache-Control': 'no-cache', Pragma: 'no-cache' } }, response => {
                 if (![200,404].includes(response.statusCode) || response.headers.location) { response.destroy(); reject(new Error('GitHub read API HTTP ' + response.statusCode)); return; }
                 let bytes = 0; const parts = [];
                 response.on('data', chunk => { bytes += chunk.length; if (bytes > 2_000_000) { response.destroy(new Error('GitHub API response exceeded its limit')); return; } parts.push(chunk); });
@@ -150,21 +150,35 @@ jobs:
             if (previous) ensure(previous.refSha === refSha && previous.commit === object.sha, 'Tag changed during verification');
             return { refSha, commit: object.sha };
           }
-          async function findRelease(tag) {
+          async function waitForRead(label, read, ready) {
+            const controller = new AbortController(), deadline = Date.now() + 90_000;
+            const timer = setTimeout(() => controller.abort(), 90_000);
+            try {
+              for (let attempt = 0; attempt <= 90; attempt++) {
+                ensure(!controller.signal.aborted, label + ' was not visible within 90 seconds');
+                const value = await read(controller.signal); if (ready(value)) return value;
+                const remaining = deadline - Date.now();
+                ensure(remaining > 0 && attempt < 90, label + ' was not visible within 90 seconds');
+                await new Promise(resolve => setTimeout(resolve, Math.min(1000, remaining)));
+              }
+            } catch (error) { if (controller.signal.aborted) throw new Error(label + ' was not visible within 90 seconds'); throw error; }
+            finally { clearTimeout(timer); }
+          }
+          async function findRelease(tag, signal) {
             const found = [];
             // Listing also discovers authenticated draft releases, unlike relying
             // on published-release-by-tag behavior alone.
             for (let page = 1; page <= 5; page++) {
-              const response = await api('/repos/' + REPOSITORY + '/releases?per_page=100&page=' + page);
+              const response = await api('/repos/' + REPOSITORY + '/releases?per_page=100&page=' + page, signal);
               ensure(response.status === 200 && Array.isArray(response.value), 'Cannot list releases');
               found.push(...response.value.filter(release => release.tag_name === tag));
               if (response.value.length < 100) { ensure(found.length <= 1, 'Multiple releases use this tag'); return found[0] || null; }
             }
             throw new Error('Release enumeration exceeded 500 releases; refusing an ambiguous create');
           }
-          async function assetsFor(release, plan) {
+          async function assetsFor(release, plan, signal) {
             ensure(Number.isSafeInteger(release.id) && release.id > 0 && release.tag_name === plan.tag && !release.prerelease, 'Unexpected release identity/type');
-            const response = await api('/repos/' + REPOSITORY + '/releases/' + release.id + '/assets?per_page=100');
+            const response = await api('/repos/' + REPOSITORY + '/releases/' + release.id + '/assets?per_page=100', signal);
             ensure(response.status === 200 && Array.isArray(response.value) && response.value.length <= MAX_FILES, 'Invalid or excessive release assets');
             const expected = new Map(plan.files.map(file => [file.name, file])), seen = new Set();
             for (const asset of response.value) {
@@ -248,12 +262,18 @@ jobs:
                 report.stage = 'create-draft-after-all-hashes'; save();
                 const notes = path.join(root, 'release-notes.md'); fs.writeFileSync(notes, plan.notes, 'utf8');
                 await gh(['release','create',plan.tag,'--repo',REPOSITORY,'--verify-tag','--draft','--latest=false','--title','LolzCloud 0.9.15','--notes-file',notes]);
-                release = await findRelease(plan.tag); ensure(release && release.draft, 'Created draft is not discoverable'); report.mutations.push({ action: 'created-draft', releaseId: release.id }); save();
+                const createdDraft = { action: 'created-draft', tag: plan.tag }; report.mutations.push(createdDraft); save();
+                release = await waitForRead('Created draft', signal => findRelease(plan.tag, signal), found => {
+                  if (!found) return false;
+                  ensure(Number.isSafeInteger(found.id) && found.id > 0 && found.draft && !found.prerelease, 'Created release identity/type conflict'); return true;
+                }); createdDraft.releaseId = release.id; save();
               }
               const releaseId = release.id;
               async function confirmReleaseIdentity() {
-                const found = await findRelease(plan.tag); ensure(found?.id === releaseId, 'Release identity changed before a write');
-                ensure(!found.prerelease, 'Release changed to prerelease'); return found;
+                return waitForRead('Known release', signal => findRelease(plan.tag, signal), found => {
+                  if (!found) return false;
+                  ensure(found.id === releaseId, 'Release identity changed before a write'); ensure(!found.prerelease, 'Release changed to prerelease'); return true;
+                });
               }
               for (const file of plan.files) {
                 release = await confirmReleaseIdentity(); existing = await assetsFor(release, plan); await verifyExisting(existing);
@@ -264,14 +284,21 @@ jobs:
                 await gh(['release','upload',plan.tag,path.join(source,file.name),'--repo',REPOSITORY]); report.mutations.push({ action: 'uploaded-missing-asset', name: file.name }); save();
               }
               report.stage = 'verify-final-github-asset-set'; save();
-              const current = await findRelease(plan.tag); ensure(current?.id === releaseId, 'Release identity changed'); release = current;
-              existing = await assetsFor(release, plan); ensure(existing.length === plan.files.length, 'Final asset set is incomplete'); await verifyExisting(existing);
+              const final = await waitForRead('Complete GitHub asset set', async signal => {
+                const found = await findRelease(plan.tag, signal); if (!found) return null;
+                ensure(found.id === releaseId, 'Release identity changed'); return { release: found, assets: await assetsFor(found, plan, signal) };
+              }, value => !!value && value.assets.length === plan.files.length);
+              release = final.release; existing = final.assets; await verifyExisting(existing);
               ensure(checked.size === plan.files.length, 'Not every GitHub asset has actual verified bytes'); await verifyTag(plan, tag);
               await confirmReleaseIdentity();
               report.stage = 'publish-and-mark-latest'; save();
               await gh(['release','edit',plan.tag,'--repo',REPOSITORY,'--draft=false','--latest']); report.mutations.push({ action: 'published-latest', releaseId });
-              const published = await findRelease(plan.tag), latest = await api('/repos/' + REPOSITORY + '/releases/latest');
-              ensure(published?.id === releaseId && !published.draft && !published.prerelease && latest.status === 200 && latest.value.id === releaseId, 'Publication/latest confirmation failed');
+              const publication = await waitForRead('Published release/latest', async signal => {
+                const published = await findRelease(plan.tag, signal);
+                if (published) ensure(published.id === releaseId && !published.prerelease, 'Published release identity/type conflict');
+                const latest = await api('/repos/' + REPOSITORY + '/releases/latest', signal); return { published, latest };
+              }, value => !!value.published && !value.published.draft && value.latest.status === 200 && value.latest.value.id === releaseId);
+              const published = publication.published;
               await verifyTag(plan, tag); report.release = { id: releaseId, url: published.html_url, draft: false, latest: true }; report.status = 'passed'; report.stage = 'complete';
               fs.writeFileSync(path.join(reports, 'actual-SHA256SUMS.txt'), plan.files.map(file => checked.get(file.name).sha256 + '  ' + file.name).join('\n') + '\n');
             } catch (error) { report.error = String(error.message || error).replace(/[\r\n]/g,' ').slice(0,500); throw error; }
