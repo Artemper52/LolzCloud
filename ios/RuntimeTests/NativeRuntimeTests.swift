@@ -459,6 +459,15 @@ import UIKit
             }
         }
     }
+    private func javascriptObject(_ source: String, in web: WKWebView) async throws -> [String:Any] {
+        let deadline = ProcessInfo.processInfo.systemUptime+5
+        while ProcessInfo.processInfo.systemUptime<deadline {
+            if let value = try await javascript(source,in:web) as? [String:Any] { return value }
+            try await settle(0.025)
+        }
+        XCTFail("Timed out waiting for the real WebKit event")
+        throw UserError.message("WebKit event did not arrive")
+    }
 
     private func post(_ object: [String: Any], in web: WKWebView) async throws {
         let data = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
@@ -555,5 +564,87 @@ import UIKit
         try await settle(0.2)
         XCTAssertEqual(av.defaultRate, 1, "A public same-origin page must not acquire the /app bridge")
         XCTAssertFalse(records.contains { $0["requestId"] as? Int == 3 })
+    }
+
+    func testTaggedProfileExportPresentsRealAnchoredSystemSheetAndPreservesPause() async throws {
+        let shell = AppShell(), web = try XCTUnwrap(shell.webView)
+        let scene = try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first { $0.activationState == .foregroundActive })
+        let previousKey = scene.windows.first { $0.isKeyWindow }, window = UIWindow(windowScene:scene), controller = UIViewController()
+        window.rootViewController = controller; window.frame = scene.screen.bounds
+        controller.view.addSubview(web); web.frame = controller.view.bounds; web.autoresizingMask = [.flexibleWidth,.flexibleHeight]
+        window.makeKeyAndVisible(); controller.view.layoutIfNeeded()
+        subjects.append(shell.player)
+        shell.player.emit = { [weak self] name,detail in var row = detail; row["event"] = name; self?.records.append(row) }
+        let temporary = FileManager.default.temporaryDirectory.standardizedFileURL
+        func profileFolders() -> [URL] {
+            ((try? FileManager.default.contentsOfDirectory(at:temporary,includingPropertiesForKeys:[.isDirectoryKey,.isSymbolicLinkKey])) ?? [])
+                .filter { $0.lastPathComponent.hasPrefix("LolzCloud-profile-") }.map(\.standardizedFileURL)
+        }
+        let before = Set(profileFolders()); var fixtureFolder: URL?
+        defer {
+            // This is fixture cleanup, not a simulated user completion. No
+            // activity or destination is selected and no completion callback
+            // is invoked by the test. Physical/system Cancel remains unproved.
+            controller.presentedViewController?.dismiss(animated:false)
+            if let folder = fixtureFolder, folder.deletingLastPathComponent() == temporary,
+               folder.lastPathComponent.hasPrefix("LolzCloud-profile-") { try? FileManager.default.removeItem(at:folder) }
+            shell.login.cancel(); web.stopLoading(); web.configuration.userContentController.removeScriptMessageHandler(forName:"lolzcloud")
+            web.navigationDelegate = nil; web.uiDelegate = nil; web.removeFromSuperview(); window.isHidden = true; previousKey?.makeKeyAndVisible()
+        }
+        try await waitFor("public own application loads for actual export bridge",timeout:35) { !shell.loading && MediaPolicy.bridgePage(web.url) }
+        XCTAssertTrue(shell.loadError.isEmpty,shell.loadError)
+        _ = try await javascript("window.__runtimeProfileExports=[];window.addEventListener('lolzcloud:profileExport',e=>window.__runtimeProfileExports.push(e.detail));true",in:web)
+        let track = try await importOne(shell.player,wave("Export paused music")), client = UUID().uuidString.lowercased()
+        try await post(["action":"queue","clientId":client,"requestId":1,"handshake":true,"tracks":[track.object,track.object],"index":1,"repeat":"off","shuffle":false],in:web)
+        var play = track.object; play.merge(["action":"play","clientId":client,"requestId":2,"queueIndex":1]) { _,new in new }
+        try await post(play,in:web)
+        let av = try avPlayer(shell.player)
+        try await waitFor("actual audio plays before export pause") { av.rate>0 && av.currentTime().seconds>0.2 }
+        try await post(["action":"pause","clientId":client,"requestId":3],in:web)
+        try await waitFor("actual export source is paused") { av.rate==0 && shell.player.state == "paused" }
+        let position = av.currentTime().seconds, item = try XCTUnwrap(av.currentItem), operation = UUID().uuidString.lowercased()
+        let object: [String:Any] = ["format":"lolzcloud-profile","version":1,"music":["preferences":["density":"compact","description":"Проверка профиля UTF-8"]],"wave":[:],"tools":[:]]
+        let bytes = try JSONSerialization.data(withJSONObject:object,options:[.sortedKeys]), json = try XCTUnwrap(String(data:bytes,encoding:.utf8))
+        let filename = "LolzCloud-profile-2026-11-15.json"
+        try await post(["action":"exportProfile","clientId":client,"requestId":3,"operationId":operation,"filename":filename,"json":json],in:web)
+        try await waitFor("real UIKit share controller is presented") {
+            controller.presentedViewController is UIActivityViewController && controller.presentedViewController?.isBeingPresented == false
+        }
+        let activity = try XCTUnwrap(controller.presentedViewController as? UIActivityViewController)
+        let created = profileFolders().filter { !before.contains($0) }
+        XCTAssertEqual(created.count,1); let folder = try XCTUnwrap(created.first); fixtureFolder = folder
+        let values = try folder.resourceValues(forKeys:[.isDirectoryKey,.isSymbolicLinkKey])
+        XCTAssertTrue(values.isDirectory == true); XCTAssertFalse(values.isSymbolicLink == true)
+        XCTAssertEqual(try Data(contentsOf:folder.appendingPathComponent(filename)),bytes)
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            let popover = try XCTUnwrap(activity.popoverPresentationController)
+            XCTAssertTrue(popover.sourceView === web)
+            XCTAssertEqual(popover.sourceRect,CGRect(x:web.bounds.midX,y:web.bounds.midY,width:1,height:1))
+            XCTAssertTrue(web.bounds.contains(popover.sourceRect))
+        }
+        let initial = try await javascriptObject("window.__runtimeProfileExports.find(e=>e.state==='sharing')||null",in:web)
+        XCTAssertEqual(initial["operationId"] as? String,operation); XCTAssertEqual(initial["clientId"] as? String,client); XCTAssertEqual(initial["requestId"] as? Int,3)
+        // A second current-tag request must fail without replacing the first
+        // sheet's captured owner or creating a second private export file.
+        try await post(["action":"pause","clientId":client,"requestId":4],in:web)
+        let duplicate = UUID().uuidString.lowercased()
+        try await post(["action":"exportProfile","clientId":client,"requestId":4,"operationId":duplicate,"filename":filename,"json":json],in:web)
+        let rejected = try await javascriptObject("window.__runtimeProfileExports.find(e=>e.state==='error')||null",in:web)
+        XCTAssertEqual(rejected["operationId"] as? String,duplicate); XCTAssertEqual(rejected["requestId"] as? Int,4)
+        XCTAssertTrue(controller.presentedViewController === activity)
+        XCTAssertEqual(profileFolders().filter { !before.contains($0) },[folder])
+        let captured = Mirror(reflecting:shell).children.first { $0.label == "profileExportOwner" }?.value as? [String:Any]
+        XCTAssertEqual(captured?["clientId"] as? String,client); XCTAssertEqual(captured?["requestId"] as? Int,3)
+        XCTAssertTrue(av.currentItem === item); XCTAssertEqual(av.rate,0); XCTAssertEqual(shell.player.state,"paused")
+        XCTAssertEqual(av.currentTime().seconds,position,accuracy:0.08)
+        XCTAssertEqual(shell.player.current?.id,track.id)
+        XCTAssertEqual(records.last { $0["event"] as? String == "selection" }?["index"] as? Int,1)
+        let image = UIGraphicsImageRenderer(bounds:window.bounds).image { _ in window.drawHierarchy(in:window.bounds,afterScreenUpdates:true) }
+        let screen = XCTAttachment(image:image); screen.name = "actual-system-profile-share-"+(UIDevice.current.userInterfaceIdiom == .pad ? "ipad":"iphone"); screen.lifetime = .keepAlways; add(screen)
+        let evidence: [String:Any] = ["presentedController":String(describing:type(of:activity)),"fileBytes":bytes.count,
+            "utf8Exact":true,"duplicateRejected":true,"pausedQueueIndex":1,"ipadAnchorChecked":UIDevice.current.userInterfaceIdiom == .pad,
+            "cleanup":"Programmatic fixture dismissal and removal of this test's private directory; user Cancel/completion callback not asserted."]
+        let note = XCTAttachment(data:try JSONSerialization.data(withJSONObject:evidence,options:[.prettyPrinted,.sortedKeys]),uniformTypeIdentifier:"public.json")
+        note.name = "profile-share-scope"; note.lifetime = .keepAlways; add(note)
     }
 }
