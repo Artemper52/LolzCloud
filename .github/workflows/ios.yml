@@ -24,6 +24,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - name: Select an installed stable Xcode and Apple SDK 26 or newer
+        run: node ios/tools/select-xcode.cjs
       - name: Read the application version
         id: version
         run: node -e 'console.log("value=" + require("./ios/tools/version.cjs").version())' >> "$GITHUB_OUTPUT"
@@ -63,6 +65,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24
+      - name: Select an installed stable Xcode and Apple SDK 26 or newer
+        run: node ios/tools/select-xcode.cjs
       - name: Verify native audio and WebKit in a fresh iOS Simulator
         env:
           LOLZCLOUD_IOS_RUNTIME_OUTPUT: ${{ runner.temp }}/ios-runtime

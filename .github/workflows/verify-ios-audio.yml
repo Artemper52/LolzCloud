@@ -1,0 +1,41 @@
+name: Verify native iOS audio and current Apple SDK
+'on':
+  push:
+    branches: ['codex/recover-ios-audio-0.1.2']
+    paths: ['ios/**', '.github/workflows/ios.yml', '.github/workflows/verify-ios-audio.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: native-audio-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      ref: ${{ steps.source.outputs.ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify source ancestry
+        id: source
+        run: |
+          set -eu
+          test "$GITHUB_REF" = refs/heads/codex/recover-ios-audio-0.1.2
+          git merge-base --is-ancestor 98eb2e722cb324332c598ea091ce0334a25436de HEAD
+          printf 'ref=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: node --test ios/tools/select-xcode.test.cjs ios/tools/version.test.cjs
+  apple-sdk:
+    needs: source
+    uses: ./.github/workflows/ios.yml
+    with:
+      source_ref: ${{ needs.source.outputs.ref }}
