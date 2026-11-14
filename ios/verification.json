@@ -1,7 +1,7 @@
 {
   "releaseCandidate": "0.1.1",
   "bundleBuild": "2",
-  "checkedAt": "2026-11-14T16:58:54Z",
+  "checkedAt": "2026-11-14T18:53:13Z",
   "sourceFrozen": true,
   "toolchain": "Swift 6.2.1, Docker swift:6.2.1-bookworm on Linux",
   "sourceHashesSha256": {
@@ -36,7 +36,7 @@
   "projectInputs": {
     "appleSDKBuild": "passed",
     "backgroundAudio": true,
-    "deviceRuntime": "pending",
+    "deviceRuntime": "physical device pending; simulator runtime passed separately",
     "iconHeight": 1024,
     "iconWidth": 1024,
     "nativeSources": [
@@ -97,7 +97,7 @@
     "commit": "4def8a9f69c612f7a319f47830bb66d1e8f007b1"
   },
   "artifactsDirectory": "D:/LolzCloud-Android-Toolchain/ios-review-0.1.1",
-  "scopeNote": "Apple SDK simulator compilation and generic-device archive passed. Archive/plist/Mach-O inspection passed. No physical iOS runtime or Apple distribution signing is claimed. The Linux-only historical report is preserved separately.",
+  "scopeNote": "Apple SDK compilation/archive and a separate hosted XCTest source-equivalent simulator build passed. Published IPA/ZIP remain unchanged. Physical iOS runtime and Apple distribution signing are not claimed. Historical Linux-only and the first failed harness attempt remain recorded separately.",
   "bridgeIntent": {
     "clientId": "lowercase per-document UUID",
     "requestId": "monotonic safe integer >= 1; same intent may cover stop/queue/play",
@@ -140,5 +140,17 @@
   "artifactStaticVerification": "docs/ios-sdk-0.1.1-verification.json",
   "sourceHashes": {
     "Package.swift": "6266e84ab1085488b72681e491fa107b70cde91b718155fe47e311e3a64a7510"
+  },
+  "simulatorRuntime": {
+    "status": "passed",
+    "workflowURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43627918673",
+    "commit": "bb3514bbc94d30bad4e3d4cc0d081330fc65faea",
+    "tests": 5,
+    "failed": 0,
+    "device": "iPhone 16 arm64",
+    "runtime": "iOS 26.2",
+    "sdk": "18.5",
+    "proof": "docs/ios-runtime-0.1.1-verification.json",
+    "publishedArtifactsReplaced": false
   }
 }

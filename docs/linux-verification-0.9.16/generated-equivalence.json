@@ -1,0 +1,32 @@
+{
+  "source/app/session-transfer/helper.zip": {
+    "status": "passed",
+    "inputSha256": "96593a474113a0e7a87f4990153c8f93f562112dc18945f35419f5d8f2cbe010",
+    "generatedSha256": "09062d9b66b085cc8735df173d0f05c72e4ae53d559b9adf0d7cd5e6e07e1bc8",
+    "contentSha256": {
+      "manifest.json": "958e9752ff8e3a3bc079152caae3c2142a5fbcd58e75150dd73ac0b5333547c2",
+      "popup.html": "5a72c088a54c12ddc09701162c28273c5e5923775b4ae047620fa01b1bed95dd",
+      "popup.css": "4081fe51d8a9dfdf33fcce7af0b38389cff8079ea297c33a168eb72e076b9cee",
+      "popup.js": "64562b26019ad6a1ea93e5c48e58ef97a4f534434ba048a01af7aafaba996e6d",
+      "bridge.js": "3a0b9d68f27bea592902f7264d3f95de73747e6c9190500e3c0527dfb316a367",
+      "background.js": "9687011d4ab59a8a79852a0e9991c037b2d89474be6df2f672e7b2c290f6809d",
+      "content.js": "bf55776a0d3fa3d7cd0f53197a6d68552a0429aec31109ebde7df5c045a8a125"
+    },
+    "note": "ZIP container bytes differ across build hosts; every named payload byte is identical."
+  },
+  "source/app/session-transfer/helper-firefox.zip": {
+    "status": "passed",
+    "inputSha256": "87ffd46eef97e8f183997999b63c2b4e58078232ccf3ea97276193b22cb9a5bb",
+    "generatedSha256": "7b03873fb1ce9a74ba6d0da36a6c8e894b39a30598ce0be4c8caaeeeeade8c46",
+    "contentSha256": {
+      "manifest.json": "a2ac35391f45a3621a975931ddc97628813331f026bff8295cb96263a50ac646",
+      "popup.html": "5a72c088a54c12ddc09701162c28273c5e5923775b4ae047620fa01b1bed95dd",
+      "popup.css": "4081fe51d8a9dfdf33fcce7af0b38389cff8079ea297c33a168eb72e076b9cee",
+      "popup.js": "64562b26019ad6a1ea93e5c48e58ef97a4f534434ba048a01af7aafaba996e6d",
+      "bridge.js": "3a0b9d68f27bea592902f7264d3f95de73747e6c9190500e3c0527dfb316a367",
+      "background.js": "9687011d4ab59a8a79852a0e9991c037b2d89474be6df2f672e7b2c290f6809d",
+      "content.js": "bf55776a0d3fa3d7cd0f53197a6d68552a0429aec31109ebde7df5c045a8a125"
+    },
+    "note": "ZIP container bytes differ across build hosts; every named payload byte is identical."
+  }
+}

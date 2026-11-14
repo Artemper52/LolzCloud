@@ -1,0 +1,517 @@
+{
+  "status": "passed",
+  "roomId": "60c256aeb0b89ee20554a9500bddd209",
+  "previousUrl": "https://music.youtube.com/watch?v=fixtureYT03",
+  "selectedUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+  "chosenQueueId": "002dbcdca25b56562a87d7c3",
+  "expectedInitialIds": [
+    "b6dfa08be173654eb3f64e3f",
+    "002dbcdca25b56562a87d7c3",
+    "266c30c0a554064d0f2740bc"
+  ],
+  "expectedRemainingIds": [
+    "b6dfa08be173654eb3f64e3f",
+    "266c30c0a554064d0f2740bc"
+  ],
+  "duplicateAddStatus": 409,
+  "setup": "Two real HTTP additions; one explicitly seeded restored duplicate with a distinct ID in the isolated store.",
+  "holdPrevious": false,
+  "puts": [
+    {
+      "url": "https://music.youtube.com/watch?v=fixtureYT03",
+      "sequence": 17,
+      "sentAt": 1794681728938
+    },
+    {
+      "url": "https://music.youtube.com/watch?v=fixtureYT05",
+      "sequence": 19,
+      "sentAt": 1794681729030,
+      "status": 200
+    },
+    {
+      "url": "https://music.youtube.com/watch?v=fixtureYT05",
+      "sequence": 20,
+      "sentAt": 1794681729306,
+      "status": 200
+    },
+    {
+      "url": "https://music.youtube.com/watch?v=fixtureYT05",
+      "sequence": 21,
+      "sentAt": 1794681730445,
+      "status": 200
+    },
+    {
+      "url": "https://music.youtube.com/watch?v=fixtureYT05",
+      "sequence": 22,
+      "sentAt": 1794681731948,
+      "status": 200
+    }
+  ],
+  "controls": [
+    {
+      "id": "002dbcdca25b56562a87d7c3",
+      "sequence": 18
+    }
+  ],
+  "trace": [
+    {
+      "at": 1794681729061,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT03",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729107,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT03",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729153,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT03",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729195,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729245,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729291,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729336,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729382,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729429,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729475,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729521,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729568,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729614,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729660,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729706,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729753,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729799,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729845,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729890,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729937,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681729984,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730030,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730077,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730122,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730168,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730214,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730260,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730305,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730352,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730399,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730446,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730492,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730537,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730584,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730628,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730677,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730725,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730772,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730817,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730866,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730908,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681730954,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681731001,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    },
+    {
+      "at": 1794681731047,
+      "serverUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativeUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+      "nativePlaying": true,
+      "queueIds": [
+        "b6dfa08be173654eb3f64e3f",
+        "266c30c0a554064d0f2740bc"
+      ]
+    }
+  ],
+  "checks": [
+    "Actual WebView action reaches native playQueued and the real atomic control API exactly once",
+    "Server and native queue preserve first and third IDs, including the duplicate URL",
+    "Delayed accepted old PUT response and the next native heartbeat do not revert the chosen recording or lease",
+    "Same guest, same hidden provider iframe, room route and unchanged chat draft remain resident",
+    "Remaining fixture entries are removed through authenticated HTTP before the unchanged handoff test"
+  ],
+  "heldPut": {
+    "url": "https://music.youtube.com/watch?v=fixtureYT03",
+    "sequence": 17,
+    "sentAt": 1794681728938,
+    "status": 200,
+    "responseUrl": "https://music.youtube.com/watch?v=fixtureYT03",
+    "releasedAt": 1794681729262
+  },
+  "controlStatus": 200,
+  "controlUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+  "committedAt": 1794681729029,
+  "nativeReadyAt": 1794681729262
+}

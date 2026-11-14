@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-11-14T18:51:31.211Z",
+  "status": "passed",
+  "platform": "linux",
+  "arch": "x64",
+  "plainUser": 986,
+  "sandboxDisabled": false,
+  "packagedX64SelfTest": "passed",
+  "appImageNormalFuseSelfTest": "passed",
+  "realKeyring": {
+    "status": "passed",
+    "platform": "linux",
+    "arch": "x64",
+    "electron": "45.2.1",
+    "node": "24.22.1",
+    "realSystemKeyring": true,
+    "backend": "gnome_libsecret",
+    "encryptedRoundTrip": true,
+    "personalAccountsUsed": false,
+    "rendererSandboxed": true,
+    "rendererSeccomp": 2,
+    "noSandboxSwitch": false
+  },
+  "roomsMobile": {
+    "status": "passed",
+    "checks": 22,
+    "report": "rooms-mobile/rooms-mobile-results.json",
+    "scope": "Real isolated Chromium DOM/mouse input, HTTP, sessions, SSE, role/lease/atomic queue APIs. Search metadata and SC/YT SDK are declared deterministic fixtures; this does not prove real external-provider audio or physical Android/iOS."
+  },
+  "arm64": "static-only",
+  "physicalAudio": false
+}

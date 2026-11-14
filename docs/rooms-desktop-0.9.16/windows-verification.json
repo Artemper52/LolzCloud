@@ -1,0 +1,165 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T18:45:28.682Z",
+  "version": "0.9.16",
+  "builds": [
+    {
+      "flavor": "modern",
+      "asarSha256": "45a0207bd450b3612dc0b8aeb9c8f83344850ba641603701a3ca88538169a270",
+      "sourceChecks": [
+        {
+          "path": "source/package.json",
+          "sha256": "0c254874f10265b1804f62a3952ca332837d3a02abd91ea10b173e83267334db"
+        },
+        {
+          "path": "source/room-preload.cjs",
+          "sha256": "000e04f19ad1ee1c330f1ce62e01e2ce0070108e72de1bbf465c1a041b252ea2"
+        },
+        {
+          "path": "source/integrations/room.cjs",
+          "sha256": "761bdadfc815d15386e664ec613820f3445d5b64df083ad4084cbdb5f9064c43"
+        },
+        {
+          "path": "source/integrations/player-experience.cjs",
+          "sha256": "16aeac3fe467b45476248e7c870b05fbef1b1f3d2b5d6d242e3571b16e072f67"
+        },
+        {
+          "path": "source/integrations/studio.cjs",
+          "sha256": "a3e890a65a714aa2e709db403b9b599d3676b2101622cecb2c2869ecf6768d4b"
+        },
+        {
+          "path": "source/app/lib/room-client/room.html",
+          "sha256": "a195898b4526c70d68f8b2627d61ba98902daefb7472ad3cf990cc2cc9807af1"
+        },
+        {
+          "path": "source/app/lib/room-client/room.css",
+          "sha256": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340"
+        },
+        {
+          "path": "source/app/lib/room-client/room.js",
+          "sha256": "1bbaf4f4580e43c00a731efbc9dd1dc6c3cf57a1a570c50a30a3852d23fb4e08"
+        },
+        {
+          "path": "source/app/lib/room-client/room-sync.js",
+          "sha256": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab"
+        },
+        {
+          "path": "source/app/lib/room-client/room-players.js",
+          "sha256": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9"
+        },
+        {
+          "path": "source/app/lib/room-client/site.js",
+          "sha256": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616"
+        },
+        {
+          "path": "source/app/lib/room-client/media-source.js",
+          "sha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c"
+        }
+      ]
+    },
+    {
+      "flavor": "legacy",
+      "asarSha256": "45a0207bd450b3612dc0b8aeb9c8f83344850ba641603701a3ca88538169a270",
+      "sourceChecks": [
+        {
+          "path": "source/package.json",
+          "sha256": "0c254874f10265b1804f62a3952ca332837d3a02abd91ea10b173e83267334db"
+        },
+        {
+          "path": "source/room-preload.cjs",
+          "sha256": "000e04f19ad1ee1c330f1ce62e01e2ce0070108e72de1bbf465c1a041b252ea2"
+        },
+        {
+          "path": "source/integrations/room.cjs",
+          "sha256": "761bdadfc815d15386e664ec613820f3445d5b64df083ad4084cbdb5f9064c43"
+        },
+        {
+          "path": "source/integrations/player-experience.cjs",
+          "sha256": "16aeac3fe467b45476248e7c870b05fbef1b1f3d2b5d6d242e3571b16e072f67"
+        },
+        {
+          "path": "source/integrations/studio.cjs",
+          "sha256": "a3e890a65a714aa2e709db403b9b599d3676b2101622cecb2c2869ecf6768d4b"
+        },
+        {
+          "path": "source/app/lib/room-client/room.html",
+          "sha256": "a195898b4526c70d68f8b2627d61ba98902daefb7472ad3cf990cc2cc9807af1"
+        },
+        {
+          "path": "source/app/lib/room-client/room.css",
+          "sha256": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340"
+        },
+        {
+          "path": "source/app/lib/room-client/room.js",
+          "sha256": "1bbaf4f4580e43c00a731efbc9dd1dc6c3cf57a1a570c50a30a3852d23fb4e08"
+        },
+        {
+          "path": "source/app/lib/room-client/room-sync.js",
+          "sha256": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab"
+        },
+        {
+          "path": "source/app/lib/room-client/room-players.js",
+          "sha256": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9"
+        },
+        {
+          "path": "source/app/lib/room-client/site.js",
+          "sha256": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616"
+        },
+        {
+          "path": "source/app/lib/room-client/media-source.js",
+          "sha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c"
+        }
+      ]
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "latest.yml",
+      "size": 366,
+      "sha256": "fab228f65ea0fb2a4b807d86c0565b53ab832e8a51a25be4b209a5f45ea99ce5"
+    },
+    {
+      "name": "legacy.yml",
+      "size": 373,
+      "sha256": "ec0bbcacb954c1b557ba8327e49a5b0b4cd3a8756a90b8c83c7078b167036ed2"
+    },
+    {
+      "name": "LolzCloud-0.9.16-win-x64-Setup.exe",
+      "size": 146394186,
+      "sha256": "93356ceea169ac1ddf7b5a44acb4a790332f4667b4ec3014e3f63cfafaf908e9"
+    },
+    {
+      "name": "LolzCloud-0.9.16-win-x64-Setup.exe.blockmap",
+      "size": 152495,
+      "sha256": "edd949d89af7c716c8b3800302e0e2448e881e5ae34ba6add6af676649dd1d9e"
+    },
+    {
+      "name": "LolzCloud-0.9.16-win-x64.zip",
+      "size": 196669243,
+      "sha256": "4a989ed144667c593fb4c86aaca126f37bc0d6efe33bf1d7995f2cb02f975375"
+    },
+    {
+      "name": "LolzCloud-0.9.16-win7-legacy-Setup.exe",
+      "size": 99539305,
+      "sha256": "79d9bffa7fac38bb2ac42f4866417049dd2ebe067cfb9574ff97f658c8c61b4d"
+    },
+    {
+      "name": "LolzCloud-0.9.16-win7-legacy-Setup.exe.blockmap",
+      "size": 104968,
+      "sha256": "3256dbe2eb2bc4590aa60fad4f1b09919362a2a39c2eb35fe9369920abb64ca0"
+    },
+    {
+      "name": "LolzCloud-0.9.16-win7-legacy-x64.zip",
+      "size": 134386314,
+      "sha256": "cceafccc59f16840a15af0f700d193e4cf0997b6570fa28fd9682fff4a11daff"
+    }
+  ],
+  "modernNativeSelfTest": "passed",
+  "legacyNativeSelfTestOnModernWindows": "passed",
+  "upgrade015to016": "passed",
+  "lowDiskGuard": "passed",
+  "savedProfile": "preserved",
+  "limitations": [
+    "Legacy build executed on modern Windows; no physical Windows 7 device."
+  ]
+}

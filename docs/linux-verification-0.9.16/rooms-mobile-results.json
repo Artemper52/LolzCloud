@@ -1,0 +1,35 @@
+{
+  "status": "passed",
+  "count": 22,
+  "checks": [
+    "A joined phone preloads without audible playback or silently taking the PC controller",
+    "An owner phone sees direct play before claiming, while merely opening or searching never takes the PC controller",
+    "One explicit search Play transfers the owner controller from PC to phone and starts the chosen track",
+    "Unlock and handoff never play the outgoing track as an audio-gesture workaround",
+    "The old PC cannot overwrite the phone track after handoff",
+    "Direct play returns to the same room, source iframe and untouched chat draft",
+    "Listener results only offer queue proposals and do not promise direct play",
+    "A listener proposal waits for approval and leaves the current music playing",
+    "Promotion to DJ updates the existing search results without another query",
+    "DJ cannot steal an occupied controller; error keeps search and a working explicit retry",
+    "The same DJ result starts correctly after an explicit owner release",
+    "Revoking DJ removes stale play and transport controls in the existing room",
+    "Direct queue play atomically consumes only its exact queue ID and preserves every other row",
+    "Next after direct queue selection consumes the next approved row without replaying the selected entry",
+    "A blocked local source is reported explicitly and does not pause the shared room",
+    "The explicit allow-sound action starts local audio without toggling the shared room into pause",
+    "A queued source error leaves the selected track paused and consumes its queue entry only once",
+    "Retry starts the selected track without consuming another queue entry or losing the original chat draft",
+    "Room layout stays within the actual 360px viewport",
+    "Room layout stays within the actual 420px viewport",
+    "Room layout stays within the actual 1366px viewport",
+    "No uncaught JavaScript errors in mobile handoff/search/queue scenarios"
+  ],
+  "screenshots": [
+    "/opt/lolzcloud-builds/release-0.9.16/.build/linux-qa/rooms-mobile/room-playing-360.png",
+    "/opt/lolzcloud-builds/release-0.9.16/.build/linux-qa/rooms-mobile/room-dj-conflict-420.png"
+  ],
+  "errors": [],
+  "failure": "",
+  "fixtureNote": "Real isolated Chromium DOM/mouse input, HTTP, sessions, SSE, role/lease/atomic queue APIs. Search metadata and SC/YT SDK are declared deterministic fixtures; this does not prove real external-provider audio or physical Android/iOS."
+}

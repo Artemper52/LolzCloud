@@ -27,6 +27,8 @@
 
 Для исходников 0.1.1 прошли 34 Swift/Foundation проверки и 2 Node-проверки версии артефактов, в том числе 34 policy-теста на macOS без ошибок. Текущий отчёт: `verification.json`; отдельный SDK-отчёт: `verification-sdk-0.1.1.json`. Исторические Linux-only `verification-0.1.1.json` и результат 0.1.0 сохранены отдельно. Foundation-тесты файлов проверяют копирование, пути, лимиты и восстановление; это не тест декодирования аудио AVFoundation на устройстве.
 
+Дополнительно [прошли 5 hosted XCTest в настоящем iOS Simulator](https://github.com/Artemper52/LolzCloud/actions/runs/43627918673): импорт WAV и реальный AVAsset, прогресс/pause/seek/rate AVPlayer, естественные переходы смешанной очереди с дублями, отказ для удалённого локального файла и HTTPS WKWebView bridge с проверкой client/request, iframe и страницы вне `/app`. Окружение — iPhone 16 arm64, iOS Simulator 26.2, Xcode 16.4 / SDK 18.5. Это отдельная testable-сборка тех же четырёх production Swift-файлов; опубликованные IPA/ZIP не заменялись. [Runtime-отчёт](../docs/ios-runtime-0.1.1-verification.json) сохраняет и первый прогон: 4 теста прошли, пятый остановился на ошибочном ожидании защищённой `/social`; после исправления только теста все 5 прошли. Реальный внешний Documents Provider/picker, физическое устройство и личный вход остаются непроверенными.
+
 ```sh
 swift test --package-path ios
 swift ios/tools/CheckProject.swift

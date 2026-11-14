@@ -19,7 +19,7 @@ const delay = value => new Promise(resolve => setTimeout(resolve, value));
 async function until(predicate, label, timeout = 8000) { const deadline = Date.now() + timeout; while (!await predicate()) { if (Date.now() > deadline) throw new Error(label); await delay(70); } }
 function wave() { const samples = 16000 * 100, buffer = Buffer.alloc(44 + samples * 2); buffer.write('RIFF'); buffer.writeUInt32LE(buffer.length - 8, 4); buffer.write('WAVEfmt ', 8); buffer.writeUInt32LE(16, 16); buffer.writeUInt16LE(1, 20); buffer.writeUInt16LE(1, 22); buffer.writeUInt32LE(16000, 24); buffer.writeUInt32LE(32000, 28); buffer.writeUInt16LE(2, 32); buffer.writeUInt16LE(16, 34); buffer.write('data', 36); buffer.writeUInt32LE(samples * 2, 40); for (let i = 0; i < samples; i++) buffer.writeInt16LE(Math.round(Math.sin(i * Math.PI * 2 * 440 / 16000) * 1000), 44 + i * 2); return buffer; }
 app.whenReady().then(async () => {
-  let host, studio, timer, roomServer, phase = 'setup'; const errors = [];
+  let host, studio, timer, roomServer, phase = 'setup', nativeQueueProbe = null, nativeQueueMonitor, releaseHeldNativePut = () => {}; const errors = [];
   try {
     const fixture = { title: 'Fixture original song', artist: 'Fixture artist', url: 'https://soundcloud.com/fixture/original', duration: 100, position: 23, playing: false };
     const service = new LolzteamService({ store: { load: () => null, save() {} }, api: {} }); service.setPlayback(fixture);
@@ -54,7 +54,32 @@ app.whenReady().then(async () => {
     const fetchOriginal = globalThis.fetch;
     globalThis.fetch = (value, options) => {
       const url = String(value);
-      return fetchOriginal(url.startsWith(roomOrigin + '/api/') ? loopback + url.slice(roomOrigin.length) : value, options);
+      const target = url.startsWith(roomOrigin + '/api/') ? loopback + url.slice(roomOrigin.length) : value;
+      if (nativeQueueProbe && url.startsWith(roomOrigin + '/api/rooms/' + nativeQueueProbe.roomId + '/')) {
+        const body = options?.body ? JSON.parse(options.body) : null;
+        if (options?.method === 'PUT' && url.endsWith('/state')) {
+          const entry = { url: body?.playback?.url || '', sequence: body?.sequence, sentAt: Date.now() }; nativeQueueProbe.puts.push(entry);
+          if (nativeQueueProbe.holdPrevious && entry.url === nativeQueueProbe.previousUrl) {
+            const probe = nativeQueueProbe; probe.holdPrevious = false;
+            return fetchOriginal(target, options).then(async response => {
+              const previous = await response.clone().json();
+              probe.heldPut = { ...entry, status: response.status, responseUrl: previous.playback?.url };
+              return new Promise(resolve => { let released = false; releaseHeldNativePut = () => { if (released) return; released = true; probe.heldPut.releasedAt = Date.now(); resolve(response); }; });
+            });
+          }
+          return fetchOriginal(target, options).then(response => { entry.status = response.status; return response; });
+        }
+        if (options?.method === 'POST' && url.endsWith('/control') && body?.type === 'play-queue') {
+          nativeQueueProbe.controls.push({ id: body.id, sequence: body.sequence });
+          return fetchOriginal(target, options).then(async response => {
+            const result = await response.clone().json();
+            nativeQueueProbe.controlStatus = response.status; nativeQueueProbe.controlUrl = result.room?.playback?.url;
+            if (response.ok) nativeQueueProbe.committedAt = Date.now();
+            return response;
+          });
+        }
+      }
+      return fetchOriginal(target, options);
     };
     fs.writeFileSync(path.join(temporary, 'cloud-session.json'), JSON.stringify({ encryptedToken: safeStorage.encryptString(token).toString('base64'), expires, user }));
     await roomSession.protocol.handle('https', async request => {
@@ -362,6 +387,60 @@ app.whenReady().then(async () => {
     await studio.act({ type: 'media', command: 'next' });
     await until(() => service.playback.url === nativeQueue[1] && service.playback.playing, 'The main Next command must prefer the room queue over personal playback history', 12000);
     assert.equal(studio.getState().room.queue.length, 0, 'Native Next must consume the remaining room track');
+    phase = 'room: native explicit middle queue selection with restored duplicate';
+    const selectedUrls = ['https://music.youtube.com/watch?v=fixtureYT04', 'https://music.youtube.com/watch?v=fixtureYT05'];
+    const ownerQueueAction = async action => {
+      const response = await fetchOriginal(loopback + '/api/rooms/' + nativeRoomId + '/queue', { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify(action) });
+      return { status: response.status, value: await response.json() };
+    };
+    for (const url of selectedUrls) assert.equal((await ownerQueueAction({ type: 'add', track: { url, title: 'Native selected queue track', artist: 'Fixture artist' } })).status, 200, 'Native selection entries must be added through the real authenticated API');
+    const duplicateRejected = await ownerQueueAction({ type: 'add', track: { url: selectedUrls[1], title: 'Duplicate request' } });
+    assert.equal(duplicateRejected.status, 409, 'The existing public API must retain its duplicate-URL policy');
+    // A restored/legacy queue can already contain equal URLs. Seed ONLY that
+    // extra row in this isolated in-memory fixture; all selection/removal and
+    // playback below use the actual server, IPC, preload and WebView path.
+    const rawNativeRoom = store.room(nativeRoomId), restoredFrom = rawNativeRoom.queue[1];
+    const restoredDuplicateId = require('node:crypto').randomBytes(12).toString('hex');
+    rawNativeRoom.queue.push({ ...restoredFrom, id: restoredDuplicateId, votes: new Set(restoredFrom.votes), createdAt: restoredFrom.createdAt + 1 }); rawNativeRoom.revision++;
+    const expectedInitialIds = rawNativeRoom.queue.map(row => row.id), chosenQueueId = expectedInitialIds[1], expectedRemainingIds = [expectedInitialIds[0], expectedInitialIds[2]];
+    await until(() => studio.getState().room.queue.length === 3, 'The native bridge did not receive the declared restored duplicate fixture');
+    assert.deepEqual(studio.getState().room.queue.map(row => row.track.url), [selectedUrls[0], selectedUrls[1], selectedUrls[1]], 'The fixture must contain the intended ordered duplicate URL');
+    const nativeSelectionGuestId = await js('document.querySelector("#lc-room-webview").getWebContentsId()');
+    const nativeSelectionDraft = 'Native selection keeps this room draft';
+    await roomJs('window.__nativeSelectedFrame=document.getElementById("player");document.getElementById("chat-input").value=' + JSON.stringify(nativeSelectionDraft));
+    nativeQueueProbe = { status: 'running', roomId: nativeRoomId, previousUrl: service.playback.url, selectedUrl: selectedUrls[1], chosenQueueId, expectedInitialIds, expectedRemainingIds, duplicateAddStatus: duplicateRejected.status, setup: 'Two real HTTP additions; one explicitly seeded restored duplicate with a distinct ID in the isolated store.', holdPrevious: true, puts: [], controls: [], trace: [], checks: [] };
+    await until(() => !!nativeQueueProbe.heldPut, 'The native fixture did not expose a real previous-track PUT response to delay');
+    assert.equal(nativeQueueProbe.heldPut.status, 200, 'The delayed previous-track PUT must first be accepted by the real server');
+    assert.equal(nativeQueueProbe.heldPut.responseUrl, nativeQueueProbe.previousUrl, 'The delayed response must contain the actual previous recording');
+    nativeQueueMonitor = setInterval(() => { if (nativeQueueProbe.committedAt) nativeQueueProbe.trace.push({ at: Date.now(), serverUrl: store.room(nativeRoomId).playback.url, nativeUrl: service.playback.url, nativePlaying: service.playback.playing, queueIds: store.room(nativeRoomId).queue.map(row => row.id) }); }, 40);
+    await roomJs('document.getElementById("open-queue").click()');
+    await until(() => roomJs('document.getElementById("room-sheet").open&&!document.getElementById("room-panel-queue").hidden&&!!document.querySelector(' + JSON.stringify('[data-room-play="' + chosenQueueId + '"]') + ')'), 'The selected middle queue action did not appear in the actual queue panel');
+    await roomJs('document.querySelector(' + JSON.stringify('[data-room-play="' + chosenQueueId + '"]') + ').click()');
+    await until(() => service.playback.url === selectedUrls[1] && service.playback.playing, 'The middle queue action did not start the selected actual native YouTube source', 12000);
+    await until(() => yt.getURL() === selectedUrls[1] && yt.executeJavaScript('!document.querySelector("video").paused'), 'The selected native YouTube WebView did not play the chosen recording');
+    assert.equal(nativeQueueProbe.controlStatus, 200); assert.equal(nativeQueueProbe.controlUrl, selectedUrls[1]);
+    assert.deepEqual(nativeQueueProbe.controls.map(row => row.id), [chosenQueueId], 'The actual native bridge must submit exactly the selected queue ID once'); nativeQueueProbe.checks.push('Actual WebView action reaches native playQueued and the real atomic control API exactly once');
+    assert.deepEqual(store.room(nativeRoomId).queue.map(row => row.id), expectedRemainingIds, 'Only the chosen middle ID may be consumed; first and duplicate third must remain');
+    assert.deepEqual(studio.getState().room.queue.map(row => row.id), expectedRemainingIds, 'Native room state must preserve the exact remaining entry IDs'); nativeQueueProbe.checks.push('Server and native queue preserve first and third IDs, including the duplicate URL');
+    nativeQueueProbe.nativeReadyAt = Date.now(); releaseHeldNativePut();
+    await delay(1800); // Cross one real 1.5s native publish tick after the stale response.
+    clearInterval(nativeQueueMonitor); nativeQueueMonitor = null;
+    assert.ok(nativeQueueProbe.trace.length >= 20, 'The no-revert observation window must contain real server/native samples');
+    assert.ok(nativeQueueProbe.trace.every(row => row.serverUrl === selectedUrls[1] && JSON.stringify(row.queueIds) === JSON.stringify(expectedRemainingIds)), 'An old PUT/late response reverted the selected server track or restored consumed queue entries');
+    const readyNativeSamples = nativeQueueProbe.trace.filter(row => row.at >= nativeQueueProbe.nativeReadyAt);
+    assert.ok(readyNativeSamples.length >= 20 && readyNativeSamples.every(row => row.nativeUrl === selectedUrls[1] && row.nativePlaying), 'A stale response briefly reverted or paused the actual selected native source after it became ready');
+    assert.ok(nativeQueueProbe.puts.some(row => row.url === selectedUrls[1] && row.sequence > nativeQueueProbe.controls[0].sequence), 'The selected native recording must publish a newer real heartbeat after the delayed old response');
+    assert.equal(service.playback.url, selectedUrls[1]); assert.equal(service.playback.playing, true); assert.equal(studio.getState().room.hosting, true); nativeQueueProbe.checks.push('Delayed accepted old PUT response and the next native heartbeat do not revert the chosen recording or lease');
+    assert.equal(await js('document.querySelector("#lc-room-webview").getWebContentsId()'), nativeSelectionGuestId, 'Selecting a native queue entry must preserve the connected room guest');
+    assert.equal(await roomJs('window.__nativeSelectedFrame===document.getElementById("player")&&document.getElementById("player").hidden'), true, 'Native queue selection must preserve the same hidden provider iframe without duplicate embedded audio');
+    assert.equal(await roomJs('document.getElementById("chat-input").value'), nativeSelectionDraft, 'Native queue selection must preserve the chat draft');
+    assert.equal(await js('document.body.dataset.view'), 'room'); nativeQueueProbe.checks.push('Same guest, same hidden provider iframe, room route and unchanged chat draft remain resident');
+    await until(() => roomJs('!document.getElementById("room-sheet").open'), 'Successful native selection did not return from the queue panel');
+    fs.writeFileSync(path.join(artifacts, 'room-native-selected-queue.png'), (await host.webContents.capturePage()).toPNG());
+    for (const id of expectedRemainingIds) assert.equal((await ownerQueueAction({ type: 'remove', id })).status, 200, 'Remaining fixture entries must be cleaned through the real API before handoff');
+    await until(() => studio.getState().room.queue.length === 0, 'Native fixture cleanup did not reach the current room state'); nativeQueueProbe.checks.push('Remaining fixture entries are removed through authenticated HTTP before the unchanged handoff test');
+    nativeQueueProbe.status = 'passed'; fs.writeFileSync(path.join(artifacts, 'native-queue-selection-results.json'), JSON.stringify(nativeQueueProbe, null, 2));
+    nativeQueueProbe = null;
     phase = 'room: native controller handoff';
     await roomJs('document.getElementById("release-host").click()');
     await until(()=>studio.getState().source==='room','Releasing the native controller did not become an embedded listener');
@@ -411,6 +490,6 @@ app.whenReady().then(async () => {
     await js('window.LolzCloudPlayerTools.open("library")'); await delay(100); fs.writeFileSync(path.join(artifacts, 'player-offline-test.png'), (await host.webContents.capturePage()).toPNG());
     await js('(async()=>{const {ipcRenderer}=require("electron");await ipcRenderer.invoke("player-tools:action",{type:"profile-export"})})()'); const exported = JSON.parse(fs.readFileSync(path.join(temporary, 'exported-profile.json'))); assert.equal(exported.format, 'lolzcloud-profile'); assert.ok(!JSON.stringify(exported).includes(audioFile));
     assert.deepEqual(errors, []); console.log('Player UI passed: shared SoundCloud/YouTube footer and mini, actual audio seek/repeat/DSP/like, room host/listener bridge and handoff without duplicate audio, Profile/Friends/Inbox preserve the active room guest/audio/chat draft, isolated standalone social, local volume/pause, privacy, directory/chat, lyric seek, bookmarks, offline profile.');
-  } catch (error) { console.error('Player UI phase: ' + phase); console.error(error.stack); process.exitCode = 1; }
-  finally { clearInterval(timer); if (host && !host.isDestroyed()) { await host.webContents.executeJavaScript('window.LolzCloudLocal?.shutdown()').catch(() => {}); await delay(80); } if (studio) await studio.shutdown(); if (host && !host.isDestroyed()) host.destroy(); if (roomServer) { roomServer.closeAllConnections(); await new Promise(resolve => roomServer.close(resolve)); } app.exit(process.exitCode || 0); }
+  } catch (error) { if (nativeQueueProbe) { nativeQueueProbe.status = 'failed'; nativeQueueProbe.error = error.stack || String(error); fs.writeFileSync(path.join(artifacts, 'native-queue-selection-results.json'), JSON.stringify(nativeQueueProbe, null, 2)); } console.error('Player UI phase: ' + phase); console.error(error.stack); process.exitCode = 1; }
+  finally { clearInterval(nativeQueueMonitor); releaseHeldNativePut(); clearInterval(timer); if (host && !host.isDestroyed()) { await host.webContents.executeJavaScript('window.LolzCloudLocal?.shutdown()').catch(() => {}); await delay(80); } if (studio) await studio.shutdown(); if (host && !host.isDestroyed()) host.destroy(); if (roomServer) { roomServer.closeAllConnections(); await new Promise(resolve => roomServer.close(resolve)); } app.exit(process.exitCode || 0); }
 });

@@ -1,0 +1,65 @@
+{
+  "status": "passed",
+  "version": "0.1.6",
+  "versionCode": 7,
+  "apkSha256": "2509087bb8cc80e14675e487093d8f9bbc1a8fb382421142236d9dcd4f6bd17f",
+  "checks": [
+    {
+      "name": "Only the isolated task emulator may run this fixture",
+      "passed": true
+    },
+    {
+      "name": "Both real HTTPS fixture frames load",
+      "passed": true
+    },
+    {
+      "name": "Production trusted room navigation allows asynchronous iframe media after explicit Join",
+      "passed": true
+    },
+    {
+      "name": "Audio document is an actual cross-origin iframe",
+      "passed": true
+    },
+    {
+      "name": "Fixture remains silent before the parent Join touch",
+      "passed": true
+    },
+    {
+      "name": "Real parent touch followed by async fetch starts decoded child audio",
+      "passed": true
+    },
+    {
+      "name": "The successful play follows a user touch and delayed network fixture, without a synthetic play callback",
+      "passed": true
+    },
+    {
+      "name": "Actual child HTMLAudioElement clock advances",
+      "passed": true
+    },
+    {
+      "name": "Next asynchronous child audio request also starts without a new frame gesture",
+      "passed": true
+    },
+    {
+      "name": "Both Join and Next completed their asynchronous readiness request",
+      "passed": true
+    },
+    {
+      "name": "Same WebView navigates to the declared own social page",
+      "passed": true
+    },
+    {
+      "name": "Production non-room main-frame navigation restores the media gesture requirement",
+      "passed": true
+    },
+    {
+      "name": "No external browser intent was launched during room media transitions",
+      "passed": true
+    }
+  ],
+  "diagnostics": [],
+  "scope": "Real Android WebView media pipeline using declared intercepted HTTPS main/child/audio fixtures, genuine generated PCM WAV, actual MotionEvent touches and audio clock. Not a real SoundCloud/YouTube provider, personal login, room membership or system audio fidelity test. Login is native-intercepted and is not opened by this test.",
+  "generatedAt": "2026-11-14T18:30:14.826Z",
+  "emulator": "emulator-5554",
+  "api": "35"
+}

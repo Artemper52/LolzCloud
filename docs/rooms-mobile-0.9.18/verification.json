@@ -39,8 +39,15 @@
     "command": "node --test tests/room-engine.test.cjs"
   },
   "androidWebView": {
-    "status": "pending",
-    "note": "Actual cross-origin media regression will run on the coordinator-built new APK; no production APK rebuilt by this task."
+    "status": "passed",
+    "version": "0.1.6",
+    "versionCode": 7,
+    "apkSha256": "2509087bb8cc80e14675e487093d8f9bbc1a8fb382421142236d9dcd4f6bd17f",
+    "mediaChecks": 13,
+    "socialBackChecks": 17,
+    "report": "../android/verification-0.1.6/README.md",
+    "scope": "Actual Android WebView with explicitly intercepted cross-origin HTTPS audio fixtures and real MotionEvents; no external SDK or physical-device claim. Social Back does not verify the new room-sheet Back."
   },
-  "scope": "Real isolated Chromium DOM/mouse, HTTP/SSE, sessions/roles/lease/queue APIs. Music search and SC/YT SDK are declared deterministic fixtures. No physical iOS/Android or real external-provider media is claimed by these browser suites."
+  "scope": "Real isolated Chromium DOM/mouse, HTTP/SSE, sessions/roles/lease/queue APIs. Music search and SC/YT SDK are declared deterministic fixtures. No physical iOS/Android or real external-provider media is claimed by these browser suites.",
+  "completedAt": "2026-11-14T18:53:16.033Z"
 }

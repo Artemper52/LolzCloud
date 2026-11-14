@@ -1,0 +1,182 @@
+{
+  "status": "passed",
+  "verifiedAt": "2026-11-14T18:53:13Z",
+  "workflowURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43627918673",
+  "runURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43627918673",
+  "runId": 43627918673,
+  "jobId": 132548771212,
+  "product": {
+    "version": "0.1.1",
+    "build": 2,
+    "bundleIdentifier": "com.lolzcloud.ios",
+    "minimumOS": "16.4"
+  },
+  "scope": "Actual hosted XCTest on a fresh iPhone 16 arm64 Simulator running iOS 26.2, built using Xcode 16.4 / iOS Simulator SDK 18.5. The testable application compiles the four unchanged production Swift files. Published unsigned IPA and simulator ZIP remain the original immutable artifacts, not this separate testable build.",
+  "sourceEquivalence": {
+    "publishedCompiledCommit": "4def8a9f69c612f7a319f47830bb66d1e8f007b1",
+    "runtimeCommit": "bb3514bbc94d30bad4e3d4cc0d081330fc65faea",
+    "productionSourceChanges": false,
+    "sourceHashes": {
+      "App.swift": "e356b6af9774554ac41c8f3f13d022218e7c8b0c8541e7cad0491f0aa4fa9f64",
+      "MediaPolicy.swift": "d18d7bfb2c521bed380fce9413a09d1fe096527763e748d039a714206c429fec",
+      "NativePlayer.swift": "a4c09b963f7d09c8c4ff06cd1924c0c451b516450913bcd7895bba160d5fb9f6",
+      "AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734"
+    },
+    "buildDifference": "Separate temporary Xcode project and hosted XCTest target; application ENABLE_TESTABILITY=YES. No rewritten Swift sources or production self-test hooks."
+  },
+  "tests": [
+    {
+      "name": "testActualAVPlayerProgressPauseSeekRateAndEarlyPause",
+      "status": "passed",
+      "seconds": 2.448
+    },
+    {
+      "name": "testActualEndedAdvancesMixedQueueAndPreservesDuplicateIndex",
+      "status": "passed",
+      "seconds": 5.381
+    },
+    {
+      "name": "testDeletedLocalCannotFallbackToNetworkOrPlayCallerURL",
+      "status": "passed",
+      "seconds": 0.61
+    },
+    {
+      "name": "testImportCopiesValidatedWAVAndRejectsInvalidAudio",
+      "status": "passed",
+      "seconds": 0.199
+    },
+    {
+      "name": "testLiveHTTPSWebKitBridgeRejectsStaleClientAndWrongPage",
+      "status": "passed",
+      "seconds": 3.751
+    }
+  ],
+  "totals": {
+    "tests": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 12.388
+  },
+  "runtimeReport": {
+    "status": "passed",
+    "checkedAt": "2026-11-14T18:43:57.951Z",
+    "scope": "Hosted XCTest on a fresh disposable iOS Simulator. No physical-device, external Document Provider, signing or personal-account verification.",
+    "version": "0.1.1",
+    "commit": "bb3514bbc94d30bad4e3d4cc0d081330fc65faea",
+    "sourceHashes": {
+      "App.swift": "e356b6af9774554ac41c8f3f13d022218e7c8b0c8541e7cad0491f0aa4fa9f64",
+      "MediaPolicy.swift": "d18d7bfb2c521bed380fce9413a09d1fe096527763e748d039a714206c429fec",
+      "NativePlayer.swift": "a4c09b963f7d09c8c4ff06cd1924c0c451b516450913bcd7895bba160d5fb9f6",
+      "AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734"
+    },
+    "simulator": {
+      "uuid": "BABEC378-7FA3-42FA-862D-65D7CECE37C9",
+      "device": "iPhone 16",
+      "runtime": "iOS 26.2",
+      "version": "26.2"
+    },
+    "xcresult": "/Users/runner/work/_temp/ios-runtime/NativeRuntime.xcresult",
+    "tests": {
+      "devicesAndConfigurations": [
+        {
+          "device": {
+            "architecture": "arm64",
+            "deviceId": "BABEC378-7FA3-42FA-862D-65D7CECE37C9",
+            "deviceName": "LolzCloud-runtime-1794681901730",
+            "modelName": "iPhone 16",
+            "osBuildNumber": "23C54",
+            "osVersion": "26.2",
+            "platform": "iOS Simulator"
+          },
+          "expectedFailures": 0,
+          "failedTests": 0,
+          "passedTests": 5,
+          "skippedTests": 0,
+          "testPlanConfiguration": {
+            "configurationId": "1",
+            "configurationName": "Test Scheme Action"
+          }
+        }
+      ],
+      "environmentDescription": "LolzCloudRuntime · Built with macOS 15.8.2",
+      "expectedFailures": 0,
+      "failedTests": 0,
+      "finishTime": 1794682282.921,
+      "passedTests": 5,
+      "result": "Passed",
+      "skippedTests": 0,
+      "startTime": 1794682140.416,
+      "statistics": [],
+      "testFailures": [],
+      "title": "Test - LolzCloudRuntime",
+      "topInsights": [],
+      "totalTestCount": 5
+    }
+  },
+  "artifact": {
+    "id": 14127069194,
+    "name": "LolzCloud-iOS-runtime-43627918673",
+    "size_in_bytes": 68455,
+    "url": "https://api.github.com/repos/Artemper52/LolzCloud/actions/artifacts/14127069194",
+    "archive_download_url": "https://api.github.com/repos/Artemper52/LolzCloud/actions/artifacts/14127069194/zip",
+    "expired": false,
+    "created_at": "2026-11-14T18:51:39Z",
+    "expires_at": "2027-02-12T18:40:33Z",
+    "updated_at": "2026-11-14T18:51:39Z",
+    "digest": "sha256:8b4de2fc5edf848ff80ef9d4ab29106b2dfacb2a8fdf6b530960c4fafa1d96d5",
+    "workflow_run": {
+      "id": 43627918673,
+      "repository_id": 1446029268,
+      "head_repository_id": 1446029268,
+      "head_branch": "codex/recover-platforms-0.9.15",
+      "head_sha": "bb3514bbc94d30bad4e3d4cc0d081330fc65faea"
+    }
+  },
+  "attempts": [
+    {
+      "runId": 43626332852,
+      "workflowURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43626332852",
+      "commit": "98f046de60ff34d310bb5fbfda7d22f511bd250c",
+      "status": "failed",
+      "tests": 5,
+      "passed": 4,
+      "failed": 1,
+      "failedTest": "testLiveHTTPSWebKitBridgeRejectsStaleClientAndWrongPage",
+      "cause": "Harness navigated to authenticated /social and waited for that URL. Server correctly redirected to /login, intercepted by native login. Earlier live /app, playback, client-tag and iframe checks had passed; final non-/app wait timed out. This was not a production failure.",
+      "correction": "Test-only navigation to public HTTP 200 /install.html; cancel any pending test login in defer. No browser approval, personal credentials, successful account login or product fix."
+    },
+    {
+      "runId": 43627918673,
+      "commit": "bb3514bbc94d30bad4e3d4cc0d081330fc65faea",
+      "status": "passed",
+      "tests": 5,
+      "passed": 5,
+      "failed": 0
+    }
+  ],
+  "publishedArtifactsUnchanged": [
+    {
+      "file": "LolzCloud-iOS-0.1.1-unsigned.ipa",
+      "bytes": 218523,
+      "sha256": "6a3d7b4d36e328aa3a961c63b43fd4453f7a678655235c23e25fc0744e0c479e"
+    },
+    {
+      "file": "LolzCloud-iOS-0.1.1-simulator.zip",
+      "bytes": 826608,
+      "sha256": "e664f211324bc6abee7bbe7ddac4aaf779899a293ce7243d5d14c16aeb8f40a6"
+    }
+  ],
+  "limitations": [
+    "Simulator evidence; no physical iPhone/iPad, lock-screen/background endurance or audible fidelity test.",
+    "Sandbox WAV import invokes production security-scope/coordinator/private-copy/AVAsset code. A real external Document Provider scope grant and manual document picker interaction remain untested.",
+    "Mixed queue contains a genuine locally seeded MP3 cache record. No successful HTTPS music download is claimed by that fixture.",
+    "Natural-ended transitions and explicit duplicate index were exercised; OS Control Center remote Next/Previous buttons were not pressed.",
+    "No personal authentication, browser approval, room membership mutation, Apple distribution signing or App Store installation."
+  ],
+  "inputs": {
+    "test": "ios/RuntimeTests/NativeRuntimeTests.swift",
+    "runner": "ios/tools/runtime-test.cjs",
+    "generator": "ios/tools/runtime-project.cjs"
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "checkedAt": "2026-11-14T18:42:55.398Z",
+  "fullPlayerUI": {
+    "passed": true,
+    "exitCode": 0,
+    "log": "D:/LolzCloud-Android-Toolchain/room-rave-review/native-queue-integration/final/run.log",
+    "command": "node tools/test-player-ui.cjs",
+    "temporaryRoot": "D:/LolzCloud-Android-Toolchain/tmp"
+  },
+  "nativeQueue": {
+    "status": "passed",
+    "fixtureSetup": "Two real HTTP additions; one explicitly seeded restored duplicate with a distinct ID in the isolated store.",
+    "duplicateAddStatus": 409,
+    "initialIds": [
+      "b6dfa08be173654eb3f64e3f",
+      "002dbcdca25b56562a87d7c3",
+      "266c30c0a554064d0f2740bc"
+    ],
+    "chosenId": "002dbcdca25b56562a87d7c3",
+    "remainingIds": [
+      "b6dfa08be173654eb3f64e3f",
+      "266c30c0a554064d0f2740bc"
+    ],
+    "previousUrl": "https://music.youtube.com/watch?v=fixtureYT03",
+    "selectedUrl": "https://music.youtube.com/watch?v=fixtureYT05",
+    "controlStatus": 200,
+    "controls": [
+      {
+        "id": "002dbcdca25b56562a87d7c3",
+        "sequence": 18
+      }
+    ],
+    "heldPut": {
+      "url": "https://music.youtube.com/watch?v=fixtureYT03",
+      "sequence": 17,
+      "sentAt": 1794681728938,
+      "status": 200,
+      "responseUrl": "https://music.youtube.com/watch?v=fixtureYT03",
+      "releasedAt": 1794681729262
+    },
+    "sampleCount": 44,
+    "postReadySamples": 39,
+    "postReadyNativeUrls": [
+      "https://music.youtube.com/watch?v=fixtureYT05"
+    ],
+    "allPostReadyPlaying": true,
+    "serverUrls": [
+      "https://music.youtube.com/watch?v=fixtureYT05"
+    ],
+    "newerSelectedPuts": [
+      {
+        "url": "https://music.youtube.com/watch?v=fixtureYT05",
+        "sequence": 19,
+        "sentAt": 1794681729030,
+        "status": 200
+      },
+      {
+        "url": "https://music.youtube.com/watch?v=fixtureYT05",
+        "sequence": 20,
+        "sentAt": 1794681729306,
+        "status": 200
+      },
+      {
+        "url": "https://music.youtube.com/watch?v=fixtureYT05",
+        "sequence": 21,
+        "sentAt": 1794681730445,
+        "status": 200
+      },
+      {
+        "url": "https://music.youtube.com/watch?v=fixtureYT05",
+        "sequence": 22,
+        "sentAt": 1794681731948,
+        "status": 200
+      }
+    ],
+    "checks": [
+      "Actual WebView action reaches native playQueued and the real atomic control API exactly once",
+      "Server and native queue preserve first and third IDs, including the duplicate URL",
+      "Delayed accepted old PUT response and the next native heartbeat do not revert the chosen recording or lease",
+      "Same guest, same hidden provider iframe, room route and unchanged chat draft remain resident",
+      "Remaining fixture entries are removed through authenticated HTTP before the unchanged handoff test"
+    ]
+  },
+  "limitations": [
+    "Real Electron Studio/WebViews/HTMLMediaElement with synthetic WAV and deterministic service pages; muted audio; not real YouTube network or physical speaker output.",
+    "Third duplicate row is explicitly seeded as legacy/restored data; public duplicate-add API remains409."
+  ],
+  "files": [
+    {
+      "path": "C:\\Users\\27nov\\LolzCloud\\tests\\player-ui.cjs",
+      "size": 62987,
+      "sha256": "ecc99b1c3b984b4bf7a136f9cc91533c93189c02776ce9fabf24b41882920bc5"
+    },
+    {
+      "path": "C:\\Users\\27nov\\LolzCloud\\tools\\test-player-ui.cjs",
+      "size": 893,
+      "sha256": "b2b7725aaf66a6aef26c5a1893cf95bc108355e65925ed869beee7893d48ebb9"
+    },
+    {
+      "path": "C:\\Users\\27nov\\LolzCloud\\source\\integrations\\room.cjs",
+      "size": 17638,
+      "sha256": "761bdadfc815d15386e664ec613820f3445d5b64df083ad4084cbdb5f9064c43"
+    },
+    {
+      "path": "C:\\Users\\27nov\\LolzCloud\\source\\integrations\\player-experience.cjs",
+      "size": 18426,
+      "sha256": "16aeac3fe467b45476248e7c870b05fbef1b1f3d2b5d6d242e3571b16e072f67"
+    },
+    {
+      "path": "C:\\Users\\27nov\\LolzCloud\\source\\integrations\\studio.cjs",
+      "size": 37350,
+      "sha256": "a3e890a65a714aa2e709db403b9b599d3676b2101622cecb2c2869ecf6768d4b"
+    },
+    {
+      "path": "C:\\Users\\27nov\\LolzCloud\\source\\room-preload.cjs",
+      "size": 1677,
+      "sha256": "000e04f19ad1ee1c330f1ce62e01e2ce0070108e72de1bbf465c1a041b252ea2"
+    }
+  ]
+}

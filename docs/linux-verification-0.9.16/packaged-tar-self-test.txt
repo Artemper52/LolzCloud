@@ -1,0 +1,1 @@
+Compatibility self-test passed: Electron 45.2.1, Node 24.22.1, binary fetch/streams, session cookies, stored bookmarks and native renderer.
