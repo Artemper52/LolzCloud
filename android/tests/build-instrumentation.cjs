@@ -20,6 +20,8 @@ function run(file, args) {
 function java(name) { return path.join(javaHome, 'bin', name + '.exe'); }
 function walk(dir) { return fs.readdirSync(dir, { withFileTypes: true }).flatMap(e => e.isDirectory() ? walk(path.join(dir, e.name)) : e.name.endsWith('.java') ? [path.join(dir, e.name)] : []); }
 for (const dir of ['classes', 'dex', 'assets/fixtures']) fs.mkdirSync(path.join(build, dir), { recursive: true });
+const profiles = path.join(build, 'assets', 'profiles'); fs.mkdirSync(profiles, { recursive: true });
+for (const name of ['desktop-v1.json', 'legacy-android-v1.json', 'crypto-v1.json']) fs.copyFileSync(path.join(repo, 'tests', 'fixtures', 'portable-profiles', name), path.join(profiles, name));
 const titles = ['Ночной маршрут', 'Тёплый воздух', 'Тихий берег', 'До рассвета'];
 const ids = ['night-route', 'warm-air', 'quiet-shore', 'before-dawn'];
 const ffmpeg = require(path.join(repo, 'node_modules', 'ffmpeg-static'));

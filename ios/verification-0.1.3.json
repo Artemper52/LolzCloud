@@ -1,0 +1,451 @@
+{
+  "status": "passed",
+  "verifiedAt": "2026-11-14T23:08:58.445Z",
+  "releaseCandidate": "0.1.3",
+  "bundleBuild": "4",
+  "workflowURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43649974098",
+  "runURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43649974098",
+  "runId": 43649974098,
+  "sourceCommit": "74e3273b702abcc24882290475729a642f8852c8",
+  "compiledCommit": "74e3273b702abcc24882290475729a642f8852c8",
+  "sourceFrozen": true,
+  "appleSDK": {
+    "status": "passed",
+    "jobId": 132616174464,
+    "xcode": "26.3",
+    "deviceSDK": "26.2",
+    "simulatorSDK": "26.2",
+    "minimumOS": "16.4",
+    "simulatorBuildSucceeded": true,
+    "deviceArchiveSucceeded": true,
+    "policyTests": 65,
+    "policyFailures": 0
+  },
+  "purePolicy": {
+    "status": "passed",
+    "tests": 65,
+    "failures": 0,
+    "host": "Linux x86_64 swift:6.2.1-bookworm",
+    "addressSanitizer": "passed",
+    "asanOptions": "detect_leaks=0",
+    "leakSanitizer": "disabled",
+    "note": "Foundation/C tests complement, and do not replace, the actual Apple SDK/runtime verification."
+  },
+  "runtime": {
+    "iphone": {
+      "jobId": 132616729775,
+      "report": {
+        "status": "passed",
+        "checkedAt": "2026-11-14T22:51:03.195Z",
+        "scope": "Hosted XCTest on a fresh disposable iOS Simulator. No physical-device, external Document Provider, signing or personal-account verification.",
+        "version": "0.1.3",
+        "commit": "74e3273b702abcc24882290475729a642f8852c8",
+        "sourceHashes": {
+          "App.swift": "33ef9e5b9d5a90ff7a52333c6276d5c190fc1cc097f988296b78adf1b6cff036",
+          "MediaPolicy.swift": "01b9cbc681505ed4497d154fd866d1f31dbe16ff6f15e6f09027ac989e09cd55",
+          "NativePlayer.swift": "291101391d36eb8877c2c66128bd8932c4bfc39e96487efb0fe5c78a211b1503",
+          "AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
+          "AudioEffectsPolicy.swift": "04e0efe18dc15036716243ae263157e57d3ae3fc62446ba5c945ff7d42ed9d5d",
+          "NativeAudioEffects.swift": "cad5c9289a0146485348eef0c651799fb3508ec03772fcc035a0d7f4acaeffc3",
+          "NativeCatalog.swift": "757ee942d3f9d6e9854f8b2ffed1bdb3ebcd8da0d25e45ac22be8c8795937c0f",
+          "NativeProfileShare.swift": "2818dccc99e4c9e61c8603ca979ccf77b62389797a0fdaf5bc75734665eb23c5",
+          "DSPCore.c": "0ab77fbbe9a32e33339050cf9ad9968140d385a858008d0367664b34965c03a0",
+          "NativeAudioTap.c": "3d68886e3ed3964c75861886c575ae42422dde573084c7868f2fa94df556d2c7"
+        },
+        "simulator": {
+          "uuid": "A61E0C88-12C9-4194-A9F6-7681568CF272",
+          "family": "iphone",
+          "device": "iPhone 16",
+          "runtime": "iOS 26.2",
+          "version": "26.2"
+        },
+        "xcresult": "/Users/runner/work/_temp/ios-runtime/NativeRuntime.xcresult",
+        "tests": {
+          "devicesAndConfigurations": [
+            {
+              "device": {
+                "architecture": "arm64",
+                "deviceId": "A61E0C88-12C9-4194-A9F6-7681568CF272",
+                "deviceName": "LolzCloud-runtime-1794696673240",
+                "modelName": "iPhone 16",
+                "osBuildNumber": "23C54",
+                "osVersion": "26.2",
+                "platform": "iOS Simulator"
+              },
+              "expectedFailures": 0,
+              "failedTests": 0,
+              "passedTests": 12,
+              "skippedTests": 0,
+              "testPlanConfiguration": {
+                "configurationId": "1",
+                "configurationName": "Test Scheme Action"
+              }
+            }
+          ],
+          "environmentDescription": "LolzCloudRuntime Â· Built with macOS 15.8.2",
+          "expectedFailures": 0,
+          "failedTests": 0,
+          "finishTime": 1794697136.017,
+          "passedTests": 12,
+          "result": "Passed",
+          "skippedTests": 0,
+          "startTime": 1794696935.445,
+          "statistics": [],
+          "testFailures": [],
+          "title": "Test - LolzCloudRuntime",
+          "topInsights": [],
+          "totalTestCount": 12
+        }
+      },
+      "cases": [
+        {
+          "name": "testActualAVPlayerProgressPauseSeekRateAndEarlyPause",
+          "seconds": 2.463
+        },
+        {
+          "name": "testActualCachedMP3TapMeasuresPreampOnDecodedPCM",
+          "seconds": 0.197
+        },
+        {
+          "name": "testActualEndedAdvancesMixedQueueAndPreservesDuplicateIndex",
+          "seconds": 6.288
+        },
+        {
+          "name": "testActualLocalTapChangesSpectrumAndPausedSettingsDoNotResume",
+          "seconds": 1.022
+        },
+        {
+          "name": "testActualTapEchoImpulseAndReverbTail",
+          "seconds": 4.324
+        },
+        {
+          "name": "testActualTapNormalizationConvergesWithoutChangingPausedTransport",
+          "seconds": 11.912
+        },
+        {
+          "name": "testAdvancedSettingsFollowRealDuplicateQueueWithoutDoubleAdvance",
+          "seconds": 3.393
+        },
+        {
+          "name": "testDeletedLocalCannotFallbackToNetworkOrPlayCallerURL",
+          "seconds": 0.495
+        },
+        {
+          "name": "testImportCopiesValidatedWAVAndRejectsInvalidAudio",
+          "seconds": 0.108
+        },
+        {
+          "name": "testLazyCatalogReferenceUsesSeededCacheAndPreservesDuplicateOccurrence",
+          "seconds": 3.492
+        },
+        {
+          "name": "testLiveHTTPSWebKitBridgeRejectsStaleClientAndWrongPage",
+          "seconds": 20.847
+        },
+        {
+          "name": "testTaggedProfileExportPresentsRealAnchoredSystemSheetAndPreservesPause",
+          "seconds": 13.527
+        }
+      ]
+    },
+    "ipad": {
+      "jobId": 132616729735,
+      "report": {
+        "status": "passed",
+        "checkedAt": "2026-11-14T22:51:00.835Z",
+        "scope": "Hosted XCTest on a fresh disposable iOS Simulator. No physical-device, external Document Provider, signing or personal-account verification.",
+        "version": "0.1.3",
+        "commit": "74e3273b702abcc24882290475729a642f8852c8",
+        "sourceHashes": {
+          "App.swift": "33ef9e5b9d5a90ff7a52333c6276d5c190fc1cc097f988296b78adf1b6cff036",
+          "MediaPolicy.swift": "01b9cbc681505ed4497d154fd866d1f31dbe16ff6f15e6f09027ac989e09cd55",
+          "NativePlayer.swift": "291101391d36eb8877c2c66128bd8932c4bfc39e96487efb0fe5c78a211b1503",
+          "AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
+          "AudioEffectsPolicy.swift": "04e0efe18dc15036716243ae263157e57d3ae3fc62446ba5c945ff7d42ed9d5d",
+          "NativeAudioEffects.swift": "cad5c9289a0146485348eef0c651799fb3508ec03772fcc035a0d7f4acaeffc3",
+          "NativeCatalog.swift": "757ee942d3f9d6e9854f8b2ffed1bdb3ebcd8da0d25e45ac22be8c8795937c0f",
+          "NativeProfileShare.swift": "2818dccc99e4c9e61c8603ca979ccf77b62389797a0fdaf5bc75734665eb23c5",
+          "DSPCore.c": "0ab77fbbe9a32e33339050cf9ad9968140d385a858008d0367664b34965c03a0",
+          "NativeAudioTap.c": "3d68886e3ed3964c75861886c575ae42422dde573084c7868f2fa94df556d2c7"
+        },
+        "simulator": {
+          "uuid": "D96C3FA7-CDB1-4A6F-9AAB-1B66D945F6B8",
+          "family": "ipad",
+          "device": "iPad Pro 11-inch (M4) (16GB)",
+          "runtime": "iOS 26.2",
+          "version": "26.2"
+        },
+        "xcresult": "/Users/runner/work/_temp/ios-runtime/NativeRuntime.xcresult",
+        "tests": {
+          "devicesAndConfigurations": [
+            {
+              "device": {
+                "architecture": "arm64",
+                "deviceId": "D96C3FA7-CDB1-4A6F-9AAB-1B66D945F6B8",
+                "deviceName": "LolzCloud-runtime-1794696789462",
+                "modelName": "iPad Pro 11-inch (M4) (16GB)",
+                "osBuildNumber": "23C54",
+                "osVersion": "26.2",
+                "platform": "iOS Simulator"
+              },
+              "expectedFailures": 0,
+              "failedTests": 0,
+              "passedTests": 12,
+              "skippedTests": 0,
+              "testPlanConfiguration": {
+                "configurationId": "1",
+                "configurationName": "Test Scheme Action"
+              }
+            }
+          ],
+          "environmentDescription": "LolzCloudRuntime Â· Built with macOS 15.8.2",
+          "expectedFailures": 0,
+          "failedTests": 0,
+          "finishTime": 1794697237.677,
+          "passedTests": 12,
+          "result": "Passed",
+          "skippedTests": 0,
+          "startTime": 1794696989.465,
+          "statistics": [],
+          "testFailures": [],
+          "title": "Test - LolzCloudRuntime",
+          "topInsights": [],
+          "totalTestCount": 12
+        }
+      },
+      "cases": [
+        {
+          "name": "testActualAVPlayerProgressPauseSeekRateAndEarlyPause",
+          "seconds": 2.918
+        },
+        {
+          "name": "testActualCachedMP3TapMeasuresPreampOnDecodedPCM",
+          "seconds": 0.189
+        },
+        {
+          "name": "testActualEndedAdvancesMixedQueueAndPreservesDuplicateIndex",
+          "seconds": 6.269
+        },
+        {
+          "name": "testActualLocalTapChangesSpectrumAndPausedSettingsDoNotResume",
+          "seconds": 1.186
+        },
+        {
+          "name": "testActualTapEchoImpulseAndReverbTail",
+          "seconds": 4.325
+        },
+        {
+          "name": "testActualTapNormalizationConvergesWithoutChangingPausedTransport",
+          "seconds": 11.798
+        },
+        {
+          "name": "testAdvancedSettingsFollowRealDuplicateQueueWithoutDoubleAdvance",
+          "seconds": 3.368
+        },
+        {
+          "name": "testDeletedLocalCannotFallbackToNetworkOrPlayCallerURL",
+          "seconds": 0.5
+        },
+        {
+          "name": "testImportCopiesValidatedWAVAndRejectsInvalidAudio",
+          "seconds": 0.128
+        },
+        {
+          "name": "testLazyCatalogReferenceUsesSeededCacheAndPreservesDuplicateOccurrence",
+          "seconds": 3.045
+        },
+        {
+          "name": "testLiveHTTPSWebKitBridgeRejectsStaleClientAndWrongPage",
+          "seconds": 5.169
+        },
+        {
+          "name": "testTaggedProfileExportPresentsRealAnchoredSystemSheetAndPreservesPause",
+          "seconds": 8.92
+        }
+      ]
+    }
+  },
+  "canonicalInputs": {
+    "ios/LolzCloud/AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
+    "ios/LolzCloud/App.swift": "33ef9e5b9d5a90ff7a52333c6276d5c190fc1cc097f988296b78adf1b6cff036",
+    "ios/LolzCloud/AudioEffectsPolicy.swift": "04e0efe18dc15036716243ae263157e57d3ae3fc62446ba5c945ff7d42ed9d5d",
+    "ios/LolzCloud/MediaPolicy.swift": "01b9cbc681505ed4497d154fd866d1f31dbe16ff6f15e6f09027ac989e09cd55",
+    "ios/LolzCloud/NativeAudioEffects.swift": "cad5c9289a0146485348eef0c651799fb3508ec03772fcc035a0d7f4acaeffc3",
+    "ios/LolzCloud/NativeCatalog.swift": "757ee942d3f9d6e9854f8b2ffed1bdb3ebcd8da0d25e45ac22be8c8795937c0f",
+    "ios/LolzCloud/NativePlayer.swift": "291101391d36eb8877c2c66128bd8932c4bfc39e96487efb0fe5c78a211b1503",
+    "ios/LolzCloud/NativeProfileShare.swift": "2818dccc99e4c9e61c8603ca979ccf77b62389797a0fdaf5bc75734665eb23c5",
+    "ios/LolzCloud/DSP/DSPCore.c": "0ab77fbbe9a32e33339050cf9ad9968140d385a858008d0367664b34965c03a0",
+    "ios/LolzCloud/DSP/NativeAudioTap.c": "3d68886e3ed3964c75861886c575ae42422dde573084c7868f2fa94df556d2c7",
+    "ios/LolzCloud/DSP/NativeAudioEffectsBridge.h": "b2a95cc7ee4c027b32d49a7f97a25dab0e5734e5381ae24cb0a48ccf30795317",
+    "ios/LolzCloud/DSP/NativeAudioTap.h": "e1e6fc7beed917df0d1e6a3e8e0af48736772e9c4288a0c9bb08f550a879ca5b",
+    "ios/LolzCloud/DSP/include/LCDSPCore.h": "520ac9d474deaeb25d8b161a8cd7f48a76d3a6ee0be0176dbb64b4005ab90ef7",
+    "ios/Tests/AdvancedAudioEffectsTests.swift": "0e99d1eb1f560792f840bbb7275a8ccf5bf6f0756a9d91cc07e84efcfb5295d0",
+    "ios/Tests/AudioEffectsTests.swift": "9cd9d10f3c2df6685c38c54e174b29493448badf35eccfba15d06937e9f09465",
+    "ios/Tests/MediaPolicyTests.swift": "fc6ea87bafb7987286b934f721437874d314e5d3f1e4678f90cf53beb32f4913",
+    "ios/Tests/NativeCatalogTests.swift": "94a90789e7387938dc9b1b031848e06460d875685f92c91bc00c5e525fc600e0",
+    "ios/Tests/PortableProfileFileTests.swift": "6217c5e690cd983c3fe90985d8213435aee1070dcd8aa135b5d3dd9390dbac1f",
+    "ios/RuntimeTests/NativeRuntimeTests.swift": "de82ca5eec3fa5910b4e10c525261215aa7bb55f435617ea2b1d1901478e4dd8",
+    "ios/Package.swift": "82267e63405286f511434958b307a3b4f0d282ba066b64ac782c4f562a27f9bf",
+    "ios/tools/project.cjs": "c4d6ba798a3e29db7e6703078743c2cc828a7e211bcd0a2fe8f62a7ce9c248b4",
+    "ios/tools/runtime-project.cjs": "f20ad8d6f077beabac6614cdf3c0c3c555edb604a5634719b09267b1ab8da240",
+    "ios/tools/CheckProject.swift": "bc905400792e55d5c688c344dd7ec721db1fa432488d368fae2abf29eb2cbaa1"
+  },
+  "canonicalInputCount": 23,
+  "compiledProductionInputCount": 10,
+  "harnessSha256": "de82ca5eec3fa5910b4e10c525261215aa7bb55f435617ea2b1d1901478e4dd8",
+  "infoPlistSha256": "46220d643bc0769974662410970d20695f2e145ec2ef8d0513ea7df98fbe756b",
+  "artifacts": [
+    {
+      "archive_download_url": "https://api.github.com/repos/Artemper52/LolzCloud/actions/artifacts/14136310853/zip",
+      "created_at": "2026-11-14T23:01:01Z",
+      "digest": "sha256:f470c77e553570ce28067ec23ada110ee38b015a234573a16a730801eced7e06",
+      "expired": false,
+      "expires_at": "2027-02-12T22:48:06Z",
+      "id": 14136310853,
+      "name": "LolzCloud-iOS-runtime-ipad-43649974098",
+      "node_id": "MDg6QXJ0aWZhY3QxNDEzNjMxMDg1Mw==",
+      "size_in_bytes": 579354,
+      "updated_at": "2026-11-14T23:01:01Z",
+      "url": "https://api.github.com/repos/Artemper52/LolzCloud/actions/artifacts/14136310853",
+      "workflow_run": {
+        "head_branch": "codex/recover-ios-advanced-0.1.3",
+        "head_repository_id": 1446029268,
+        "head_sha": "74e3273b702abcc24882290475729a642f8852c8",
+        "id": 43649974098,
+        "repository_id": 1446029268
+      }
+    },
+    {
+      "archive_download_url": "https://api.github.com/repos/Artemper52/LolzCloud/actions/artifacts/14135468374/zip",
+      "created_at": "2026-11-14T22:59:15Z",
+      "digest": "sha256:551a69326b7909f24b2467f3570832da2ebfbfd2b0bedfdf6a4cc000b66972b0",
+      "expired": false,
+      "expires_at": "2027-02-12T22:48:06Z",
+      "id": 14135468374,
+      "name": "LolzCloud-iOS-runtime-iphone-43649974098",
+      "node_id": "MDg6QXJ0aWZhY3QxNDEzNTQ2ODM3NA==",
+      "size_in_bytes": 740356,
+      "updated_at": "2026-11-14T22:59:15Z",
+      "url": "https://api.github.com/repos/Artemper52/LolzCloud/actions/artifacts/14135468374",
+      "workflow_run": {
+        "head_branch": "codex/recover-ios-advanced-0.1.3",
+        "head_repository_id": 1446029268,
+        "head_sha": "74e3273b702abcc24882290475729a642f8852c8",
+        "id": 43649974098,
+        "repository_id": 1446029268
+      }
+    },
+    {
+      "archive_download_url": "https://api.github.com/repos/Artemper52/LolzCloud/actions/artifacts/14135374053/zip",
+      "created_at": "2026-11-14T22:50:40Z",
+      "digest": "sha256:939029e9935400709dae52961430e9b07fb6d8798320f14c086e04c649afbb5a",
+      "expired": false,
+      "expires_at": "2027-02-12T22:48:06Z",
+      "id": 14135374053,
+      "name": "LolzCloud-iOS-0.1.3",
+      "node_id": "MDg6QXJ0aWZhY3QxNDEzNTM3NDA1Mw==",
+      "size_in_bytes": 1326406,
+      "updated_at": "2026-11-14T22:50:40Z",
+      "url": "https://api.github.com/repos/Artemper52/LolzCloud/actions/artifacts/14135374053",
+      "workflow_run": {
+        "head_branch": "codex/recover-ios-advanced-0.1.3",
+        "head_repository_id": 1446029268,
+        "head_sha": "74e3273b702abcc24882290475729a642f8852c8",
+        "id": 43649974098,
+        "repository_id": 1446029268
+      }
+    }
+  ],
+  "archiveContent": {
+    "status": "passed",
+    "sourceCommit": "74e3273b702abcc24882290475729a642f8852c8",
+    "ciArtifactId": 14135374053,
+    "ciZipSha256": "939029e9935400709dae52961430e9b07fb6d8798320f14c086e04c649afbb5a",
+    "files": [
+      {
+        "name": "LolzCloud-iOS-0.1.3-simulator.zip",
+        "bytes": 1060184,
+        "sha256": "71a6b7d5556002393b1e966bf502c2ae64166a0be25dfebb34fd7a4e14133cf5",
+        "version": "0.1.3",
+        "build": 4,
+        "minimumOS": "16.4",
+        "deviceFamilies": [
+          1,
+          2
+        ]
+      },
+      {
+        "name": "LolzCloud-iOS-0.1.3-unsigned.ipa",
+        "bytes": 275908,
+        "sha256": "fe815d77baccbb1d36444a63fea34237873d699f6e2fbb855d0ec773849320fb",
+        "version": "0.1.3",
+        "build": 4,
+        "minimumOS": "16.4",
+        "deviceFamilies": [
+          1,
+          2
+        ]
+      }
+    ]
+  },
+  "verifiedBehavior": [
+    "AVPlayer progress, pause, seek, rate and early pause without autoplay",
+    "Genuine seeded cached MP3 preamp and imported WAV spectral EQ through actual PCM tap",
+    "Actual 280 ms echo, source-silent decaying reverb tail, gated normalization gain convergence, independent settings/transport intent",
+    "Advanced FX preserved through real queue end and duplicate occurrences",
+    "Public HTTPS metadata lazy reference resolution into seeded genuine MP3 cache without duplicate-index rewind",
+    "Real own-origin WK bridge rejects stale clients, provider frames and wrong public pages",
+    "Actual UIKit profile share presentation with exact UTF-8 file, iPad popover anchor, duplicate rejection and unchanged paused item/queue"
+  ],
+  "shareScope": {
+    "actualUIActivityViewController": true,
+    "actualUTF8File": true,
+    "actualIPadAnchor": true,
+    "capturedOwnerAndDuplicateRejection": true,
+    "unchangedPausedPlayback": true,
+    "externalDestinationSelected": false,
+    "userCancelCallbackVerified": false,
+    "cleanup": "Programmatic dismissal and removal of the fixture-owned private temporary directory; no completion callback was fabricated."
+  },
+  "networkFixtureScope": "Catalog metadata is fetched from the real fixed HTTPS endpoint. Cached audio in the catalog/mixed-queue test is a seeded genuine MP3 fixture, not an HTTPS-download or source-authenticity claim.",
+  "limitations": [
+    "No physical-device, screen-lock, headphone/call endurance or personal-account verification",
+    "External Documents Provider selection and share destination persistence/user Cancel are not verified",
+    "Device IPA is unsigned for Apple distribution and requires recipient provisioning/signing",
+    "Loudness matching/limiter are not certified LUFS or true-peak implementations",
+    "Native independent pitch remains unsupported; capability is false"
+  ],
+  "distribution": {
+    "appleDistributionSigned": false,
+    "provisioningRequired": true,
+    "recommendedUnprovisionedInstall": "https://lolzcloud.com/app/"
+  },
+  "history": {
+    "initial": {
+      "runURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43646716050",
+      "commit": "0d6e92e77aba15eb991efdab34181c3d5134eb9d",
+      "sdkBuild": "passed",
+      "perFamily": {
+        "iphone": {
+          "passed": 10,
+          "failed": 1
+        },
+        "ipad": {
+          "passed": 10,
+          "failed": 1
+        }
+      },
+      "failure": "Reverb test assumed an absolute PCM origin: a 0.0624847337603569 input impulse was inside the supposedly silent fixed window. The test was changed to locate the measured impulse and retain strict relative no-input/tail/decay assertions; production DSP did not change."
+    },
+    "temporalFixtureRetry": {
+      "runURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43648426658",
+      "commit": "596c0db03bb5ef6e2a442f2da29f5faaf2e5da1d",
+      "iphonePassed": 11,
+      "ipadPassed": 11,
+      "failed": 0,
+      "skipped": 0
+    },
+    "final": "Added the real UIKit profile-share test; all twelve passed on both fresh simulator families with the same ten production source hashes.",
+    "preserved012ProofSha256": "f67b1572dfa00b48d0aeb83805190536ddd766bd7e2f281465387f085363bd37"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "status": "failed",
+  "error": "java.lang.AssertionError: Second real import preview",
+  "ui": "LolzCloud profile QA|Files from LolzCloud profile QA / Declared portable JSON fixtures|List view|Show roots|LolzCloud profile QA|More options|Preview the file Desktop profile.json|Desktop profile.json|4.00 kB|2:01 AM|Preview the file export-8bacd59d-849d-40d0-b8d8-f2afc10297a9.json|export-8bacd59d-849d-40d0-b8d8-f2afc10297a9.json|2.70 kB|2:01 AM|Preview the file Invalid profile.json|Invalid profile.json|105 B|2:01 AM|Preview the file Legacy Android profile.json|Legacy Android profile.json|367 B|2:01 AM|Cancel|1 selected|Select|More options|",
+  "runId": "2eee4f1c-8dcc-4f7e-a6c0-25c34c5cdbdd",
+  "checks": [
+    "Saved reference JSON retains its explicit nonplayable marker",
+    "Malformed reference uri cannot enter a saved queue",
+    "Malformed reference sourceUrl cannot enter a saved queue",
+    "Malformed reference id cannot enter a saved queue",
+    "Corrupt/wrong/private profile is rejected without any preference mutation",
+    "Corrupt/wrong/private profile is rejected without any preference mutation",
+    "Corrupt/wrong/private profile is rejected without any preference mutation",
+    "Corrupt/wrong/private profile is rejected without any preference mutation",
+    "Corrupt/wrong/private profile is rejected without any preference mutation",
+    "Corrupt/wrong/private profile is rejected without any preference mutation",
+    "Unknown secrets/private fields never enter the whitelisted sidecar",
+    "One permalink with conflicting numeric identities is rejected atomically",
+    "Duplicate native positions retain every portable bookmark ID, note and order",
+    "Duplicate portable like metadata is retained without duplicating the native library row",
+    "Genuine SAF selection and preview do not mutate preferences or start catalog requests",
+    "Real Activity recreation preserves the unconfirmed preview and checkbox without a large Bundle or import mutation",
+    "Preview Cancel preserves all original preference values"
+  ],
+  "screenshots": [
+    "profile-preview.png"
+  ],
+  "effectReadbacks": [],
+  "version": "0.1.8",
+  "versionCode": 9,
+  "apkSha256": "e98fbdaf0fb815922a6efb3081a9d85539ff47a2ad028f2229774fc1a5989ff0",
+  "preferencesRestored": true,
+  "personalAccountsUsed": false,
+  "scope": "Actual Java JSON/SharedPreferences/SAF DocumentsUI and native MediaPlayer; synthetic desktop data is explicitly separate from real public SoundCloud Gno playback. No personal account/cloud, physical device or acoustic EQ response claim.",
+  "productionShaUnchanged": true,
+  "checkedAt": "2026-11-14T23:03:42.278Z"
+}

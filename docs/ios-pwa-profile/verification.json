@@ -1,0 +1,209 @@
+{
+  "status": "passed",
+  "createdAt": "2026-11-14T23:06:29.436530+00:00",
+  "candidate": true,
+  "publishedBaselineUnchanged": true,
+  "format": "lolzcloud-profile",
+  "version": 1,
+  "maxUtf8Bytes": 750000,
+  "serviceWorker": "lolzcloud-app-shell-v6",
+  "sourceFiles": [
+    {
+      "path": "server/public/app/app.css",
+      "size": 19490,
+      "sha256": "21378a2133a1c4d3b2b7c1cc2617a82e61ff2f77948e0ba07c202959b0b195ed",
+      "owner": "noslop_design"
+    },
+    {
+      "path": "server/public/app/app.js",
+      "size": 94782,
+      "sha256": "b38538b26f1c9b7aebede70aa9715a4e6de25033de8824abf41c0d89f570a338",
+      "owner": "noslop_design"
+    },
+    {
+      "path": "server/public/app/core.js",
+      "size": 9897,
+      "sha256": "20a8d5b82f1c392438cd6655dd0f40f253e6d8ce6aace96e123dba4edca97daf",
+      "owner": "root-or-existing-frozen"
+    },
+    {
+      "path": "server/public/app/effects-policy.js",
+      "size": 5503,
+      "sha256": "d09718958652e166fef7dcaed791d0353107601b7214814ffb13e20aecb94687",
+      "owner": "noslop_design"
+    },
+    {
+      "path": "server/public/app/effects.js",
+      "size": 14086,
+      "sha256": "ce79663279f017d67e03d376c3664764b1a5c6b1379d239cd746c4097caf9991",
+      "owner": "noslop_design"
+    },
+    {
+      "path": "server/public/app/icon-192.png",
+      "size": 7875,
+      "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4",
+      "owner": "root-or-existing-frozen"
+    },
+    {
+      "path": "server/public/app/icon-512.png",
+      "size": 9687,
+      "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef",
+      "owner": "root-or-existing-frozen"
+    },
+    {
+      "path": "server/public/app/icon.svg",
+      "size": 366,
+      "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6",
+      "owner": "root-or-existing-frozen"
+    },
+    {
+      "path": "server/public/app/imports.js",
+      "size": 2375,
+      "sha256": "9c025444b795b53b730d27723d18006a743c11601f22c86b2f89bea9d384abc2",
+      "owner": "root-or-existing-frozen"
+    },
+    {
+      "path": "server/public/app/index.html",
+      "size": 23084,
+      "sha256": "3add195181b9b3f1c367a9f3ee1cbca07d228c118968b647a09100c44abb2471",
+      "owner": "noslop_design"
+    },
+    {
+      "path": "server/public/app/limiter-worklet.js",
+      "size": 2197,
+      "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112",
+      "owner": "root-or-existing-frozen"
+    },
+    {
+      "path": "server/public/app/manifest.webmanifest",
+      "size": 440,
+      "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7",
+      "owner": "root-or-existing-frozen"
+    },
+    {
+      "path": "server/public/app/normalization-worklet.js",
+      "size": 3376,
+      "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664",
+      "owner": "root-or-existing-frozen"
+    },
+    {
+      "path": "server/public/app/offline.js",
+      "size": 4979,
+      "sha256": "8774eb963ff7fe0c85e61668c0355d8c3b0e3467a3e30a7ba032c49771ab3936",
+      "owner": "root-or-existing-frozen"
+    },
+    {
+      "path": "server/public/app/profile-cloud.js",
+      "size": 9042,
+      "sha256": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64",
+      "owner": "root-or-existing-frozen"
+    },
+    {
+      "path": "server/public/app/profile-crypto-worker.js",
+      "size": 4898,
+      "sha256": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66",
+      "owner": "root-or-existing-frozen"
+    },
+    {
+      "path": "server/public/app/profile-crypto.js",
+      "size": 2972,
+      "sha256": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206",
+      "owner": "root-or-existing-frozen"
+    },
+    {
+      "path": "server/public/app/profile-policy.js",
+      "size": 9513,
+      "sha256": "5e2d9bf5253d7a25dba7419baf4bb8d64670a179474da02577c5a5687e75c56a",
+      "owner": "noslop_design"
+    },
+    {
+      "path": "server/public/app/profile.js",
+      "size": 13969,
+      "sha256": "8b8c35e95dd8030103650d3e7128043a4b5cac8259d209e8a0dc2f0e05dc454a",
+      "owner": "noslop_design"
+    },
+    {
+      "path": "server/public/app/sw.js",
+      "size": 1814,
+      "sha256": "2b454a579636b24bb59fab8dab7ecf234e06439e78c2017ba92e15ff953062ba",
+      "owner": "noslop_design"
+    },
+    {
+      "path": "server/public/app/vendor-scrypt-3.0.1.js",
+      "size": 17811,
+      "sha256": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d",
+      "owner": "root-or-existing-frozen"
+    }
+  ],
+  "browser": {
+    "passed": 202,
+    "suites": [
+      {
+        "report": "profile.json",
+        "passed": 36
+      },
+      {
+        "report": "cloud.json",
+        "passed": 19
+      },
+      {
+        "report": "effects.json",
+        "passed": 40
+      },
+      {
+        "report": "baseline.json",
+        "passed": 66
+      },
+      {
+        "report": "imports.json",
+        "passed": 17
+      },
+      {
+        "report": "queue.json",
+        "passed": 11
+      },
+      {
+        "report": "login.json",
+        "passed": 13
+      }
+    ],
+    "limitations": "Chromium/Electron isolated real DOM/Worker/HTMLMediaElement and local HTTP/SSE; native events are exact-contract IPC fixtures. No physical Safari/iPhone/iPad or native share-sheet proof."
+  },
+  "node": {
+    "passed": 55,
+    "failed": 0,
+    "skipped": 0,
+    "command": "node --test tests/pwa-profile.test.cjs tests/pwa-effects-policy.test.cjs tests/pwa-profile-cloud.test.cjs tests/pwa-profile-crypto.test.cjs tests/pwa-core.test.cjs",
+    "suites": {
+      "profile": 20,
+      "effectsPolicy": 7,
+      "cloud": 10,
+      "crypto": 5,
+      "core": 13
+    },
+    "report": "node-v6.tap"
+  },
+  "scope": [
+    "desktop v1 plaintext file compatibility",
+    "raw UTF8 scrypt/AES-GCM encrypted v1 compatibility",
+    "opt-in sound apply and separate export-desired settings",
+    "likes/bookmarks merge and backup/Undo without active queue mutation",
+    "lazy references and bounded metadata rehydration",
+    "native schema2 full6 positive-PCM ACK routing",
+    "old native1.2 resolved-track compatibility"
+  ],
+  "screenshots": [
+    "profile-import-360.png",
+    "profile-export-1024.png",
+    "cloud-preview-360.png",
+    "cloud-preview-1024.png"
+  ],
+  "frozen": true,
+  "reviewFixes": {
+    "profileResponseOwner": "server-authoritative ownerId required for read/validate/PUT acknowledgement; actual cookie ABA UI check passed",
+    "normalizedSize": "root portable normalizer rejects expanded sanitized result above750000UTF8bytes",
+    "cacheUpgrade": "SWv6 atomically includes the complete21-file directory shell and updated owner-bound cloud client",
+    "desktopDuplicates": "Original ordered whitelisted likes/bookmarks keep all metadata IDs/notes for one native heart/position; deleting projection removes every matching original row. Actual File/DOM/Blob regression passed.",
+    "freshExport": "Reopening portable panel discards the old prepared File/JSON so a second export reflects unlike and bookmark removal."
+  }
+}

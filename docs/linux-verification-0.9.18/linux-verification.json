@@ -1,0 +1,96 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T23:05:09.508834+00:00",
+  "version": "0.9.18",
+  "revision": "r2",
+  "remoteRoot": "/opt/lolzcloud-builds/release-0.9.18",
+  "input": {
+    "path": "D:\\LolzCloud-Android-Toolchain\\release-0.9.18\\build-input.zip",
+    "size": 22882353,
+    "sha256": "d255f320d880cd386114890ef90bca554f6fa2820b5cb02a8b3836159332a412",
+    "lockEquivalentExceptRootVersion": true,
+    "dependencyDeclarationsIdentical": true,
+    "copiedDependenciesFromFrozen17": true
+  },
+  "buildUid": 986,
+  "runtimeProvenance": {
+    "inputs": 153,
+    "exact": 150,
+    "explained": 3,
+    "unexplained": 0,
+    "targets": [
+      "x64",
+      "arm64",
+      "AppDir-x64"
+    ],
+    "details": "linux-artifact-verification.json",
+    "note": "package.json only packaging metadata removed; two helper ZIP containers have identical named payload bytes."
+  },
+  "node": {
+    "tests": 445,
+    "pass": 445,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "linuxUpdaterExecuted": 22,
+    "report": "linux-full-node.tap",
+    "source": "exact pinned r2 build input tree; later PWA-only duplicate metadata patch is independently tested and is not included in desktop runtime"
+  },
+  "native": {
+    "checkedAt": "2026-11-14T23:00:04.591Z",
+    "status": "passed",
+    "version": "0.9.18",
+    "platform": "linux",
+    "arch": "x64",
+    "uid": 986,
+    "packagedX64TarSelfTest": "passed",
+    "appImageNormalFuseSelfTest": "passed",
+    "realKeyring": {
+      "status": "passed",
+      "platform": "linux",
+      "arch": "x64",
+      "electron": "45.2.1",
+      "node": "24.22.1",
+      "realSystemKeyring": true,
+      "backend": "gnome_libsecret",
+      "encryptedRoundTrip": true,
+      "personalAccountsUsed": false,
+      "rendererSandboxed": true,
+      "rendererSeccomp": 2,
+      "noSandboxSwitch": false
+    },
+    "personalAccountsUsed": false,
+    "arm64Runtime": "not-tested-static-only",
+    "physicalAudio": false,
+    "scope": "Native packaged self-test + real OS keyring and sandbox. No repeat of previous full music/provider/UI suites, no user installation or deploy."
+  },
+  "artifacts": [
+    {
+      "name": "LolzCloud-0.9.18-linux-x64.AppImage",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.18/dist/LolzCloud-0.9.18-linux-x64.AppImage",
+      "size": 147466744,
+      "sha256": "97a30c5dbdf55bd4bad473e91b872e443a3b3a9f437c2749a593b0915ee4446e"
+    },
+    {
+      "name": "LolzCloud-0.9.18-linux-x64.tar.gz",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.18/dist/LolzCloud-0.9.18-linux-x64.tar.gz",
+      "size": 160326261,
+      "sha256": "3c52fcf8e08accd900fce6d28a9eba3ac91b93f51b3882668d9f6703d8206350"
+    },
+    {
+      "name": "LolzCloud-0.9.18-linux-arm64.tar.gz",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.18/dist/LolzCloud-0.9.18-linux-arm64.tar.gz",
+      "size": 159411491,
+      "sha256": "3796a4484fd55e5f3483100ec2888a8d58f5edb12a4d2d3ba5223bbbb12e982e"
+    }
+  ],
+  "published": false,
+  "personalProfilesTouched": false,
+  "previousCandidatePreservedAt": "/opt/lolzcloud-builds/release-0.9.18-pre-bound-fix",
+  "limitations": [
+    "ARM64 static-only, no ARM64 runtime",
+    "No physical DAC or Wayland/device check",
+    "Music/provider suites from prior releases were not repeated as native Linux proof",
+    "Build and QA only; no deploy or user installation"
+  ]
+}

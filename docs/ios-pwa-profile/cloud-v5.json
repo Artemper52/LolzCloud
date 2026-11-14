@@ -1,0 +1,31 @@
+{
+  "ok": true,
+  "count": 18,
+  "checks": [
+    "A real browser Worker scrypt/AES-GCM envelope decrypts with the existing desktop raw-UTF8 implementation",
+    "A real browser Worker opens a desktop encryptedv1 envelope without changing collection identity",
+    "The browser crypto worker rejects overlapping key derivations instead of leaking another busy worker",
+    "Actual Worker abort terminates computation and leaves the next encryption usable",
+    "Actual authenticated HTTP PUT stores only a desktop-readable encrypted envelope",
+    "Password and plaintext never enter API payloads or persistent storage, and the field clears after the operation",
+    "Wrong cloud password cannot create an import preview or mutate local data",
+    "Decrypted cloud content uses the same explicit preview with sound application off by default",
+    "A concurrent cloud revision rejects stale preview import before writing local likes or starting audio",
+    "Fresh owner/revision validation merges cloud favourites and preserves the current queue, selected occurrence, pause and applied sound",
+    "A trusted existing cloud copy still requires explicit replacement confirmation",
+    "Confirmed cloud replacement increments exactly one revision and preserves imported export-desired sound independently of applied sound",
+    "Expanded cloud/profile preview fits360px without horizontal scrolling",
+    "The actual Done control stays visible while a long cloud preview is scrolled",
+    "A changed HttpOnly-cookie owner cannot apply another account preview or write a replacement",
+    "Account change clears the old preview and overwrite authority",
+    "Dialog close aborts a late cloud read and leaves no stale preview, password or busy lock",
+    "Cloud and actual Worker scenarios have no uncaught renderer errors"
+  ],
+  "errors": [],
+  "failure": "",
+  "screenshots": [
+    "D:\\LolzCloud-Android-Toolchain\\pwa-profile\\cloud-layout-final\\cloud-preview-360.png",
+    "D:\\LolzCloud-Android-Toolchain\\pwa-profile\\cloud-layout-final\\cloud-preview-1024.png"
+  ],
+  "fixtureNote": "Actual isolated Chromium Worker scrypt/AES-GCM, production PWA DOM and actual local HTTP session/profile/CSRF/revision handling. Accounts are declared isolated fixtures; no physical Safari or native share-sheet proof."
+}

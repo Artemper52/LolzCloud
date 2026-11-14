@@ -8,6 +8,9 @@
         <provider android:name="com.lolzcloud.mobile.test.FixtureImageProvider" android:authorities="com.lolzcloud.mobile.test.images" android:exported="true" android:grantUriPermissions="true" android:permission="android.permission.MANAGE_DOCUMENTS">
             <intent-filter><action android:name="android.content.action.DOCUMENTS_PROVIDER" /></intent-filter>
         </provider>
+        <provider android:name="com.lolzcloud.mobile.test.ProfileDocumentsProvider" android:authorities="com.lolzcloud.mobile.test.profiles" android:exported="true" android:grantUriPermissions="true" android:permission="android.permission.MANAGE_DOCUMENTS">
+            <intent-filter><action android:name="android.content.action.DOCUMENTS_PROVIDER" /></intent-filter>
+        </provider>
     </application>
     <instrumentation android:name="com.lolzcloud.mobile.test.CoreInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
     <instrumentation android:name="com.lolzcloud.mobile.test.WebRenderingInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
@@ -18,4 +21,6 @@
     <instrumentation android:name="com.lolzcloud.mobile.test.LyricsInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
     <instrumentation android:name="com.lolzcloud.mobile.test.RoomMediaInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
     <instrumentation android:name="com.lolzcloud.mobile.test.AudioComfortInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
+    <instrumentation android:name="com.lolzcloud.mobile.test.PortableProfileInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
+    <instrumentation android:name="com.lolzcloud.mobile.test.CloudProfileInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
 </manifest>

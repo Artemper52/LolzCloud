@@ -30,6 +30,9 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
 import android.os.SystemClock;
+import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,6 +54,7 @@ public final class PlaybackService extends Service {
     private static final String ACTION_KEEP = "com.lolzcloud.mobile.KEEP";
     private static final String CHANNEL = "lolzcloud_playback";
     private static final int NOTIFICATION_ID = 19;
+    private float portableGain = 1f;
     private static volatile PlaybackService running;
 
     /** Download completion is independent of whichever Activity started it. */
@@ -60,6 +64,11 @@ public final class PlaybackService extends Service {
         active.handler.post(() -> {
             if (running == active && !active.destroyed) active.replaceStoredTrack(track);
         });
+    }
+
+    static void profileImported() {
+        final PlaybackService active = running;
+        if (active != null) active.handler.post(() -> { if (running == active && !active.destroyed) active.reloadSettings(); });
     }
 
     /** Main-thread native navigation controller; it creates no service and is never exposed to JavaScript. */
@@ -193,7 +202,7 @@ public final class PlaybackService extends Service {
         catch (IllegalStateException ignored) { return false; }
     }
     public boolean isLoading() { return playWhenReady && (preparingAudio || media != null && !prepared); }
-    public String loadingMessage() { return !isLoading() ? "" : preparingAudio ? "Готовим трек…" : "Загружаем аудио…"; }
+    public String loadingMessage() { return !isLoading() ? "" : preparingAudio ? current() != null && current().isCatalogReference() ? "Находим запись из профиля…" : "Готовим трек…" : "Загружаем аудио…"; }
     public boolean isPrepared() { return prepared; }
     public long position() {
         try {
@@ -390,6 +399,7 @@ public final class PlaybackService extends Service {
         if (Float.isNaN(value) || Float.isInfinite(value)) return;
         speed = Math.max(.5f, Math.min(2f, value));
         store.preferences().edit().putFloat("speed", speed).apply();
+        updatePortableTransport("rate");
         applySpeed();
         changed(false);
     }
@@ -398,6 +408,7 @@ public final class PlaybackService extends Service {
         if (Float.isNaN(value) || Float.isInfinite(value)) return;
         pitch = Math.max(.5f, Math.min(2f, value));
         store.preferences().edit().putFloat("pitch", pitch).apply();
+        updatePortableTransport("preservesPitch");
         applySpeed();
         changed(false);
     }
@@ -464,8 +475,13 @@ public final class PlaybackService extends Service {
             equalizer.setBandLevel((short) band, value);
             if (equalizer.setEnabled(true) != android.media.audiofx.AudioEffect.SUCCESS || !equalizer.getEnabled()) return false;
             store.preferences().edit().putInt("eq_" + band, value).putBoolean("eq_enabled", true).apply();
+            if (store.preferences().getBoolean("portable_dsp_apply", false)) {
+                JSONObject sound = portableSound(); sound.put("gains", hardwareCurve()).put("enabled", true).put("preset", "Custom");
+                store.preferences().edit().putString("portable_dsp", sound.toString()).apply();
+                exportPortableKeys(sound, "gains", "enabled", "preset");
+            }
             return true;
-        } catch (RuntimeException ignored) { return false; }
+        } catch (RuntimeException | JSONException ignored) { return false; }
     }
 
     public boolean setReverb(boolean enabled) {
@@ -504,6 +520,9 @@ public final class PlaybackService extends Service {
                 .putInt("bass", 0).putBoolean("reverb", false).putInt("loudness", 0).putBoolean("eq_enabled", false);
         for (String key : AudioEffectsPolicy.storedEqBands(prefs.getAll().keySet())) edit.remove(key);
         edit.apply(); speed = 1f; pitch = 1f; applySpeed();
+        try { String neutral = PortableProfile.sound(new JSONObject()).toString(); store.preferences().edit().putString("portable_dsp", neutral).putString("portable_export_dsp", neutral).putBoolean("portable_dsp_apply", true).putBoolean("portable_dsp_pending", false).apply(); }
+        catch (IOException | JSONException impossible) { throw new IllegalStateException(impossible); }
+        applyPortableGain();
         boolean applied = bassBoost == null || AudioEffectsPolicy.applyBass(bassDriver, 0);
         if (equalizer != null) try {
             for (short band = 0; band < equalizer.getNumberOfBands(); band++) equalizer.setBandLevel(band, (short) 0);
@@ -522,12 +541,84 @@ public final class PlaybackService extends Service {
     private void applyEqPreferences() {
         if (equalizer == null) return;
         SharedPreferences prefs = store.preferences();
+        if (prefs.getBoolean("portable_dsp_apply", false) && prefs.contains("portable_dsp")) {
+            JSONObject sound = portableSound(); double[] gains = portableGains(); short[] range = equalizer.getBandLevelRange();
+            for (short band = 0; band < equalizer.getNumberOfBands(); band++) equalizer.setBandLevel(band,
+                    PortableAudioCurve.nativeLevel(gains, equalizer.getCenterFreq(band) / 1000d, range[0], range[1]));
+            equalizer.setEnabled(sound.optBoolean("enabled", false)); return;
+        }
         for (short band = 0; band < equalizer.getNumberOfBands(); band++) {
             short[] range = equalizer.getBandLevelRange();
             equalizer.setBandLevel(band, (short) Math.max(range[0], Math.min(range[1], prefs.getInt("eq_" + band, 0))));
         }
         // Old installations had no bypass preference; preserve that behaviour.
         equalizer.setEnabled(prefs.getBoolean("eq_enabled", true));
+    }
+
+    private JSONObject portableSound() {
+        try {
+            SharedPreferences prefs = store.preferences();
+            if (prefs.contains("portable_dsp")) return PortableProfile.sound(new JSONObject(prefs.getString("portable_dsp", "{}")));
+            JSONObject sound = PortableProfile.sound(new JSONObject()).put("rate", speed).put("preservesPitch", Math.abs(pitch - 1f) < .001f);
+            if (eqAvailable()) sound.put("gains", hardwareCurve()).put("enabled", equalizer.getEnabled());
+            return sound;
+        } catch (IOException | JSONException | RuntimeException invalid) {
+            try { return new JSONObject("{\"enabled\":false,\"preset\":\"Original\",\"gains\":[0,0,0,0,0],\"rate\":1,\"preservesPitch\":false,\"reverb\":0,\"echo\":0,\"preampDb\":0}"); }
+            catch (JSONException impossible) { throw new IllegalStateException(impossible); }
+        }
+    }
+
+    private JSONArray hardwareCurve() throws JSONException {
+        JSONArray result = new JSONArray(); int count = eqBandCount();
+        double[] frequencies = new double[count], levels = new double[count];
+        for (int band = 0; band < count; band++) { frequencies[band] = eqCenterHz(band); levels[band] = eqBandLevel(band) / 100d; }
+        for (double frequency : PortableAudioCurve.FREQUENCIES) result.put(count == 0 ? 0 : Math.max(-12, Math.min(12, PortableAudioCurve.at(frequencies, levels, frequency))));
+        return result;
+    }
+
+    private void updatePortableTransport(String key) {
+        try { JSONObject sound = portableSound().put("rate", speed).put("preservesPitch", Math.abs(pitch - 1f) < .001f); if (store.preferences().contains("portable_dsp")) store.preferences().edit().putString("portable_dsp", sound.toString()).apply(); exportPortableKeys(sound, key); }
+        catch (JSONException impossible) { throw new IllegalStateException(impossible); }
+    }
+
+    private void exportPortableKeys(JSONObject sound, String... keys) {
+        try { JSONObject exported = store.preferences().contains("portable_export_dsp") ? PortableProfile.sound(new JSONObject(store.preferences().getString("portable_export_dsp", "{}"))) : new JSONObject(sound.toString()); for (String key : keys) exported.put(key, sound.get(key)); store.preferences().edit().putString("portable_export_dsp", exported.toString()).apply(); }
+        catch (IOException | JSONException invalid) { throw new IllegalStateException(invalid); }
+    }
+
+    public double[] portableGains() {
+        JSONArray gains = portableSound().optJSONArray("gains"); double[] result = new double[5];
+        for (int i = 0; i < result.length; i++) result[i] = gains == null ? 0 : gains.optDouble(i, 0);
+        return result;
+    }
+    public boolean portableSoundActive() { return store.preferences().getBoolean("portable_dsp_apply", false); }
+    public boolean portableProfilePending() { return store.preferences().getBoolean("portable_dsp_pending", false); }
+    public boolean portableSoundEnabled() { return portableSound().optBoolean("enabled", false); }
+    public double portablePreampDb() { return portableSound().optDouble("preampDb", 0); }
+
+    public void activatePortableSound() {
+        JSONObject sound = portableSound();
+        if (portableProfilePending()) try { sound = PortableProfile.sound(new JSONObject(store.preferences().getString("portable_profile", "{}")).getJSONObject("music").getJSONObject("dsp")); } catch (IOException | JSONException invalid) { error = "Не удалось прочитать сохранённый звук профиля"; changed(false); return; }
+        float rate = (float) sound.optDouble("rate", 1);
+        store.preferences().edit().putString("portable_dsp", sound.toString()).putString("portable_export_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).putBoolean("portable_dsp_pending", false)
+                .putFloat("speed", rate).putFloat("pitch", sound.optBoolean("preservesPitch", false) ? 1f : rate)
+                .putInt("bass", 0).putBoolean("reverb", false).putInt("loudness", 0).apply();
+        reloadSettings();
+    }
+    public void setPortableEnabled(boolean enabled) { try { JSONObject sound = portableSound().put("enabled", enabled); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"enabled"); try { applyEqPreferences(); } catch (RuntimeException unavailable) { } applyPortableGain(); changed(true); } catch (JSONException impossible) { throw new IllegalStateException(impossible); } }
+    public void setPortableBand(int band, double gain) {
+        if (band < 0 || band >= 5 || !Double.isFinite(gain) || gain < -12 || gain > 12) return;
+        try { JSONObject sound = portableSound(); JSONArray gains = sound.getJSONArray("gains"); gains.put(band, gain); sound.put("enabled", true).put("preset", "Custom"); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"gains","enabled","preset"); try { applyEqPreferences(); } catch (RuntimeException unavailable) { } applyPortableGain(); changed(false); }
+        catch (JSONException impossible) { throw new IllegalStateException(impossible); }
+    }
+    public void setPortablePreamp(double db) {
+        if (!Double.isFinite(db) || db < -12 || db > 0) return;
+        try { JSONObject sound = portableSound().put("preampDb", db); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"preampDb"); applyPortableGain(); changed(false); }
+        catch (JSONException impossible) { throw new IllegalStateException(impossible); }
+    }
+    private void applyPortableGain() {
+        JSONObject sound = portableSound(); portableGain = portableSoundActive() && sound.optBoolean("enabled", false) ? (float) Math.pow(10, sound.optDouble("preampDb", 0) / 20d) : 1f;
+        try { if (media != null && prepared) media.setVolume(outputVolume(), outputVolume()); } catch (RuntimeException unavailable) { }
     }
 
     /** Reapply portable preferences after a profile import without restarting playback. */
@@ -542,6 +633,7 @@ public final class PlaybackService extends Service {
         setReverb(prefs.getBoolean("reverb", false));
         setLoudness(prefs.getInt("loudness", 0));
         try { applyEqPreferences(); } catch (RuntimeException unavailable) { /* Keep honest device availability. */ }
+        applyPortableGain();
         changed(true);
     }
 
@@ -561,9 +653,18 @@ public final class PlaybackService extends Service {
         playWhenReady = play;
         Track track = current();
         if (track == null) { changed(true); return; }
+        if (track.isCatalogReference()) {
+            Track saved = store.find(track.id);
+            if (saved != null && !saved.isCatalogReference()) {
+                String referenceId = track.id;
+                for (int i = 0; i < queue.size(); i++) if (queue.get(i).id.equals(referenceId)) queue.set(i, saved);
+                track = saved;
+            }
+        }
         cycleVisited.add(index);
         // The selected queue must survive a network/prepare failure before onPrepared.
         save();
+        if (track.isCatalogReference()) { resolvePortableReference(track, play); return; }
         if (!LibraryStore.isPlayable(this, track.uri)) {
             fail("Источник нельзя воспроизвести. Выберите локальный файл или прямую HTTPS-ссылку на аудио");
             return;
@@ -574,6 +675,37 @@ public final class PlaybackService extends Service {
         }
         if (play && !ensureForeground()) return;
         openPlayer(track);
+    }
+
+    private void resolvePortableReference(final Track reference, boolean play) {
+        preparingAudio = true;
+        if (play && !ensureForeground()) { preparingAudio = false; return; }
+        final long generation = sourceGeneration;
+        try {
+            preparationWake = ((PowerManager) getSystemService(POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LolzCloud:profile-resolve");
+            preparationWake.acquire(35_000);
+        } catch (RuntimeException ignored) { }
+        sourceDeadline = () -> { if (ownsPreparation(generation, reference)) fail("Не удалось найти запись вовремя. Нажми «Повторить»"); };
+        handler.postDelayed(sourceDeadline, 30_000); changed(true);
+        sourceTask = sourceIo.submit(() -> {
+            try {
+                final Track resolved = sourceCatalog.resolveReference(reference);
+                handler.post(() -> {
+                    if (!ownsPreparation(generation, reference)) return;
+                    try {
+                        Track canonical = store.resolvePortableReference(reference, resolved);
+                        for (int i = 0; i < queue.size(); i++) if (queue.get(i).id.equals(reference.id)) queue.set(i, canonical);
+                        boolean resume = playWhenReady;
+                        finishPreparation(); loadCurrent(resume);
+                    } catch (IOException failure) { fail(failure.getMessage()); }
+                });
+            } catch (IOException failure) {
+                final String message = failure.getMessage() == null ? "Не удалось найти запись. Нажми «Повторить»" : failure.getMessage();
+                handler.post(() -> { if (ownsPreparation(generation, reference)) fail(message); });
+            } catch (RuntimeException failure) {
+                handler.post(() -> { if (ownsPreparation(generation, reference)) fail("Не удалось найти запись. Нажми «Повторить»"); });
+            }
+        });
     }
 
     private void prepareCatalogAudio(final Track track, boolean play) {
@@ -718,6 +850,11 @@ public final class PlaybackService extends Service {
         catch (RuntimeException ignored) { if (reverb != null) reverb.release(); reverb = null; }
         try { loudness = new LoudnessEnhancer(audioSession); setLoudness(prefs.getInt("loudness", 0)); }
         catch (RuntimeException ignored) { if (loudness != null) loudness.release(); loudness = null; }
+        if (!prefs.contains("portable_dsp")) {
+            JSONObject initial = portableSound(); prefs.edit().putString("portable_dsp", initial.toString()).putBoolean("portable_dsp_apply", false).apply();
+            if (!prefs.contains("portable_profile")) exportPortableKeys(initial, "enabled", "gains");
+        }
+        applyPortableGain();
     }
 
     private void applySpeed() {
@@ -765,7 +902,7 @@ public final class PlaybackService extends Service {
         ducked = false;
     }
 
-    private float outputVolume() { return volume * (ducked ? .2f : 1f); }
+    private float outputVolume() { return volume * (ducked ? .2f : 1f) * portableGain; }
 
     private boolean ensureForeground() {
         if (foreground) return true;

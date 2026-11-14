@@ -1,0 +1,16 @@
+{
+  "checkedAt": "2026-11-14T23:17:32.8409366Z",
+  "serial": "emulator-5554",
+  "avd": "LolzCloud",
+  "launcherPid": 31192,
+  "qemuPid": 23392,
+  "qemuPath": "D:\\LolzCloud-Android-Toolchain\\sdk\\emulator\\qemu\\windows-x86_64\\qemu-system-x86_64-headless.exe",
+  "apiLevel": "35",
+  "qemu": "1",
+  "apkSha256": "e98fbdaf0fb815922a6efb3081a9d85539ff47a2ad028f2229774fc1a5989ff0",
+  "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+  "wifiAfter": "1",
+  "mobileDataAfter": "1",
+  "emulatorStopped": true,
+  "adbAfter": "List of devices attached\n"
+}

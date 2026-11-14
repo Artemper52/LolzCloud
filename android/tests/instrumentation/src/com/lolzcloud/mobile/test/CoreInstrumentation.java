@@ -34,6 +34,7 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /** Plain platform instrumentation: real system SAF + native service. No AndroidX or network fixture. */
 public final class CoreInstrumentation extends Instrumentation {
@@ -144,19 +145,19 @@ public final class CoreInstrumentation extends Instrumentation {
         await(() -> player.isPlaying() && player.current().id.equals(fixtures.get(3).id), 5000, "Private playback");
         check(store.history().get(0).id.equals(historyBefore), "Private listening does not update history");
         if (!store.isLiked(fixtures.get(0).id)) store.toggleLike(fixtures.get(0).id);
-        JSONObject profile = new JSONObject(store.exportProfile());
+        JSONObject profile = new JSONObject().put("format","lolzcloud-android-profile").put("version",1).put("liked",new JSONArray().put(new JSONObject().put("title",fixtures.get(0).title).put("artist",fixtures.get(0).artist)));
         profile.put("speed", 1.25); profile.put("bass", 250); profile.put("repeat", 1);
         int restored = store.importProfile(profile.toString());
         onMain(() -> player.reloadSettings());
         check(restored >= 1 && Math.abs(player.speed() - 1.25f) < .01f && player.repeat() == 1, "Imported sound settings reach the live service");
         check(store.privateMode() && new LibraryStore(getTargetContext()).isLiked(fixtures.get(0).id), "Privacy and liked files survive profile import and store recreation");
         check(store.preferences().contains("profile_backup"), "Profile import saves the previous portable profile");
-        String before = store.exportProfile();
+        Map<String, ?> before = new java.util.HashMap<>(store.preferences().getAll());
         JSONObject invalid = new JSONObject(profile.toString());
         invalid.getJSONArray("liked").getJSONObject(0).put("uri", "file:///data/local/tmp/unsafe.mp3");
         boolean rejected = false;
         try { store.importProfile(invalid.toString()); } catch (IOException expected) { rejected = true; }
-        check(rejected && before.equals(store.exportProfile()), "Invalid file URI profile is rejected without changing the portable profile");
+        check(rejected && before.equals(store.preferences().getAll()), "Invalid legacy file URI is rejected without changing preferences or the portable sidecar");
 
         onMain(() -> { player.setSpeed(1f); player.setPitch(1f); player.setRepeat(0); player.setShuffle(false); player.setQueue(fixtures, 0, false); });
         await(() -> player.isPrepared(), 5000, "Prepare persistence state");

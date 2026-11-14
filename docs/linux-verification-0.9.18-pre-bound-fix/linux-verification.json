@@ -1,0 +1,94 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T22:44:16.707436+00:00",
+  "version": "0.9.18",
+  "remoteRoot": "/opt/lolzcloud-builds/release-0.9.18",
+  "input": {
+    "path": "D:\\LolzCloud-Android-Toolchain\\release-0.9.18\\build-input.zip",
+    "size": 22810392,
+    "sha256": "84105ceeb8a09f3b3af508ca4bf4e790c32455ca5dfcecfd40388a76189fc88f",
+    "lockEquivalentExceptRootVersion": true,
+    "dependencyDeclarationsIdentical": true,
+    "copiedDependenciesFromFrozen17": true
+  },
+  "buildUid": 986,
+  "runtimeProvenance": {
+    "inputs": 153,
+    "exact": 150,
+    "explained": 3,
+    "unexplained": 0,
+    "targets": [
+      "x64",
+      "arm64",
+      "AppDir-x64"
+    ],
+    "details": "linux-artifact-verification.json",
+    "note": "package.json only packaging metadata removed; two helper ZIP containers have identical named payload bytes."
+  },
+  "node": {
+    "tests": 431,
+    "pass": 431,
+    "fail": 0,
+    "skipped": 0,
+    "cancelled": 0,
+    "linuxUpdaterExecuted": 22,
+    "report": "linux-full-node.tap",
+    "source": "exact pinned build input tree"
+  },
+  "native": {
+    "checkedAt": "2026-11-14T22:42:24.457Z",
+    "status": "passed",
+    "version": "0.9.18",
+    "platform": "linux",
+    "arch": "x64",
+    "uid": 986,
+    "packagedX64TarSelfTest": "passed",
+    "appImageNormalFuseSelfTest": "passed",
+    "realKeyring": {
+      "status": "passed",
+      "platform": "linux",
+      "arch": "x64",
+      "electron": "45.2.1",
+      "node": "24.22.1",
+      "realSystemKeyring": true,
+      "backend": "gnome_libsecret",
+      "encryptedRoundTrip": true,
+      "personalAccountsUsed": false,
+      "rendererSandboxed": true,
+      "rendererSeccomp": 2,
+      "noSandboxSwitch": false
+    },
+    "personalAccountsUsed": false,
+    "arm64Runtime": "not-tested-static-only",
+    "physicalAudio": false,
+    "scope": "Native packaged self-test + real OS keyring and sandbox. No repeat of previous full music/provider/UI suites, no user installation or deploy."
+  },
+  "artifacts": [
+    {
+      "name": "LolzCloud-0.9.18-linux-x64.AppImage",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.18/dist/LolzCloud-0.9.18-linux-x64.AppImage",
+      "size": 147466744,
+      "sha256": "6d66cdca82e826205097a30f6cad8f5f70d6deafb6f510526f00a8a63a116c28"
+    },
+    {
+      "name": "LolzCloud-0.9.18-linux-x64.tar.gz",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.18/dist/LolzCloud-0.9.18-linux-x64.tar.gz",
+      "size": 160327312,
+      "sha256": "63a2d756c1d7f905cd43b3bbbb84501999cbedb506ad50fc771dd35abb5212ef"
+    },
+    {
+      "name": "LolzCloud-0.9.18-linux-arm64.tar.gz",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.18/dist/LolzCloud-0.9.18-linux-arm64.tar.gz",
+      "size": 159410537,
+      "sha256": "93ee94587fafcca301d328d9bdecc2811723d43698f683051bc0367c4208d7d4"
+    }
+  ],
+  "published": false,
+  "personalProfilesTouched": false,
+  "limitations": [
+    "ARM64 static-only, no ARM64 runtime",
+    "No physical DAC or Wayland/device check",
+    "Music/provider suites from prior releases were not repeated as native Linux proof",
+    "Build and QA only; no deploy or user installation"
+  ]
+}

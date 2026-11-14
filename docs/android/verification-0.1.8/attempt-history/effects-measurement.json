@@ -1,0 +1,56 @@
+{
+  "status": "failed",
+  "error": "java.lang.AssertionError: Actual native band readback confirms the bounded portable approximation",
+  "ui": "LolzCloud|Профиль и настройки|Моя волна|Из твоей библиотеки|ТВОЯ ЛИЧНАЯ РАДИОСТАНЦИЯ|Включить волну|Включить волну|Вся музыка|Вся музыка, выбрано|Любимые|Любимые|Недавно добавлены|Local metadata only. Fixture artist|Local metadata only|Fixture artist · 0:30|Действия: Local metadata only|Local metadata only|Fixture artist|Продолжить воспроизведение|Следующий трек|Волна, выбрано|Волна|Поиск|Поиск|Моя музыка|Моя музыка|Комнаты|Комнаты|",
+  "runId": "effects-diagnostic",
+  "checks": [],
+  "screenshots": [],
+  "effectReadbacks": [
+    {
+      "band": 0,
+      "frequencyHz": 60,
+      "requestedMillibels": 550,
+      "actualMillibels": 600,
+      "minimumMillibels": -1500,
+      "maximumMillibels": 1500
+    },
+    {
+      "band": 1,
+      "frequencyHz": 230,
+      "requestedMillibels": -200,
+      "actualMillibels": -200,
+      "minimumMillibels": -1500,
+      "maximumMillibels": 1500
+    },
+    {
+      "band": 2,
+      "frequencyHz": 910,
+      "requestedMillibels": 300,
+      "actualMillibels": 300,
+      "minimumMillibels": -1500,
+      "maximumMillibels": 1500
+    },
+    {
+      "band": 3,
+      "frequencyHz": 3600,
+      "requestedMillibels": 0,
+      "actualMillibels": 0,
+      "minimumMillibels": -1500,
+      "maximumMillibels": 1500
+    },
+    {
+      "band": 4,
+      "frequencyHz": 14000,
+      "requestedMillibels": -100,
+      "actualMillibels": -100,
+      "minimumMillibels": -1500,
+      "maximumMillibels": 1500
+    }
+  ],
+  "version": "0.1.8",
+  "versionCode": 9,
+  "apkSha256": "e98fbdaf0fb815922a6efb3081a9d85539ff47a2ad028f2229774fc1a5989ff0",
+  "preferencesRestored": true,
+  "personalAccountsUsed": false,
+  "scope": "Actual Java JSON\/SharedPreferences\/SAF DocumentsUI and native MediaPlayer; synthetic desktop data is explicitly separate from real public SoundCloud Gno playback. No personal account\/cloud, physical device or acoustic EQ response claim."
+}

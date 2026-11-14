@@ -1,0 +1,145 @@
+{
+  "checkedAt": "2026-11-14T22:41:52.435Z",
+  "version": "0.9.18",
+  "input": {
+    "inputZipSha256": "84105ceeb8a09f3b3af508ca4bf4e790c32455ca5dfcecfd40388a76189fc88f",
+    "pathValidation": "strict raw ZIP names, no backslashes/absolute/traversal/duplicate/symlinks",
+    "runtimeFiles": 153,
+    "lockEquivalentExceptRootVersion": true,
+    "dependencyDeclarationsIdentical": true,
+    "sourceVersion": "0.9.18"
+  },
+  "sourceReports": [
+    {
+      "label": "x64",
+      "archive": "/opt/lolzcloud-builds/release-0.9.18/dist/LolzCloud-linux-x64/resources/app.asar",
+      "asarSha256": "00fec753b074fb12362e217b9977d28b70681ed188fbc14199df76cd66795bfa",
+      "verified": 150,
+      "equivalentGenerated": [
+        {
+          "file": "package.json",
+          "sha256": "5ab9291713ac6c962bcf8a5a7f184cb2f78f9392ca834c63398d1b3b7eecbe58",
+          "reason": "Packager removes only private/scripts/devDependencies/overrides; remaining metadata including version/main/dependencies is identical."
+        },
+        {
+          "file": "source/app/session-transfer/helper-firefox.zip",
+          "sha256": "7b03873fb1ce9a74ba6d0da36a6c8e894b39a30598ce0be4c8caaeeeeade8c46",
+          "reason": "ZIP container regenerated; all named payload bytes exactly match input."
+        },
+        {
+          "file": "source/app/session-transfer/helper.zip",
+          "sha256": "09062d9b66b085cc8735df173d0f05c72e4ae53d559b9adf0d7cd5e6e07e1bc8",
+          "reason": "ZIP container regenerated; all named payload bytes exactly match input."
+        }
+      ],
+      "mismatches": []
+    },
+    {
+      "label": "arm64",
+      "archive": "/opt/lolzcloud-builds/release-0.9.18/dist/LolzCloud-linux-arm64/resources/app.asar",
+      "asarSha256": "2aadb8546c43efe3c15714385bbca92a241c415019cd747fad4463b620fd2ec3",
+      "verified": 150,
+      "equivalentGenerated": [
+        {
+          "file": "package.json",
+          "sha256": "5ab9291713ac6c962bcf8a5a7f184cb2f78f9392ca834c63398d1b3b7eecbe58",
+          "reason": "Packager removes only private/scripts/devDependencies/overrides; remaining metadata including version/main/dependencies is identical."
+        },
+        {
+          "file": "source/app/session-transfer/helper-firefox.zip",
+          "sha256": "7b03873fb1ce9a74ba6d0da36a6c8e894b39a30598ce0be4c8caaeeeeade8c46",
+          "reason": "ZIP container regenerated; all named payload bytes exactly match input."
+        },
+        {
+          "file": "source/app/session-transfer/helper.zip",
+          "sha256": "09062d9b66b085cc8735df173d0f05c72e4ae53d559b9adf0d7cd5e6e07e1bc8",
+          "reason": "ZIP container regenerated; all named payload bytes exactly match input."
+        }
+      ],
+      "mismatches": []
+    },
+    {
+      "label": "AppDir-x64",
+      "archive": "/opt/lolzcloud-builds/release-0.9.18/.build/AppDir-x64/resources/app.asar",
+      "asarSha256": "00fec753b074fb12362e217b9977d28b70681ed188fbc14199df76cd66795bfa",
+      "verified": 150,
+      "equivalentGenerated": [
+        {
+          "file": "package.json",
+          "sha256": "5ab9291713ac6c962bcf8a5a7f184cb2f78f9392ca834c63398d1b3b7eecbe58",
+          "reason": "Packager removes only private/scripts/devDependencies/overrides; remaining metadata including version/main/dependencies is identical."
+        },
+        {
+          "file": "source/app/session-transfer/helper-firefox.zip",
+          "sha256": "7b03873fb1ce9a74ba6d0da36a6c8e894b39a30598ce0be4c8caaeeeeade8c46",
+          "reason": "ZIP container regenerated; all named payload bytes exactly match input."
+        },
+        {
+          "file": "source/app/session-transfer/helper.zip",
+          "sha256": "09062d9b66b085cc8735df173d0f05c72e4ae53d559b9adf0d7cd5e6e07e1bc8",
+          "reason": "ZIP container regenerated; all named payload bytes exactly match input."
+        }
+      ],
+      "mismatches": []
+    }
+  ],
+  "elf": [
+    {
+      "arch": "x64",
+      "path": "LolzCloud",
+      "architecture": "x64",
+      "mode": "777"
+    },
+    {
+      "arch": "x64",
+      "path": "chrome-sandbox",
+      "architecture": "x64",
+      "mode": "777"
+    },
+    {
+      "arch": "x64",
+      "path": "resources/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg",
+      "architecture": "x64",
+      "mode": "755"
+    },
+    {
+      "arch": "arm64",
+      "path": "LolzCloud",
+      "architecture": "arm64",
+      "mode": "777"
+    },
+    {
+      "arch": "arm64",
+      "path": "chrome-sandbox",
+      "architecture": "arm64",
+      "mode": "777"
+    },
+    {
+      "arch": "arm64",
+      "path": "resources/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg",
+      "architecture": "arm64",
+      "mode": "755"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "LolzCloud-0.9.18-linux-x64.AppImage",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.18/dist/LolzCloud-0.9.18-linux-x64.AppImage",
+      "size": 147466744,
+      "sha256": "6d66cdca82e826205097a30f6cad8f5f70d6deafb6f510526f00a8a63a116c28"
+    },
+    {
+      "name": "LolzCloud-0.9.18-linux-x64.tar.gz",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.18/dist/LolzCloud-0.9.18-linux-x64.tar.gz",
+      "size": 160327312,
+      "sha256": "63a2d756c1d7f905cd43b3bbbb84501999cbedb506ad50fc771dd35abb5212ef"
+    },
+    {
+      "name": "LolzCloud-0.9.18-linux-arm64.tar.gz",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.18/dist/LolzCloud-0.9.18-linux-arm64.tar.gz",
+      "size": 159410537,
+      "sha256": "93ee94587fafcca301d328d9bdecc2811723d43698f683051bc0367c4208d7d4"
+    }
+  ],
+  "status": "passed"
+}

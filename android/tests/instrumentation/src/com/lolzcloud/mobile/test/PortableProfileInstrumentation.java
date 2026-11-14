@@ -1,0 +1,138 @@
+package com.lolzcloud.mobile.test;
+
+import android.app.*;
+import android.content.*;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.*;
+import android.view.*;
+import android.view.accessibility.AccessibilityNodeInfo;
+import com.lolzcloud.mobile.*;
+import org.json.*;
+import java.io.*;
+import java.lang.reflect.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.*;
+
+/** Isolated emulator: real Java transactions, genuine SAF UI, then real public native audio. */
+public final class PortableProfileInstrumentation extends Instrumentation {
+    private final JSONArray checks=new JSONArray(),screenshots=new JSONArray(),effectReadbacks=new JSONArray();
+    private Bundle arguments;private MainActivity activity;private PlaybackService player;private LibraryStore store;
+    private File output,wav,download;private String wifi,data;private ActivityMonitor browser;
+    private interface Task{void run()throws Exception;}private interface Condition{boolean ready()throws Exception;}
+    @Override public void onCreate(Bundle args){super.onCreate(args);arguments=args;start();}
+    @Override public void onStart(){JSONObject report=new JSONObject();Map<String,Object> original=null;int result=Activity.RESULT_OK;boolean restored=false;
+        try{
+            if(!"1".equals(shell("getprop ro.kernel.qemu").trim()))throw new AssertionError("Only the owned emulator is allowed");
+            output=new File(getTargetContext().getExternalFilesDir(null),"portable-profile-review");output.mkdirs();store=new LibraryStore(getTargetContext());original=snapshot(store.preferences());
+            wifi=shell("settings get global wifi_on").trim();data=shell("settings get global mobile_data").trim();
+            store.preferences().edit().clear().putBoolean("notification_permission_asked",true).commit();
+            IntentFilter filter=new IntentFilter(Intent.ACTION_VIEW);filter.addDataScheme("http");filter.addDataScheme("https");browser=addMonitor(filter,new ActivityResult(Activity.RESULT_CANCELED,null),true);
+            activity=(MainActivity)startActivitySync(new Intent(getTargetContext(),MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK));
+            await(()->{player=(PlaybackService)field(activity,"player");return player!=null;},10000,"Service binding");
+            wav=new File(getTargetContext().getCacheDir(),"portable-qa-"+System.nanoTime()+".wav");wave(wav);Track local=new Track("portable-local","Local metadata only","Fixture artist",Uri.fromFile(wav).toString(),30000);store.add(local);store.toggleLike(local.id);
+            onMain(()->{player.setQueue(Arrays.asList(local),0,false);player.setSpeed(1);player.setPitch(1);player.setSleepMinutes(15);});await(()->player.isPrepared(),8000,"Local paused decoder");onMain(()->{});
+            suite: { String fixture=asset("desktop-v1.json");JSONObject expected=new JSONObject(fixture);Track ref=PortableProfile.reference(expected.getJSONObject("wave").getJSONArray("likes").getJSONObject(0));
+            if(arguments!=null&&"effects".equals(arguments.getString("phase"))){store.importProfile(fixture,true);onMain(()->player.reloadSettings());effectsReadback();break suite;}
+            if(arguments!=null&&"native".equals(arguments.getString("phase"))){store.importProfile(fixture,true);onMain(()->player.reloadSettings());networkReady();nativeResolution(local);break suite;}
+            policyChecks(fixture,ref,local);
+            wifi=shell("settings get global wifi_on").trim();data=shell("settings get global mobile_data").trim();shell("svc wifi disable");shell("svc data disable");
+            Map<String,Object> before=snapshot(store.preferences());openImport("Desktop profile.json");await(()->profileDialog()!=null&&profileDialog().isShowing(),8000,"Real import preview");
+            check(before.equals(snapshot(store.preferences())),"Genuine SAF selection and preview do not mutate preferences or start catalog requests");
+            capture("profile-preview.png");
+            onMain(()->((android.widget.CheckBox)field(activity,"profileSound")).setChecked(false));
+            ActivityMonitor recreation=addMonitor(MainActivity.class.getName(),null,false);MainActivity previous=activity;onMain(previous::recreate);
+            Activity next=recreation.waitForActivityWithTimeout(10000);removeMonitor(recreation);if(!(next instanceof MainActivity))throw new AssertionError("Preview Activity recreation did not finish");activity=(MainActivity)next;
+            await(()->{player=(PlaybackService)field(activity,"player");return player!=null&&profileDialog()!=null&&profileDialog().isShowing();},8000,"Actual preview cache restoration");
+            check(!((android.widget.CheckBox)field(activity,"profileSound")).isChecked()&&before.equals(snapshot(store.preferences())),"Real Activity recreation preserves the unconfirmed preview and checkbox without a large Bundle or import mutation");
+            onMain(()->profileDialog().getButton(AlertDialog.BUTTON_NEGATIVE).performClick());await(()->profileDialog()==null||!profileDialog().isShowing(),3000,"Cancel preview");
+            check(before.equals(snapshot(store.preferences())),"Preview Cancel preserves all original preference values");
+            openImport("Desktop profile.json");await(()->profileDialog()!=null&&profileDialog().isShowing(),8000,"Second real import preview");
+            onMain(()->{((android.widget.CheckBox)field(activity,"profileSound")).setChecked(false);profileDialog().getButton(AlertDialog.BUTTON_POSITIVE).performClick();});
+            await(()->store.preferences().contains("portable_profile")&&!((Boolean)field(activity,"profileCommitting")),8000,"Confirmed atomic profile merge");
+            check(player.queue().size()==1&&player.current().id.equals(local.id)&&!player.isPlaying()&&Math.abs(player.speed()-1)<.01,"Confirmed import preserves queue, pause and speed when Apply sound is unchecked");
+            check(store.isLiked(local.id)&&store.isLiked(ref.id)&&store.find(ref.id).isCatalogReference()&&store.find(ref.id).uri.isEmpty(),"Local likes survive; imported SoundCloud metadata remains a nonplayable reference until tap");
+            check(store.bookmarks(ref.id).contains(42250L)&&store.preferences().contains("profile_backup"),"SC bookmark milliseconds and a previous portable backup are committed together");
+            check(player.sleepRemainingMillis()>14*60000,"Portable import does not replace the native sleep timer");
+            write("java-roundtrip.json",store.exportProfile());
+            Set<String> exports=exports();onMain(()->invoke(activity,"exportProfile"));await(()->activePackage().contains("documentsui"),6000,"Real export picker");SystemClock.sleep(700);chooseRoot();SystemClock.sleep(350);
+            if(!click(new String[]{"Save","SAVE","Сохранить","СОХРАНИТЬ"},false,6000))throw new AssertionError("DocumentsUI Save not found: "+describe());
+            final String[] saved={null};await(()->{for(String name:exports())if(!exports.contains(name)){String value=providerText(name);if(value.startsWith("{")){saved[0]=value;return true;}}return false;},8000,"Production export through writable SAF descriptor");
+            JSONObject saf=new JSONObject(saved[0]);check(saf.getString("format").equals("lolzcloud-profile")&&saf.getJSONObject("wave").getJSONArray("likes").length()==2,"Actual ACTION_CREATE_DOCUMENT output uses desktop v1 and excludes local-only likes");write("android-saf-export.json",saved[0]);
+            before=snapshot(store.preferences());openImport("Invalid profile.json");SystemClock.sleep(900);waitForIdleSync();check(before.equals(snapshot(store.preferences()))&&(profileDialog()==null||!profileDialog().isShowing()),"A genuine SAF file with a private file URI is rejected before any preference change");
+            onMain(()->{player.activatePortableSound();});
+            check(!player.isPlaying()&&player.queue().size()==1&&Math.abs(player.speed()-1.75f)<.01&&Math.abs(player.pitch()-1)<.01,"Explicitly applying imported transport reaches the live paused player without replacing its queue");
+            double gain=(double)(float)invokeResult(player,"outputVolume");check(Math.abs(gain-player.volume()*Math.pow(10,-6d/20))<.0001,"Imported preamp attenuates native output without replacing user volume");
+            effectsReadback();
+            restoreNetwork();
+            networkReady();
+            nativeResolution(local);
+            store.toggleLike(ref.id);store.removeBookmark(ref.id,42250);write("java-after-edits.json",store.exportProfile());
+            JSONObject edited=new JSONObject(store.exportProfile());boolean resurrected=false;JSONArray liked=edited.getJSONObject("wave").getJSONArray("likes");for(int i=0;i<liked.length();i++)if(liked.getJSONObject(i).optLong("id")==123)resurrected=true;
+            check(!resurrected&&edited.getJSONObject("tools").getJSONArray("bookmarks").toString().contains("fixture-bookmark-yt"),"Unlike/remove edits do not resurrect imported SC rows; unsupported YouTube bookmark survives");
+            float previousSpeed=player.speed();store.importProfile(asset("legacy-android-v1.json"),false);check(store.isLiked(local.id)&&Math.abs(player.speed()-previousSpeed)<.01,"Legacy Android v1 remains importable and metadata-only local likes still match without an invented URI");
+            check(browser.getHits()==0,"Import, export, references, bookmarks, retry and native SoundCloud audio never launch a browser");
+            }
+            report.put("status","passed");
+        }catch(Throwable failure){result=Activity.RESULT_CANCELED;try{report.put("status","failed").put("error",failure.toString()).put("ui",describe());if(player!=null)report.put("playbackError",player.error()).put("loadingMessage",player.loadingMessage());}catch(Exception ignored){}}
+        finally{
+            try{restoreNetwork();if(activity!=null){onMain(()->{if(player!=null)player.stopPlayback();activity.finish();});await(()->activity.isDestroyed()&&(player==null||(Boolean)field(player,"destroyed")),8000,"Stop before restoring user state");waitForIdleSync();}if(original!=null){restore(store.preferences(),original);restored=true;}if(wav!=null&&wav.getParentFile().equals(getTargetContext().getCacheDir()))wav.delete();if(download!=null&&download.getCanonicalFile().getParentFile().equals(new File(getTargetContext().getFilesDir(),"offline").getCanonicalFile()))download.delete();}catch(Throwable failure){result=Activity.RESULT_CANCELED;try{report.put("status","failed").put("cleanupError",failure.toString());}catch(Exception ignored){}}if(browser!=null)removeMonitor(browser);
+        }
+        try{android.content.pm.PackageInfo p=getTargetContext().getPackageManager().getPackageInfo(getTargetContext().getPackageName(),0);report.put("runId",arguments==null?"":arguments.getString("runId","")).put("checks",checks).put("screenshots",screenshots).put("effectReadbacks",effectReadbacks).put("version",p.versionName).put("versionCode",p.versionCode).put("apkSha256",sha(new File(p.applicationInfo.sourceDir))).put("preferencesRestored",restored).put("personalAccountsUsed",false).put("scope","Actual Java JSON/SharedPreferences/SAF DocumentsUI and native MediaPlayer; synthetic desktop data is explicitly separate from real public SoundCloud Gno playback. No personal account/cloud, physical device or acoustic EQ response claim.");write("android-portable-profile-test.json",report.toString(2));Bundle b=new Bundle();b.putString("stream",report.toString(2));finish(result,b);}catch(Exception failure){Bundle b=new Bundle();b.putString("stream",failure.toString());finish(Activity.RESULT_CANCELED,b);}
+    }
+
+    private void policyChecks(String fixture,Track reference,Track local)throws Exception{
+        JSONObject encoded=reference.toJson();check(Track.fromJson(encoded).isCatalogReference(),"Saved reference JSON retains its explicit nonplayable marker");
+        for(String key:new String[]{"uri","sourceUrl","id"}){JSONObject bad=new JSONObject(encoded.toString());bad.put(key,key.equals("uri")?"file:///private/other":key.equals("sourceUrl")?"https://evil.test/a/b":"soundcloud-url:forged");boolean denied=false;try{Track.fromJson(bad);}catch(JSONException expected){denied=true;}check(denied,"Malformed reference "+key+" cannot enter a saved queue");}
+        for(String bad:new String[]{"not json",fixture+"trailing",fixture.replace("lolzcloud-profile","wrong-format"),fixture.replace("\"version\": 1","\"version\": 9"),fixture.replace("https://soundcloud.com/fixture/portable-one","file:///private/audio"),fixture.replace("1.75","\"not-a-rate\"")}){Map<String,Object> before=snapshot(store.preferences());boolean denied=false;try{store.importProfile(bad);}catch(IOException expected){denied=true;}check(denied&&before.equals(snapshot(store.preferences())),"Corrupt/wrong/private profile is rejected without any preference mutation");}
+        JSONObject secret=new JSONObject(fixture);secret.put("cookies","forbidden").put("token","forbidden");secret.getJSONObject("music").put("privatePath","file:///data/private");String safe=PortableProfile.parse(secret.toString()).toString();check(!safe.contains("forbidden")&&!safe.contains("privatePath"),"Unknown secrets/private fields never enter the whitelisted sidecar");
+        JSONObject duplicate=new JSONObject(fixture);JSONArray likes=duplicate.getJSONObject("wave").getJSONArray("likes");JSONObject conflict=new JSONObject(likes.getJSONObject(0).toString());conflict.put("id",999);likes.put(conflict);boolean denied=false;try{store.importProfile(duplicate.toString());}catch(IOException expected){denied=true;}check(denied,"One permalink with conflicting numeric identities is rejected atomically");
+        Map<String,Object> original=snapshot(store.preferences());try{JSONObject repeated=new JSONObject(fixture);JSONArray moments=repeated.getJSONObject("tools").getJSONArray("bookmarks");JSONObject same=new JSONObject(moments.getJSONObject(0).toString());same.put("id","fixture-second-note").put("note","Independent note at the same native position");moments.put(same);JSONArray repeatedLikes=repeated.getJSONObject("wave").getJSONArray("likes");JSONObject alias=new JSONObject(repeatedLikes.getJSONObject(0).toString());alias.put("description","Separate valid metadata for the same identity");repeatedLikes.put(alias);store.importProfile(repeated.toString(),false);JSONObject roundtrip=new JSONObject(store.exportProfile());check(roundtrip.getJSONObject("tools").getJSONArray("bookmarks").toString().equals(PortableProfile.parse(repeated.toString()).getJSONObject("tools").getJSONArray("bookmarks").toString()),"Duplicate native positions retain every portable bookmark ID, note and order");check(roundtrip.getJSONObject("wave").getJSONArray("likes").length()==3,"Duplicate portable like metadata is retained without duplicating the native library row");}finally{restore(store.preferences(),original);}
+    }
+    private void effectsReadback()throws Exception{if(player.eqAvailable()){short[] range=player.eqRange();boolean bounded=true;for(int band=0;band<player.eqBandCount();band++){short mapped=PortableAudioCurve.nativeLevel(player.portableGains(),player.eqCenterHz(band),range[0],range[1]),actual=player.eqBandLevel(band);effectReadbacks.put(new JSONObject().put("band",band).put("frequencyHz",player.eqCenterHz(band)).put("requestedMillibels",mapped).put("actualMillibels",actual).put("minimumMillibels",range[0]).put("maximumMillibels",range[1]));bounded&=actual>=range[0]&&actual<=range[1]&&Math.abs(actual-mapped)<=50;}check(bounded&&Math.abs(player.portableGains()[0]-5.5)<.0001,"Actual API35 native bands stay within measured 0.5dB device rounding; desired5.5dB is retained exactly");}}
+    private void nativeResolution(Track local)throws Exception{
+        String source="https://soundcloud.com/darkprinceee/gnoy";Track alias=Track.catalogReference("",source,"Imported Gno","Profile QA",89000,"");store.add(alias);store.toggleLike(alias.id);store.addBookmark(alias.id,1000);
+        onMain(()->{player.setSpeed(1);player.setPitch(1);player.setQueue(Arrays.asList(alias,local),0,true);player.next();});await(()->player.isPlaying()&&player.current().id.equals(local.id),8000,"Next wins while the old reference resolves");SystemClock.sleep(500);
+        check(player.current().id.equals(local.id)&&store.find(alias.id).isCatalogReference(),"A late metadata response cannot migrate an abandoned reference or overwrite the new current track");
+        onMain(()->player.openBookmark(alias,1000));await(()->{if(!player.error().isEmpty())throw new AssertionError("Native reference resolution: "+player.error());return player.isPlaying()&&player.current().id.equals("soundcloud:1930572542");},140000,"Explicit permalink bookmark resolves and plays real HTTPS MP3");
+        Track canonical=player.current();check(!canonical.isCatalogReference()&&!OnlineCatalog.audioId(canonical.uri).isEmpty()&&player.queue().size()==2&&store.isLiked(alias.id)&&store.bookmarks(alias.id).contains(1000L),"Permalink alias migrates to signed numeric identity with likes, bookmarks and remaining queue preserved");
+        long before=player.position();SystemClock.sleep(650);check(player.position()>before+350,"Resolved portable identity advances the actual native MediaPlayer clock");
+        store.toggleLike(alias.id);check(!store.isLiked(canonical.id),"A stale alias action after resolution changes the canonical like instead of resurrecting an orphan");store.toggleLike(canonical.id);
+        Track byId=new OnlineCatalog().track("1930572542");check(byId.id.equals(canonical.id)&&byId.sourceUrl.equals(source),"Real numeric metadata endpoint returns only the requested stable recording");
+        Method save=Class.forName("com.lolzcloud.mobile.StreamDownloads").getDeclaredMethod("save",Context.class,Track.class,LibraryStore.class);save.setAccessible(true);Track offline=(Track)save.invoke(null,getTargetContext(),canonical,store);download=new File(Uri.parse(offline.uri).getPath());
+        JSONObject profile=PortableProfile.normalize(new JSONObject().put("format","lolzcloud-profile").put("version",1));profile.getJSONObject("wave").getJSONArray("likes").put(new JSONObject().put("id",1930572542L).put("url",source).put("title","Imported duplicate").put("artist","Portable QA"));store.importProfile(profile.toString(),false);
+        check(store.find(canonical.id).uri.equals(offline.uri)&&store.isLiked(canonical.id),"A desktop import merges stable identity without overwriting its genuine private offline MP3");
+        shell("svc wifi disable");shell("svc data disable");onMain(()->player.setQueue(Arrays.asList(store.find(canonical.id),local),0,true));await(()->player.isPlaying(),8000,"Offline source survives profile merge");check(player.current().uri.equals(offline.uri),"Imported SoundCloud identity plays its downloaded private file with emulator networking disabled");check(Math.abs((float)invokeResult(player,"outputVolume")-player.volume()*Math.pow(10,-6d/20))<.0001,"Unchecked sound import keeps the previous attenuation on the NEXT native source as well");capture("profile-native-player.png");restoreNetwork();
+        // Restore the original sidecar without changing merged likes/queue; it is the preservation fixture.
+        store.importProfile(asset("desktop-v1.json"),false);
+    }
+
+    private void openImport(String filename)throws Exception{onMain(()->invoke(activity,"importProfile"));await(()->activePackage().contains("documentsui"),6000,"System import picker");SystemClock.sleep(700);if(!click(new String[]{filename},false,1200)){chooseRoot();SystemClock.sleep(350);if(!click(new String[]{filename},false,6000))throw new AssertionError("Profile document absent: "+describe());}SystemClock.sleep(350);if(activePackage().contains("documentsui"))click(new String[]{"Select","SELECT","Выбрать","ВЫБРАТЬ"},false,800);}
+    private void chooseRoot()throws Exception{if(click(new String[]{"LolzCloud profile QA"},false,500))return;if(!click(new String[]{"Show roots","Open navigation drawer","Показать корневые папки","Открыть меню навигации"},true,3000))throw new AssertionError("DocumentsUI roots missing: "+describe());if(!click(new String[]{"LolzCloud profile QA"},false,5000))throw new AssertionError("Profile provider missing: "+describe());}
+    private boolean click(String[] labels,boolean description,long timeout)throws Exception{long end=SystemClock.elapsedRealtime()+timeout;do{AccessibilityNodeInfo node=find(getUiAutomation().getRootInActiveWindow(),labels,description);if(node!=null){android.graphics.Rect bounds=new android.graphics.Rect();node.getBoundsInScreen(bounds);if(bounds.isEmpty())throw new AssertionError("Picker target has no touch bounds");shell("input tap "+bounds.centerX()+" "+bounds.centerY());return true;}SystemClock.sleep(80);}while(SystemClock.elapsedRealtime()<end);return false;}
+    private static AccessibilityNodeInfo find(AccessibilityNodeInfo node,String[] names,boolean description){if(node==null)return null;CharSequence value=description?node.getContentDescription():node.getText();for(String name:names)if(value!=null&&name.contentEquals(value))return node;for(int i=0;i<node.getChildCount();i++){AccessibilityNodeInfo found=find(node.getChild(i),names,description);if(found!=null)return found;}return null;}
+    private AlertDialog profileDialog()throws Exception{return(AlertDialog)field(activity,"profileDialog");}
+    private Set<String> exports()throws Exception{Set<String> names=new HashSet<>();for(String line:shell("run-as com.lolzcloud.mobile.test ls cache/portable-documents").split("\\s+"))if(line.matches("export-[a-f0-9-]{36}\\.json"))names.add(line);return names;}
+    private String providerText(String filename)throws Exception{if(!filename.matches("export-[a-f0-9-]{36}\\.json"))throw new IOException();return shell("run-as com.lolzcloud.mobile.test cat cache/portable-documents/"+filename);}
+    private void restoreNetwork()throws Exception{if(wifi!=null){shell("svc wifi "+(wifi.equals("1")?"enable":"disable"));shell("svc data "+(data!=null&&data.equals("1")?"enable":"disable"));}}
+    private void networkReady()throws Exception{android.net.ConnectivityManager connectivity=(android.net.ConnectivityManager)getTargetContext().getSystemService(Context.CONNECTIVITY_SERVICE);await(()->{android.net.NetworkCapabilities capabilities=connectivity.getNetworkCapabilities(connectivity.getActiveNetwork());return capabilities!=null&&capabilities.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET)&&capabilities.hasCapability(android.net.NetworkCapabilities.NET_CAPABILITY_VALIDATED);},15000,"Real emulator network restored and validated before explicit catalog playback");}
+    private String asset(String name)throws Exception{try(InputStream in=getContext().getAssets().open("profiles/"+name);ByteArrayOutputStream out=new ByteArrayOutputStream()){byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1)out.write(b,0,n);return out.toString("UTF-8");}}
+    private void write(String name,String value)throws Exception{try(FileOutputStream out=new FileOutputStream(new File(output,name))){out.write(value.getBytes(StandardCharsets.UTF_8));}}
+    private void capture(String name)throws Exception{SystemClock.sleep(350);Bitmap bitmap=getUiAutomation().takeScreenshot();if(bitmap!=null){try(FileOutputStream out=new FileOutputStream(new File(output,name))){bitmap.compress(Bitmap.CompressFormat.PNG,100,out);}bitmap.recycle();screenshots.put(name);}}
+    private void onMain(Task task)throws Exception{Throwable[] failure={null};runOnMainSync(()->{try{task.run();}catch(Throwable e){failure[0]=e;}});if(failure[0] instanceof Error)throw(Error)failure[0];if(failure[0]!=null)throw(Exception)failure[0];}
+    private static Object field(Object target,String name)throws Exception{Field f=target.getClass().getDeclaredField(name);f.setAccessible(true);return f.get(target);}
+    private static void invoke(Object target,String name)throws Exception{invokeResult(target,name);}
+    private static Object invokeResult(Object target,String name)throws Exception{Method m=target.getClass().getDeclaredMethod(name);m.setAccessible(true);return m.invoke(target);}
+    private void await(Condition condition,long timeout,String message)throws Exception{long end=SystemClock.elapsedRealtime()+timeout;while(!condition.ready()){if(SystemClock.elapsedRealtime()>end)throw new AssertionError(message);SystemClock.sleep(40);}}
+    private void check(boolean value,String name){if(!value)throw new AssertionError(name);checks.put(name);}
+    private String activePackage(){AccessibilityNodeInfo root=getUiAutomation().getRootInActiveWindow();return root==null||root.getPackageName()==null?"":root.getPackageName().toString();}
+    private String describe(){AccessibilityNodeInfo root=getUiAutomation().getRootInActiveWindow();StringBuilder out=new StringBuilder();describe(root,out);return out.toString();}
+    private void describe(AccessibilityNodeInfo node,StringBuilder out){if(node==null)return;if(node.getText()!=null)out.append(node.getText()).append('|');if(node.getContentDescription()!=null)out.append(node.getContentDescription()).append('|');for(int i=0;i<node.getChildCount();i++)describe(node.getChild(i),out);}
+    private String shell(String command)throws IOException{try(InputStream in=new ParcelFileDescriptor.AutoCloseInputStream(getUiAutomation().executeShellCommand(command));ByteArrayOutputStream out=new ByteArrayOutputStream()){byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1)out.write(b,0,n);return out.toString("UTF-8");}}
+    private static Map<String,Object> snapshot(SharedPreferences p){Map<String,Object> result=new HashMap<>();for(Map.Entry<String,?> entry:p.getAll().entrySet())result.put(entry.getKey(),entry.getValue() instanceof Set?new HashSet<>((Set<?>)entry.getValue()):entry.getValue());return result;}
+    @SuppressWarnings("unchecked")private static void restore(SharedPreferences p,Map<String,Object> original)throws IOException{SharedPreferences.Editor edit=p.edit().clear();for(Map.Entry<String,Object> entry:original.entrySet()){String k=entry.getKey();Object v=entry.getValue();if(v instanceof String)edit.putString(k,(String)v);else if(v instanceof Boolean)edit.putBoolean(k,(Boolean)v);else if(v instanceof Integer)edit.putInt(k,(Integer)v);else if(v instanceof Long)edit.putLong(k,(Long)v);else if(v instanceof Float)edit.putFloat(k,(Float)v);else if(v instanceof Set)edit.putStringSet(k,(Set<String>)v);}if(!edit.commit())throw new IOException("Preference restoration failed");}
+    private static String sha(File file)throws Exception{MessageDigest hash=MessageDigest.getInstance("SHA-256");try(InputStream in=new FileInputStream(file)){byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1)hash.update(b,0,n);}StringBuilder out=new StringBuilder();for(byte b:hash.digest())out.append(String.format(Locale.ROOT,"%02x",b&255));return out.toString();}
+    private static void wave(File file)throws Exception{int bytes=16000*30*2;try(OutputStream out=new BufferedOutputStream(new FileOutputStream(file))){out.write("RIFF".getBytes("US-ASCII"));le(out,bytes+36,4);out.write("WAVEfmt ".getBytes("US-ASCII"));le(out,16,4);le(out,1,2);le(out,1,2);le(out,16000,4);le(out,32000,4);le(out,2,2);le(out,16,2);out.write("data".getBytes("US-ASCII"));le(out,bytes,4);byte[] b=new byte[8192];while(bytes>0){int n=Math.min(bytes,b.length);out.write(b,0,n);bytes-=n;}}}
+    private static void le(OutputStream out,int value,int bytes)throws IOException{for(int i=0;i<bytes;i++)out.write(value>>>(8*i)&255);}
+}

@@ -8,6 +8,10 @@ Some existing interface SVG glyphs are from Google Material Symbols, distributed
 
 Electron and npm dependencies retain their respective licenses. Electron's runtime license files are included in the packaged distribution; dependency license files remain alongside the bundled modules.
 
+The installed web application's encrypted profile worker includes unmodified `scrypt-js` 3.0.1 by Richard Moore (2016), under the MIT license, preserved in `licenses/scrypt-js-3.0.1.txt`. Upstream: https://github.com/ricmoo/scrypt-js, commit `dc830dd5bed0a74b901aeabf64776debbb246e18`. The npm archive was verified against SHA-512 `cdwTTnqPu0Hyvf5in5asVdZocVDTNRmR7XEcJuIzMjJeSHybHl7vpB66AzwTaIg6CLSbtjcxc8fqcySfnTkccA==`; vendored JavaScript SHA-256 is `544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d`. AES-GCM uses the browser's WebCrypto implementation. Existing profile version1 key parameters and raw UTF-8 password bytes are retained for desktop compatibility.
+
+Android's encrypted profile transfer includes the pure Java implementation from [wg/scrypt](https://github.com/wg/scrypt/tree/0675236370458e819ee21e4427c5f7f3f9485d33), copyright 2011 Will Glozer, under Apache License 2.0, retained in `licenses/wg-scrypt-apache-2.0.txt`. `PBKDF.java` and the complete `scryptJ`/SMix/Salsa implementation are unchanged. LolzCloud removed the optional JNI loader and native dispatcher; `scrypt` delegates to `scryptJ`. Exact source, modified-file and unchanged-core hashes are recorded in `android/vendor/wg-scrypt-provenance.json`. AES-GCM uses Android's platform provider. Public Node-generated interoperability fixtures cover raw UTF-8 passwords without Unicode normalization.
+
 Inter 4.1 by Rasmus Andersson is bundled locally under the SIL Open Font License 1.1. The license and copyright notice are preserved in `licenses/Inter-OFL.txt`. Font source and releases are available at https://github.com/rsms/inter.
 
 Selected duotone and solid interface icons were extracted from the Untitled UI SVG sheets supplied by the project owner. Untitled UI retains the rights to those icons. They are excluded from this repository's MIT license.

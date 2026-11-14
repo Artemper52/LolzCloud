@@ -1,0 +1,15 @@
+{
+  "status": "prepared",
+  "version": "0.9.18",
+  "published": false,
+  "checkedAt": "2026-11-14T23:22:52.508Z",
+  "expectedPlatforms": {
+    "desktop": "0.9.18",
+    "android": "0.1.8",
+    "androidVersionCode": 9,
+    "nativeIOS": "0.1.3",
+    "nativeIOSBuild": 4,
+    "server": "0.9.21"
+  },
+  "note": "Build snapshot before publication. Public availability is checked separately and recorded after promotion."
+}

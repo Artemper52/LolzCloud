@@ -1,0 +1,3 @@
+
+Native Web Audio passed: actual SoundCloud/local −6dB portable preamp and bypass, full .5–2 rate, peak ceiling, smooth duck/recovery without volume changes, AudioWorklet tempo, effects and SoundCloud SDK reconnects.
+{"dryTail":0,"reverbTail":0.000027087507905817956,"echoTail":0.0000036417508986813427,"bassRatioIncrease":1.7672481578175239,"soundCloudPreampRatio":0.5050980161338323,"localPreampRatio":0.5011871992339124}

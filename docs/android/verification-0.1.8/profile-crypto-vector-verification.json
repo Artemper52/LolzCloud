@@ -1,0 +1,67 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T22:55:30.368Z",
+  "checks": [
+    "ascii: actual upstream Java scrypt matches Node DK",
+    "ascii: deterministic Java AES-GCM equals Node envelope byte-for-byte",
+    "ascii: Node envelope decrypts in Java without normalization/trim",
+    "ascii: random Java envelope authenticates and decrypts in Node",
+    "ascii: wrong password cannot produce plaintext",
+    "ascii: modified GCM tag cannot produce plaintext",
+    "decomposed-raw-utf8: actual upstream Java scrypt matches Node DK",
+    "decomposed-raw-utf8: deterministic Java AES-GCM equals Node envelope byte-for-byte",
+    "decomposed-raw-utf8: Node envelope decrypts in Java without normalization/trim",
+    "decomposed-raw-utf8: random Java envelope authenticates and decrypts in Node",
+    "decomposed-raw-utf8: wrong password cannot produce plaintext",
+    "decomposed-raw-utf8: modified GCM tag cannot produce plaintext",
+    "composed-raw-utf8: actual upstream Java scrypt matches Node DK",
+    "composed-raw-utf8: deterministic Java AES-GCM equals Node envelope byte-for-byte",
+    "composed-raw-utf8: Node envelope decrypts in Java without normalization/trim",
+    "composed-raw-utf8: random Java envelope authenticates and decrypts in Node",
+    "composed-raw-utf8: wrong password cannot produce plaintext",
+    "composed-raw-utf8: modified GCM tag cannot produce plaintext",
+    "Short/oversized/unpaired-surrogate passwords are rejected explicitly"
+  ],
+  "parameters": {
+    "N": 16384,
+    "r": 8,
+    "p": 1,
+    "dkLen": 32,
+    "saltBytes": 16,
+    "ivBytes": 12,
+    "tagBytes": 16,
+    "password": "raw UTF-8; unpaired UTF16 rejected, no trim/NFKC"
+  },
+  "vendor": {
+    "upstream": "https://github.com/wg/scrypt",
+    "commit": "0675236370458e819ee21e4427c5f7f3f9485d33",
+    "license": "Apache-2.0",
+    "files": {
+      "SCrypt": {
+        "sourceSha256": "7fae0832fd4be7fb932bafb0c9e6eb1d351e73bd8b2c54f29c24eb1a4eef4357",
+        "vendoredSha256": "1901fb26a3ee3b1d3a3889a3172f8e3ff13a04588c969b564020d58e9530a140",
+        "unchangedCoreSha256": "1386cc23fa6e6c00c89be069b53f4829f613db4bee59ee1dd67e875ffc67c866"
+      },
+      "PBKDF": {
+        "sourceSha256": "ed6a6325daa5674e658deff7d9e4371dddba56e51b5eca69c51d721aeccbe9de",
+        "vendoredSha256": "ed6a6325daa5674e658deff7d9e4371dddba56e51b5eca69c51d721aeccbe9de"
+      },
+      "LICENSE": {
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+      }
+    },
+    "modifications": [
+      "Removed optional JNI import, loader initialization, native declaration and dispatcher",
+      "scrypt delegates directly to scryptJ",
+      "Preserved upstream scryptJ through end of class byte-for-byte; PBKDF.java unmodified"
+    ],
+    "parameters": {
+      "N": 16384,
+      "r": 8,
+      "p": 1,
+      "dkLen": 32,
+      "passwordEncoding": "raw UTF-8"
+    }
+  },
+  "scope": "Actual JVM upstream pure-Java SCrypt + standard AES/GCM against three public Node vectors and Java→Node fresh random envelopes. This proves crypto interoperability, not authenticated cloud HTTP, Android provider performance or native UI."
+}

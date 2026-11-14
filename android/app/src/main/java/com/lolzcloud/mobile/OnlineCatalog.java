@@ -47,6 +47,52 @@ public final class OnlineCatalog {
 
     public void cancel() { HttpsURLConnection connection = active; if (connection != null) try { connection.disconnect(); } catch (RuntimeException ignored) { } }
 
+    /** Resolve only on explicit playback, never while a portable file is imported. */
+    public Track resolveReference(Track reference) throws IOException {
+        if (reference == null || !reference.isCatalogReference()) throw new IOException("Некорректная ссылка на запись");
+        if (reference.id.startsWith("soundcloud:")) return track(reference.id.substring("soundcloud:".length()));
+        Page page = search(reference.sourceUrl, "0");
+        for (Track candidate : page.tracks) if (candidate.sourceUrl.equals(reference.sourceUrl)) return candidate;
+        throw new IOException("Эта запись SoundCloud недоступна. Попробуй позже или выбери другую запись");
+    }
+
+    public Track track(String id) throws IOException {
+        if (id == null || !ID.matcher(id).matches()) throw new IOException("Некорректный ID записи SoundCloud");
+        if (Thread.currentThread().isInterrupted()) throw new IOException("Загрузка записи отменена");
+        HttpsURLConnection connection = (HttpsURLConnection) new URL(ORIGIN + "/music/track/" + id).openConnection();
+        active = connection;
+        try {
+            prepare(connection, 22000); connection.setRequestProperty("Accept", "application/json");
+            int status = connection.getResponseCode();
+            if (status >= 300 && status < 400) throw new IOException("Каталог вернул переадресацию. Попробуй позже");
+            String type = connection.getContentType();
+            if (type == null || !type.toLowerCase(Locale.ROOT).startsWith("application/json"))
+                throw new IOException("Каталог временно недоступен (HTTP " + status + ")");
+            String json = new String(read(status == 200 ? connection.getInputStream() : connection.getErrorStream(), JSON_LIMIT), StandardCharsets.UTF_8);
+            if (Thread.currentThread().isInterrupted()) throw new IOException("Загрузка записи отменена");
+            if (status != 200) {
+                String message = status == 404 ? "Запись SoundCloud больше недоступна. Выбери другую запись" : "Не удалось загрузить запись (HTTP " + status + ")";
+                try { String detail = new JSONObject(json).optString("error", ""); if (!detail.trim().isEmpty()) message = clean(detail, 300); }
+                catch (JSONException ignored) { }
+                throw new IOException(message);
+            }
+            return parseTrack(json, id);
+        } catch (java.net.UnknownHostException failure) { throw new IOException("Нет связи с каталогом. Проверь интернет и нажми «Повторить»", failure); }
+        catch (java.net.SocketTimeoutException failure) { throw new IOException("Каталог долго отвечает. Нажми «Повторить»", failure); }
+        finally { if (active == connection) active = null; connection.disconnect(); }
+    }
+
+    public static Track parseTrack(String json, String requestedId) throws IOException {
+        if (json == null || json.getBytes(StandardCharsets.UTF_8).length > JSON_LIMIT) throw new IOException("Ответ каталога слишком большой");
+        try {
+            JSONObject row = new JSONObject(json).getJSONObject("track");
+            Page page = parse(new JSONObject().put("tracks", new JSONArray().put(row)).put("nextOffset", "").toString());
+            if (page.tracks.size() != 1 || !page.tracks.get(0).id.equals("soundcloud:" + requestedId))
+                throw new IOException("Каталог вернул другую запись");
+            return page.tracks.get(0);
+        } catch (JSONException failure) { throw new IOException("Каталог вернул некорректную запись", failure); }
+    }
+
     public Page search(String query, String offset) throws IOException {
         String q = normalizeQuery(query);
         if (q.length() < 2 || q.length() > 140 || q.matches("(?s).*[\\p{Cntrl}].*"))

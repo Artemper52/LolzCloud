@@ -1,0 +1,2597 @@
+TAP version 13
+# Subtest: update manifests isolate legacy and modern channels, reject other repositories and compare versions numerically
+ok 1 - update manifests isolate legacy and modern channels, reject other repositories and compare versions numerically
+  ---
+  duration_ms: 1.661428
+  type: 'test'
+  ...
+# Subtest: portable updates verify both byte count and SHA-256 and never retain a bad download
+ok 2 - portable updates verify both byte count and SHA-256 and never retain a bad download
+  ---
+  duration_ms: 45.296981
+  type: 'test'
+  ...
+# Subtest: portable extraction accepts a complete application and rejects traversal and symlink entries
+ok 3 - portable extraction accepts a complete application and rejects traversal and symlink entries
+  ---
+  duration_ms: 32.314006
+  type: 'test'
+  ...
+# Subtest: one update click downloads, verifies, saves the profile and requests a silent restart in that order
+ok 4 - one update click downloads, verifies, saves the profile and requests a silent restart in that order
+  ---
+  duration_ms: 4.689028
+  type: 'test'
+  ...
+# Subtest: a corrupted installer cannot trigger preflight, change the environment, shut down the profile or execute an update
+ok 5 - a corrupted installer cannot trigger preflight, change the environment, shut down the profile or execute an update
+  ---
+  duration_ms: 4.10251
+  type: 'test'
+  ...
+# Subtest: the official website can deliver updates while GitHub is unavailable
+ok 6 - the official website can deliver updates while GitHub is unavailable
+  ---
+  duration_ms: 2.143209
+  type: 'test'
+  ...
+# Subtest: C temp full with D available selects a writable installation-volume sibling outside the uninstall target
+ok 7 - C temp full with D available selects a writable installation-volume sibling outside the uninstall target
+  ---
+  duration_ms: 1.205938
+  type: 'test'
+  ...
+# Subtest: 1100 MiB free on C cannot pass the real 0.9.14 NSIS temporary-space requirement and falls back to D
+ok 8 - 1100 MiB free on C cannot pass the real 0.9.14 NSIS temporary-space requirement and falls back to D
+  ---
+  duration_ms: 0.202032
+  type: 'test'
+  ...
+# Subtest: a usable normal temp is retained and unknown, unwritable or inside-target alternatives fail closed
+ok 9 - a usable normal temp is retained and unknown, unwritable or inside-target alternatives fail closed
+  ---
+  duration_ms: 1.553504
+  type: 'test'
+  ...
+# Subtest: legacy Node without statfs uses bounded read-only DriveInfo with the path on stdin
+ok 10 - legacy Node without statfs uses bounded read-only DriveInfo with the path on stdin
+  ---
+  duration_ms: 0.391209
+  type: 'test'
+  ...
+# Subtest: temporary environment restoration preserves absent variables without touching the global environment
+ok 11 - temporary environment restoration preserves absent variables without touching the global environment
+  ---
+  duration_ms: 0.170863
+  type: 'test'
+  ...
+# Subtest: verified cached installer can hand off with D temp while C is full, after preflight and profile preparation
+ok 12 - verified cached installer can hand off with D temp while C is full, after preflight and profile preparation
+  ---
+  duration_ms: 9.502952
+  type: 'test'
+  ...
+# Subtest: no safe temp alternative leaves the app open and the original process environment intact before profile shutdown
+ok 13 - no safe temp alternative leaves the app open and the original process environment intact before profile shutdown
+  ---
+  duration_ms: 3.294644
+  type: 'test'
+  ...
+# Subtest: a full download cache reports a clear recoverable error before preflight or shutdown
+ok 14 - a full download cache reports a clear recoverable error before preflight or shutdown
+  ---
+  duration_ms: 1.48743
+  type: 'test'
+  ...
+# Subtest: prepare failure never changes TEMP and a synchronous handoff failure restores both TEMP and TMP
+ok 15 - prepare failure never changes TEMP and a synchronous handoff failure restores both TEMP and TMP
+  ---
+  duration_ms: 5.686943
+  type: 'test'
+  ...
+# Subtest: real filesystem preflight probes only the selected temporary directory and leaves no probe file
+ok 16 - real filesystem preflight probes only the selected temporary directory and leaves no probe file
+  ---
+  duration_ms: 1.006641
+  type: 'test'
+  ...
+# Subtest: a second desktop instance returns immediately after quit instead of registering a ghost client
+ok 17 - a second desktop instance returns immediately after quit instead of registering a ghost client
+  ---
+  duration_ms: 1.707155
+  type: 'test'
+  ...
+# Subtest: queued preparation has its own total deadline and leaves no abandoned waiter
+ok 18 - queued preparation has its own total deadline and leaves no abandoned waiter
+  ---
+  duration_ms: 46.961508
+  type: 'test'
+  ...
+# Subtest: service shutdown rejects queued work immediately and drains worker accounting
+ok 19 - service shutdown rejects queued work immediately and drains worker accounting
+  ---
+  duration_ms: 8.115041
+  type: 'test'
+  ...
+# Subtest: an open cached audio file stays readable during eviction and refreshes its access time
+ok 20 - an open cached audio file stays readable during eviction and refreshes its access time
+  ---
+  duration_ms: 8.548089
+  type: 'test'
+  ...
+# Subtest: simultaneous real MP3 conversions cannot publish beyond the cache quota
+ok 21 - simultaneous real MP3 conversions cannot publish beyond the cache quota
+  ---
+  duration_ms: 87.717106
+  type: 'test'
+  ...
+# Subtest: HTTP HEAD, invalid range and disconnected stream release real cache file leases
+ok 22 - HTTP HEAD, invalid range and disconnected stream release real cache file leases
+  ---
+  duration_ms: 107.766651
+  type: 'test'
+  ...
+# Subtest: browser profiles are discovered from names only, unsafe profile paths stay out of launch arguments
+ok 23 - browser profiles are discovered from names only, unsafe profile paths stay out of launch arguments
+  ---
+  duration_ms: 3.292239
+  type: 'test'
+  ...
+# Subtest: several browser accounts can be previewed without replacing the app login, only the chosen session is imported
+ok 24 - several browser accounts can be previewed without replacing the app login, only the chosen session is imported
+  ---
+  duration_ms: 72.739956
+  type: 'test'
+  ...
+# Subtest: an expired or cancelled account chooser cannot import a previously offered account
+ok 25 - an expired or cancelled account chooser cannot import a previously offered account
+  ---
+  duration_ms: 7.94067
+  type: 'test'
+  ...
+# Subtest: account preview uses only the offered SoundCloud token without borrowing or replacing the active login
+ok 26 - account preview uses only the offered SoundCloud token without borrowing or replacing the active login
+  ---
+  duration_ms: 0.461101
+  type: 'test'
+  ...
+# Subtest: a previous LolzCloud installation is recovered automatically before browser onboarding, while logout is respected
+ok 27 - a previous LolzCloud installation is recovered automatically before browser onboarding, while logout is respected
+  ---
+  duration_ms: 0.635691
+  type: 'test'
+  ...
+# Subtest: persistent browser pairing keys remain OS-encrypted and a temporarily unavailable key is preserved
+ok 28 - persistent browser pairing keys remain OS-encrypted and a temporarily unavailable key is preserved
+  ---
+  duration_ms: 5.988332
+  type: 'test'
+  ...
+# Subtest: browser request signatures bind the receiver, encryption key, expiry and installation identity
+ok 29 - browser request signatures bind the receiver, encryption key, expiry and installation identity
+  ---
+  duration_ms: 60.760525
+  type: 'test'
+  ...
+# Subtest: browser: HttpOnly sessions transfer automatically only after popup approval, survive app restart and can be revoked
+ok 30 - browser: HttpOnly sessions transfer automatically only after popup approval, survive app restart and can be revoked
+  ---
+  duration_ms: 52.275164
+  type: 'test'
+  ...
+# Subtest: chrome: HttpOnly sessions transfer automatically only after popup approval, survive app restart and can be revoked
+ok 31 - chrome: HttpOnly sessions transfer automatically only after popup approval, survive app restart and can be revoked
+  ---
+  duration_ms: 24.447504
+  type: 'test'
+  ...
+# Subtest: the helper ships separate Chromium worker and Firefox background manifests
+ok 32 - the helper ships separate Chromium worker and Firefox background manifests
+  ---
+  duration_ms: 38.216304
+  type: 'test'
+  ...
+# Subtest: browser exports accept JSON, Playwright-style expiry and Netscape HttpOnly without other sites
+ok 33 - browser exports accept JSON, Playwright-style expiry and Netscape HttpOnly without other sites
+  ---
+  duration_ms: 1.187104
+  type: 'test'
+  ...
+# Subtest: replacing a session removes conflicting cookies and a failed write restores the old login
+ok 34 - replacing a session removes conflicting cookies and a failed write restores the old login
+  ---
+  duration_ms: 0.826361
+  type: 'test'
+  ...
+# Subtest: the actual browser bookmark encrypts its session, imports once and rejects other origins and tampering
+ok 35 - the actual browser bookmark encrypts its session, imports once and rejects other origins and tampering
+  ---
+  duration_ms: 82.327849
+  type: 'test'
+  ...
+# Subtest: the browser helper exports HttpOnly login with a password and the app decrypts it without plaintext files
+ok 36 - the browser helper exports HttpOnly login with a password and the app decrypts it without plaintext files
+  ---
+  duration_ms: 93.54134
+  type: 'test'
+  ...
+# Subtest: rooms require verified sessions and only their owner can publish or close them
+ok 37 - rooms require verified sessions and only their owner can publish or close them
+  ---
+  duration_ms: 88.39031
+  type: 'test'
+  ...
+# Subtest: room music search requires authentication and keeps the scoped player policy
+ok 38 - room music search requires authentication and keeps the scoped player policy
+  ---
+  duration_ms: 75.692249
+  type: 'test'
+  ...
+# Subtest: participants use server-verified identities, deduplicate tabs, expire and hide stale/private music
+ok 39 - participants use server-verified identities, deduplicate tabs, expire and hide stale/private music
+  ---
+  duration_ms: 15.747919
+  type: 'test'
+  ...
+# Subtest: browser mutations require CSRF and the correct origin
+ok 40 - browser mutations require CSRF and the correct origin
+  ---
+  duration_ms: 5.904664
+  type: 'test'
+  ...
+# Subtest: OAuth callback binds state to its browser, rejects replay and never trusts callback user IDs
+ok 41 - OAuth callback binds state to its browser, rejects replay and never trusts callback user IDs
+  ---
+  duration_ms: 5.995446
+  type: 'test'
+  ...
+# Subtest: OAuth redirect modes preserve the request and cookie while only explicit mode sends the callback URI
+ok 42 - OAuth redirect modes preserve the request and cookie while only explicit mode sends the callback URI
+  ---
+  duration_ms: 6.66493
+  type: 'test'
+  ...
+# Subtest: neither OAuth redirect mode can complete login with a mismatched browser state
+ok 43 - neither OAuth redirect mode can complete login with a mismatched browser state
+  ---
+  duration_ms: 14.304563
+  type: 'test'
+  ...
+# Subtest: desktop pairing needs an authenticated approval and retries return the same session briefly
+ok 44 - desktop pairing needs an authenticated approval and retries return the same session briefly
+  ---
+  duration_ms: 9.520235
+  type: 'test'
+  ...
+# Subtest: shared Spicy requests require login, preserve attribution and cache without revealing the key
+ok 45 - shared Spicy requests require login, preserve attribution and cache without revealing the key
+  ---
+  duration_ms: 9.450923
+  type: 'test'
+  ...
+# Subtest: desktop private mode removes track metadata before sending anything to the server
+ok 46 - desktop private mode removes track metadata before sending anything to the server
+  ---
+  duration_ms: 1.158337
+  type: 'test'
+  ...
+# Subtest: a crashed renderer cannot pass release validation merely because Electron returned zero
+ok 47 - a crashed renderer cannot pass release validation merely because Electron returned zero
+  ---
+  duration_ms: 1.952528
+  type: 'test'
+  ...
+# Subtest: a local pause cancels a play still waiting for the audio device
+ok 48 - a local pause cancels a play still waiting for the audio device
+  ---
+  duration_ms: 6.299651
+  type: 'test'
+  ...
+# Subtest: a local stop fences an older pending play
+ok 49 - a local stop fences an older pending play
+  ---
+  duration_ms: 1.671809
+  type: 'test'
+  ...
+# Subtest: local play/pause toggles cancel preparation and resume the selected track once
+ok 50 - local play/pause toggles cancel preparation and resume the selected track once
+  ---
+  duration_ms: 2.460027
+  type: 'test'
+  ...
+# Subtest: an older YouTube open cannot revert a newer source selection
+ok 51 - an older YouTube open cannot revert a newer source selection
+  ---
+  duration_ms: 2.717675
+  type: 'test'
+  ...
+# Subtest: pausing a pending YouTube track prevents its delayed autoplay
+ok 52 - pausing a pending YouTube track prevents its delayed autoplay
+  ---
+  duration_ms: 2.134653
+  type: 'test'
+  ...
+# Subtest: leaving a pending YouTube open returns the authoritative source to SoundCloud
+ok 53 - leaving a pending YouTube open returns the authoritative source to SoundCloud
+  ---
+  duration_ms: 1.066343
+  type: 'test'
+  ...
+# Subtest: YouTube polling drops old source samples and reads playback plus audio in one guest call
+ok 54 - YouTube polling drops old source samples and reads playback plus audio in one guest call
+  ---
+  duration_ms: 2.614169
+  type: 'test'
+  ...
+# Subtest: repeat-all skips unavailable files across both ends of a local queue
+ok 55 - repeat-all skips unavailable files across both ends of a local queue
+  ---
+  duration_ms: 2.856587
+  type: 'test'
+  ...
+# Subtest: Discord sends the listener profiles instead of the artist or project links
+ok 56 - Discord sends the listener profiles instead of the artist or project links
+  ---
+  duration_ms: 2.302781
+  type: 'test'
+  ...
+# Subtest: Discord profile switches remove every link and nickname for the disabled service
+ok 57 - Discord profile switches remove every link and nickname for the disabled service
+  ---
+  duration_ms: 0.358968
+  type: 'test'
+  ...
+# Subtest: Discord timestamps account for speed changes
+ok 58 - Discord timestamps account for speed changes
+  ---
+  duration_ms: 0.167787
+  type: 'test'
+  ...
+# Subtest: unknown SoundCloud accounts do not fall back to a track uploader
+ok 59 - unknown SoundCloud accounts do not fall back to a track uploader
+  ---
+  duration_ms: 0.319663
+  type: 'test'
+  ...
+# Subtest: pause and idle keep LolzCloud visible without a running timer
+ok 60 - pause and idle keep LolzCloud visible without a running timer
+  ---
+  duration_ms: 0.434181
+  type: 'test'
+  ...
+# Subtest: a discovered listener profile persists and an explicit logout clears it
+ok 61 - a discovered listener profile persists and an explicit logout clears it
+  ---
+  duration_ms: 0.686497
+  type: 'test'
+  ...
+# Subtest: a manually supplied SoundCloud profile works while logged out and survives anonymous snapshots
+ok 62 - a manually supplied SoundCloud profile works while logged out and survives anonymous snapshots
+  ---
+  duration_ms: 0.24877
+  type: 'test'
+  ...
+# Subtest: Discord throttles updates and switches to paused presence with the profile buttons
+ok 63 - Discord throttles updates and switches to paused presence with the profile buttons
+  ---
+  duration_ms: 1.454548
+  type: 'test'
+  ...
+# Subtest: Discord reconnects after failure and disabling does not send more activity
+ok 64 - Discord reconnects after failure and disabling does not send more activity
+  ---
+  duration_ms: 1.293755
+  type: 'test'
+  ...
+# Subtest: an unset application ID does not publish under another application name
+ok 65 - an unset application ID does not publish under another application name
+  ---
+  duration_ms: 0.368547
+  type: 'test'
+  ...
+# Subtest: changing or removing the application ID clears the previous Discord activity
+ok 66 - changing or removing the application ID clears the previous Discord activity
+  ---
+  duration_ms: 1.437056
+  type: 'test'
+  ...
+# Subtest: catalogue bootstrap tolerates changed script attributes and a failed asset without contacting untrusted hosts
+ok 67 - catalogue bootstrap tolerates changed script attributes and a failed asset without contacting untrusted hosts
+  ---
+  duration_ms: 31.58097
+  type: 'test'
+  ...
+# Subtest: missing and oversized catalogue pages reject cleanly instead of hanging in nested callbacks
+ok 68 - missing and oversized catalogue pages reject cleanly instead of hanging in nested callbacks
+  ---
+  duration_ms: 1.218582
+  type: 'test'
+  ...
+# Subtest: an expired public client ID is refreshed once and then reused by later catalogue requests
+ok 69 - an expired public client ID is refreshed once and then reused by later catalogue requests
+  ---
+  duration_ms: 1.896101
+  type: 'test'
+  ...
+# Subtest: a rejected account authorization is returned to the caller without endlessly rotating public IDs
+ok 70 - a rejected account authorization is returned to the caller without endlessly rotating public IDs
+  ---
+  duration_ms: 0.297563
+  type: 'test'
+  ...
+# Subtest: cancelling one caller during client discovery does not hang or cancel another caller
+ok 71 - cancelling one caller during client discovery does not hang or cancel another caller
+  ---
+  duration_ms: 1.152958
+  type: 'test'
+  ...
+# Subtest: MP3 filenames cannot traverse folders, overwrite device files or keep invalid Windows characters
+ok 72 - MP3 filenames cannot traverse folders, overwrite device files or keep invalid Windows characters
+  ---
+  duration_ms: 1.473222
+  type: 'test'
+  ...
+# Subtest: the bundled converter produces real MP3 audio and preserves Unicode title tags
+ok 73 - the bundled converter produces real MP3 audio and preserves Unicode title tags
+  ---
+  duration_ms: 96.478808
+  type: 'test'
+  ...
+# Subtest: downloads serialize jobs, deduplicate a track and preserve existing MP3 files
+ok 74 - downloads serialize jobs, deduplicate a track and preserve existing MP3 files
+  ---
+  duration_ms: 34.209095
+  type: 'test'
+  ...
+# Subtest: cancelled downloads leave no final file or temporary audio
+ok 75 - cancelled downloads leave no final file or temporary audio
+  ---
+  duration_ms: 3.305945
+  type: 'test'
+  ...
+# Subtest: cancelling while the final MP3 is being copied removes only the newly created file
+ok 76 - cancelling while the final MP3 is being copied removes only the newly created file
+  ---
+  duration_ms: 3.214042
+  type: 'test'
+  ...
+# Subtest: retrying a failed download reuses its row and completes without duplicate files or list entries
+ok 77 - retrying a failed download reuses its row and completes without duplicate files or list entries
+  ---
+  duration_ms: 3.820178
+  type: 'test'
+  ...
+# Subtest: a failed history write cannot reject the background worker or discard a completed MP3
+ok 78 - a failed history write cannot reject the background worker or discard a completed MP3
+  ---
+  duration_ms: 2.580084
+  type: 'test'
+  ...
+# Subtest: interrupted jobs clean only their own UUID temporary files on restart
+ok 79 - interrupted jobs clean only their own UUID temporary files on restart
+  ---
+  duration_ms: 0.875103
+  type: 'test'
+  ...
+# Subtest: HLS parser accepts finite playlists, preserves ranges, and rejects untrusted/DRM/live sources
+ok 80 - HLS parser accepts finite playlists, preserves ranges, and rejects untrusted/DRM/live sources
+  ---
+  duration_ms: 0.91009
+  type: 'test'
+  ...
+# Subtest: HLS source saves complete ordinary AES-128 segments without persisting signed URLs or keys
+ok 81 - HLS source saves complete ordinary AES-128 segments without persisting signed URLs or keys
+  ---
+  duration_ms: 39.181768
+  type: 'test'
+  ...
+# Subtest: MONETIZE tracks with downloads disabled choose the full AAC stream instead of the adaptive playlist
+ok 82 - MONETIZE tracks with downloads disabled choose the full AAC stream instead of the adaptive playlist
+  ---
+  duration_ms: 2.531071
+  type: 'test'
+  ...
+# Subtest: an unavailable or malformed stream falls back to another full format and cleans partial bytes
+ok 83 - an unavailable or malformed stream falls back to another full format and cleans partial bytes
+  ---
+  duration_ms: 3.126907
+  type: 'test'
+  ...
+# Subtest: session access is used only with the SoundCloud API and is never sent to media CDNs or returned in metadata
+ok 84 - session access is used only with the SoundCloud API and is never sent to media CDNs or returned in metadata
+  ---
+  duration_ms: 1.431233
+  type: 'test'
+  ...
+# Subtest: expired session access retries public tracks anonymously and never saves previews as complete songs
+ok 85 - expired session access retries public tracks anonymously and never saves previews as complete songs
+  ---
+  duration_ms: 0.440633
+  type: 'test'
+  ...
+# Subtest: Linux manifest selects exact architecture, versioned basename and official origin
+ok 86 - Linux manifest selects exact architecture, versioned basename and official origin
+  ---
+  duration_ms: 3.490795
+  type: 'test'
+  ...
+# Subtest: AppImage architecture requires ELF64 little endian and AI Type2 magic
+ok 87 - AppImage architecture requires ELF64 little endian and AI Type2 magic
+  ---
+  duration_ms: 14.252555
+  type: 'test'
+  ...
+# Subtest: Linux start-time parsing handles process names with spaces and closing parentheses
+ok 88 - Linux start-time parsing handles process names with spaces and closing parentheses
+  ---
+  duration_ms: 0.383304
+  type: 'test'
+  ...
+# Subtest: unpackaged Linux archive stays unsupported and never requests shutdown
+ok 89 - unpackaged Linux archive stays unsupported and never requests shutdown
+  ---
+  duration_ms: 1.032069
+  type: 'test'
+  ...
+# Subtest: Linux manifest is bounded while reading and cancels an oversized stream
+ok 90 - Linux manifest is bounded while reading and cancels an oversized stream
+  ---
+  duration_ms: 16.896059
+  type: 'test'
+  ...
+# Subtest: manifest redirect/final origin is rejected even when the response body looks valid
+ok 91 - manifest redirect/final origin is rejected even when the response body looks valid
+  ---
+  duration_ms: 5.05555
+  type: 'test'
+  ...
+# Subtest: Linux download refuses final-origin redirects before preparation; Windows downloader is unchanged
+ok 92 - Linux download refuses final-origin redirects before preparation; Windows downloader is unchanged
+  ---
+  duration_ms: 23.80481
+  type: 'test'
+  ...
+# Subtest: destination changed during download is preserved and cannot reach profile preparation
+ok 93 - destination changed during download is preserved and cannot reach profile preparation
+  ---
+  duration_ms: 31.573535
+  type: 'test'
+  ...
+# Subtest: corrupt downloaded bytes cannot spawn a helper or shut down the running app
+ok 94 - corrupt downloaded bytes cannot spawn a helper or shut down the running app
+  ---
+  duration_ms: 39.25629
+  type: 'test'
+  ...
+# Subtest: download size mismatch and wrong architecture fail before helper/profile shutdown
+ok 95 - download size mismatch and wrong architecture fail before helper/profile shutdown
+  ---
+  duration_ms: 64.360154
+  type: 'test'
+  ...
+# Subtest: a current/older Linux release never becomes available or triggers install
+ok 96 - a current/older Linux release never becomes available or triggers install
+  ---
+  duration_ms: 4.643462
+  type: 'test'
+  ...
+# Subtest: real helper confirms backup/ready before prepare; prepare failure cancels without quitting
+ok 97 - real helper confirms backup/ready before prepare; prepare failure cancels without quitting
+  ---
+  duration_ms: 1058.382107
+  type: 'test'
+  ...
+# Subtest: an unavailable helper lock fails before profile shutdown and keeps the previous AppImage
+ok 98 - an unavailable helper lock fails before profile shutdown and keeps the previous AppImage
+  ---
+  duration_ms: 68.311915
+  type: 'test'
+  ...
+# Subtest: real helper waits exact parent PID/startTime, backs up and replaces only after exit; quoted paths/args survive
+ok 99 - real helper waits exact parent PID/startTime, backs up and replaces only after exit; quoted paths/args survive
+  ---
+  duration_ms: 3137.583715
+  type: 'test'
+  ...
+# Subtest: PID reuse/start-time mismatch does not wait for an unrelated living process
+ok 100 - PID reuse/start-time mismatch does not wait for an unrelated living process
+  ---
+  duration_ms: 2022.332566
+  type: 'test'
+  ...
+# Subtest: failed new launch rolls back original bytes and starts the previous fixture
+ok 101 - failed new launch rolls back original bytes and starts the previous fixture
+  ---
+  duration_ms: 3029.154201
+  type: 'test'
+  ...
+# Subtest: explicit cancellation after readiness keeps parent open and never replaces destination
+ok 102 - explicit cancellation after readiness keeps parent open and never replaces destination
+  ---
+  duration_ms: 1017.528317
+  type: 'test'
+  ...
+# Subtest: staged bytes corrupted after readiness cannot replace the old AppImage
+ok 103 - staged bytes corrupted after readiness cannot replace the old AppImage
+  ---
+  duration_ms: 1023.463174
+  type: 'test'
+  ...
+# Subtest: destination changed after readiness is never clobbered by the helper
+ok 104 - destination changed after readiness is never clobbered by the helper
+  ---
+  duration_ms: 1023.052808
+  type: 'test'
+  ...
+# Subtest: destination changed into a symlink leaves the outside file untouched
+ok 105 - destination changed into a symlink leaves the outside file untouched
+  ---
+  duration_ms: 1018.985498
+  type: 'test'
+  ...
+# Subtest: pre-existing helper lock prevents readiness and keeps destination/backup state safe
+ok 106 - pre-existing helper lock prevents readiness and keeps destination/backup state safe
+  ---
+  duration_ms: 15.820261
+  type: 'test'
+  ...
+# Subtest: malformed, empty, zero or noncanonical parent/startTime never confirms ready or replaces a living parent image
+ok 107 - malformed, empty, zero or noncanonical parent/startTime never confirms ready or replaces a living parent image
+  ---
+  duration_ms: 55.49746
+  type: 'test'
+  ...
+# Subtest: Linux credentials require an unlocked real keyring and never use basic_text
+ok 108 - Linux credentials require an unlocked real keyring and never use basic_text
+  ---
+  duration_ms: 0.515094
+  type: 'test'
+  ...
+# Linux archive: /opt/lolzcloud-builds/release-0.9.18/dist/LolzCloud-fixture-4058428-linux-x64.tar.gz
+# Subtest: portable Linux tar preserves executable modes when cross-built from Windows
+ok 109 - portable Linux tar preserves executable modes when cross-built from Windows
+  ---
+  duration_ms: 12.794851
+  type: 'test'
+  ...
+# Subtest: status includes artist, complete timecode and pipe characters from the track
+ok 110 - status includes artist, complete timecode and pipe characters from the track
+  ---
+  duration_ms: 1.340223
+  type: 'test'
+  ...
+# Subtest: long Unicode names are shortened to 50 UTF-16 units without losing the timecode
+ok 111 - long Unicode names are shortened to 50 UTF-16 units without losing the timecode
+  ---
+  duration_ms: 0.243601
+  type: 'test'
+  ...
+# Subtest: normalization handles hours, missing durations and hostile data without evaluating it
+ok 112 - normalization handles hours, missing durations and hostile data without evaluating it
+  ---
+  duration_ms: 0.364858
+  type: 'test'
+  ...
+# Subtest: binding is read-only and the state returned to the UI never contains the token
+ok 113 - binding is read-only and the state returned to the UI never contains the token
+  ---
+  duration_ms: 0.84694
+  type: 'test'
+  ...
+# Subtest: automatic writes happen at least 60 seconds apart and use the newest track
+ok 114 - automatic writes happen at least 60 seconds apart and use the newest track
+  ---
+  duration_ms: 4.665373
+  type: 'test'
+  ...
+# Subtest: pause restores the actual custom title, including an empty original title
+ok 115 - pause restores the actual custom title, including an empty original title
+  ---
+  duration_ms: 0.713618
+  type: 'test'
+  ...
+# Subtest: paused and keep policies behave differently; disabling always restores
+ok 116 - paused and keep policies behave differently; disabling always restores
+  ---
+  duration_ms: 0.749837
+  type: 'test'
+  ...
+# Subtest: missing playback heartbeats restore stale music instead of broadcasting forever
+ok 117 - missing playback heartbeats restore stale music instead of broadcasting forever
+  ---
+  duration_ms: 0.501077
+  type: 'test'
+  ...
+# Subtest: private mode immediately restores the original title and excludes the track
+ok 118 - private mode immediately restores the original title and excludes the track
+  ---
+  duration_ms: 0.591968
+  type: 'test'
+  ...
+# Subtest: a manual forum edit stops broadcasting and is never overwritten by restoration
+ok 119 - a manual forum edit stops broadcasting and is never overwritten by restoration
+  ---
+  duration_ms: 1.499211
+  type: 'test'
+  ...
+# Subtest: the forum edit_permissions hint does not block an otherwise permitted status write
+ok 120 - the forum edit_permissions hint does not block an otherwise permitted status write
+  ---
+  duration_ms: 0.292463
+  type: 'test'
+  ...
+# Subtest: an actual 403 disables publication and reports the permission failure
+ok 121 - an actual 403 disables publication and reports the permission failure
+  ---
+  duration_ms: 0.389234
+  type: 'test'
+  ...
+# Subtest: an account linked by the older permission check migrates without requiring its token again
+ok 122 - an account linked by the older permission check migrates without requiring its token again
+  ---
+  duration_ms: 0.108996
+  type: 'test'
+  ...
+# Subtest: 429 honors server retry time, including manual restore attempts
+ok 123 - 429 honors server retry time, including manual restore attempts
+  ---
+  duration_ms: 0.855636
+  type: 'test'
+  ...
+# Subtest: retry-after supports HTTP dates and Unix reset headers
+ok 124 - retry-after supports HTTP dates and Unix reset headers
+  ---
+  duration_ms: 0.403985
+  type: 'test'
+  ...
+# Subtest: an interrupted PUT is reconciled both when it reached the server and when it did not
+ok 125 - an interrupted PUT is reconciled both when it reached the server and when it did not
+  ---
+  duration_ms: 0.950435
+  type: 'test'
+  ...
+# Subtest: the track is sampled again after a slow API preflight; overlapping ticks are dropped
+ok 126 - the track is sampled again after a slow API preflight; overlapping ticks are dropped
+  ---
+  duration_ms: 0.452725
+  type: 'test'
+  ...
+# Subtest: regular exit and disconnect restore the original; explicit local forget removes credentials
+ok 127 - regular exit and disconnect restore the original; explicit local forget removes credentials
+  ---
+  duration_ms: 0.696585
+  type: 'test'
+  ...
+# Subtest: the on-disk store encrypts the token and has no plaintext fallback
+ok 128 - the on-disk store encrypts the token and has no plaintext fallback
+  ---
+  duration_ms: 1.345593
+  type: 'test'
+  ...
+# Subtest: SoundCloud reupload metadata cleans promotion, artist prefixes, features and decorative Unicode
+ok 129 - SoundCloud reupload metadata cleans promotion, artist prefixes, features and decorative Unicode
+  ---
+  duration_ms: 4.842077
+  type: 'test'
+  ...
+# Subtest: artist names in an uploader title can be found in either direction without accepting arbitrary matches
+ok 130 - artist names in an uploader title can be found in either direction without accepting arbitrary matches
+  ---
+  duration_ms: 0.729127
+  type: 'test'
+  ...
+# Subtest: a temporary empty lookup retries later rather than poisoning the recording for the whole session
+ok 131 - a temporary empty lookup retries later rather than poisoning the recording for the whole session
+  ---
+  duration_ms: 0.611265
+  type: 'test'
+  ...
+# Subtest: manual artist corrections are kept per recording and never change another track
+ok 132 - manual artist corrections are kept per recording and never change another track
+  ---
+  duration_ms: 1.623416
+  type: 'test'
+  ...
+# Subtest: identity cleanup retains recording versions and rejects unrelated artists or collaborations
+ok 133 - identity cleanup retains recording versions and rejects unrelated artists or collaborations
+  ---
+  duration_ms: 0.240284
+  type: 'test'
+  ...
+# Subtest: Better Lyrics uses a matched album and duration and preserves genuine word timings
+ok 134 - Better Lyrics uses a matched album and duration and preserves genuine word timings
+  ---
+  duration_ms: 18.809994
+  type: 'test'
+  ...
+# Subtest: a short upload can show matching written lyrics but never adopts the full recording timings
+ok 135 - a short upload can show matching written lyrics but never adopts the full recording timings
+  ---
+  duration_ms: 2.213752
+  type: 'test'
+  ...
+# Subtest: LRCLIB exact-lookup failures do not disable the working search endpoint for later recordings
+ok 136 - LRCLIB exact-lookup failures do not disable the working search endpoint for later recordings
+  ---
+  duration_ms: 1.801383
+  type: 'test'
+  ...
+# Subtest: a catalogue whose search only indexes titles still checks the artist and recording duration
+ok 137 - a catalogue whose search only indexes titles still checks the artist and recording duration
+  ---
+  duration_ms: 2.403611
+  type: 'test'
+  ...
+# Subtest: TTML preserves sub-minute and namespaced word timings, whitespace, ends and XML entities
+ok 138 - TTML preserves sub-minute and namespaced word timings, whitespace, ends and XML entities
+  ---
+  duration_ms: 4.565256
+  type: 'test'
+  ...
+# Subtest: enhanced LRC, NetEase YRC, Musixmatch and Spicy retain real word ends
+ok 139 - enhanced LRC, NetEase YRC, Musixmatch and Spicy retain real word ends
+  ---
+  duration_ms: 1.24905
+  type: 'test'
+  ...
+# Subtest: recording matching keeps remix, slowed and other-duration versions separate
+ok 140 - recording matching keeps remix, slowed and other-duration versions separate
+  ---
+  duration_ms: 1.769512
+  type: 'test'
+  ...
+# Subtest: timing concatenation aligns split rows and never fabricates words or borrows changed lyrics
+ok 141 - timing concatenation aligns split rows and never fabricates words or borrows changed lyrics
+  ---
+  duration_ms: 0.351553
+  type: 'test'
+  ...
+# Subtest: fallback is sequential, preserves plain progress, skips missing keys and continues after a refusal
+ok 142 - fallback is sequential, preserves plain progress, skips missing keys and continues after a refusal
+  ---
+  duration_ms: 1.179059
+  type: 'test'
+  ...
+# Subtest: LRCLIB plain text cannot stop the subsequent QQ and KuGou attempts
+ok 143 - LRCLIB plain text cannot stop the subsequent QQ and KuGou attempts
+  ---
+  duration_ms: 0.545199
+  type: 'test'
+  ...
+# Subtest: BiniLyrics follows its catalogue migration and only downloads approved lyric storage
+ok 144 - BiniLyrics follows its catalogue migration and only downloads approved lyric storage
+  ---
+  duration_ms: 15.826458
+  type: 'test'
+  ...
+# Subtest: Spicy uses the user client key, real Spotify ID and conditional contributor attribution
+ok 145 - Spicy uses the user client key, real Spotify ID and conditional contributor attribution
+  ---
+  duration_ms: 1.052678
+  type: 'test'
+  ...
+# Subtest: lyric API keys are encrypted at rest, omitted from state and updated atomically
+ok 146 - lyric API keys are encrypted at rest, omitted from state and updated atomically
+  ---
+  duration_ms: 2.023012
+  type: 'test'
+  ...
+# Subtest: a new track cancels an old lookup and late progress cannot replace the new text
+ok 147 - a new track cancels an old lookup and late progress cannot replace the new text
+  ---
+  duration_ms: 0.596868
+  type: 'test'
+  ...
+# Subtest: QQ and KuGou decode their catalogue responses without using a different recording
+ok 148 - QQ and KuGou decode their catalogue responses without using a different recording
+  ---
+  duration_ms: 2.868418
+  type: 'test'
+  ...
+# Subtest: NetEase prefers its YRC words while Musixmatch falls back when richsync is not permitted
+ok 149 - NetEase prefers its YRC words while Musixmatch falls back when richsync is not permitted
+  ---
+  duration_ms: 4.699828
+  type: 'test'
+  ...
+# Subtest: the search returns to a previously cancelled song with a new request
+ok 150 - the search returns to a previously cancelled song with a new request
+  ---
+  duration_ms: 0.222029
+  type: 'test'
+  ...
+# Subtest: an explicit lyric reload replaces a pending lookup and ignores its late result
+ok 151 - an explicit lyric reload replaces a pending lookup and ignores its late result
+  ---
+  duration_ms: 0.134694
+  type: 'test'
+  ...
+# Subtest: upcoming lyrics share a request with playback and reuse the warmed recording immediately
+ok 152 - upcoming lyrics share a request with playback and reuse the warmed recording immediately
+  ---
+  duration_ms: 0.232229
+  type: 'test'
+  ...
+# Subtest: warming the next songs does not cancel the current lyric request
+ok 153 - warming the next songs does not cancel the current lyric request
+  ---
+  duration_ms: 0.173308
+  type: 'test'
+  ...
+# Subtest: prefetch resolves actual upcoming metadata and skips private listening
+ok 154 - prefetch resolves actual upcoming metadata and skips private listening
+  ---
+  duration_ms: 10.43346
+  type: 'test'
+  ...
+# Subtest: shared media URLs accept exact provider origins and canonicalize YouTube links
+ok 155 - shared media URLs accept exact provider origins and canonicalize YouTube links
+  ---
+  duration_ms: 2.690022
+  type: 'test'
+  ...
+# Subtest: room queue, permissions and authoritative state support mixed providers
+ok 156 - room queue, permissions and authoritative state support mixed providers
+  ---
+  duration_ms: 2.198534
+  type: 'test'
+  ...
+# Subtest: room catalog coalesces searches, filters unavailable tracks and keeps bounded cache
+ok 157 - room catalog coalesces searches, filters unavailable tracks and keeps bounded cache
+  ---
+  duration_ms: 17.042445
+  type: 'test'
+  ...
+# Subtest: mini stays pinned after losing focus, hiding or being minimized without stealing focus
+ok 158 - mini stays pinned after losing focus, hiding or being minimized without stealing focus
+  ---
+  duration_ms: 82.157295
+  type: 'test'
+  ...
+# Subtest: position and both mini sizes survive reopening, resizing and an application restart
+ok 159 - position and both mini sizes survive reopening, resizing and an application restart
+  ---
+  duration_ms: 37.41438
+  type: 'test'
+  ...
+# Subtest: a disconnected monitor cannot leave the mini outside the remaining work area
+ok 160 - a disconnected monitor cannot leave the mini outside the remaining work area
+  ---
+  duration_ms: 18.35248
+  type: 'test'
+  ...
+# Subtest: native music search returns playable signed MP3 alongside source metadata without requiring login
+ok 161 - native music search returns playable signed MP3 alongside source metadata without requiring login
+  ---
+  duration_ms: 48.888025
+  type: 'test'
+  ...
+# Subtest: native search rejects invalid pages and arbitrary source URLs before contacting providers
+ok 162 - native search rejects invalid pages and arbitrary source URLs before contacting providers
+  ---
+  duration_ms: 9.48089
+  type: 'test'
+  ...
+# Subtest: native catalogue failures offer a JSON error and never expose private provider diagnostics
+ok 163 - native catalogue failures offer a JSON error and never expose private provider diagnostics
+  ---
+  duration_ms: 3.8112
+  type: 'test'
+  ...
+# Subtest: music and Telegram signatures cannot be interchanged, and forged audio is hidden
+ok 164 - music and Telegram signatures cannot be interchanged, and forged audio is hidden
+  ---
+  duration_ms: 4.617243
+  type: 'test'
+  ...
+# Subtest: music health is independent of Telegram and search is rate limited
+ok 165 - music health is independent of Telegram and search is rate limited
+  ---
+  duration_ms: 68.473682
+  type: 'test'
+  ...
+# Subtest: a saved issued URL restores bounded-index metadata by the same track ID, without accepting a substituted track
+ok 166 - a saved issued URL restores bounded-index metadata by the same track ID, without accepting a substituted track
+  ---
+  duration_ms: 5.330179
+  type: 'test'
+  ...
+# Subtest: cold native preparation responds immediately and concurrent polls share one conversion
+ok 167 - cold native preparation responds immediately and concurrent polls share one conversion
+  ---
+  duration_ms: 14.554045
+  type: 'test'
+  ...
+# Subtest: preparation failures are briefly shared, safe and distinct from an unavailable local file
+ok 168 - preparation failures are briefly shared, safe and distinct from an unavailable local file
+  ---
+  duration_ms: 6.670902
+  type: 'test'
+  ...
+# Subtest: issued cached audio remains playable without catalog metadata or an available upstream
+ok 169 - issued cached audio remains playable without catalog metadata or an available upstream
+  ---
+  duration_ms: 5.200244
+  type: 'test'
+  ...
+# Subtest: preparation only accepts an issued music signature and bounds unfinished jobs
+ok 170 - preparation only accepts an issued music signature and bounds unfinished jobs
+  ---
+  duration_ms: 102.997364
+  type: 'test'
+  ...
+# Subtest: public search excludes protected-only streams and full-duration previews instead of offering broken audio
+ok 171 - public search excludes protected-only streams and full-duration previews instead of offering broken audio
+  ---
+  duration_ms: 4.549333
+  type: 'test'
+  ...
+# Subtest: portable track metadata recovers the exact public ID without login or starting an audio conversion
+ok 172 - portable track metadata recovers the exact public ID without login or starting an audio conversion
+  ---
+  duration_ms: 3.262744
+  type: 'test'
+  ...
+# Subtest: portable metadata rejects malformed paths, query injection, HEAD and a substituted provider ID
+ok 173 - portable metadata rejects malformed paths, query injection, HEAD and a substituted provider ID
+  ---
+  duration_ms: 7.356107
+  type: 'test'
+  ...
+# Subtest: portable metadata hides upstream diagnostics and protected-only recordings
+ok 174 - portable metadata hides upstream diagnostics and protected-only recordings
+  ---
+  duration_ms: 3.14426
+  type: 'test'
+  ...
+# Subtest: metadata bounds unknown upstream work while known identities remain usable
+ok 175 - metadata bounds unknown upstream work while known identities remain usable
+  ---
+  duration_ms: 21.704421
+  type: 'test'
+  ...
+# Subtest: concurrent metadata has a bounded preparation budget and releases every slot after completion
+ok 176 - concurrent metadata has a bounded preparation budget and releases every slot after completion
+  ---
+  duration_ms: 7.672354
+  type: 'test'
+  ...
+# Subtest: YouTube history, saved links and bookmarks survive reopening and portable export
+ok 177 - YouTube history, saved links and bookmarks survive reopening and portable export
+  ---
+  duration_ms: 5.8172
+  type: 'test'
+  ...
+# Subtest: forum BBCode includes the actual profiles, time and cover and neutralizes injected tags
+ok 178 - forum BBCode includes the actual profiles, time and cover and neutralizes injected tags
+  ---
+  duration_ms: 0.463586
+  type: 'test'
+  ...
+# Subtest: listening history measures actual progression, ignores seeks, and persists
+ok 179 - listening history measures actual progression, ignores seeks, and persists
+  ---
+  duration_ms: 0.928343
+  type: 'test'
+  ...
+# Subtest: private and stale tracks never enter history
+ok 180 - private and stale tracks never enter history
+  ---
+  duration_ms: 0.522406
+  type: 'test'
+  ...
+# Subtest: collection sharing validates destinations and can round-trip user playlists
+ok 181 - collection sharing validates destinations and can round-trip user playlists
+  ---
+  duration_ms: 1.124995
+  type: 'test'
+  ...
+# Subtest: DSP presets are bounded and custom presets survive a restart
+ok 182 - DSP presets are bounded and custom presets survive a restart
+  ---
+  duration_ms: 1.593319
+  type: 'test'
+  ...
+# Subtest: hotkeys reject duplicates and invalid accelerators
+ok 183 - hotkeys reject duplicates and invalid accelerators
+  ---
+  duration_ms: 1.147047
+  type: 'test'
+  ...
+# Subtest: different modifier orders cannot register the same hotkey for two actions
+ok 184 - different modifier orders cannot register the same hotkey for two actions
+  ---
+  duration_ms: 0.600475
+  type: 'test'
+  ...
+# Subtest: a rejected collection import cannot leave a partially imported library on disk
+ok 185 - a rejected collection import cannot leave a partially imported library on disk
+  ---
+  duration_ms: 0.994768
+  type: 'test'
+  ...
+# Subtest: synced lyrics handle multiple tags and binary-search the current line
+ok 186 - synced lyrics handle multiple tags and binary-search the current line
+  ---
+  duration_ms: 1.264359
+  type: 'test'
+  ...
+# Subtest: profile detection uses only the authenticated listener and never evaluates embedded script
+ok 187 - profile detection uses only the authenticated listener and never evaluates embedded script
+  ---
+  duration_ms: 0.302171
+  type: 'test'
+  ...
+# Subtest: cloud rooms reject untrusted endpoints and never open a LAN listener
+ok 188 - cloud rooms reject untrusted endpoints and never open a LAN listener
+  ---
+  duration_ms: 0.68284
+  type: 'test'
+  ...
+# Subtest: track navigation never replaces known metadata with an empty welcome state
+ok 189 - track navigation never replaces known metadata with an empty welcome state
+  ---
+  duration_ms: 2.310946
+  type: 'test'
+  ...
+# Subtest: temporary Windows key failures cannot erase a forum binding and recover automatically
+ok 190 - temporary Windows key failures cannot erase a forum binding and recover automatically
+  ---
+  duration_ms: 3.041998
+  type: 'test'
+  ...
+# Subtest: explicitly forgetting an unreadable forum binding never resurrects it on another launch
+ok 191 - explicitly forgetting an unreadable forum binding never resurrects it on another launch
+  ---
+  duration_ms: 0.850056
+  type: 'test'
+  ...
+# Subtest: SoundCloud session cookies survive a cold start in an encrypted snapshot without invented cookie expiry
+ok 192 - SoundCloud session cookies survive a cold start in an encrypted snapshot without invented cookie expiry
+  ---
+  duration_ms: 2.63603
+  type: 'test'
+  ...
+# Subtest: an explicit SoundCloud logout clears the snapshot and cannot be undone by a restart
+ok 193 - an explicit SoundCloud logout clears the snapshot and cannot be undone by a restart
+  ---
+  duration_ms: 1.160502
+  type: 'test'
+  ...
+# Subtest: a saved SoundCloud login remains intact while Windows encryption is temporarily unavailable
+ok 194 - a saved SoundCloud login remains intact while Windows encryption is temporarily unavailable
+  ---
+  duration_ms: 1.266481
+  type: 'test'
+  ...
+# Subtest: a current SoundCloud account takes precedence over a cached account and expired snapshots are ignored
+ok 195 - a current SoundCloud account takes precedence over a cached account and expired snapshots are ignored
+  ---
+  duration_ms: 1.364337
+  type: 'test'
+  ...
+# Subtest: encrypted lyric keys are not cleared by an unrelated setting change during a key failure
+ok 196 - encrypted lyric keys are not cleared by an unrelated setting change during a key failure
+  ---
+  duration_ms: 1.145844
+  type: 'test'
+  ...
+# Subtest: cloud room sessions recover from temporary Windows key failures without opening a new login
+ok 197 - cloud room sessions recover from temporary Windows key failures without opening a new login
+  ---
+  duration_ms: 1.532355
+  type: 'test'
+  ...
+# Subtest: new SoundCloud track pages can start through their same-origin embedded player
+ok 198 - new SoundCloud track pages can start through their same-origin embedded player
+  ---
+  duration_ms: 1.818015
+  type: 'test'
+  ...
+# Subtest: seeking reaches the actual embedded audio immediately and preserves its end state
+ok 199 - seeking reaches the actual embedded audio immediately and preserves its end state
+  ---
+  duration_ms: 0.858853
+  type: 'test'
+  ...
+# Subtest: detached SoundCloud Audio objects remain seekable while the browser displays a different page
+ok 200 - detached SoundCloud Audio objects remain seekable while the browser displays a different page
+  ---
+  duration_ms: 1.142338
+  type: 'test'
+  ...
+# Subtest: previous goes to the preceding recording even in the middle of a song and next returns forward
+ok 201 - previous goes to the preceding recording even in the middle of a song and next returns forward
+  ---
+  duration_ms: 1.703508
+  type: 'test'
+  ...
+# Subtest: rapid previous clicks advance the cursor immediately and ignore intermediate navigation results
+ok 202 - rapid previous clicks advance the cursor immediately and ignore intermediate navigation results
+  ---
+  duration_ms: 0.437788
+  type: 'test'
+  ...
+# Subtest: manual choices replace forward history; failed navigation can recover after timeout
+ok 203 - manual choices replace forward history; failed navigation can recover after timeout
+  ---
+  duration_ms: 0.25966
+  type: 'test'
+  ...
+# Subtest: phone remote accepts commands only from its verified owner, hides private tracks and acknowledges commands once
+ok 204 - phone remote accepts commands only from its verified owner, hides private tracks and acknowledges commands once
+  ---
+  duration_ms: 60.603304
+  type: 'test'
+  ...
+# Subtest: encrypted profile storage is scoped to the verified user and rejects conflicting updates without overwriting
+ok 205 - encrypted profile storage is scoped to the verified user and rejects conflicting updates without overwriting
+  ---
+  duration_ms: 77.526775
+  type: 'test'
+  ...
+# Subtest: moment bookmarks persist exact positions and edits, reject invalid destinations and never expose local paths
+ok 206 - moment bookmarks persist exact positions and edits, reject invalid destinations and never expose local paths
+  ---
+  duration_ms: 2.263868
+  type: 'test'
+  ...
+# Subtest: confirmed reuploads close transitive groups and obey the existing 24-hour wave cooldown
+ok 207 - confirmed reuploads close transitive groups and obey the existing 24-hour wave cooldown
+  ---
+  duration_ms: 1.756999
+  type: 'test'
+  ...
+# Subtest: offline library imports bounded audio files, reads Unicode ID3 and navigates only registered files
+ok 208 - offline library imports bounded audio files, reads Unicode ID3 and navigates only registered files
+  ---
+  duration_ms: 1.294105
+  type: 'test'
+  ...
+# Subtest: portable profiles export preferences without login data, file paths or private listening history
+ok 209 - portable profiles export preferences without login data, file paths or private listening history
+  ---
+  duration_ms: 1.808526
+  type: 'test'
+  ...
+# Subtest: cloud copies use authenticated encryption and wrong passwords or altered ciphertext cannot import data
+ok 210 - cloud copies use authenticated encryption and wrong passwords or altered ciphertext cannot import data
+  ---
+  duration_ms: 105.572036
+  type: 'test'
+  ...
+# Subtest: release radar uses uploads rather than reposts, keeps good results after partial failures and remembers heard songs
+ok 211 - release radar uses uploads rather than reposts, keeps good results after partial failures and remembers heard songs
+  ---
+  duration_ms: 2.199454
+  type: 'test'
+  ...
+# Subtest: real normalization processor increases quiet music, lowers loud music, preserves mono channels and ignores silence
+ok 212 - real normalization processor increases quiet music, lowers loud music, preserves mono channels and ignores silence
+  ---
+  duration_ms: 326.093083
+  type: 'test'
+  ...
+# Subtest: profile migration preserves encrypted credentials and cookies without replacing the original
+ok 213 - profile migration preserves encrypted credentials and cookies without replacing the original
+  ---
+  duration_ms: 3.578701
+  type: 'test'
+  ...
+# Subtest: a clean installation never invents an account
+ok 214 - a clean installation never invents an account
+  ---
+  duration_ms: 0.568754
+  type: 'test'
+  ...
+# Subtest: migration includes every application store and recovers an empty destination directory
+ok 215 - migration includes every application store and recovers an empty destination directory
+  ---
+  duration_ms: 1.981252
+  type: 'test'
+  ...
+# Subtest: an encrypted old session can migrate and be imported even without a Chromium cookie database
+ok 216 - an encrypted old session can migrate and be imported even without a Chromium cookie database
+  ---
+  duration_ms: 1.818938
+  type: 'test'
+  ...
+# Subtest: PWA accepts only matching signed same-origin MP3 sources
+ok 217 - PWA accepts only matching signed same-origin MP3 sources
+  ---
+  duration_ms: 1.336845
+  type: 'test'
+  ...
+# Subtest: PWA retains only canonical public SoundCloud permalinks for profile portability
+ok 218 - PWA retains only canonical public SoundCloud permalinks for profile portability
+  ---
+  duration_ms: 0.528367
+  type: 'test'
+  ...
+# Subtest: explicit catalog references are metadata and cannot become signed or local audio by parsing
+ok 219 - explicit catalog references are metadata and cannot become signed or local audio by parsing
+  ---
+  duration_ms: 0.441303
+  type: 'test'
+  ...
+# Subtest: PWA validates pages, deduplicates IDs, rejects cursor loops and malformed rows
+ok 220 - PWA validates pages, deduplicates IDs, rejects cursor loops and malformed rows
+  ---
+  duration_ms: 1.118783
+  type: 'test'
+  ...
+# Subtest: PWA queue end, repeat-one automatic only, and shuffle avoid the current track
+ok 221 - PWA queue end, repeat-one automatic only, and shuffle avoid the current track
+  ---
+  duration_ms: 1.213313
+  type: 'test'
+  ...
+# Subtest: PWA room routing refuses external, credential, query and non-room navigation
+ok 222 - PWA room routing refuses external, credential, query and non-room navigation
+  ---
+  duration_ms: 0.20155
+  type: 'test'
+  ...
+# Subtest: PWA lyrics parse repeated timestamps in time order and keep text inert
+ok 223 - PWA lyrics parse repeated timestamps in time order and keep text inert
+  ---
+  duration_ms: 0.395147
+  type: 'test'
+  ...
+# Subtest: PWA lyric identity normalizes Unicode and case while preserving recording versions
+ok 224 - PWA lyric identity normalizes Unicode and case while preserving recording versions
+  ---
+  duration_ms: 4.00147
+  type: 'test'
+  ...
+# Subtest: PWA timed lyrics require exact own identity and duration within two seconds
+ok 225 - PWA timed lyrics require exact own identity and duration within two seconds
+  ---
+  duration_ms: 0.35507
+  type: 'test'
+  ...
+# Subtest: local track parsing cannot weaken signed network catalogue policy
+ok 226 - local track parsing cannot weaken signed network catalogue policy
+  ---
+  duration_ms: 0.308673
+  type: 'test'
+  ...
+# Subtest: local audio sniffing requires a supported extension and matching container header
+ok 227 - local audio sniffing requires a supported extension and matching container header
+  ---
+  duration_ms: 0.38147
+  type: 'test'
+  ...
+# Subtest: imported lyrics enforce UTF8/size/extension and preserve text inertly
+ok 228 - imported lyrics enforce UTF8/size/extension and preserve text inertly
+  ---
+  duration_ms: 0.55574
+  type: 'test'
+  ...
+# Subtest: saved identifiers reject trailing line terminators across numeric and local records
+ok 229 - saved identifiers reject trailing line terminators across numeric and local records
+  ---
+  duration_ms: 0.166574
+  type: 'test'
+  ...
+# Subtest: effects start disabled; normalized data is isolated and five canonical frequencies remain stable
+ok 230 - effects start disabled; normalized data is isolated and five canonical frequencies remain stable
+  ---
+  duration_ms: 1.449719
+  type: 'test'
+  ...
+# Subtest: invalid/nonfinite settings and unrelated DSP claims are rejected
+ok 231 - invalid/nonfinite settings and unrelated DSP claims are rejected
+  ---
+  duration_ms: 0.475769
+  type: 'test'
+  ...
+# Subtest: presets produce independent validated gains and real effect settings
+ok 232 - presets produce independent validated gains and real effect settings
+  ---
+  duration_ms: 2.152437
+  type: 'test'
+  ...
+# Subtest: native settings include only supported canonical EQ and preamp keys
+ok 233 - native settings include only supported canonical EQ and preamp keys
+  ---
+  duration_ms: 0.425674
+  type: 'test'
+  ...
+# Subtest: native applied status needs actual PCM frames and exact revision/config/client/transport binding
+ok 234 - native applied status needs actual PCM frames and exact revision/config/client/transport binding
+  ---
+  duration_ms: 0.386461
+  type: 'test'
+  ...
+# Subtest: pending/unsupported never claim a processed revision; enabled settings cannot be acknowledged bypassed
+ok 235 - pending/unsupported never claim a processed revision; enabled settings cannot be acknowledged bypassed
+  ---
+  duration_ms: 5.410811
+  type: 'test'
+  ...
+# Subtest: schema2 uses exact full config and rejects unsupported or mismatched advanced PCM ACKs
+ok 236 - schema2 uses exact full config and rejects unsupported or mismatched advanced PCM ACKs
+  ---
+  duration_ms: 0.45484
+  type: 'test'
+  ...
+# Subtest: same-origin cloud create/read/validate interoperates with desktop and sends only encrypted envelope and revision
+ok 237 - same-origin cloud create/read/validate interoperates with desktop and sends only encrypted envelope and revision
+  ---
+  duration_ms: 270.559484
+  type: 'test'
+  ...
+# Subtest: an existing cloud copy requires its real read proof and the current revision before replacement
+ok 238 - an existing cloud copy requires its real read proof and the current revision before replacement
+  ---
+  duration_ms: 171.130862
+  type: 'test'
+  ...
+# Subtest: an edit on another device during encryption produces 409 without retrying or replacing that copy
+ok 239 - an edit on another device during encryption produces 409 without retrying or replacing that copy
+  ---
+  duration_ms: 203.110535
+  type: 'test'
+  ...
+# Subtest: account changes while deriving a key prevent any late cloud upload
+ok 240 - account changes while deriving a key prevent any late cloud upload
+  ---
+  duration_ms: 3.989836
+  type: 'test'
+  ...
+# Subtest: a changed HttpOnly cookie is detected even when the visible account has not refreshed yet
+ok 241 - a changed HttpOnly cookie is detected even when the visible account has not refreshed yet
+  ---
+  duration_ms: 66.375237
+  type: 'test'
+  ...
+# Subtest: CSRF remains bound to the verified session if the cookie changes immediately before PUT
+ok 242 - CSRF remains bound to the verified session if the cookie changes immediately before PUT
+  ---
+  duration_ms: 74.841431
+  type: 'test'
+  ...
+# Subtest: cancel invalidates previous previews and busy work cannot apply or upload after it ends
+ok 243 - cancel invalidates previous previews and busy work cannot apply or upload after it ends
+  ---
+  duration_ms: 130.970501
+  type: 'test'
+  ...
+# Subtest: read results cannot be applied after the cloud revision or account changes
+ok 244 - read results cannot be applied after the cloud revision or account changes
+  ---
+  duration_ms: 66.271921
+  type: 'test'
+  ...
+# Subtest: unbounded or non-JSON responses are rejected without attempting decryption
+ok 245 - unbounded or non-JSON responses are rejected without attempting decryption
+  ---
+  duration_ms: 5.265907
+  type: 'test'
+  ...
+# Subtest: browser scrypt and AES-GCM decrypt all independently generated Node raw-UTF8 vectors
+ok 246 - browser scrypt and AES-GCM decrypt all independently generated Node raw-UTF8 vectors
+  ---
+  duration_ms: 531.32185
+  type: 'test'
+  ...
+# Subtest: browser encrypt → desktop decrypt and desktop encrypt → browser decrypt retain the complete v1 profile
+ok 247 - browser encrypt → desktop decrypt and desktop encrypt → browser decrypt retain the complete v1 profile
+  ---
+  duration_ms: 192.888881
+  type: 'test'
+  ...
+# Subtest: encryption never normalizes password bytes and rejects wrong passwords or changed tags
+ok 248 - encryption never normalizes password bytes and rejects wrong passwords or changed tags
+  ---
+  duration_ms: 183.495093
+  type: 'test'
+  ...
+# Subtest: malformed or oversized envelopes and profiles are rejected before key derivation
+ok 249 - malformed or oversized envelopes and profiles are rejected before key derivation
+  ---
+  duration_ms: 6.036363
+  type: 'test'
+  ...
+# Subtest: both crypto implementations use independent random salts and nonces for the same profile
+ok 250 - both crypto implementations use independent random salts and nonces for the same profile
+  ---
+  duration_ms: 210.758015
+  type: 'test'
+  ...
+# Subtest: browser v1 whitelist agrees with desktop for implemented and desktop-only safe fields
+ok 251 - browser v1 whitelist agrees with desktop for implemented and desktop-only safe fields
+  ---
+  duration_ms: 4.399271
+  type: 'test'
+  ...
+# Subtest: portable data removes paths, auth/signed URLs and unsafe object keys without touching typed text
+ok 252 - portable data removes paths, auth/signed URLs and unsafe object keys without touching typed text
+  ---
+  duration_ms: 0.447857
+  type: 'test'
+  ...
+# Subtest: catalog refs represent known numeric and permalink-only identities without an audioURL
+ok 253 - catalog refs represent known numeric and permalink-only identities without an audioURL
+  ---
+  duration_ms: 0.230325
+  type: 'test'
+  ...
+# Subtest: future/oversized/malformed profile imports cannot mutate current data
+ok 254 - future/oversized/malformed profile imports cannot mutate current data
+  ---
+  duration_ms: 12.116158
+  type: 'test'
+  ...
+# Subtest: import merges likes/moments, preserves local data, keeps settings opt-in and snapshots a backup
+ok 255 - import merges likes/moments, preserves local data, keeps settings opt-in and snapshots a backup
+  ---
+  duration_ms: 1.760856
+  type: 'test'
+  ...
+# Subtest: explicit settings import applies desired EQ/rate/normalization independently of hardware
+ok 256 - explicit settings import applies desired EQ/rate/normalization independently of hardware
+  ---
+  duration_ms: 1.023704
+  type: 'test'
+  ...
+# Subtest: roundtrip preserves desktop-only collections/presets/preferences/groups and unsupported YouTube moments
+ok 257 - roundtrip preserves desktop-only collections/presets/preferences/groups and unsupported YouTube moments
+  ---
+  duration_ms: 1.745477
+  type: 'test'
+  ...
+# Subtest: unlike and moment deletion after import never resurrect records from sidecar
+ok 258 - unlike and moment deletion after import never resurrect records from sidecar
+  ---
+  duration_ms: 1.069571
+  type: 'test'
+  ...
+# Subtest: backup quota failure leaves profile and application untouched
+ok 259 - backup quota failure leaves profile and application untouched
+  ---
+  duration_ms: 0.871737
+  type: 'test'
+  ...
+# Subtest: a failed app transaction restores sidecar and prior backup
+ok 260 - a failed app transaction restores sidecar and prior backup
+  ---
+  duration_ms: 2.11807
+  type: 'test'
+  ...
+# Subtest: export rehydrates legacy numeric IDs with at most two requests and transfers no signed audio
+ok 261 - export rehydrates legacy numeric IDs with at most two requests and transfers no signed audio
+  ---
+  duration_ms: 16.567889
+  type: 'test'
+  ...
+# Subtest: cancelled export cannot complete or modify live state when metadata returns late
+ok 262 - cancelled export cannot complete or modify live state when metadata returns late
+  ---
+  duration_ms: 1.455299
+  type: 'test'
+  ...
+# Subtest: metadata mismatch is rejected before exporting another song
+ok 263 - metadata mismatch is rejected before exporting another song
+  ---
+  duration_ms: 0.721865
+  type: 'test'
+  ...
+# Subtest: canonical shared desktop fixture keeps every supported v1 field through import/export
+ok 264 - canonical shared desktop fixture keeps every supported v1 field through import/export
+  ---
+  duration_ms: 3.487638
+  type: 'test'
+  ...
+# Subtest: URL-only likes and standalone moments keep their proven numeric identity after collection eviction/reload
+ok 265 - URL-only likes and standalone moments keep their proven numeric identity after collection eviction/reload
+  ---
+  duration_ms: 2.219544
+  type: 'test'
+  ...
+# Subtest: a remembered late metadata response cannot silently migrate a still-unresolved identity
+ok 266 - a remembered late metadata response cannot silently migrate a still-unresolved identity
+  ---
+  duration_ms: 1.260191
+  type: 'test'
+  ...
+# Subtest: unchecked settings remain export-desired across reload without changing the applied player on Next
+ok 267 - unchecked settings remain export-desired across reload without changing the applied player on Next
+  ---
+  duration_ms: 2.60944
+  type: 'test'
+  ...
+# Subtest: Undo storage failure leaves current profile and applied state intact
+ok 268 - Undo storage failure leaves current profile and applied state intact
+  ---
+  duration_ms: 1.67779
+  type: 'test'
+  ...
+# Subtest: explicit settings import preserves an inactive desktop speed and pitch field for semantic roundtrip
+ok 269 - explicit settings import preserves an inactive desktop speed and pitch field for semantic roundtrip
+  ---
+  duration_ms: 1.34006
+  type: 'test'
+  ...
+# Subtest: installed app exposes only its public shell, install manifest and scoped service worker
+ok 270 - installed app exposes only its public shell, install manifest and scoped service worker
+  ---
+  duration_ms: 64.050328
+  type: 'test'
+  ...
+# Subtest: embedded room/profile retains same-origin framing and strict API authentication
+ok 271 - embedded room/profile retains same-origin framing and strict API authentication
+  ---
+  duration_ms: 12.774743
+  type: 'test'
+  ...
+# Subtest: account return to the installed app is exact and cannot become an open redirect
+ok 272 - account return to the installed app is exact and cannot become an open redirect
+  ---
+  duration_ms: 0.57119
+  type: 'test'
+  ...
+# Subtest: repeat intent preserves the chosen mode through stale snapshots and rapid clicks
+ok 273 - repeat intent preserves the chosen mode through stale snapshots and rapid clicks
+  ---
+  duration_ms: 1.313351
+  type: 'test'
+  ...
+# Subtest: guest applies explicit repeat modes regardless of SoundCloud native cycle order
+ok 274 - guest applies explicit repeat modes regardless of SoundCloud native cycle order
+  ---
+  duration_ms: 187.23743
+  type: 'test'
+  ...
+# Subtest: guest coalesces quick requests and does not swallow a command after an already-satisfied mode
+ok 275 - guest coalesces quick requests and does not swallow a command after an already-satisfied mode
+  ---
+  duration_ms: 252.45867
+  type: 'test'
+  ...
+# Subtest: packaged room frontend routes only its own presentation, preserving API/auth traffic
+ok 276 - packaged room frontend routes only its own presentation, preserving API/auth traffic
+  ---
+  duration_ms: 1.120768
+  type: 'test'
+  ...
+# Subtest: bundled response retains same-origin CSP and never handles backend requests
+ok 277 - bundled response retains same-origin CSP and never handles backend requests
+  ---
+  duration_ms: 23.350351
+  type: 'test'
+  ...
+# Subtest: room network fallback uses the same session and bypasses only protocol recursion
+ok 278 - room network fallback uses the same session and bypasses only protocol recursion
+  ---
+  duration_ms: 0.944614
+  type: 'test'
+  ...
+# Subtest: older runtimes keep the service frontend when session forwarding is unavailable
+ok 279 - older runtimes keep the service frontend when session forwarding is unavailable
+  ---
+  duration_ms: 0.119937
+  type: 'test'
+  ...
+# Subtest: a selected queue entry suppresses old heartbeats until native loading has started
+ok 280 - a selected queue entry suppresses old heartbeats until native loading has started
+  ---
+  duration_ms: 2.402409
+  type: 'test'
+  ...
+# Subtest: a late successful heartbeat cannot overwrite an atomic queue selection
+ok 281 - a late successful heartbeat cannot overwrite an atomic queue selection
+  ---
+  duration_ms: 1.459478
+  type: 'test'
+  ...
+# Subtest: an obsolete rejected heartbeat cannot revoke the lease after a newer queue action
+ok 282 - an obsolete rejected heartbeat cannot revoke the lease after a newer queue action
+  ---
+  duration_ms: 0.380379
+  type: 'test'
+  ...
+# Subtest: while a provider prepares a selected song the room publishes that song paused at its start
+ok 283 - while a provider prepares a selected song the room publishes that song paused at its start
+  ---
+  duration_ms: 0.353767
+  type: 'test'
+  ...
+# Subtest: private transition metadata is never published to a room
+ok 284 - private transition metadata is never published to a room
+  ---
+  duration_ms: 0.443128
+  type: 'test'
+  ...
+# Subtest: leaving a room cancels a slow queue result before it can start native audio
+ok 285 - leaving a room cancels a slow queue result before it can start native audio
+  ---
+  duration_ms: 1.526604
+  type: 'test'
+  ...
+# Subtest: a double selection sends one control request and does not consume a second entry
+ok 286 - a double selection sends one control request and does not consume a second entry
+  ---
+  duration_ms: 0.349099
+  type: 'test'
+  ...
+# Subtest: a malformed queue id or missing lease never reaches the server
+ok 287 - a malformed queue id or missing lease never reaches the server
+  ---
+  duration_ms: 0.778692
+  type: 'test'
+  ...
+# Subtest: app and browser have one authoritative controller; old and duplicate updates cannot rewind music
+ok 288 - app and browser have one authoritative controller; old and duplicate updates cannot rewind music
+  ---
+  duration_ms: 5.048106
+  type: 'test'
+  ...
+# Subtest: lease expiry pauses a room and a listener cannot claim, publish, approve or consume the queue
+ok 289 - lease expiry pauses a room and a listener cannot claim, publish, approve or consume the queue
+  ---
+  duration_ms: 0.92098
+  type: 'test'
+  ...
+# Subtest: DJ roles, voting, limits and moderation work across devices without trusting client identities
+ok 290 - DJ roles, voting, limits and moderation work across devices without trusting client identities
+  ---
+  duration_ms: 0.822524
+  type: 'test'
+  ...
+# Subtest: room chat treats text as content and ordinary speed is required for compatible guests
+ok 291 - room chat treats text as content and ordinary speed is required for compatible guests
+  ---
+  duration_ms: 0.741841
+  type: 'test'
+  ...
+# Subtest: rooms restore paused with their queue and settings, without restoring active controller secrets
+ok 292 - rooms restore paused with their queue and settings, without restoring active controller secrets
+  ---
+  duration_ms: 1.430092
+  type: 'test'
+  ...
+# Subtest: synchronization clock handles arbitrary wall-clock skew, latency and paused positions
+ok 293 - synchronization clock handles arbitrary wall-clock skew, latency and paused positions
+  ---
+  duration_ms: 0.253338
+  type: 'test'
+  ...
+# Subtest: drift correction ignores jitter but corrects sustained offsets, late joins and track changes
+ok 294 - drift correction ignores jitter but corrects sustained offsets, late joins and track changes
+  ---
+  duration_ms: 0.143533
+  type: 'test'
+  ...
+# Subtest: a late rejected heartbeat cannot expel or pause a newly joined room
+ok 295 - a late rejected heartbeat cannot expel or pause a newly joined room
+  ---
+  duration_ms: 2.140113
+  type: 'test'
+  ...
+# Subtest: a late listener refresh cannot resurrect the room that was left
+ok 296 - a late listener refresh cannot resurrect the room that was left
+  ---
+  duration_ms: 0.341335
+  type: 'test'
+  ...
+# Subtest: a slow release cannot clear a room entered after Leave
+ok 297 - a slow release cannot clear a room entered after Leave
+  ---
+  duration_ms: 0.989048
+  type: 'test'
+  ...
+# Subtest: a late host claim is released after its room session was cancelled
+ok 298 - a late host claim is released after its room session was cancelled
+  ---
+  duration_ms: 1.269187
+  type: 'test'
+  ...
+# Subtest: an error from the previous room tick cannot clear the new session
+ok 299 - an error from the previous room tick cannot clear the new session
+  ---
+  duration_ms: 0.67286
+  type: 'test'
+  ...
+# Subtest: an expired response for the old login cannot log out a newly connected account
+ok 300 - an expired response for the old login cannot log out a newly connected account
+  ---
+  duration_ms: 18.237544
+  type: 'test'
+  ...
+# Subtest: a cancelled slow room lookup cannot detach the room entered afterwards
+ok 301 - a cancelled slow room lookup cannot detach the room entered afterwards
+  ---
+  duration_ms: 0.675155
+  type: 'test'
+  ...
+# Subtest: play-queue atomically selects one non-head ID and preserves chat, other entries and subsequent Next
+ok 302 - play-queue atomically selects one non-head ID and preserves chat, other entries and subsequent Next
+  ---
+  duration_ms: 5.026005
+  type: 'test'
+  ...
+# Subtest: persisted equal-URL entries are distinguished by queue ID
+ok 303 - persisted equal-URL entries are distinguished by queue ID
+  ---
+  duration_ms: 1.135415
+  type: 'test'
+  ...
+# Subtest: an older in-flight state cannot overwrite an atomic queue choice; failed selection does not consume anything
+ok 304 - an older in-flight state cannot overwrite an atomic queue choice; failed selection does not consume anything
+  ---
+  duration_ms: 0.774092
+  type: 'test'
+  ...
+# Subtest: owner phone handoff invalidates old desktop selection and publication without consuming queue entries
+ok 305 - owner phone handoff invalidates old desktop selection and publication without consuming queue entries
+  ---
+  duration_ms: 0.503531
+  type: 'test'
+  ...
+# Subtest: listener and revoked DJ cannot play queue entries, assigned DJ needs the exact active lease
+ok 306 - listener and revoked DJ cannot play queue entries, assigned DJ needs the exact active lease
+  ---
+  duration_ms: 1.347266
+  type: 'test'
+  ...
+# Subtest: an expired controller cannot consume a queued selection
+ok 307 - an expired controller cannot consume a queued selection
+  ---
+  duration_ms: 0.476871
+  type: 'test'
+  ...
+# Subtest: real HTTP play-queue keeps cookie CSRF, origin and authentication guards
+ok 308 - real HTTP play-queue keeps cookie CSRF, origin and authentication guards
+  ---
+  duration_ms: 76.27445
+  type: 'test'
+  ...
+# Subtest: pairing recovers from a network timeout and clears an expired attempt
+ok 309 - pairing recovers from a network timeout and clears an expired attempt
+  ---
+  duration_ms: 24.46134
+  type: 'test'
+  ...
+# Subtest: a paired desktop resumes room creation after a temporary storage failure
+ok 310 - a paired desktop resumes room creation after a temporary storage failure
+  ---
+  duration_ms: 3.251371
+  type: 'test'
+  ...
+# Subtest: a paired desktop resumes room creation after a temporary session failure
+ok 311 - a paired desktop resumes room creation after a temporary session failure
+  ---
+  duration_ms: 3.44632
+  type: 'test'
+  ...
+# Subtest: cancelling while a deferred room start is checking the session cannot revive the room
+ok 312 - cancelling while a deferred room start is checking the session cannot revive the room
+  ---
+  duration_ms: 2.348577
+  type: 'test'
+  ...
+# Subtest: a slow room creation is shared and a room closed elsewhere stays closed
+ok 313 - a slow room creation is shared and a room closed elsewhere stays closed
+  ---
+  duration_ms: 0.881345
+  type: 'test'
+  ...
+# Subtest: room drift is checked on the five-second boundary without seeking already aligned audio
+ok 314 - room drift is checked on the five-second boundary without seeking already aligned audio
+  ---
+  duration_ms: 0.74598
+  type: 'test'
+  ...
+# Subtest: five-second correction handles both faster and slower players including paused position drift
+ok 315 - five-second correction handles both faster and slower players including paused position drift
+  ---
+  duration_ms: 0.156355
+  type: 'test'
+  ...
+# Subtest: an independent scheduled tick checks drift without waiting for a later one-second poll
+ok 316 - an independent scheduled tick checks drift without waiting for a later one-second poll
+  ---
+  duration_ms: 0.085623
+  type: 'test'
+  ...
+# Subtest: large drift and explicit resync recover promptly while seek cooldown remains bounded
+ok 317 - large drift and explicit resync recover promptly while seek cooldown remains bounded
+  ---
+  duration_ms: 1.53553
+  type: 'test'
+  ...
+# Subtest: room clock projects server playback rate, freezes pause/reconnect and never runs past the controller lease
+ok 318 - room clock projects server playback rate, freezes pause/reconnect and never runs past the controller lease
+  ---
+  duration_ms: 0.251486
+  type: 'test'
+  ...
+# Subtest: monotonic server clock supports a zero timestamp without replacing it with the current time
+ok 319 - monotonic server clock supports a zero timestamp without replacing it with the current time
+  ---
+  duration_ms: 0.092945
+  type: 'test'
+  ...
+# Subtest: one automatic end and its simultaneous duplicate share one queue advance
+ok 320 - one automatic end and its simultaneous duplicate share one queue advance
+  ---
+  duration_ms: 0.147157
+  type: 'test'
+  ...
+# Subtest: failed automatic advance is not repeated ambiguously but a deliberate manual retry is possible
+ok 321 - failed automatic advance is not repeated ambiguously but a deliberate manual retry is possible
+  ---
+  duration_ms: 0.406239
+  type: 'test'
+  ...
+# Subtest: a seek-to-end and an overlapping manual next remain one in-flight queue action
+ok 322 - a seek-to-end and an overlapping manual next remain one in-flight queue action
+  ---
+  duration_ms: 0.118915
+  type: 'test'
+  ...
+# Subtest: seeking back deliberately rearms the same recording without allowing an in-flight duplicate
+ok 323 - seeking back deliberately rearms the same recording without allowing an in-flight duplicate
+  ---
+  duration_ms: 0.19082
+  type: 'test'
+  ...
+# Subtest: session import transfers only SoundCloud login cookies
+ok 324 - session import transfers only SoundCloud login cookies
+  ---
+  duration_ms: 0.686216
+  type: 'test'
+  ...
+# Subtest: cookie import preserves security and host-only semantics without inventing expiry
+ok 325 - cookie import preserves security and host-only semantics without inventing expiry
+  ---
+  duration_ms: 0.288193
+  type: 'test'
+  ...
+# Subtest: desktop social pages use an exact origin/route allowlist without gaining the room bridge
+ok 326 - desktop social pages use an exact origin/route allowlist without gaining the room bridge
+  ---
+  duration_ms: 2.974538
+  type: 'test'
+  ...
+# Subtest: first inbox snapshot is quiet; new notifications arrive once and click only opens inbox
+ok 327 - first inbox snapshot is quiet; new notifications arrive once and click only opens inbox
+  ---
+  duration_ms: 1.718608
+  type: 'test'
+  ...
+# Subtest: disabled, foreground, read, expired and resolved notifications never become OS toasts
+ok 328 - disabled, foreground, read, expired and resolved notifications never become OS toasts
+  ---
+  duration_ms: 0.443377
+  type: 'test'
+  ...
+# Subtest: persisted per-user dedup survives restart without cross-account notifications
+ok 329 - persisted per-user dedup survives restart without cross-account notifications
+  ---
+  duration_ms: 1.274158
+  type: 'test'
+  ...
+# Subtest: a delayed snapshot cannot publish after logout or a user switch
+ok 330 - a delayed snapshot cannot publish after logout or a user switch
+  ---
+  duration_ms: 0.197152
+  type: 'test'
+  ...
+# Subtest: owner bootstrap uses an explicit canonical id and app roles stay separate from forum titles and rank
+ok 331 - owner bootstrap uses an explicit canonical id and app roles stay separate from forum titles and rank
+  ---
+  duration_ms: 49.474853
+  type: 'test'
+  ...
+# Subtest: only server-authorized owners can assign Tester or Owner to another user
+ok 332 - only server-authorized owners can assign Tester or Owner to another user
+  ---
+  duration_ms: 31.816515
+  type: 'test'
+  ...
+# Subtest: self-role edits and removal of the final owner fail without changing access
+ok 333 - self-role edits and removal of the final owner fail without changing access
+  ---
+  duration_ms: 14.057837
+  type: 'test'
+  ...
+# Subtest: role writes use revision checks, a closed field/role set and normal profile writes cannot bypass authority
+ok 334 - role writes use revision checks, a closed field/role set and normal profile writes cannot bypass authority
+  ---
+  duration_ms: 17.225982
+  type: 'test'
+  ...
+# Subtest: role route enforces authentication, cookie CSRF and exact request Origin
+ok 335 - role route enforces authentication, cookie CSRF and exact request Origin
+  ---
+  duration_ms: 7.570431
+  type: 'test'
+  ...
+# Subtest: role badges decorate rooms and fresh session cards without changing verified forum identity
+ok 336 - role badges decorate rooms and fresh session cards without changing verified forum identity
+  ---
+  duration_ms: 8.043356
+  type: 'test'
+  ...
+# Subtest: persistent roles survive restart and bootstrap never promotes another configured id when an owner already exists
+ok 337 - persistent roles survive restart and bootstrap never promotes another configured id when an owner already exists
+  ---
+  duration_ms: 5.525969
+  type: 'test'
+  ...
+# Subtest: a service without a configured canonical owner never grants authority by name or client identity fields
+ok 338 - a service without a configured canonical owner never grants authority by name or client identity fields
+  ---
+  duration_ms: 2.151764
+  type: 'test'
+  ...
+# Subtest: verified group labels survive normalization; editable custom titles never become membership badges
+ok 339 - verified group labels survive normalization; editable custom titles never become membership badges
+  ---
+  duration_ms: 1.778409
+  type: 'test'
+  ...
+# Subtest: profiles have shared authenticated identity and server-owned ranks; client cannot forge badges
+ok 340 - profiles have shared authenticated identity and server-owned ranks; client cannot forge badges
+  ---
+  duration_ms: 59.910106
+  type: 'test'
+  ...
+# Subtest: older sessions cannot undo a newer Lolzteam identity refresh
+ok 341 - older sessions cannot undo a newer Lolzteam identity refresh
+  ---
+  duration_ms: 8.296804
+  type: 'test'
+  ...
+# Subtest: friend requests require consent, deduplicate, notify only the target and support cancellation/removal
+ok 342 - friend requests require consent, deduplicate, notify only the target and support cancellation/removal
+  ---
+  duration_ms: 17.565682
+  type: 'test'
+  ...
+# Subtest: privacy preferences suppress unsolicited requests, invitations and native alert delivery
+ok 343 - privacy preferences suppress unsolicited requests, invitations and native alert delivery
+  ---
+  duration_ms: 12.776675
+  type: 'test'
+  ...
+# Subtest: room invitations enforce sender membership, recipient identity and explicit acceptance without autoplay
+ok 344 - room invitations enforce sender membership, recipient identity and explicit acceptance without autoplay
+  ---
+  duration_ms: 12.750778
+  type: 'test'
+  ...
+# Subtest: expired/closed/banned room invitations cannot grant access
+ok 345 - expired/closed/banned room invitations cannot grant access
+  ---
+  duration_ms: 16.745604
+  type: 'test'
+  ...
+# Subtest: read acknowledgements are account-scoped and never accept an invitation
+ok 346 - read acknowledgements are account-scoped and never accept an invitation
+  ---
+  duration_ms: 9.451434
+  type: 'test'
+  ...
+# Subtest: image upload validates bytes/size/ownership and serves a custom avatar without trusting external URLs
+ok 347 - image upload validates bytes/size/ownership and serves a custom avatar without trusting external URLs
+  ---
+  duration_ms: 10.011413
+  type: 'test'
+  ...
+# Subtest: browser social mutations keep CSRF/origin guards
+ok 348 - browser social mutations keep CSRF/origin guards
+  ---
+  duration_ms: 8.440405
+  type: 'test'
+  ...
+# Subtest: notification SSE streams only that account and immediately publishes changes
+ok 349 - notification SSE streams only that account and immediately publishes changes
+  ---
+  duration_ms: 6.59546
+  type: 'test'
+  ...
+# Subtest: logout revokes an already open room SSE stream instead of retaining cached authorization
+ok 350 - logout revokes an already open room SSE stream instead of retaining cached authorization
+  ---
+  duration_ms: 7.867532
+  type: 'test'
+  ...
+# Subtest: social profiles and friendships survive restart without provider secrets; persistence failure rolls back
+ok 351 - social profiles and friendships survive restart without provider secrets; persistence failure rolls back
+  ---
+  duration_ms: 7.434485
+  type: 'test'
+  ...
+# Subtest: ducking waits for sustained sound, holds between words and releases to unity
+ok 352 - ducking waits for sustained sound, holds between words and releases to unity
+  ---
+  duration_ms: 2.951566
+  type: 'test'
+  ...
+# Subtest: own audio, silent/invalid sessions and unselected apps never trigger ducking
+ok 353 - own audio, silent/invalid sessions and unselected apps never trigger ducking
+  ---
+  duration_ms: 0.933634
+  type: 'test'
+  ...
+# Subtest: browser sound ducks music, settings disable it, and stale data cannot keep it ducked
+ok 354 - browser sound ducks music, settings disable it, and stale data cannot keep it ducked
+  ---
+  duration_ms: 0.172947
+  type: 'test'
+  ...
+# Subtest: loopback copies of LolzCloud in Discord, Steam and OBS cannot trigger ducking
+ok 355 - loopback copies of LolzCloud in Discord, Steam and OBS cannot trigger ducking
+  ---
+  duration_ms: 0.457714
+  type: 'test'
+  ...
+# Subtest: independent sound on a different output is not suppressed by the echo guard
+ok 356 - independent sound on a different output is not suppressed by the echo guard
+  ---
+  duration_ms: 0.127681
+  type: 'test'
+  ...
+# Subtest: audio protection settings persist atomically without changing the user volume
+ok 357 - audio protection settings persist atomically without changing the user volume
+  ---
+  duration_ms: 3.55154
+  type: 'test'
+  ...
+# Subtest: Windows monitor uses a hidden owned helper, ignores bad protocol and stops cleanly
+ok 358 - Windows monitor uses a hidden owned helper, ignores bad protocol and stops cleanly
+  ---
+  duration_ms: 1.707406
+  type: 'test'
+  ...
+# Subtest: Slowed + Reverb, Speed Up and Bass Boost change real effect settings
+ok 359 - Slowed + Reverb, Speed Up and Bass Boost change real effect settings
+  ---
+  duration_ms: 2.474985
+  type: 'test'
+  ...
+# Subtest: a personal preset and mini-player lyrics survive restarting the app
+ok 360 - a personal preset and mini-player lyrics survive restarting the app
+  ---
+  duration_ms: 2.329351
+  type: 'test'
+  ...
+# Subtest: invalid sound changes cannot partially update or corrupt the saved settings
+ok 361 - invalid sound changes cannot partially update or corrupt the saved settings
+  ---
+  duration_ms: 1.305556
+  type: 'test'
+  ...
+# Subtest: portable preamp and full mobile speed range survive a saved personal preset and restart
+ok 362 - portable preamp and full mobile speed range survive a saved personal preset and restart
+  ---
+  duration_ms: 1.044793
+  type: 'test'
+  ...
+# Subtest: lyrics share pending requests and cannot mix different track versions
+ok 363 - lyrics share pending requests and cannot mix different track versions
+  ---
+  duration_ms: 0.873871
+  type: 'test'
+  ...
+# Subtest: a failed lyric lookup stays quiet until explicitly retried
+ok 364 - a failed lyric lookup stays quiet until explicitly retried
+  ---
+  duration_ms: 0.305527
+  type: 'test'
+  ...
+# Subtest: volume and interface settings persist without changing the single visual theme
+ok 365 - volume and interface settings persist without changing the single visual theme
+  ---
+  duration_ms: 0.910119
+  type: 'test'
+  ...
+# Subtest: lyrics-only, enlarged lyrics, interface zoom and repeat survive app restart
+ok 366 - lyrics-only, enlarged lyrics, interface zoom and repeat survive app restart
+  ---
+  duration_ms: 0.542054
+  type: 'test'
+  ...
+# Subtest: volume hotkeys update the audible command, both players and the saved volume together
+ok 367 - volume hotkeys update the audible command, both players and the saved volume together
+  ---
+  duration_ms: 16.999654
+  type: 'test'
+  ...
+# Subtest: footer, mini and hotkey transport return to actual previous tracks without restarting the current one
+ok 368 - footer, mini and hotkey transport return to actual previous tracks without restarting the current one
+  ---
+  duration_ms: 5.733912
+  type: 'test'
+  ...
+# Subtest: Telegram state persists bot-scoped file IDs and refuses a different bot without replacing state
+ok 369 - Telegram state persists bot-scoped file IDs and refuses a different bot without replacing state
+  ---
+  duration_ms: 3.759873
+  type: 'test'
+  ...
+# Subtest: signed audio URLs and callback tokens reject tampering, traversal and cross-purpose reuse
+ok 370 - signed audio URLs and callback tokens reject tampering, traversal and cross-purpose reuse
+  ---
+  duration_ms: 1.020687
+  type: 'test'
+  ...
+# Subtest: search coalesces concurrent queries, paginates and excludes blocked, preview and excessive duration tracks
+ok 371 - search coalesces concurrent queries, paginates and excludes blocked, preview and excessive duration tracks
+  ---
+  duration_ms: 8.252229
+  type: 'test'
+  ...
+# Subtest: direct inline mode sends actual audio URLs without depending on chosen-result feedback
+ok 372 - direct inline mode sends actual audio URLs without depending on chosen-result feedback
+  ---
+  duration_ms: 1.167465
+  type: 'test'
+  ...
+# Subtest: cached inline results reuse Telegram file_id rather than download or URL
+ok 373 - cached inline results reuse Telegram file_id rather than download or URL
+  ---
+  duration_ms: 2.116218
+  type: 'test'
+  ...
+# Subtest: cover mode has real thumbnail, signed retry and replaces chosen result with audio
+ok 374 - cover mode has real thumbnail, signed retry and replaces chosen result with audio
+  ---
+  duration_ms: 1.149341
+  type: 'test'
+  ...
+# Subtest: a failed cold inline download keeps a usable retry and source link
+ok 375 - a failed cold inline download keeps a usable retry and source link
+  ---
+  duration_ms: 0.453217
+  type: 'test'
+  ...
+# Subtest: private search returns track choices and ignores ordinary group conversation
+ok 376 - private search returns track choices and ignores ordinary group conversation
+  ---
+  duration_ms: 0.991903
+  type: 'test'
+  ...
+# Subtest: callback tampering and an unrelated group cannot trigger audio uploads
+ok 377 - callback tampering and an unrelated group cannot trigger audio uploads
+  ---
+  duration_ms: 0.75219
+  type: 'test'
+  ...
+# Subtest: an invalid saved file_id falls back to uploading the prepared MP3 and replaces the cache entry
+ok 378 - an invalid saved file_id falls back to uploading the prepared MP3 and replaces the cache entry
+  ---
+  duration_ms: 0.864253
+  type: 'test'
+  ...
+# Subtest: concurrent cache-channel uploads share one Telegram file rather than duplicate messages
+ok 379 - concurrent cache-channel uploads share one Telegram file rather than duplicate messages
+  ---
+  duration_ms: 5.056321
+  type: 'test'
+  ...
+# Subtest: Telegram transport avoids redirects and hides credentials from network errors
+ok 380 - Telegram transport avoids redirects and hides credentials from network errors
+  ---
+  duration_ms: 12.090499
+  type: 'test'
+  ...
+# Subtest: public audio HTTP supports HEAD and byte ranges, hides unsigned tracks, and returns real MP3 bytes
+ok 381 - public audio HTTP supports HEAD and byte ranges, hides unsigned tracks, and returns real MP3 bytes
+  ---
+  duration_ms: 36.217038
+  type: 'test'
+  ...
+# Subtest: real ffmpeg conversion deduplicates downloads, adds Unicode tags and serves the disk cache after restart
+ok 382 - real ffmpeg conversion deduplicates downloads, adds Unicode tags and serves the disk cache after restart
+  ---
+  duration_ms: 73.21481
+  type: 'test'
+  ...
+# Subtest: failed audio preparation removes partial source files and can be retried
+ok 383 - failed audio preparation removes partial source files and can be retried
+  ---
+  duration_ms: 1.891082
+  type: 'test'
+  ...
+# Subtest: MP3 cover is embedded and an actual multipart upload stores the Telegram file identifier
+ok 384 - MP3 cover is embedded and an actual multipart upload stores the Telegram file identifier
+  ---
+  duration_ms: 58.621239
+  type: 'test'
+  ...
+# Subtest: concurrent cached reads cannot invalidate an in-flight file-backed multipart upload
+ok 385 - concurrent cached reads cannot invalidate an in-flight file-backed multipart upload
+  ---
+  duration_ms: 34.134813
+  type: 'test'
+  ...
+# Subtest: a failed multipart upload closes the cache file and releases its read lease
+ok 386 - a failed multipart upload closes the cache file and releases its read lease
+  ---
+  duration_ms: 1.580907
+  type: 'test'
+  ...
+# Subtest: welcome sends the real branded image once and reuses its persistent Telegram photo ID
+ok 387 - welcome sends the real branded image once and reuses its persistent Telegram photo ID
+  ---
+  duration_ms: 1.826119
+  type: 'test'
+  ...
+# Subtest: carousel edits the same message, escapes track metadata and prevents another account from browsing it
+ok 388 - carousel edits the same message, escapes track metadata and prevents another account from browsing it
+  ---
+  duration_ms: 0.949084
+  type: 'test'
+  ...
+# Subtest: carousel lazily fetches the next catalogue page and expiration gives an explicit retry path
+ok 389 - carousel lazily fetches the next catalogue page and expiration gives an explicit retry path
+  ---
+  duration_ms: 0.583311
+  type: 'test'
+  ...
+# Subtest: a missing album cover switches to the brand image instead of retaining the previous song artwork
+ok 390 - a missing album cover switches to the brand image instead of retaining the previous song artwork
+  ---
+  duration_ms: 0.39652
+  type: 'test'
+  ...
+# Subtest: chosen cached audio is already delivered and is never converted or fetched again
+ok 391 - chosen cached audio is already delivered and is never converted or fetched again
+  ---
+  duration_ms: 0.392902
+  type: 'test'
+  ...
+# Subtest: double tapping download sends one audio while another request is in flight
+ok 392 - double tapping download sends one audio while another request is in flight
+  ---
+  duration_ms: 0.328661
+  type: 'test'
+  ...
+# Subtest: brand image hash prevents reusing an obsolete Telegram welcome asset
+ok 393 - brand image hash prevents reusing an obsolete Telegram welcome asset
+  ---
+  duration_ms: 0.288445
+  type: 'test'
+  ...
+# Subtest: public welcome JPEG matches the actual branded asset and supports HEAD
+ok 394 - public welcome JPEG matches the actual branded asset and supports HEAD
+  ---
+  duration_ms: 10.018425
+  type: 'test'
+  ...
+# Subtest: a hidden login element cannot erase the signed-in listener or expose their token
+ok 395 - a hidden login element cannot erase the signed-in listener or expose their token
+  ---
+  duration_ms: 2.483822
+  type: 'test'
+  ...
+# Subtest: the avatar inside the header profile anchor identifies the listener
+ok 396 - the avatar inside the header profile anchor identifies the listener
+  ---
+  duration_ms: 0.98493
+  type: 'test'
+  ...
+# Subtest: logged-out and unresolved sessions do not invent a SoundCloud button
+ok 397 - logged-out and unresolved sessions do not invent a SoundCloud button
+  ---
+  duration_ms: 2.598128
+  type: 'test'
+  ...
+# Subtest: tempo estimation follows regular beats at different speeds and clears on seek or silence
+ok 398 - tempo estimation follows regular beats at different speeds and clears on seek or silence
+  ---
+  duration_ms: 116.613515
+  type: 'test'
+  ...
+# Subtest: cover colours determine the palette, including monochrome artwork and missing covers
+ok 399 - cover colours determine the palette, including monochrome artwork and missing covers
+  ---
+  duration_ms: 1.022141
+  type: 'test'
+  ...
+# Subtest: metadata BPM is cached by track; live estimates respect tempo changes and reject stale samples
+ok 400 - metadata BPM is cached by track; live estimates respect tempo changes and reject stale samples
+  ---
+  duration_ms: 2.279477
+  type: 'test'
+  ...
+# Subtest: voicetags reject changed remote bytes and unsafe identifiers, while volume survives restarting
+ok 401 - voicetags reject changed remote bytes and unsafe identifiers, while volume survives restarting
+  ---
+  duration_ms: 15.754593
+  type: 'test'
+  ...
+# Subtest: 24-hour exclusion survives restarting, shaking, resetting and manually selecting a stale queue row
+ok 402 - 24-hour exclusion survives restarting, shaking, resetting and manually selecting a stale queue row
+  ---
+  duration_ms: 15.438105
+  type: 'test'
+  ...
+# Subtest: aliases of the same SoundCloud ID are deduplicated and no cooldown can be bypassed by changing a slug
+ok 403 - aliases of the same SoundCloud ID are deduplicated and no cooldown can be bypassed by changing a slug
+  ---
+  duration_ms: 0.733345
+  type: 'test'
+  ...
+# Subtest: private wave sessions keep only expiring fingerprints and do not learn private reactions or titles
+ok 404 - private wave sessions keep only expiring fingerprints and do not learn private reactions or titles
+  ---
+  duration_ms: 2.592929
+  type: 'test'
+  ...
+# Subtest: reading state preserves queue order and does not consume random ranking or trigger requests
+ok 405 - reading state preserves queue order and does not consume random ranking or trigger requests
+  ---
+  duration_ms: 3.735638
+  type: 'test'
+  ...
+# Subtest: simultaneous next requests share the same fill and start exactly one song
+ok 406 - simultaneous next requests share the same fill and start exactly one song
+  ---
+  duration_ms: 8.341268
+  type: 'test'
+  ...
+# Subtest: deliberately replaying a previous wave track preserves the queue and daily exclusions
+ok 407 - deliberately replaying a previous wave track preserves the queue and daily exclusions
+  ---
+  duration_ms: 4.195446
+  type: 'test'
+  ...
+# Subtest: stopping while a request is pending cannot revive the wave or play a late result
+ok 408 - stopping while a request is pending cannot revive the wave or play a late result
+  ---
+  duration_ms: 3.35628
+  type: 'test'
+  ...
+# Subtest: a wave advances through multiple tracks even without a browser ended event or a changed URL
+ok 409 - a wave advances through multiple tracks even without a browser ended event or a changed URL
+  ---
+  duration_ms: 2.622455
+  type: 'test'
+  ...
+# Subtest: repeat-one, manual pauses, deliberate seeking and stale media never advance the wave
+ok 410 - repeat-one, manual pauses, deliberate seeking and stale media never advance the wave
+  ---
+  duration_ms: 1.726641
+  type: 'test'
+  ...
+# Subtest: settings replace pending recommendations atomically and stale results cannot overwrite the new mood
+ok 411 - settings replace pending recommendations atomically and stale results cannot overwrite the new mood
+  ---
+  duration_ms: 2.802194
+  type: 'test'
+  ...
+# Subtest: catalogue exhaustion reports the rule instead of replaying songs from the last 24 hours
+ok 412 - catalogue exhaustion reports the rule instead of replaying songs from the last 24 hours
+  ---
+  duration_ms: 1.215467
+  type: 'test'
+  ...
+# Subtest: known/fresh modes, mood, language and time context actually change recommendation scores
+ok 413 - known/fresh modes, mood, language and time context actually change recommendation scores
+  ---
+  duration_ms: 0.860656
+  type: 'test'
+  ...
+# Subtest: natural music requests extract genre, mood, activity and actual historical decades
+ok 414 - natural music requests extract genre, mood, activity and actual historical decades
+  ---
+  duration_ms: 52.990786
+  type: 'test'
+  ...
+# Subtest: ambiguous, empty, future and contradictory requests report a useful error
+ok 415 - ambiguous, empty, future and contradictory requests report a useful error
+  ---
+  duration_ms: 1.064631
+  type: 'test'
+  ...
+# Subtest: historical matching never mistakes upload dates or modern remixes for the requested era
+ok 416 - historical matching never mistakes upload dates or modern remixes for the requested era
+  ---
+  duration_ms: 1.307449
+  type: 'test'
+  ...
+# Subtest: request searches real catalogue metadata without overwriting saved wave preferences or the 24-hour rule
+ok 417 - request searches real catalogue metadata without overwriting saved wave preferences or the 24-hour rule
+  ---
+  duration_ms: 10.728808
+  type: 'test'
+  ...
+# Subtest: likes and long listening strengthen affinity, while quick skips weaken it
+ok 418 - likes and long listening strengthen affinity, while quick skips weaken it
+  ---
+  duration_ms: 3.609037
+  type: 'test'
+  ...
+# Subtest: wave avoids repeat tracks, excludes bans and discourages repeated quick skips
+ok 419 - wave avoids repeat tracks, excludes bans and discourages repeated quick skips
+  ---
+  duration_ms: 0.978288
+  type: 'test'
+  ...
+# Subtest: recommendations import only metadata and preserve the correct track duration
+ok 420 - recommendations import only metadata and preserve the correct track duration
+  ---
+  duration_ms: 0.145634
+  type: 'test'
+  ...
+# Subtest: maximum novelty excludes familiar recordings even under another upload URL
+ok 421 - maximum novelty excludes familiar recordings even under another upload URL
+  ---
+  duration_ms: 0.458286
+  type: 'test'
+  ...
+# Subtest: a personal wave starts a queue, learns skip feedback and persists local choices
+ok 422 - a personal wave starts a queue, learns skip feedback and persists local choices
+  ---
+  duration_ms: 5.96011
+  type: 'test'
+  ...
+# Subtest: pausing does not create another listening session or record a skip
+ok 423 - pausing does not create another listening session or record a skip
+  ---
+  duration_ms: 1.385187
+  type: 'test'
+  ...
+# Subtest: wave reactions toggle once, ignore stale clicks and ban before advancing
+ok 424 - wave reactions toggle once, ignore stale clicks and ban before advancing
+  ---
+  duration_ms: 3.703615
+  type: 'test'
+  ...
+# Subtest: synced lyrics selection rejects other artists and different song versions
+ok 425 - synced lyrics selection rejects other artists and different song versions
+  ---
+  duration_ms: 2.391949
+  type: 'test'
+  ...
+# Subtest: enhanced LRC exposes real word timestamps and personal timings survive restart
+ok 426 - enhanced LRC exposes real word timestamps and personal timings survive restart
+  ---
+  duration_ms: 1.533747
+  type: 'test'
+  ...
+# Subtest: a verified device grant commits a host-only HttpOnly session in the web app cookie jar
+ok 427 - a verified device grant commits a host-only HttpOnly session in the web app cookie jar
+  ---
+  duration_ms: 39.013799
+  type: 'test'
+  ...
+# Subtest: cookie commit rejects missing/foreign Origin, unauthenticated tokens and cookie-only requests
+ok 428 - cookie commit rejects missing/foreign Origin, unauthenticated tokens and cookie-only requests
+  ---
+  duration_ms: 14.651568
+  type: 'test'
+  ...
+# Subtest: device session cannot be supplied through request body, redirect or URL parameters
+ok 429 - device session cannot be supplied through request body, redirect or URL parameters
+  ---
+  duration_ms: 8.664547
+  type: 'test'
+  ...
+# Subtest: explicit grant replaces only the current app cookie and retains other valid sessions
+ok 430 - explicit grant replaces only the current app cookie and retains other valid sessions
+  ---
+  duration_ms: 3.204514
+  type: 'test'
+  ...
+# Subtest: YouTube Music uses its own sandbox and never inherits the SoundCloud preload
+ok 431 - YouTube Music uses its own sandbox and never inherits the SoundCloud preload
+  ---
+  duration_ms: 0.821923
+  type: 'test'
+  ...
+1..431
+# tests 431
+# suites 0
+# pass 431
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 22805.873559

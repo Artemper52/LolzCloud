@@ -1,0 +1,687 @@
+{
+  "ok": true,
+  "count": 40,
+  "checks": [
+    "Disabled graph is sample-identical unity bypass without limiter delay",
+    "Real PCM canonical EQ band 0 attenuates its own frequency by more than5dB",
+    "Real PCM canonical EQ band 1 attenuates its own frequency by more than5dB",
+    "Real PCM canonical EQ band 2 attenuates its own frequency by more than5dB",
+    "Real PCM canonical EQ band 3 attenuates its own frequency by more than5dB",
+    "Real PCM canonical EQ band 4 attenuates its own frequency by more than5dB",
+    "Actual preamp changes PCM amplitude by12dB",
+    "Echo produces real280ms repeats and bounded decaying feedback",
+    "Convolver creates a real decaying stereo reverberation tail",
+    "K-weighted bounded loudness matching boosts quiet music and reduces loud music using real worklet PCM",
+    "Lookahead limiter sanitizes nonfinite input and bounds actual sample peaks to−3dB",
+    "Default-off personal player creates no AudioContext",
+    "A real worklet HTTP503 before source attachment preserves direct original HTMLAudio and reports unavailable processing",
+    "Processor retry closes failed unattached contexts and attaches the MediaElementSource exactly once",
+    "Enabling effects during a real delayed prepare preserves the selected track and the single playing HTMLAudio element",
+    "A real EQ edit while paused never resumes or replaces playback",
+    "An actual OFF→preamp gesture enables the requested sound consistently and preserves pause",
+    "Sound controls fit360px and all five sliders have44px touch targets",
+    "Escape closes only Sound and returns focus to its actual opener",
+    "Browser Back closes Sound without navigating away from the player",
+    "Tablet Sound panel stays compact with no horizontal overflow",
+    "Disabling processing keeps the attached source alive through unity bypass",
+    "A real context interruption pauses personal audio and reports an explicit Play recovery without creating a second source",
+    "Explicit Play resumes the existing context and MediaElementSource after interruption",
+    "Legacy v3 worker fixture has none of the new DSP modules cached",
+    "One failed worklet fetch prevents v6 activation and preserves the previous active shell",
+    "Successful v6 upgrade precaches exactly the complete public shell including both worklets and policy; no API/room/session/audio enters cache",
+    "A full offline reload plays the explicitly stored IndexedDB Blob through cached worklets and saved actual effects while actual uncached HTTP is unavailable",
+    "Native route creates no WebAudio/HTMLAudio and never claims applied from a settings setter",
+    "Native panel hides all unsupported advanced effects and effect presets",
+    "Native EQ edit uses a separate revision and preserves paused playback intent with the exact supported config",
+    "Cross-client, stale revision/transport and zero-frame native ACKs are rejected",
+    "Only the current positive-PCM native ACK marks actual applied settings",
+    "Native effects during pending prepare do not replace the transport intent and reject the previous track/request ACK",
+    "Pending native audio still receives exactly one play with its original current intent and no HTMLAudio fallback",
+    "Cross-document effectsSchema2 capabilities cannot upgrade the legacy exact3 bridge",
+    "Exact-tag schema2 upgrades to the full6 config with a separate FX revision and no transport mutation or autoplay",
+    "Schema2 preserves requested echo/normalization and rejects a same-revision ACK with a different config",
+    "Only actual positive-frame full6 ACK exposes supported advanced native controls and the current-track meter without a web audio fallback",
+    "DSP and actual player scenarios contain no uncaught JavaScript errors"
+  ],
+  "errors": [],
+  "failure": "",
+  "pcm": [
+    {
+      "config": {
+        "enabled": false
+      },
+      "options": {
+        "amplitude": 0.3
+      },
+      "amplitude": 0.2999999996671668,
+      "peak": 0.30000001192092896,
+      "early": 0.21213203412061168,
+      "late": 0.21212896662341735,
+      "echo1": 0.2999989688396454,
+      "echo2": 0.30000001192092896,
+      "tail": 0.21213203412061368,
+      "finite": true,
+      "difference": 0,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true
+      },
+      "options": {
+        "frequency": 30
+      },
+      "amplitude": 0.09999999998440574,
+      "peak": 0.10000000149011612,
+      "early": 0.07071067810763089,
+      "late": 0.07071172301731649,
+      "echo1": 0.10000000149011612,
+      "echo2": 0.10000000149011612,
+      "tail": 0.07071067810763024,
+      "finite": true,
+      "difference": 0.13690942525863647,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true,
+        "gains": [
+          -12,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "options": {
+        "frequency": 30
+      },
+      "amplitude": 0.027852587884750857,
+      "peak": 0.0321478471159935,
+      "early": 0.01969475376727254,
+      "late": 0.019694835085228957,
+      "echo1": 0.02785263955593109,
+      "echo2": 0.02785263955593109,
+      "tail": 0.019694753767272588,
+      "finite": true,
+      "difference": 0.09980267286300659,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true
+      },
+      "options": {
+        "frequency": 230
+      },
+      "amplitude": 0.10000000006583898,
+      "peak": 0.10000000149011612,
+      "early": 0.07071067816521209,
+      "late": 0.07071106806863443,
+      "echo1": 0.10000000149011612,
+      "echo2": 0.09999991208314896,
+      "tail": 0.07071067816521213,
+      "finite": true,
+      "difference": 0.09999922662973404,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true,
+        "gains": [
+          0,
+          -12,
+          0,
+          0,
+          0
+        ]
+      },
+      "options": {
+        "frequency": 230
+      },
+      "amplitude": 0.025118867089592094,
+      "peak": 0.05078517645597458,
+      "early": 0.01776172125481137,
+      "late": 0.017761819193023585,
+      "echo1": 0.025118909776210785,
+      "echo2": 0.02511889673769474,
+      "tail": 0.017761721254811482,
+      "finite": true,
+      "difference": 0.09999922662973404,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true
+      },
+      "options": {
+        "frequency": 910
+      },
+      "amplitude": 0.10000000006588845,
+      "peak": 0.10000000149011612,
+      "early": 0.07071067816524229,
+      "late": 0.07071153743931993,
+      "echo1": 0.10000000149011612,
+      "echo2": 0.09999991208314896,
+      "tail": 0.07071067816524261,
+      "finite": true,
+      "difference": 0.1541026532649994,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true,
+        "gains": [
+          0,
+          0,
+          -12,
+          0,
+          0
+        ]
+      },
+      "options": {
+        "frequency": 910
+      },
+      "amplitude": 0.0251188673699962,
+      "peak": 0.05082713067531586,
+      "early": 0.017761721453047895,
+      "late": 0.017761937293137704,
+      "echo1": 0.025118866935372353,
+      "echo2": 0.025118855759501457,
+      "tail": 0.017761721453048152,
+      "finite": true,
+      "difference": 0.1212936993688345,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true
+      },
+      "options": {
+        "frequency": 3600
+      },
+      "amplitude": 0.10000000017108857,
+      "peak": 0.10000000149011612,
+      "early": 0.07071067823963659,
+      "late": 0.07071067823973275,
+      "echo1": 0.10000000149011612,
+      "echo2": 0.10000000149011612,
+      "tail": 0.07071067823964187,
+      "finite": true,
+      "difference": 0.11755704879760742,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true,
+        "gains": [
+          0,
+          0,
+          0,
+          -12,
+          0
+        ]
+      },
+      "options": {
+        "frequency": 3600
+      },
+      "amplitude": 0.025118867286864313,
+      "peak": 0.051197443157434464,
+      "early": 0.01776172139426725,
+      "late": 0.017761721394346557,
+      "echo1": 0.025118868798017502,
+      "echo2": 0.025118868798017502,
+      "tail": 0.0177617213942667,
+      "finite": true,
+      "difference": 0.10551242157816887,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true
+      },
+      "options": {
+        "frequency": 18000
+      },
+      "amplitude": 0.10000000305035835,
+      "peak": 0.10000000149011612,
+      "early": 0.07071068027559112,
+      "late": 0.07071068027561539,
+      "echo1": 0.10000000149011612,
+      "echo2": 0.10000000149011612,
+      "tail": 0.07071068027557362,
+      "finite": true,
+      "difference": 0.10000000149011612,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true,
+        "gains": [
+          0,
+          0,
+          0,
+          0,
+          -12
+        ]
+      },
+      "options": {
+        "frequency": 18000
+      },
+      "amplitude": 0.02875097951286717,
+      "peak": 0.0393512099981308,
+      "early": 0.02033001257930368,
+      "late": 0.020329723410660364,
+      "echo1": 0.02843191660940647,
+      "echo2": 0.02843191660940647,
+      "tail": 0.020330012579302628,
+      "finite": true,
+      "difference": 0.10000000149011612,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true
+      },
+      "options": {},
+      "amplitude": 0.10000000006588845,
+      "peak": 0.10000000149011612,
+      "early": 0.07071067816524229,
+      "late": 0.07071153743931993,
+      "echo1": 0.10000000149011612,
+      "echo2": 0.09999991208314896,
+      "tail": 0.07071067816524261,
+      "finite": true,
+      "difference": 0.1541026532649994,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true,
+        "preampDb": -12
+      },
+      "options": {},
+      "amplitude": 0.02511886362709427,
+      "peak": 0.025118863210082054,
+      "early": 0.017761718806417644,
+      "late": 0.01776193464631022,
+      "echo1": 0.025118863210082054,
+      "echo2": 0.025118840858340263,
+      "tail": 0.01776171880641802,
+      "finite": true,
+      "difference": 0.10757470969110727,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true,
+        "echo": 0.6
+      },
+      "options": {
+        "impulse": true
+      },
+      "amplitude": 0.0000016400337277970244,
+      "peak": 0.10000000149011612,
+      "early": 0.00007668508306503584,
+      "late": 0.00006861144547702465,
+      "echo1": 0.036000002175569534,
+      "echo2": 0.011880001984536648,
+      "tail": 0.00017395546269047672,
+      "finite": true,
+      "difference": 0.10000000149011612,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true
+      },
+      "options": {
+        "impulse": true
+      },
+      "amplitude": 0,
+      "peak": 0.10000000149011612,
+      "early": 0,
+      "late": 0,
+      "echo1": 0,
+      "echo2": 0,
+      "tail": 0,
+      "finite": true,
+      "difference": 0.10000000149011612,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true,
+        "reverb": 0.6
+      },
+      "options": {
+        "impulse": true
+      },
+      "amplitude": 3.6343341231629916e-7,
+      "peak": 0.05865322798490524,
+      "early": 0.00003132297124170157,
+      "late": 0.000010443358624118898,
+      "echo1": 0.0001362032489851117,
+      "echo2": 0.00004702836668002419,
+      "tail": 0.000054019481613353824,
+      "finite": true,
+      "difference": 0.10000000149011612,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true,
+        "normalization": true
+      },
+      "options": {
+        "duration": 14,
+        "amplitude": 0.02
+      },
+      "amplitude": 0.0200000000024311,
+      "peak": 0.05023772642016411,
+      "early": 0.014142135625450459,
+      "late": 0.03552343857995553,
+      "echo1": 0.019999999552965164,
+      "echo2": 0.01999998278915882,
+      "tail": 0.014142135625450405,
+      "finite": true,
+      "difference": 0.057448871433734894,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": true,
+          "measured": true,
+          "loudness": -34.15886440741188,
+          "gainDb": 8,
+          "targetDb": 8,
+          "processedFrames": 576000
+        },
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": true,
+          "measured": true,
+          "loudness": -34.15886379702359,
+          "gainDb": 8,
+          "targetDb": 8,
+          "processedFrames": 624000
+        },
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": true,
+          "measured": true,
+          "loudness": -34.15886301224184,
+          "gainDb": 8,
+          "targetDb": 8,
+          "processedFrames": 672000
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true,
+        "normalization": true
+      },
+      "options": {
+        "duration": 14,
+        "amplitude": 0.5
+      },
+      "amplitude": 0.49999999963342767,
+      "peak": 0.5,
+      "early": 0.3535533903340669,
+      "late": 0.14403172725854863,
+      "echo1": 0.5,
+      "echo2": 0.4999995827674866,
+      "tail": 0.35355339033406585,
+      "finite": true,
+      "difference": 0.7705132365226746,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": true,
+          "measured": true,
+          "loudness": -6.2000642414207805,
+          "gainDb": -7.799935421819637,
+          "targetDb": -7.7999357585792195,
+          "processedFrames": 576000
+        },
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": true,
+          "measured": true,
+          "loudness": -6.200063631045751,
+          "gainDb": -7.799936368954249,
+          "targetDb": -7.799936368954249,
+          "processedFrames": 624000
+        },
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": true,
+          "measured": true,
+          "loudness": -6.200062846278358,
+          "gainDb": -7.799936907520381,
+          "targetDb": -7.799937153721642,
+          "processedFrames": 672000
+        }
+      ]
+    },
+    {
+      "config": {
+        "enabled": true
+      },
+      "options": {
+        "duration": 1.4,
+        "amplitude": 3,
+        "unsafe": true
+      },
+      "amplitude": 0.7079460549932688,
+      "peak": 0.7079457640647888,
+      "early": 0.5005934619085683,
+      "late": 0.5005995440479856,
+      "echo1": 0.7079457640647888,
+      "echo2": 0.7079452276229858,
+      "tail": 0.5005934582388338,
+      "finite": true,
+      "difference": null,
+      "meters": [
+        {
+          "kind": "normalization",
+          "key": "123",
+          "enabled": false,
+          "measured": false,
+          "loudness": null,
+          "gainDb": 0,
+          "targetDb": 0,
+          "processedFrames": 0
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    "D:\\LolzCloud-Android-Toolchain\\pwa-profile\\effects-v6\\effects-360.png",
+    "D:\\LolzCloud-Android-Toolchain\\pwa-profile\\effects-v6\\effects-1024.png",
+    "D:\\LolzCloud-Android-Toolchain\\pwa-profile\\effects-v6\\effects-offline-1024.png"
+  ],
+  "fixtureNote": "Actual isolated Chromium OfflineAudioContext/AudioWorklet PCM and production HTMLAudio, signed local MP3 HTTP fixture. Native ACK tests are a strict IPC adapter, not physical iOS/Safari or AVPlayer proof."
+}

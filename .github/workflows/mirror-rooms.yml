@@ -319,4 +319,3 @@ jobs:
           path: ${{ runner.temp }}/lolzcloud-mirror-reports/
           if-no-files-found: error
           retention-days: 14
-

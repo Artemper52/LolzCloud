@@ -1,0 +1,328 @@
+TAP version 13
+# Subtest: PWA accepts only matching signed same-origin MP3 sources
+ok 1 - PWA accepts only matching signed same-origin MP3 sources
+  ---
+  duration_ms: 1.5107
+  type: 'test'
+  ...
+# Subtest: PWA retains only canonical public SoundCloud permalinks for profile portability
+ok 2 - PWA retains only canonical public SoundCloud permalinks for profile portability
+  ---
+  duration_ms: 1.4769
+  type: 'test'
+  ...
+# Subtest: explicit catalog references are metadata and cannot become signed or local audio by parsing
+ok 3 - explicit catalog references are metadata and cannot become signed or local audio by parsing
+  ---
+  duration_ms: 0.6542
+  type: 'test'
+  ...
+# Subtest: PWA validates pages, deduplicates IDs, rejects cursor loops and malformed rows
+ok 4 - PWA validates pages, deduplicates IDs, rejects cursor loops and malformed rows
+  ---
+  duration_ms: 3.4031
+  type: 'test'
+  ...
+# Subtest: PWA queue end, repeat-one automatic only, and shuffle avoid the current track
+ok 5 - PWA queue end, repeat-one automatic only, and shuffle avoid the current track
+  ---
+  duration_ms: 1.1367
+  type: 'test'
+  ...
+# Subtest: PWA room routing refuses external, credential, query and non-room navigation
+ok 6 - PWA room routing refuses external, credential, query and non-room navigation
+  ---
+  duration_ms: 0.4978
+  type: 'test'
+  ...
+# Subtest: PWA lyrics parse repeated timestamps in time order and keep text inert
+ok 7 - PWA lyrics parse repeated timestamps in time order and keep text inert
+  ---
+  duration_ms: 0.6128
+  type: 'test'
+  ...
+# Subtest: PWA lyric identity normalizes Unicode and case while preserving recording versions
+ok 8 - PWA lyric identity normalizes Unicode and case while preserving recording versions
+  ---
+  duration_ms: 4.0878
+  type: 'test'
+  ...
+# Subtest: PWA timed lyrics require exact own identity and duration within two seconds
+ok 9 - PWA timed lyrics require exact own identity and duration within two seconds
+  ---
+  duration_ms: 0.41
+  type: 'test'
+  ...
+# Subtest: local track parsing cannot weaken signed network catalogue policy
+ok 10 - local track parsing cannot weaken signed network catalogue policy
+  ---
+  duration_ms: 0.3795
+  type: 'test'
+  ...
+# Subtest: local audio sniffing requires a supported extension and matching container header
+ok 11 - local audio sniffing requires a supported extension and matching container header
+  ---
+  duration_ms: 0.308
+  type: 'test'
+  ...
+# Subtest: imported lyrics enforce UTF8/size/extension and preserve text inertly
+ok 12 - imported lyrics enforce UTF8/size/extension and preserve text inertly
+  ---
+  duration_ms: 1.0492
+  type: 'test'
+  ...
+# Subtest: saved identifiers reject trailing line terminators across numeric and local records
+ok 13 - saved identifiers reject trailing line terminators across numeric and local records
+  ---
+  duration_ms: 0.2101
+  type: 'test'
+  ...
+# Subtest: effects start disabled; normalized data is isolated and five canonical frequencies remain stable
+ok 14 - effects start disabled; normalized data is isolated and five canonical frequencies remain stable
+  ---
+  duration_ms: 1.751
+  type: 'test'
+  ...
+# Subtest: invalid/nonfinite settings and unrelated DSP claims are rejected
+ok 15 - invalid/nonfinite settings and unrelated DSP claims are rejected
+  ---
+  duration_ms: 1.8145
+  type: 'test'
+  ...
+# Subtest: presets produce independent validated gains and real effect settings
+ok 16 - presets produce independent validated gains and real effect settings
+  ---
+  duration_ms: 0.3703
+  type: 'test'
+  ...
+# Subtest: native settings include only supported canonical EQ and preamp keys
+ok 17 - native settings include only supported canonical EQ and preamp keys
+  ---
+  duration_ms: 1.7393
+  type: 'test'
+  ...
+# Subtest: native applied status needs actual PCM frames and exact revision/config/client/transport binding
+ok 18 - native applied status needs actual PCM frames and exact revision/config/client/transport binding
+  ---
+  duration_ms: 0.5997
+  type: 'test'
+  ...
+# Subtest: pending/unsupported never claim a processed revision; enabled settings cannot be acknowledged bypassed
+ok 19 - pending/unsupported never claim a processed revision; enabled settings cannot be acknowledged bypassed
+  ---
+  duration_ms: 0.3073
+  type: 'test'
+  ...
+# Subtest: schema2 uses exact full config and rejects unsupported or mismatched advanced PCM ACKs
+ok 20 - schema2 uses exact full config and rejects unsupported or mismatched advanced PCM ACKs
+  ---
+  duration_ms: 0.3153
+  type: 'test'
+  ...
+# Subtest: same-origin cloud create/read/validate interoperates with desktop and sends only encrypted envelope and revision
+ok 21 - same-origin cloud create/read/validate interoperates with desktop and sends only encrypted envelope and revision
+  ---
+  duration_ms: 345.5836
+  type: 'test'
+  ...
+# Subtest: an existing cloud copy requires its real read proof and the current revision before replacement
+ok 22 - an existing cloud copy requires its real read proof and the current revision before replacement
+  ---
+  duration_ms: 214.9165
+  type: 'test'
+  ...
+# Subtest: an edit on another device during encryption produces 409 without retrying or replacing that copy
+ok 23 - an edit on another device during encryption produces 409 without retrying or replacing that copy
+  ---
+  duration_ms: 189.4166
+  type: 'test'
+  ...
+# Subtest: account changes while deriving a key prevent any late cloud upload
+ok 24 - account changes while deriving a key prevent any late cloud upload
+  ---
+  duration_ms: 4.9773
+  type: 'test'
+  ...
+# Subtest: a changed HttpOnly cookie is detected even when the visible account has not refreshed yet
+ok 25 - a changed HttpOnly cookie is detected even when the visible account has not refreshed yet
+  ---
+  duration_ms: 91.3979
+  type: 'test'
+  ...
+# Subtest: CSRF remains bound to the verified session if the cookie changes immediately before PUT
+ok 26 - CSRF remains bound to the verified session if the cookie changes immediately before PUT
+  ---
+  duration_ms: 114.95
+  type: 'test'
+  ...
+# Subtest: cancel invalidates previous previews and busy work cannot apply or upload after it ends
+ok 27 - cancel invalidates previous previews and busy work cannot apply or upload after it ends
+  ---
+  duration_ms: 198.4761
+  type: 'test'
+  ...
+# Subtest: read results cannot be applied after the cloud revision or account changes
+ok 28 - read results cannot be applied after the cloud revision or account changes
+  ---
+  duration_ms: 105.1365
+  type: 'test'
+  ...
+# Subtest: unbounded or non-JSON responses are rejected without attempting decryption
+ok 29 - unbounded or non-JSON responses are rejected without attempting decryption
+  ---
+  duration_ms: 8.3774
+  type: 'test'
+  ...
+# Subtest: browser scrypt and AES-GCM decrypt all independently generated Node raw-UTF8 vectors
+ok 30 - browser scrypt and AES-GCM decrypt all independently generated Node raw-UTF8 vectors
+  ---
+  duration_ms: 580.6789
+  type: 'test'
+  ...
+# Subtest: browser encrypt → desktop decrypt and desktop encrypt → browser decrypt retain the complete v1 profile
+ok 31 - browser encrypt → desktop decrypt and desktop encrypt → browser decrypt retain the complete v1 profile
+  ---
+  duration_ms: 232.7614
+  type: 'test'
+  ...
+# Subtest: encryption never normalizes password bytes and rejects wrong passwords or changed tags
+ok 32 - encryption never normalizes password bytes and rejects wrong passwords or changed tags
+  ---
+  duration_ms: 260.2217
+  type: 'test'
+  ...
+# Subtest: malformed or oversized envelopes and profiles are rejected before key derivation
+ok 33 - malformed or oversized envelopes and profiles are rejected before key derivation
+  ---
+  duration_ms: 2.92
+  type: 'test'
+  ...
+# Subtest: both crypto implementations use independent random salts and nonces for the same profile
+ok 34 - both crypto implementations use independent random salts and nonces for the same profile
+  ---
+  duration_ms: 292.7636
+  type: 'test'
+  ...
+# Subtest: browser v1 whitelist agrees with desktop for implemented and desktop-only safe fields
+ok 35 - browser v1 whitelist agrees with desktop for implemented and desktop-only safe fields
+  ---
+  duration_ms: 5.4558
+  type: 'test'
+  ...
+# Subtest: portable data removes paths, auth/signed URLs and unsafe object keys without touching typed text
+ok 36 - portable data removes paths, auth/signed URLs and unsafe object keys without touching typed text
+  ---
+  duration_ms: 0.5136
+  type: 'test'
+  ...
+# Subtest: catalog refs represent known numeric and permalink-only identities without an audioURL
+ok 37 - catalog refs represent known numeric and permalink-only identities without an audioURL
+  ---
+  duration_ms: 0.2848
+  type: 'test'
+  ...
+# Subtest: future/oversized/malformed profile imports cannot mutate current data
+ok 38 - future/oversized/malformed profile imports cannot mutate current data
+  ---
+  duration_ms: 9.9973
+  type: 'test'
+  ...
+# Subtest: import merges likes/moments, preserves local data, keeps settings opt-in and snapshots a backup
+ok 39 - import merges likes/moments, preserves local data, keeps settings opt-in and snapshots a backup
+  ---
+  duration_ms: 1.8752
+  type: 'test'
+  ...
+# Subtest: explicit settings import applies desired EQ/rate/normalization independently of hardware
+ok 40 - explicit settings import applies desired EQ/rate/normalization independently of hardware
+  ---
+  duration_ms: 1.2541
+  type: 'test'
+  ...
+# Subtest: roundtrip preserves desktop-only collections/presets/preferences/groups and unsupported YouTube moments
+ok 41 - roundtrip preserves desktop-only collections/presets/preferences/groups and unsupported YouTube moments
+  ---
+  duration_ms: 1.9216
+  type: 'test'
+  ...
+# Subtest: unlike and moment deletion after import never resurrect records from sidecar
+ok 42 - unlike and moment deletion after import never resurrect records from sidecar
+  ---
+  duration_ms: 1.1839
+  type: 'test'
+  ...
+# Subtest: backup quota failure leaves profile and application untouched
+ok 43 - backup quota failure leaves profile and application untouched
+  ---
+  duration_ms: 1.7009
+  type: 'test'
+  ...
+# Subtest: a failed app transaction restores sidecar and prior backup
+ok 44 - a failed app transaction restores sidecar and prior backup
+  ---
+  duration_ms: 1.9075
+  type: 'test'
+  ...
+# Subtest: export rehydrates legacy numeric IDs with at most two requests and transfers no signed audio
+ok 45 - export rehydrates legacy numeric IDs with at most two requests and transfers no signed audio
+  ---
+  duration_ms: 39.2704
+  type: 'test'
+  ...
+# Subtest: cancelled export cannot complete or modify live state when metadata returns late
+ok 46 - cancelled export cannot complete or modify live state when metadata returns late
+  ---
+  duration_ms: 15.4695
+  type: 'test'
+  ...
+# Subtest: metadata mismatch is rejected before exporting another song
+ok 47 - metadata mismatch is rejected before exporting another song
+  ---
+  duration_ms: 0.5151
+  type: 'test'
+  ...
+# Subtest: canonical shared desktop fixture keeps every supported v1 field through import/export
+ok 48 - canonical shared desktop fixture keeps every supported v1 field through import/export
+  ---
+  duration_ms: 5.1644
+  type: 'test'
+  ...
+# Subtest: URL-only likes and standalone moments keep their proven numeric identity after collection eviction/reload
+ok 49 - URL-only likes and standalone moments keep their proven numeric identity after collection eviction/reload
+  ---
+  duration_ms: 2.2446
+  type: 'test'
+  ...
+# Subtest: a remembered late metadata response cannot silently migrate a still-unresolved identity
+ok 50 - a remembered late metadata response cannot silently migrate a still-unresolved identity
+  ---
+  duration_ms: 0.9341
+  type: 'test'
+  ...
+# Subtest: unchecked settings remain export-desired across reload without changing the applied player on Next
+ok 51 - unchecked settings remain export-desired across reload without changing the applied player on Next
+  ---
+  duration_ms: 2.6474
+  type: 'test'
+  ...
+# Subtest: Undo storage failure leaves current profile and applied state intact
+ok 52 - Undo storage failure leaves current profile and applied state intact
+  ---
+  duration_ms: 1.1784
+  type: 'test'
+  ...
+# Subtest: explicit settings import preserves an inactive desktop speed and pitch field for semantic roundtrip
+ok 53 - explicit settings import preserves an inactive desktop speed and pitch field for semantic roundtrip
+  ---
+  duration_ms: 1.4271
+  type: 'test'
+  ...
+1..53
+# tests 53
+# suites 0
+# pass 53
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1513.5108

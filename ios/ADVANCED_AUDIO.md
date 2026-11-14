@@ -1,6 +1,6 @@
-# Нативный аудиопроцессор — кандидат 0.1.3
+# Нативный аудиопроцессор 0.1.3
 
-Опубликованные IPA, simulator ZIP и проверки 0.1.2 сохранены. Этот документ описывает новые исходники; успешную сборку Apple SDK и прохождение новых hosted XCTest нужно подтверждать отдельным CI-отчётом.
+Опубликованные IPA, simulator ZIP и проверки 0.1.2 сохранены. Для 0.1.3 прошли Apple SDK 26.2 build/archive и по 12 hosted XCTest на iPhone/iPad Simulator: [CI](https://github.com/Artemper52/LolzCloud/actions/runs/43649974098), [проверка](verification-0.1.3.json). Это не проверка физического устройства, внешнего destination или пользовательского Cancel системного share sheet.
 
 AVPlayer, AVAudioSession, очередь, системные кнопки и обработка прерываний остаются владельцами воспроизведения. `MTAudioProcessingTap` обрабатывает декодированный PCM как импортированных файлов, так и сетевого/сохранённого MP3. Дополнительный HTML audio или AVAudioEngine не запускается.
 

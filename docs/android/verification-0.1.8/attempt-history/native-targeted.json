@@ -1,0 +1,24 @@
+{
+  "status": "passed",
+  "runId": "native-diagnostic",
+  "checks": [
+    "A late metadata response cannot migrate an abandoned reference or overwrite the new current track",
+    "Permalink alias migrates to signed numeric identity with likes, bookmarks and remaining queue preserved",
+    "Resolved portable identity advances the actual native MediaPlayer clock",
+    "A stale alias action after resolution changes the canonical like instead of resurrecting an orphan",
+    "Real numeric metadata endpoint returns only the requested stable recording",
+    "A desktop import merges stable identity without overwriting its genuine private offline MP3",
+    "Imported SoundCloud identity plays its downloaded private file with emulator networking disabled",
+    "Unchecked sound import keeps the previous attenuation on the NEXT native source as well"
+  ],
+  "screenshots": [
+    "profile-native-player.png"
+  ],
+  "effectReadbacks": [],
+  "version": "0.1.8",
+  "versionCode": 9,
+  "apkSha256": "e98fbdaf0fb815922a6efb3081a9d85539ff47a2ad028f2229774fc1a5989ff0",
+  "preferencesRestored": true,
+  "personalAccountsUsed": false,
+  "scope": "Actual Java JSON\/SharedPreferences\/SAF DocumentsUI and native MediaPlayer; synthetic desktop data is explicitly separate from real public SoundCloud Gno playback. No personal account\/cloud, physical device or acoustic EQ response claim."
+}

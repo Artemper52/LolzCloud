@@ -1,0 +1,155 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T23:19:09.513197Z",
+  "version": "0.1.8",
+  "versionCode": 9,
+  "apkSha256": "e98fbdaf0fb815922a6efb3081a9d85539ff47a2ad028f2229774fc1a5989ff0",
+  "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+  "publicationVerified": false,
+  "runtime": {
+    "device": "Owned LolzCloud API35 x86_64 emulator",
+    "portableNativeChecks": 37,
+    "cloudNativeFixtureChecks": 24,
+    "bidirectionalPortableSemanticRoundtrip": "passed actual Node fixture -> Android Java -> Node; genuine SAF output -> Node",
+    "cloudEnvelopeRoundtrip": "passed actual Android native UI encrypted envelope -> Node authenticate/decrypt",
+    "preferencesRestored": true,
+    "networkRestored": true,
+    "emulatorStopped": true,
+    "personalAccountsUsed": false,
+    "liveAuthenticatedCloudMutationTested": false,
+    "physicalDeviceTested": false
+  },
+  "host": {
+    "nativeJavaSourcesCompiled": 39,
+    "allInstrumentationSourcesCompiled": true,
+    "portablePolicyChecks": 62,
+    "cryptoInteroperabilityChecks": 19
+  },
+  "limitations": [
+    "Cloud transport in native dialog tests is explicitly isolated and injected; real personal OAuth/live account cloud PUT not tested",
+    "Native hardware EQ is approximate and device-specific; API35 rounded requested550mB to actual600mB, other four bands exact",
+    "Unsupported desktop collections/YouTube/advancedDSP/wave preferences remain portable data, not applied Android features",
+    "Local/private files, local-only likes/moments and auth sessions are excluded from portable exports; user media not uploaded",
+    "No physical device/acoustic measurement or general cloud-feature parity claim"
+  ],
+  "failedAttemptHistoryPreserved": true,
+  "productionSource": [
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/MainActivity.java",
+      "sha256": "bedfe53bef26886398fcca198813449163eabb6c5ed4471f898eeb0cb0786b72",
+      "matchesPrebuildFreeze": true
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/Track.java",
+      "sha256": "b4d0fc9b0140d9e6ad8b6559b5a096b0ea727645167d6355242307de0f0f4211",
+      "matchesPrebuildFreeze": true
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/LibraryStore.java",
+      "sha256": "bf179e75b7d4fbb72b7cb32b2b572f94777f6df329fca87483218740010eb9b5",
+      "matchesPrebuildFreeze": true
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/PlaybackService.java",
+      "sha256": "beee7a6adc5de77a3d7b6cd2e1c9f0ad2aeb76beb0b66c59049ca377b8be3706",
+      "matchesPrebuildFreeze": true
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/OnlineCatalog.java",
+      "sha256": "4906a19a2a2aecf31a6f9fe3645d55c4e210f41c386dc0599b901f142abed549",
+      "matchesPrebuildFreeze": true
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/ProfileJson.java",
+      "sha256": "0d50e134fc09128f53a34664089422a8f37515b7244310f91d083ef29ce76b53",
+      "matchesPrebuildFreeze": true
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/PortableProfile.java",
+      "sha256": "b25cfa7c69dd648842b417be64dabd887af028110cee8455539562826f89bb89",
+      "matchesPrebuildFreeze": true
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/PortableAudioCurve.java",
+      "sha256": "3b2859684bbefa12a5fe212e141c48291332207fcf7387ea79eef3ac7a613a4a",
+      "matchesPrebuildFreeze": true
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/ProfileCrypto.java",
+      "sha256": "410d6a3f52be8a3c6c87c0953b972cff25f0db28c1975665326c2096860d95d9",
+      "matchesPrebuildFreeze": true
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/CloudProfileApi.java",
+      "sha256": "11dc998951b6b69bcea481614c736e94391de9e59630a1e622ecd5a7959a2b77",
+      "matchesPrebuildFreeze": true
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/CloudProfileDialog.java",
+      "sha256": "94358850bf6baa6d9558641cbd5b6ef4a19360c4b71b039b7a91a29fb35f6540",
+      "matchesPrebuildFreeze": true
+    },
+    {
+      "path": "android/app/src/main/java/com/lambdaworks/crypto/SCrypt.java",
+      "sha256": "1901fb26a3ee3b1d3a3889a3172f8e3ff13a04588c969b564020d58e9530a140",
+      "matchesPrebuildFreeze": true
+    },
+    {
+      "path": "android/app/src/main/java/com/lambdaworks/crypto/PBKDF.java",
+      "sha256": "ed6a6325daa5674e658deff7d9e4371dddba56e51b5eca69c51d721aeccbe9de",
+      "matchesPrebuildFreeze": true
+    }
+  ],
+  "testSource": [
+    {
+      "path": "android/tests/instrumentation/AndroidManifest.xml",
+      "sha256": "e3f6eac18c4f1533f2ae6225c0c2555076e381c8320a9ca357099d310c0f4253"
+    },
+    {
+      "path": "android/tests/build-instrumentation.cjs",
+      "sha256": "32a2484e7da5fa2acdf9c2f03426d9432fdac18d1cc4b28e203347864771cca0"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/PortableProfileInstrumentation.java",
+      "sha256": "1a003a3cfc78598f7f547aabd79a06d6625023b37c02ab3a2d4fd21dffbe38af"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/ProfileDocumentsProvider.java",
+      "sha256": "a8ca243b0f14b41d530e4b93bbdd0e6595e96a2a69621c4c25560a456605c1c4"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/CloudProfileInstrumentation.java",
+      "sha256": "7799b6dd82862534447b17fd59c0cf14cd7796e540d47a3a4a0b48637a24533b"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/CloudProfileTestSupport.java",
+      "sha256": "12361a5f7cc869493be9a80603c4e4e5ec6132c30409ebf0c9d3053a68b1f542"
+    },
+    {
+      "path": "android/tests/run-portable-profile.cjs",
+      "sha256": "888c81abd78b09c4a2f829e82928ce08ef8e449a20919b0f3b8f387a24303410"
+    },
+    {
+      "path": "android/tests/run-cloud-profile.cjs",
+      "sha256": "261e5ba019da72062da773f081f6b81432a3e911b31ca29ebb291ea04192e471"
+    },
+    {
+      "path": "android/tests/run-portable-profile-policy.cjs",
+      "sha256": "d568f3f26ead1e531f893a67d3418c5b1e2f731e95117467b0752779fcc622d8"
+    },
+    {
+      "path": "android/tests/PortableProfilePolicyTest.java",
+      "sha256": "434531ec1f01e7e2f0d3c8cfd7c5a585c1307b87fd89555f0fcd7f6f5386e427"
+    },
+    {
+      "path": "android/tests/run-profile-crypto-vectors.cjs",
+      "sha256": "09e3e88eb352ab5e88e7d29d772328f6385b768753eca0b3670563fe283a56fe"
+    },
+    {
+      "path": "android/tests/ProfileCryptoVectorCli.java",
+      "sha256": "0f411f4245a1deadbb05ae4d0d3e8e3a31e8646a329a70e5c3325661c067faa0"
+    }
+  ],
+  "sourceSha256": "3e02ce8cee193b986218a4f1290ec816bac94d664b2b9bf531b01201daf409cc",
+  "apkBytes": 2573850
+}

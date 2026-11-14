@@ -1,0 +1,88 @@
+{
+  "status": "failed",
+  "error": "java.lang.AssertionError: Explicit permalink bookmark resolves and plays real HTTPS MP3",
+  "ui": "LolzCloud|Профиль и настройки|Моя волна|Из твоей библиотеки|ТВОЯ ЛИЧНАЯ РАДИОСТАНЦИЯ|Включить волну|Включить волну|Вся музыка|Вся музыка, выбрано|Любимые|Любимые|Недавно добавлены|Imported Gno. Profile QA|Imported Gno|SoundCloud · из профиля · Profile QA · 1:29|Действия: Imported Gno|URL-only recording. Fixture artist|URL-only recording|SoundCloud · из профиля · Fixture artist · 1:30|Действия: URL-only recording|Portable one. Fixture artist|Portable one|SoundCloud · из профиля · Fixture artist · 1:30|Действия: Portable one|Local metadata only. Fixture artist|Local metadata only|Fixture artist · 0:30|Действия: Local metadata only|Imported Gno|Profile QA|Продолжить воспроизведение|Следующий трек|Волна, выбрано|Волна|Поиск|Поиск|Моя музыка|Моя музыка|Комнаты|Комнаты|",
+  "runId": "0e4b02f4-030c-44c5-888f-bd0aadbc69a1",
+  "checks": [
+    "Saved reference JSON retains its explicit nonplayable marker",
+    "Malformed reference uri cannot enter a saved queue",
+    "Malformed reference sourceUrl cannot enter a saved queue",
+    "Malformed reference id cannot enter a saved queue",
+    "Corrupt/wrong/private profile is rejected without any preference mutation",
+    "Corrupt/wrong/private profile is rejected without any preference mutation",
+    "Corrupt/wrong/private profile is rejected without any preference mutation",
+    "Corrupt/wrong/private profile is rejected without any preference mutation",
+    "Corrupt/wrong/private profile is rejected without any preference mutation",
+    "Corrupt/wrong/private profile is rejected without any preference mutation",
+    "Unknown secrets/private fields never enter the whitelisted sidecar",
+    "One permalink with conflicting numeric identities is rejected atomically",
+    "Duplicate native positions retain every portable bookmark ID, note and order",
+    "Duplicate portable like metadata is retained without duplicating the native library row",
+    "Genuine SAF selection and preview do not mutate preferences or start catalog requests",
+    "Real Activity recreation preserves the unconfirmed preview and checkbox without a large Bundle or import mutation",
+    "Preview Cancel preserves all original preference values",
+    "Confirmed import preserves queue, pause and speed when Apply sound is unchecked",
+    "Local likes survive; imported SoundCloud metadata remains a nonplayable reference until tap",
+    "SC bookmark milliseconds and a previous portable backup are committed together",
+    "Portable import does not replace the native sleep timer",
+    "Actual ACTION_CREATE_DOCUMENT output uses desktop v1 and excludes local-only likes",
+    "A genuine SAF file with a private file URI is rejected before any preference change",
+    "Explicitly applying imported transport reaches the live paused player without replacing its queue",
+    "Imported preamp attenuates native output without replacing user volume",
+    "Actual API35 native bands stay within measured 0.5dB device rounding; desired5.5dB is retained exactly",
+    "A late metadata response cannot migrate an abandoned reference or overwrite the new current track"
+  ],
+  "screenshots": [
+    "profile-preview.png"
+  ],
+  "effectReadbacks": [
+    {
+      "band": 0,
+      "frequencyHz": 60,
+      "requestedMillibels": 550,
+      "actualMillibels": 600,
+      "minimumMillibels": -1500,
+      "maximumMillibels": 1500
+    },
+    {
+      "band": 1,
+      "frequencyHz": 230,
+      "requestedMillibels": -200,
+      "actualMillibels": -200,
+      "minimumMillibels": -1500,
+      "maximumMillibels": 1500
+    },
+    {
+      "band": 2,
+      "frequencyHz": 910,
+      "requestedMillibels": 300,
+      "actualMillibels": 300,
+      "minimumMillibels": -1500,
+      "maximumMillibels": 1500
+    },
+    {
+      "band": 3,
+      "frequencyHz": 3600,
+      "requestedMillibels": 0,
+      "actualMillibels": 0,
+      "minimumMillibels": -1500,
+      "maximumMillibels": 1500
+    },
+    {
+      "band": 4,
+      "frequencyHz": 14000,
+      "requestedMillibels": -100,
+      "actualMillibels": -100,
+      "minimumMillibels": -1500,
+      "maximumMillibels": 1500
+    }
+  ],
+  "version": "0.1.8",
+  "versionCode": 9,
+  "apkSha256": "e98fbdaf0fb815922a6efb3081a9d85539ff47a2ad028f2229774fc1a5989ff0",
+  "preferencesRestored": true,
+  "personalAccountsUsed": false,
+  "scope": "Actual Java JSON/SharedPreferences/SAF DocumentsUI and native MediaPlayer; synthetic desktop data is explicitly separate from real public SoundCloud Gno playback. No personal account/cloud, physical device or acoustic EQ response claim.",
+  "productionShaUnchanged": true,
+  "checkedAt": "2026-11-14T23:12:01.348Z"
+}

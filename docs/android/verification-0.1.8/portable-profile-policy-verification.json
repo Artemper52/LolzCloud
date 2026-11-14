@@ -1,0 +1,6 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T22:55:25.917Z",
+  "checks": 62,
+  "scope": "Real Java reference/URI policy and log-frequency native curve mapping. android.jar supplies unused JSON type signatures only; real JSON/SharedPreferences/SAF/service lifecycle require Android instrumentation separately."
+}
