@@ -59,6 +59,12 @@ import UniformTypeIdentifiers
               let object = message.body as? [String:Any], let action = object["action"] as? String else { return }
         let client = object["clientId"] as? String, request = MediaPolicy.requestID(object["requestId"])
         if object["clientId"] != nil || object["requestId"] != nil { guard client != nil, request != nil else { return } }
+        if action == "effects" {
+            if let client, let request, let revision = MediaPolicy.requestID(object["revision"]), let config = object["config"] as? [String:Any] {
+                player.configureEffects(config,revision:revision,client:client,request:request)
+            }
+            return
+        }
         guard player.acceptClientIntent(client:client,request:request,handshake:action == "queue" && object["handshake"] as? Bool == true) else { return }
         switch action {
         case "queue":

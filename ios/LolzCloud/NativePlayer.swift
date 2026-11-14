@@ -22,6 +22,9 @@ import Combine
     private var queue = QueuePolicy()
     private var clientIntent = NativeClientIntent()
     private var preparationTask: Task<Void,Never>?
+    private var effectsTask: Task<Void,Never>?
+    private var needsEffectsPreparation = false
+    let audioEffects = NativeAudioEffects()
     private var needsPreparation = false
     private var requestedPosition: Double = 0
     private var settings = PlaybackSettings()
@@ -49,7 +52,7 @@ import Combine
         }
         statusObservation = player.observe(\.timeControlStatus, options: [.new]) { [weak self] _, _ in
             Task { @MainActor in
-                guard let self, self.current != nil, self.state != "error", self.state != "ended", !self.needsPreparation else { return }
+                guard let self, self.current != nil, self.state != "error", self.state != "ended", !self.needsPreparation, !self.needsEffectsPreparation else { return }
                 self.state = !self.intent.wantsPlay ? "paused" : self.player.timeControlStatus == .playing ? "playing" : self.player.timeControlStatus == .waitingToPlayAtSpecifiedRate ? "loading" : "paused"
                 if self.state == "loading" { self.watch() } else { self.watchdog?.cancel(); self.watchdog = nil }
                 self.publish()
@@ -67,6 +70,13 @@ import Combine
         guard let client, let request else { return clientIntent.clientID == nil }
         return clientIntent.accept(client:client,request:request,handshake:handshake)
     }
+    @discardableResult func configureEffects(_ config: [String:Any], revision: Int, client: String, request: Int) -> Bool {
+        // Settings acknowledge the current transport owner; they cannot advance
+        // its request ID, change playback generation, cancel prepare or resume.
+        guard clientIntent.clientID == client, clientIntent.requestID == request,
+              audioEffects.configure(config,revision:revision,client:client) else { return false }
+        transportEvent("effects",audioEffects.status); return true
+    }
     private func transportEvent(_ name: String,_ detail: [String:Any]) { emit?(name,detail.merging(clientIntent.fields) { _,new in new }) }
     func configureQueue(_ tracks: [SavedTrack], index: Int, repeatMode: String, shuffle: Bool) {
         let resolved = tracks.map { track -> SavedTrack in
@@ -81,6 +91,7 @@ import Combine
         if let queueIndex { guard queue.tracks.indices.contains(queueIndex), queue.tracks[queueIndex].id == requested.id, queue.tracks[queueIndex].audioUrl == requested.audioUrl else { return } }
         let ticket = intent.select()
         queue.select(requested.id,index:queueIndex); preparationTask?.cancel(); preparationTask = nil
+        effectsTask?.cancel(); effectsTask = nil; needsEffectsPreparation = false; audioEffects.clearItem()
         offlineQueue = localQueue; watchdog?.cancel(); watchdog = nil
         player.pause(); itemObservation = nil
         if let endObserver { NotificationCenter.default.removeObserver(endObserver); self.endObserver = nil }
@@ -138,19 +149,37 @@ import Combine
         endObserver = NotificationCenter.default.addObserver(forName: AVPlayerItem.didPlayToEndTimeNotification, object: item, queue: .main) { [weak self] _ in
             Task { @MainActor in guard let self, self.intent.ended(ticket) else { return }; self.state = "ended"; self.publish(); if self.offlineQueue || self.queue.current?.id == self.current?.id { self.advance(1,automatic:true) } }
         }
-        player.defaultRate = Float(settings.rate); player.play(); watch(); publish()
+        needsEffectsPreparation = true; watch(); publish()
+        effectsTask = Task { [weak self] in
+            guard let self else { return }
+            defer { if self.generation == ticket { self.effectsTask = nil } }
+            do {
+                let tracks = try await item.asset.loadTracks(withMediaType:.audio)
+                try Task.checkCancellation()
+                guard self.generation == ticket, self.player.currentItem === item, self.intent.wantsPlay else { return }
+                try self.audioEffects.attach(to:item,tracks:tracks)
+            } catch is CancellationError { return }
+            catch {
+                guard self.generation == ticket, self.player.currentItem === item, self.intent.wantsPlay else { return }
+                self.audioEffects.markUnavailable()
+            }
+            guard self.generation == ticket, self.player.currentItem === item, self.intent.wantsPlay, !Task.isCancelled else { return }
+            self.needsEffectsPreparation = false
+            self.player.defaultRate = Float(self.settings.rate); self.player.play(); self.watch(); self.publish()
+        }
     }
     func playOffline(_ track: SavedTrack) { play(track,localQueue:true) }
-    func pause() { intent.pause(); preparationTask?.cancel(); watchdog?.cancel(); watchdog = nil; player.pause(); state = "paused"; publish() }
+    func pause() { intent.pause(); preparationTask?.cancel(); effectsTask?.cancel(); watchdog?.cancel(); watchdog = nil; player.pause(); state = "paused"; publish() }
     func resume() {
         guard let current else { return }
         let position = MediaPolicy.replayPosition(ended:state == "ended",position:player.currentItem == nil ? requestedPosition : player.currentTime().seconds,duration:player.currentItem?.duration.seconds ?? 0)
-        if player.currentItem == nil || player.currentItem?.status == .failed { play(current,position:position,localQueue:offlineQueue,prepare:needsPreparation); return }
+        if player.currentItem == nil || player.currentItem?.status == .failed || needsEffectsPreparation { play(current,position:position,localQueue:offlineQueue,prepare:needsPreparation); return }
         do { try activate(); intent.resume(); if position == 0 { seek(0) }; error = ""; state = "loading"; player.defaultRate = Float(settings.rate); player.play(); watch(); publish() }
         catch { fail("Аудиосистема временно недоступна. Повтори попытку.") }
     }
     func stop() {
         intent.stop(); preparationTask?.cancel(); preparationTask = nil; needsPreparation = false; requestedPosition = 0; watchdog?.cancel(); watchdog = nil; player.pause(); itemObservation = nil
+        effectsTask?.cancel(); effectsTask = nil; needsEffectsPreparation = false; audioEffects.clearItem()
         if let endObserver { NotificationCenter.default.removeObserver(endObserver); self.endObserver = nil }
         player.replaceCurrentItem(with: nil); current = nil; state = "paused"
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
@@ -186,13 +215,14 @@ import Combine
         if settings.sleepDeadline > 0, Date().timeIntervalSince1970*1000 >= settings.sleepDeadline,
            settings.expireSleep(settings.sleepDeadline) { sleepTask?.cancel(); sleepTask = nil; error = ""; pause(); return }
         let time = player.currentTime().seconds, duration = player.currentItem?.duration.seconds ?? 0
+        transportEvent("effects",audioEffects.status)
         let queueOwned = queue.current?.id == current?.id && current != nil
         if queueOwned, let selected = queue.current { transportEvent("selection",["index":queue.index,"track":selected.object,"queue":true]) }
         if !offlineQueue { transportEvent("playback",["id":current?.id ?? "","state":state,"time":time.isFinite ? max(0,time):requestedPosition,"duration":duration.isFinite && duration > 0 ? duration:(current?.duration ?? 0),"error":error,"queue":queueOwned,"rate":settings.rate,"sleepDeadline":settings.sleepDeadline]) }
         guard let track = current else { return }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = [MPMediaItemPropertyTitle:track.title,MPMediaItemPropertyArtist:track.artist,MPMediaItemPropertyPlaybackDuration:duration.isFinite && duration > 0 ? duration:track.duration,MPNowPlayingInfoPropertyElapsedPlaybackTime:time.isFinite ? max(0,time):0,MPNowPlayingInfoPropertyPlaybackRate:player.rate]
     }
-    private func fail(_ message: String) { intent.pause(); watchdog?.cancel(); watchdog = nil; player.pause(); state = "error"; error = message; publish() }
+    private func fail(_ message: String) { intent.pause(); effectsTask?.cancel(); watchdog?.cancel(); watchdog = nil; player.pause(); state = "error"; error = message; publish() }
     private func watch() {
         guard watchdog == nil else { return }; let ticket = generation
         watchdog = Task { [weak self] in

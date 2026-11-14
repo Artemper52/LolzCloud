@@ -2,9 +2,9 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const root=path.resolve(__dirname,'..'),project=path.join(root,'LolzCloud.xcodeproj');
 const id=name=>crypto.createHash('sha256').update('LolzCloud-iOS:'+name).digest('hex').slice(0,24).toUpperCase();
-const files=['App.swift','MediaPolicy.swift','NativePlayer.swift','AccountLogin.swift'];
+const files=['App.swift','MediaPolicy.swift','NativePlayer.swift','AccountLogin.swift','AudioEffectsPolicy.swift','NativeAudioEffects.swift','DSP/DSPCore.c','DSP/NativeAudioTap.c'];
 const objects=[],add=(name,type,body)=>objects.push(`${id(name)} = { isa = ${type}; ${body} };`);
-for(const file of files){add(file,'PBXFileReference',`lastKnownFileType = sourcecode.swift; path = ${file}; sourceTree = "<group>";`);add('build:'+file,'PBXBuildFile',`fileRef = ${id(file)};`);}
+for(const file of files){add(file,'PBXFileReference',`lastKnownFileType = ${file.endsWith('.c')?'sourcecode.c.c':'sourcecode.swift'}; path = ${JSON.stringify(file)}; sourceTree = "<group>";`);add('build:'+file,'PBXBuildFile',`fileRef = ${id(file)};`);}
 add('Info.plist','PBXFileReference','lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>";');
 add('Assets.xcassets','PBXFileReference','lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>";');
 add('build:Assets.xcassets','PBXBuildFile',`fileRef = ${id('Assets.xcassets')};`);
@@ -17,7 +17,7 @@ add('frameworks','PBXFrameworksBuildPhase','buildActionMask = 2147483647; files 
 add('resources','PBXResourcesBuildPhase',`buildActionMask = 2147483647; files = (${id('build:Assets.xcassets')}); runOnlyForDeploymentPostprocessing = 0;`);
 for(const mode of ['Debug','Release']){
  add('project:'+mode,'XCBuildConfiguration',`buildSettings = { CLANG_ENABLE_MODULES = YES; IPHONEOS_DEPLOYMENT_TARGET = 16.4; SDKROOT = iphoneos; SWIFT_VERSION = 5.0; SWIFT_STRICT_CONCURRENCY = targeted; ${mode==='Debug'?'SWIFT_OPTIMIZATION_LEVEL = "-Onone"; DEBUG_INFORMATION_FORMAT = dwarf;':'SWIFT_OPTIMIZATION_LEVEL = "-O"; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";'} }; name = ${mode};`);
- add('app:'+mode,'XCBuildConfiguration',`buildSettings = { PRODUCT_NAME = LolzCloud; PRODUCT_BUNDLE_IDENTIFIER = com.lolzcloud.ios; INFOPLIST_FILE = LolzCloud/Info.plist; GENERATE_INFOPLIST_FILE = NO; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_STYLE = Automatic; TARGETED_DEVICE_FAMILY = "1,2"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks"; SWIFT_EMIT_LOC_STRINGS = YES; }; name = ${mode};`);
+ add('app:'+mode,'XCBuildConfiguration',`buildSettings = { PRODUCT_NAME = LolzCloud; PRODUCT_BUNDLE_IDENTIFIER = com.lolzcloud.ios; INFOPLIST_FILE = LolzCloud/Info.plist; GENERATE_INFOPLIST_FILE = NO; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; CODE_SIGN_STYLE = Automatic; TARGETED_DEVICE_FAMILY = "1,2"; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks"; SWIFT_EMIT_LOC_STRINGS = YES; SWIFT_OBJC_BRIDGING_HEADER = LolzCloud/DSP/NativeAudioEffectsBridge.h; CLANG_C_LANGUAGE_STANDARD = c11; }; name = ${mode};`);
 }
 for(const prefix of ['project','app'])add(prefix+':config','XCConfigurationList',`buildConfigurations = (${id(prefix+':Debug')},${id(prefix+':Release')}); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;`);
 add('target','PBXNativeTarget',`buildConfigurationList = ${id('app:config')}; buildPhases = (${id('sources')},${id('frameworks')},${id('resources')}); buildRules = (); dependencies = (); name = LolzCloud; productName = LolzCloud; productReference = ${id('product')}; productType = "com.apple.product-type.application";`);

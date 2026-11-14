@@ -17,6 +17,7 @@ import UIKit
     private var subjects: [NativePlayer] = []
     private var scratch: URL!
     private var records: [[String: Any]] = []
+    private var savedEffectsPreference: Data?
     private var offline: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Offline", isDirectory: true)
@@ -27,6 +28,7 @@ import UIKit
         scratch = FileManager.default.temporaryDirectory.appendingPathComponent("runtime-"+UUID().uuidString, isDirectory: true)
         try FileManager.default.createDirectory(at: scratch, withIntermediateDirectories: true)
         records = []
+        savedEffectsPreference = UserDefaults.standard.data(forKey: "native_audio_effects_v1")
     }
 
     override func tearDown() async throws {
@@ -36,6 +38,8 @@ import UIKit
             player.emit = nil
         }
         subjects = []
+        if let savedEffectsPreference { UserDefaults.standard.set(savedEffectsPreference,forKey:"native_audio_effects_v1") }
+        else { UserDefaults.standard.removeObject(forKey:"native_audio_effects_v1") }
         if let scratch { try? FileManager.default.removeItem(at: scratch) }
     }
 
@@ -71,8 +75,8 @@ import UIKit
         try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000))
     }
 
-    private func wave(_ name: String, seconds: Double = 8) throws -> URL {
-        let rate = 16_000, count = Int(Double(rate)*seconds)
+    private func wave(_ name: String, seconds: Double = 8, hz: Double = 440, sampleRate: Int = 16_000) throws -> URL {
+        let rate = sampleRate, count = Int(Double(rate)*seconds)
         var data = Data()
         func text(_ value: String) { data.append(contentsOf: value.utf8) }
         func u16(_ value: UInt16) { var v = value.littleEndian; Swift.withUnsafeBytes(of: &v) { data.append(contentsOf: $0) } }
@@ -81,7 +85,7 @@ import UIKit
         u16(1); u16(1); u32(UInt32(rate)); u32(UInt32(rate*2)); u16(2); u16(16)
         text("data"); u32(UInt32(count*2))
         for i in 0..<count {
-            let sample = Int16(sin(Double(i)*2*Double.pi*440/Double(rate))*4000)
+            let sample = Int16(sin(Double(i)*2*Double.pi*hz/Double(rate))*4000)
             u16(UInt16(bitPattern: sample))
         }
         let file = scratch.appendingPathComponent(name+".wav")
@@ -211,6 +215,78 @@ import UIKit
         XCTAssertEqual(player.state, "error"); XCTAssertNil(av.currentItem)
     }
 
+    private func effects(_ player: NativePlayer, client: String, request: Int = 1, revision: Int,
+                         gains: [Double] = [0,0,0,0,0], preamp: Double = 0, enabled: Bool = true) {
+        XCTAssertTrue(player.configureEffects(["enabled":enabled,"gains":gains,"preampDb":preamp],revision:revision,client:client,request:request))
+    }
+
+    func testActualLocalTapChangesSpectrumAndPausedSettingsDoNotResume() async throws {
+        let player=subject(),client=UUID().uuidString.lowercased()
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
+        let low=try wave("EQ 910",seconds:4,hz:910,sampleRate:44100),high=try wave("EQ 6000",seconds:4,hz:6000,sampleRate:44100)
+        let tracks=try await imported(player,[low,high]),av=try avPlayer(player)
+        player.configureQueue(tracks,index:0,repeatMode:"off",shuffle:false)
+        effects(player,client:client,revision:1,gains:[0,0,12,0,0])
+        player.play(tracks[0],queueIndex:0)
+        // Update during the actual asynchronous per-item metadata/tap setup.
+        // It must neither replace this selection nor cancel/rearm its transport.
+        effects(player,client:client,revision:2,gains:[0,0,10,0,0])
+        try await waitFor("real local AVPlayer tap processes selected audio") {
+            (player.audioEffects.measurement?.processedFrames ?? 0)>6000 && player.audioEffects.status["state"] as? String == "applied"
+        }
+        XCTAssertEqual(player.current?.id,tracks[0].id)
+        let near=try XCTUnwrap(player.audioEffects.measurement)
+        XCTAssertGreaterThan(near.inputRMS,0.01)
+        let nearRatio=near.outputRMS/near.inputRMS
+        player.play(tracks[1],queueIndex:1)
+        try await waitFor("second local track has a new real processed tap") {
+            (player.audioEffects.measurement?.processedFrames ?? 0)>6000 && player.audioEffects.status["state"] as? String == "applied"
+        }
+        let far=try XCTUnwrap(player.audioEffects.measurement)
+        XCTAssertGreaterThan(nearRatio/(far.outputRMS/far.inputRMS),2.5,"The actual AVPlayer PCM must show frequency-selective EQ, not just a control acknowledgement")
+        XCTAssertEqual(player.audioEffects.status["appliedRevision"] as? Int,2)
+        player.pause();let position=av.currentTime().seconds
+        effects(player,client:client,revision:3,preamp:-6)
+        XCTAssertNotEqual(player.audioEffects.status["state"] as? String,"applied")
+        try await settle(0.25)
+        XCTAssertEqual(av.rate,0);XCTAssertEqual(player.state,"paused")
+        XCTAssertEqual(av.currentTime().seconds,position,accuracy:0.08)
+        XCTAssertFalse(player.configureEffects(["enabled":true,"gains":[0,0,0,0,0],"preampDb":0],revision:99,client:client,request:500))
+        XCTAssertEqual(player.audioEffects.revision,3)
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:2,handshake:false))
+        effects(player,client:client,request:2,revision:3,preamp:-6)
+        XCTAssertEqual(av.rate,0,"Resending settings for a new transport owner must not start audio")
+        player.resume()
+        try await waitFor("paused configuration is consumed by real frames on resume") { player.audioEffects.status["state"] as? String == "applied" && av.rate>0 }
+        try await settle(0.15)
+        let preamp=try XCTUnwrap(player.audioEffects.measurement)
+        XCTAssertEqual(preamp.outputRMS/preamp.inputRMS,Float(pow(10,-6.0/20)),accuracy:0.025)
+    }
+
+    func testActualCachedMP3TapMeasuresPreampOnDecodedPCM() async throws {
+        let seed=subject()
+        let network=try XCTUnwrap(SavedTrack(["id":"223456789","title":"Seeded real MP3","artist":"Runtime test","duration":1.1,
+            "audioUrl":"https://lolzcloud.com/music/audio/223456789/bbbbbbbbbbbbbbbbbbbbbbbb.mp3"]))
+        let fixture=try XCTUnwrap(Bundle(for:NativeRuntimeTests.self).url(forResource:"tone",withExtension:"mp3"))
+        let destination=offline.appendingPathComponent(try XCTUnwrap(LocalAudioFiles.filename(network)))
+        try Data(contentsOf:fixture).write(to:destination)
+        try JSONEncoder().encode([network]).write(to:offline.appendingPathComponent("index.json"),options:.atomic)
+        seed.stop()
+        let player=subject(),client=UUID().uuidString.lowercased(),av=try avPlayer(player)
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
+        effects(player,client:client,revision:1,preamp:-6)
+        player.configureQueue([network],index:0,repeatMode:"off",shuffle:false)
+        player.play(network,queueIndex:0)
+        try await waitFor("genuine cached MP3 traverses real AVPlayer audio tap") {
+            (player.audioEffects.measurement?.processedFrames ?? 0)>3000 && player.audioEffects.status["state"] as? String == "applied"
+        }
+        XCTAssertTrue((av.currentItem?.asset as? AVURLAsset)?.url.isFileURL == true)
+        let measurement=try XCTUnwrap(player.audioEffects.measurement)
+        XCTAssertGreaterThan(measurement.inputRMS,0.01)
+        XCTAssertEqual(measurement.outputRMS/measurement.inputRMS,Float(pow(10,-6.0/20)),accuracy:0.025)
+        XCTAssertTrue((player.audioEffects.status["capabilities"] as? [String:Bool])?["normalization"] == false)
+    }
+
     private func javascript(_ source: String, in web: WKWebView) async throws -> Any? {
         try await withCheckedThrowingContinuation { continuation in
             web.evaluateJavaScript(source) { value, error in
@@ -228,16 +304,28 @@ import UIKit
 
     func testLiveHTTPSWebKitBridgeRejectsStaleClientAndWrongPage() async throws {
         let shell = AppShell(), web = try XCTUnwrap(shell.webView)
+        let scene=try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap{$0 as? UIWindowScene}.first{$0.activationState == .foregroundActive})
+        let previousKey=scene.windows.first{$0.isKeyWindow},window=UIWindow(windowScene:scene),controller=UIViewController()
+        window.rootViewController=controller;window.frame=scene.screen.bounds
+        controller.view.addSubview(web);web.frame=controller.view.bounds;web.autoresizingMask=[.flexibleWidth,.flexibleHeight]
+        window.makeKeyAndVisible();controller.view.layoutIfNeeded()
         subjects.append(shell.player)
         shell.player.emit = { [weak self] name, detail in var row = detail; row["event"] = name; self?.records.append(row) }
         defer {
             shell.login.cancel()
             web.stopLoading(); web.configuration.userContentController.removeScriptMessageHandler(forName: "lolzcloud")
             web.navigationDelegate = nil; web.uiDelegate = nil
+            web.removeFromSuperview();window.isHidden=true;previousKey?.makeKeyAndVisible()
         }
         try await waitFor("live public HTTPS PWA loads", timeout: 35) { !shell.loading && web.url?.host == "lolzcloud.com" }
         XCTAssertTrue(shell.loadError.isEmpty, shell.loadError)
         XCTAssertTrue(MediaPolicy.bridgePage(web.url))
+        XCTAssertTrue(web.window===window)
+        let fits=try await javascript("document.documentElement.scrollWidth<=innerWidth+2&&innerWidth>300&&[...document.querySelectorAll('button')].some(b=>{var r=b.getBoundingClientRect();return r.width>=24&&r.height>=24;})",in:web)
+        XCTAssertEqual(fits as? Bool,true,"The actual attached public PWA must fit this device's viewport and show usable controls")
+        let renderer=UIGraphicsImageRenderer(bounds:window.bounds)
+        let attachment=XCTAttachment(image:renderer.image{_ in window.drawHierarchy(in:window.bounds,afterScreenUpdates:true)})
+        attachment.name="attached-public-pwa-"+(UIDevice.current.userInterfaceIdiom == .pad ? "ipad":"iphone");attachment.lifetime = .keepAlways;add(attachment)
         let track = try await importOne(shell.player, wave("Bridge"))
         let a = UUID().uuidString.lowercased(), b = UUID().uuidString.lowercased()
         var handshake: [String:Any] = ["action":"queue", "clientId":a, "requestId":1, "handshake":true,
@@ -257,6 +345,15 @@ import UIKit
         XCTAssertGreaterThan(av.rate, 0, "Retired client's high request must not pause current playback")
         try await post(["action":"pause", "clientId":b, "requestId":2], in: web)
         try await waitFor("current client pause is accepted") { av.rate == 0 }
+        let config: [String:Any] = ["enabled":true,"gains":[0,0,0,0,0],"preampDb":-6]
+        try await post(["action":"effects","clientId":b,"requestId":2,"revision":1,"config":config],in:web)
+        try await waitFor("actual WK effects message stores independent settings") { shell.player.audioEffects.revision == 1 }
+        XCTAssertEqual(av.rate,0,"Effects messages must not resume the paused native player")
+        try await post(["action":"effects","clientId":b,"requestId":500,"revision":99,"config":config],in:web)
+        try await settle(0.1)
+        XCTAssertEqual(shell.player.audioEffects.revision,1,"A future FX request must not take over the transport binding")
+        try await post(["action":"pause","clientId":b,"requestId":2],in:web)
+        XCTAssertEqual(av.rate,0)
         let probe = RuntimeFrameProbe()
         web.configuration.userContentController.add(probe, name: "runtime_probe")
         web.configuration.userContentController.addUserScript(WKUserScript(

@@ -13,12 +13,11 @@ try{
  const runtimes=JSON.parse(run('xcrun',['simctl','list','runtimes','available','--json'])).runtimes.filter(r=>r.isAvailable&&r.identifier.startsWith('com.apple.CoreSimulator.SimRuntime.iOS-')).sort((a,b)=>b.version.localeCompare(a.version,undefined,{numeric:true}));
  if(!runtimes.length)throw Error('No installed available iOS Simulator runtime.');
  const types=JSON.parse(run('xcrun',['simctl','list','devicetypes','--json'])).devicetypes;
- const type=types.find(t=>t.identifier==='com.apple.CoreSimulator.SimDeviceType.iPhone-16')||types.find(t=>t.name==='iPhone 16 Pro')||types.filter(t=>t.name.startsWith('iPhone')).at(-1);
- if(!type)throw Error('No compatible iPhone simulator device type.');
+ const family=process.env.LOLZCLOUD_IOS_RUNTIME_DEVICE_FAMILY||'iphone',type=require('./runtime-device.cjs').chooseDevice(types,family);
  const created=run('xcrun',['simctl','create','LolzCloud-runtime-'+Date.now(),type.identifier,runtimes[0].identifier]).trim();
  if(!/^[A-Fa-f0-9]{8}-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{12}$/.test(created))throw Error('Unexpected simulator UUID.');
  device=created;
- report.simulator={uuid:device,device:type.name,runtime:runtimes[0].name,version:runtimes[0].version};
+ report.simulator={uuid:device,family,device:type.name,runtime:runtimes[0].name,version:runtimes[0].version};
  run('xcrun',['simctl','boot',device]);run('xcrun',['simctl','bootstatus',device,'-b'],{stdio:'inherit'});
  const result=path.join(output,'NativeRuntime.xcresult');report.xcresult=result;
  run('xcodebuild',['-project',project,'-scheme',scheme,'-configuration','Debug','-sdk','iphonesimulator','-destination','id='+device,'-derivedDataPath',path.join(output,'derived'),'-resultBundlePath',result,'-parallel-testing-enabled','NO','-maximum-concurrent-test-simulator-destinations','1','CODE_SIGNING_ALLOWED=NO','test'],{stdio:'inherit'});
