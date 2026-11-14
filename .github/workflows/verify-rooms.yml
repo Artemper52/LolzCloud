@@ -30,6 +30,12 @@ jobs:
       - run: npm ci
       - run: npm run check
       - run: npm test
+      - name: Configure the Electron sandbox helper on this disposable runner
+        run: |
+          node -e 'const fs=require("node:fs"),path=require("node:path");const helper=path.join(path.dirname(require("electron")),"chrome-sandbox"),expected=path.resolve("node_modules/electron/dist/chrome-sandbox");if(helper!==expected)throw Error("Unexpected sandbox helper path");fs.accessSync(helper);fs.writeFileSync(path.join(process.env.RUNNER_TEMP,"lolzcloud-sandbox-helper"),helper+"\n");'
+          IFS= read -r sandbox_helper < "$RUNNER_TEMP/lolzcloud-sandbox-helper"
+          sudo chown root:root "$sandbox_helper"
+          sudo chmod 4755 "$sandbox_helper"
       - name: Exercise phone and desktop room controls with real HTTP and SSE
         env:
           LOLZCLOUD_ROOMS_TEST_OUTPUT: ${{ runner.temp }}/room-mobile
@@ -41,3 +47,4 @@ jobs:
           name: LolzCloud-room-controls-${{ github.run_id }}
           path: ${{ runner.temp }}/room-mobile
           if-no-files-found: warn
+
