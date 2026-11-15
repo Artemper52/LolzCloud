@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const { presetSound } = require('../source/integrations/sound-settings.cjs');
 app.setPath('userData', process.env.LOLZCLOUD_AUDIO_TEST_PROFILE);
 app.disableHardwareAcceleration();
-const plugin = ['beat-tracker.js', 'tempo-worklet.js', 'sound-effects.js'].map(file => fs.readFileSync(path.join(__dirname, '../source/plugins', file), 'utf8')).join('\n');
+const plugin = ['beat-tracker.js', 'tempo-worklet.js', 'normalization-worklet.js', 'pitch-worklet.js', 'sound-effects.js'].map(file => fs.readFileSync(path.join(__dirname, '../source/plugins', file), 'utf8')).join('\n');
 const localPlugin=fs.readFileSync(path.join(__dirname,'../source/app/lib/js/local-player.js'),'utf8');
 async function renderLocal(window,config,volume){
   await window.loadURL('https://soundcloud.com/lolzcloud-local-render-test');

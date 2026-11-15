@@ -7,6 +7,7 @@ const path = require('node:path');
 const { MusicFeatures } = require('../source/integrations/music.cjs');
 const { normalizeSound, SOUND_PRESETS, validateSoundPatch } = require('../source/integrations/sound-settings.cjs');
 const { LyricsLibrary, lyricKey } = require('../source/integrations/lyrics.cjs');
+const { normalizeProfile, encryptProfile, decryptProfile } = require('../source/integrations/portable-profile.cjs');
 
 function model(t) {
   const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'lolzcloud-sound-test-'));
@@ -14,6 +15,33 @@ function model(t) {
   const file = path.join(directory, 'music.json');
   return { file, value: new MusicFeatures(file) };
 }
+test('independent tone and transport survive presets and restart without enabling saved EQ', t => {
+  const { value, file } = model(t);
+  value.configureDsp({ enabled: false, gains: [6, 3, 0, -2, -3], echo: .4 });
+  value.configureDsp({ rate: .75, pitch: 1.25, preservesPitch: true, transportEnabled: true, saveAs: 'Тон без EQ' });
+  const reopened = new MusicFeatures(file);
+  assert.equal(reopened.data.dsp.enabled, false); assert.equal(reopened.data.dsp.rate, .75);
+  assert.equal(reopened.data.dsp.pitch, 1.25); assert.equal(reopened.data.dsp.transportEnabled, true);
+  assert.deepEqual(reopened.data.dsp.gains, [6, 3, 0, -2, -3]); assert.equal(reopened.data.dsp.echo, .4);
+  assert.equal(reopened.data.customEffects['Тон без EQ'].pitch, 1.25);
+  reopened.configureDsp({ preset: 'Original' }); assert.equal(reopened.data.dsp.pitch, 1); assert.equal(reopened.data.dsp.transportEnabled, false);
+});
+test('new pitch controls are bounded, typed and do not activate legacy disabled transport implicitly', () => {
+  for (const pitch of [.5, .75, 1, 1.25, 2]) assert.equal(validateSoundPatch({ pitch }).pitch, pitch);
+  for (const pitch of [0, .499, 2.001, Infinity, NaN, '1.25', true, null]) assert.throws(() => validateSoundPatch({ pitch }));
+  for (const transportEnabled of [0, 1, 'true', null]) assert.throws(() => validateSoundPatch({ transportEnabled }));
+  const legacy = normalizeSound({ enabled: false, rate: .75, preservesPitch: false, gains: [5, 2, 0, 0, 0] });
+  assert.equal(legacy.rate, .75); assert.equal(legacy.pitch, 1); assert.equal(legacy.transportEnabled, false); assert.equal(legacy.enabled, false);
+  assert.deepEqual(normalizeSound({ pitch: -1, transportEnabled: 1 }).pitch, 1);
+});
+test('portable and encrypted profile retain independent tone alongside disabled desired effects', async () => {
+  const input = { format: 'lolzcloud-profile', version: 1, music: { dsp: { enabled: false, rate: .75, pitch: 1.25, preservesPitch: true, transportEnabled: true, gains: [6, 3, 0, -2, -3], echo: .4 } } };
+  const profile = normalizeProfile(input), envelope = await encryptProfile(profile, 'public pitch fixture password');
+  const restored = await decryptProfile(envelope, 'public pitch fixture password');
+  assert.deepEqual(restored.music.dsp, profile.music.dsp);
+  assert.equal(restored.music.dsp.pitch, 1.25); assert.equal(restored.music.dsp.transportEnabled, true); assert.equal(restored.music.dsp.enabled, false);
+  assert.deepEqual(restored.music.dsp.gains, [6, 3, 0, -2, -3]); assert.equal(restored.music.dsp.echo, .4);
+});
 test('Slowed + Reverb, Speed Up and Bass Boost change real effect settings', t => {
   const { value } = model(t);
   value.configureDsp({ preset: 'Slowed + Reverb' });

@@ -176,3 +176,45 @@ test('prefetch resolves actual upcoming metadata and skips private listening', a
   assert.equal(requested.length, 1); assert.equal(warmed.at(-1)[0].duration, 101); assert.equal(warmed.at(-1)[0].artist, 'Next artist');
   model.stop();
 });
+
+test('a warmed recording survives uploader-title changes and transient unknown duration without another lookup', async () => {
+  let calls = 0;
+  const library = new LyricsLibrary(async () => { calls++; return { ...rich, found: true }; });
+  const warmed = { title: 'Example Artist - Original test recording', artist: 'Uploader', duration: 100, url: 'https://soundcloud.com/test/warm-identity' };
+  library.warm([warmed]); await library.load(warmed);
+  for (const duration of [0, 100.4, 101.9]) {
+    const selected = { ...warmed, title: track.title, artist: track.artist, duration };
+    assert.equal(library.state(selected).found, true);
+    const result = await library.load(selected); assert.equal(result.found, true); assert.deepEqual(result.lines, rich.lines);
+  }
+  assert.equal(calls, 1, 'A ready prefetch must not become a second network search after selection');
+  assert.equal(library.state({ ...warmed, duration: 120 }).lines.length, 0, 'A materially different recording duration cannot borrow timings');
+});
+
+test('selecting a partial prefetch with duration0 promotes it before the next queue warm cancels it', async () => {
+  const attempts = [];
+  const library = new LyricsLibrary((value, options) => new Promise(resolve => attempts.push({ value, options, resolve })));
+  const warmed = { ...track, url: 'https://soundcloud.com/test/promoted' };
+  library.warm([warmed]); await Promise.resolve();
+  attempts[0].options.onProgress({ ...rich, found: true });
+  const foreground = library.load({ ...warmed, title: 'Uploader formatting changed', duration: 0 });
+  library.warm([{ ...track, title: 'Next distinct song', url: 'https://soundcloud.com/test/next-entry' }]); await Promise.resolve();
+  assert.equal(attempts[0].options.signal.aborted, false); assert.equal(attempts.filter(a => a.value.url === warmed.url).length, 1);
+  attempts[0].resolve({ found: false, lines: [], plain: '' });
+  const result = await foreground; assert.equal(result.found, true); assert.deepEqual(result.lines, rich.lines);
+  attempts[1].resolve({ found: false, lines: [], plain: '' });
+});
+
+test('cancelled useful prefetch progress and unsuccessful refresh cannot erase known lyrics', async () => {
+  let finish, options, calls = 0;
+  const library = new LyricsLibrary((_track, request) => { calls++; options = request; return new Promise(resolve => { finish = resolve; }); });
+  const warmed = { ...track, url: 'https://soundcloud.com/test/good-partial' };
+  library.warm([warmed]); await Promise.resolve(); options.onProgress({ ...rich, found: true });
+  library.warm([]); assert.equal(options.signal.aborted, true); assert.equal(library.state(warmed).found, true); assert.equal(library.state(warmed).loading, false);
+  finish({ found: false, lines: [], plain: '' }); await Promise.resolve(); await Promise.resolve();
+  await library.load(warmed); assert.equal(calls, 1);
+  library.invalidate({ keepFound: true }); await library.load(warmed); assert.equal(calls, 1);
+  const refreshing = library.load(warmed, true); await Promise.resolve(); options.onProgress({ found: false, lines: [], plain: '' });
+  assert.deepEqual(library.state(warmed).lines, rich.lines); finish({ found: false, lines: [], plain: '' }); await refreshing;
+  assert.equal(library.state(warmed).found, true); assert.deepEqual(library.state(warmed).lines, rich.lines);
+});

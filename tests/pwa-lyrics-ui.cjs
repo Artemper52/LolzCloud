@@ -15,6 +15,7 @@ app.whenReady().then(async () => {
     const ses = session.fromPartition('pwa-lyrics-isolated');
     const candidate = (title, artist, duration = 60) => ({ trackName: title, artistName: artist, duration, plainLyrics: 'Свои слова\nВторая строка', syncedLyrics: '[00:00.00]Свои слова\n[00:10.00]Вторая строка' });
     await ses.protocol.handle('https', request => {
+      if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Lrclib-Client', 'Access-Control-Allow-Methods': 'GET, OPTIONS' } });
       const url = new URL(request.url); requests.push({ path: url.pathname, title: url.searchParams.get('track_name'), artist: url.searchParams.get('artist_name') });
       let value, status = 200;
       if (url.pathname === '/api/get') {
@@ -26,7 +27,7 @@ app.whenReady().then(async () => {
         else if (scenario === 'plain') value = [candidate('Другая длительность', 'Артист', 65)];
         else value = [candidate('Чужая песня', 'Чужой артист')];
       } else { status = 404; value = {}; }
-      return new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } });
+      return new Response(JSON.stringify(value), { status, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Lrclib-Client' } });
     });
     window = new BrowserWindow({ show: false, width: 360, height: 800, useContentSize: true, webPreferences: { session: ses, sandbox: true, contextIsolation: true, nodeIntegration: false, offscreen: true } });
     window.webContents.on('console-message', (_event, ...args) => { const message = typeof args[0] === 'object' ? args[0].message : args[1]; if (/Uncaught|TypeError|SyntaxError/.test(message || '')) errors.push(message); });
@@ -48,7 +49,7 @@ app.whenReady().then(async () => {
     await js('document.getElementById("lyrics-metadata-form").requestSubmit()'); await until(() => js('document.querySelectorAll("#lyrics-text .lyric-line").length===2'), 'Manual correction did not find lyrics');
     check(await js('JSON.parse(localStorage.getItem("LolzCloud-lyrics-metadata-v1"))["603"].title==="Исправленная песня"&&JSON.parse(localStorage.getItem("LolzCloud-app-v1")).queue[0].title==="Сырое имя из каталога"'), 'Manual correction persists separately from catalogue metadata and cached lyric content');
     await track('603', 'Сырое имя из каталога'); await until(() => js('document.querySelectorAll("#lyrics-text .lyric-line").length===2'), 'Correction was lost after reload');
-    check(await js('LolzCloudOffline.lyrics("603").then(value=>value.policy===2&&value.identity.includes("исправленная песня"))'), 'Cache is bound to corrected identity and survives reload without confusing original metadata');
+    check(await js('LolzCloudOffline.lyrics("603").then(value=>value.policy===3&&value.identity.includes("исправленная песня"))'), 'Cache is bound to corrected identity and survives reload without confusing original metadata');
     scenario = 'rate'; const before = requests.filter(row => row.path === '/api/search').length; await track('604', 'Слишком много запросов'); await until(() => js('!document.getElementById("lyrics-edit").hidden'), '429 did not remain retryable');
     check(requests.filter(row => row.path === '/api/search').length === before, 'HTTP429 never starts a search fallback'); check(errors.length === 0, 'Targeted lyric scenarios have no uncaught browser errors');
     console.log(JSON.stringify({ ok: true, count: checks.length, checks }, null, 2));

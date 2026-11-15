@@ -4,11 +4,11 @@
   const mediaTracks = new WeakMap();
   const intentEpochs = new WeakMap(), fallbackLoading = new WeakSet();
   function playbackIntent(media, wanted) { intentEpochs.set(media,(intentEpochs.get(media)||0)+1);if(wanted)wantedPlayback.add(media);else wantedPlayback.delete(media); }
-  const sourceIntent = media => intentEpochs.set(media,(intentEpochs.get(media)||0)+1);
+  const sourceIntent = media => { intentEpochs.set(media,(intentEpochs.get(media)||0)+1); resetPitch(media); };
   const selectActive = () => [...audio].find(media => !media.paused) || [...audio].at(-1);
   const mediaSelector=window.__lolzcloudYouTube?'audio,video':'audio';
   const isMusicMedia=media=>media?.tagName==='AUDIO'||!!window.__lolzcloudYouTube&&media?.tagName==='VIDEO';
-  const defaults = { enabled: false, gains: [0, 0, 0, 0, 0], preampDb: 0, rate: 1, preservesPitch: false, reverb: 0, echo: 0 };
+  const defaults = { enabled: false, gains: [0, 0, 0, 0, 0], preampDb: 0, rate: 1, preservesPitch: false, pitch: 1, transportEnabled: false, reverb: 0, echo: 0 };
   const status = window.__lolzcloudAudioFX = { config: { ...defaults }, attached: 0, unavailable: false, reason: '', rate: 1, mediaCount: 0, audio };
   const safety = { limiter: true, ceilingDb: -3, duckGain: 1 };
   let normalization = { enabled: false, url: '', gainDb: 0 }, normalizationMeter = { available: false };
@@ -36,7 +36,7 @@
     if (!owner.audioWorklet || !window.LolzCloudTempoWorkletSource || !window.AudioWorkletNode) return null;
     let module = workletModules.get(owner);
     if (!module) {
-      const url = URL.createObjectURL(new Blob([window.LolzCloudTempoWorkletSource, '\n', window.LolzCloudNormalizerSource || ''], { type: 'text/javascript' }));
+      const url = URL.createObjectURL(new Blob([window.LolzCloudTempoWorkletSource, '\n', window.LolzCloudNormalizerSource || '', '\n', window.LolzCloudPitchWorkletSource || ''], { type: 'text/javascript' }));
       module = owner.audioWorklet.addModule(url).finally(() => URL.revokeObjectURL(url)); workletModules.set(owner, module);
     }
     return module;
@@ -114,13 +114,56 @@
     impulses.set(owner, impulse); return impulse;
   }
   function setTempo(media) {
-    const rate = status.config.enabled ? status.config.rate : 1;
+    const active = status.config.enabled || status.config.transportEnabled;
+    const rate = active ? status.config.rate : 1;
     try {
       if (Math.abs(media.playbackRate - rate) > .001) media.playbackRate = rate;
-      media.preservesPitch = status.config.enabled ? status.config.preservesPitch : true;
+      media.preservesPitch = active ? status.config.preservesPitch : true;
       if (desiredVolume !== null) media.volume = desiredVolume;
       status.rate = rate;
     } catch { /* Some advertisement media elements disallow playback changes. */ }
+  }
+  function resetPitch(media) {
+    const graph = graphs.get(media); if (!graph?.pitch) return;
+    graph.pitchEpoch = (graph.pitchEpoch || 0) + 1;
+    graph.pitchMeter = null;
+    graph.pitch.port.postMessage({ type: 'reset', epoch: graph.pitchEpoch });
+  }
+  function applyPitch(media) {
+    const graph = graphs.get(media); if (!graph?.pitch) return;
+    const config = status.config, active = (config.enabled || config.transportEnabled) && config.preservesPitch;
+    const ratio = active ? config.pitch : 1;
+    if (ratio === graph.pitchRatio) return;
+    graph.pitchMeter = null; graph.pitchRatio = ratio;
+    graph.pitch.parameters.get('pitch').setValueAtTime(ratio, graph.context.currentTime);
+    graph.pitch.parameters.get('enabled').setValueAtTime(ratio !== 1 ? 1 : 0, graph.context.currentTime);
+  }
+  function preparePitch(media, graph, source) {
+    if (!window.LolzCloudPitchWorkletSource) { graph.pitchUnavailable = true; return; }
+    const upstream = graph.normalizer || source; let node;
+    try {
+      node = new AudioWorkletNode(graph.context, 'lolzcloud-pitch', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2], channelCount: 2, channelCountMode: 'explicit' });
+      connect(node, graph.filters[0]); disconnect(upstream, graph.filters[0]); connect(upstream, node);
+      graph.pitch = node; graph.pitchRatio = null; graph.pitchEpoch = 0;
+      node.port.onmessage = event => {
+        const row = event.data;
+        if (graph.pitch !== node || row?.type !== 'status' || row.epoch !== graph.pitchEpoch || !Number.isSafeInteger(row.processedFrames) || row.processedFrames < 0 || !Number.isFinite(row.pitch) || row.pitch < .5 || row.pitch > 2 || !Number.isInteger(row.latencyFrames) || row.latencyFrames < 0 || row.latencyFrames > graph.context.sampleRate) return;
+        graph.pitchMeter = { epoch: row.epoch, processedFrames: row.processedFrames, pitch: row.pitch, latencyFrames: row.latencyFrames, settled: row.settled === true };
+      };
+      node.onprocessorerror = () => {
+        if (graph.pitch !== node) return;
+        graph.pitch = null; graph.pitchMeter = null; graph.pitchUnavailable = true;
+        try { disconnect(upstream, node); } catch {} try { disconnect(node); } catch {}
+        node.port.onmessage = null; node.port.close();
+        try { connect(upstream, graph.filters[0]); } catch {}
+      };
+      resetPitch(media);
+      applyPitch(media);
+    } catch {
+      if (node) { try { disconnect(upstream, node); } catch {} try { disconnect(node); } catch {} node.port.close(); }
+      try { connect(upstream, graph.filters[0]); } catch {}
+      graph.pitch = null; graph.pitchUnavailable = true;
+    }
   }
   function attach(media) {
     if (graphs.has(media) || media.readyState < 2 || media.error || (media.paused && !wantedPlayback.has(media))) return;
@@ -179,6 +222,7 @@
         const limiter = new AudioWorkletNode(owner, 'lolzcloud-limiter', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2], parameterData: { enabled: safety.limiter ? 1 : 0, ceilingDb: safety.ceilingDb } });
         limiter.port.onmessage = event => { const value = event.data; if (Number.isFinite(value?.peakDb) && Number.isFinite(value?.reductionDb)) graph.meter = { peakDb: Math.max(-96, Math.min(24, value.peakDb)), reductionDb: Math.max(0, Math.min(60, value.reductionDb)) }; };
         connect(limiter, output); disconnect(compressor, output); connect(compressor, limiter); graph.limiter = limiter;
+        preparePitch(media, graph, source);
       }).catch(() => { graph.limiterUnavailable = true; });
       status.attached++; status.unavailable = false; status.reason = '';
       applyGraph(media);
@@ -198,6 +242,7 @@
     target(graph.echo.gain, echo * .6); target(graph.feedback.gain, echo * .55);
     target(graph.compressor.threshold, active ? -3 : 0); target(graph.compressor.knee, active ? 8 : 0);
     target(graph.compressor.ratio, active ? 4 : 1); target(graph.compressor.attack, .006); target(graph.compressor.release, .15);
+    applyPitch(media);
   }
   function applySafety(graph) {
     if (!graph) return;
@@ -223,8 +268,9 @@
     media.addEventListener('canplay', () => { setTempo(media); attach(media); });
     media.addEventListener('ratechange', () => setTempo(media));
     media.addEventListener('volumechange', () => graphs.get(media)?.normalizer?.port.postMessage({ inputVolume: media.volume }));
-    media.addEventListener('seeking', () => { if (sources.get(media) === rhythm.record) tracker?.reset(); });
-    media.addEventListener('pause', () => { if(!fallbackLoading.has(media))playbackIntent(media,false);const record = sources.get(media); if (record?.worklet) disconnect(record.worklet); });
+    media.addEventListener('seeking', () => { resetPitch(media); if (sources.get(media) === rhythm.record) tracker?.reset(); });
+    for (const name of ['loadstart', 'emptied']) media.addEventListener(name, () => resetPitch(media));
+    media.addEventListener('pause', () => { resetPitch(media); if(!fallbackLoading.has(media))playbackIntent(media,false);const record = sources.get(media); if (record?.worklet) disconnect(record.worklet); });
     media.addEventListener('ended', () => { playbackIntent(media,false);window.__lolzcloudSnapshot?.(); const url = mediaTracks.get(media); if (url && window.__lolzcloudWaveActive && media.duration > 1 && media.currentTime >= media.duration - .5) console.log('LolzCloudReceive|WaveEnded|' + JSON.stringify({ url })); });
     media.addEventListener('error', () => {
       // Retry a CORS-incompatible source through the original media path before creating a graph.
@@ -250,9 +296,9 @@
       setTempo(media);
       if (!graphs.has(media) && !media.paused) attach(media);
       applyGraph(media);
-      const owner = graphs.get(media)?.context; if (owner?.state === 'suspended') void owner.resume().catch(() => {});
+      const owner = graphs.get(media)?.context; if (!media.paused && owner?.state === 'suspended') void owner.resume().catch(() => {});
     }
-    if (context?.state === 'suspended') void context.resume().catch(() => {});
+    if ([...audio].some(media => !media.paused) && context?.state === 'suspended') void context.resume().catch(() => {});
   }
   const nativePlay = HTMLMediaElement.prototype.play, nativePause = HTMLMediaElement.prototype.pause;
   HTMLMediaElement.prototype.play = function(...args) {
@@ -279,7 +325,7 @@
   window.__lolzcloudSetAudioFX = config => {
     const valid = config && Array.isArray(config.gains) && config.gains.length === 5 && config.gains.every(value => Number.isFinite(value) && Math.abs(value) <= 12);
     if (!valid) return false;
-    status.config = { ...defaults, ...config, gains: [...config.gains], preampDb:Math.max(-12,Math.min(0,Number(config.preampDb)||0)),rate: Math.max(.5, Math.min(2, Number(config.rate) || 1)),
+    status.config = { ...defaults, ...config, enabled: config.enabled === true, preservesPitch: config.preservesPitch === true, transportEnabled: config.transportEnabled === true, gains: [...config.gains], preampDb:Math.max(-12,Math.min(0,Number(config.preampDb)||0)),rate: Math.max(.5, Math.min(2, Number(config.rate) || 1)), pitch: Math.max(.5, Math.min(2, Number(config.pitch) || 1)),
       reverb: Math.max(0, Math.min(.8, Number(config.reverb) || 0)), echo: Math.max(0, Math.min(.8, Number(config.echo) || 0)) };
     apply(); return true;
   };
@@ -309,10 +355,13 @@
   window.__lolzcloudGetAudioState = () => {
     const active = [...audio].find(media => !media.paused);
     const graph = graphs.get(active || status.currentMedia);
+    if (graph?.pitch) graph.pitch.port.postMessage({ type: 'status', epoch: graph.pitchEpoch });
+    const pitchRatio = (status.config.enabled || status.config.transportEnabled) && status.config.preservesPitch ? status.config.pitch : 1;
+    const pitch = { available: !!graph?.pitch, requested: pitchRatio, applied: !!active && graph?.pitchMeter?.epoch === graph?.pitchEpoch && graph?.pitchMeter?.settled === true && Math.abs(graph.pitchMeter.pitch - pitchRatio) <= .001 && graph.pitchMeter.processedFrames > 0, ...(graph?.pitchMeter || {}), unavailable: graph?.pitchUnavailable === true };
     const players = [...document.querySelectorAll('.playControls,#playControls,[data-testid="play-controls"],[data-testid="playback-controls"]')];
     const ui = { nativePlayersVisible: players.filter(node => node.getBoundingClientRect().height > 0 && getComputedStyle(node).visibility !== 'hidden').length,
       likeAvailable: !!document.querySelector('.playbackSoundBadge__like, .playControls .sc-button-like'), repeatAvailable: !!document.querySelector('.playControls .repeatControl, .playControls__repeat'), hiddenPromotions: Number(window.__lolzcloudPromotions?.hidden) || 0 };
-    return { normalization: normalizationMeter, attached: status.attached, unavailable: status.unavailable, reason: status.reason, mediaCount: audio.size, rate: status.rate, volume: desiredVolume ?? active?.volume ?? 1, ui, safety: { limiterAvailable: !!graph?.limiter, limiter: safety.limiter, ceilingDb: safety.ceilingDb, duckGain: safety.duckGain, ...(graph?.meter || { peakDb: -96, reductionDb: 0 }) }, sampledAt: Date.now(), tempo: { url: rhythm.url, available: rhythm.available, method: rhythm.record?.worklet ? 'worklet' : 'analyser', ...(tracker?.state(rhythm.record?.context.currentTime ?? performance.now() / 1000) || { bpm: 0, confidence: 0, beatAge: null }) } };
+    return { normalization: normalizationMeter, pitch, attached: status.attached, unavailable: status.unavailable, reason: status.reason, mediaCount: audio.size, rate: status.rate, volume: desiredVolume ?? active?.volume ?? 1, ui, safety: { limiterAvailable: !!graph?.limiter, limiter: safety.limiter, ceilingDb: safety.ceilingDb, duckGain: safety.duckGain, ...(graph?.meter || { peakDb: -96, reductionDb: 0 }) }, sampledAt: Date.now(), tempo: { url: rhythm.url, available: rhythm.available, method: rhythm.record?.worklet ? 'worklet' : 'analyser', ...(tracker?.state(rhythm.record?.context.currentTime ?? performance.now() / 1000) || { bpm: 0, confidence: 0, beatAge: null }) } };
   };
   if (tracker) setInterval(() => {
     const media = rhythmMedia(), record = media && sources.get(media);

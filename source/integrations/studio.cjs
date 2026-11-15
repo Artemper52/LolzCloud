@@ -29,7 +29,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
   const music = new MusicFeatures(path.join(app.getPath('userData'), 'music-library.json'));
   const voicetags = new Voicetags(path.join(app.getPath('userData'), 'voicetags'));
   let playbackSource = 'soundcloud', voicetagRevision = 0;
-  let roomGuestUrl = '', roomReturnSource = 'soundcloud';
+  let roomGuestUrl = '', roomReturnSource = 'soundcloud', roomAudioLocked = false;
   const capabilities = () => { const local=experience.snapshot().local,following=playbackSource==='room'&&!local;return {download:!local&&provider(service.playback.url)==='soundcloud',seek:!following,transport:!following,like:!following&&!local}; };
   const savedPlayback = {};
   function setSource(source) {
@@ -69,6 +69,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
   const wave = new PersonalWave({ filename: path.join(app.getPath('userData'), 'wave-library.json'), provider: discovery, getSnapshot: () => service.getState(), getHistory: () => music.data.history, play: (url, track) => { setSource('soundcloud'); playbackHistory.request({ url }); service.beginPlayback({ ...track, url }); if (!service.isPrivate()) void lyrics.load(track); onStateChange(); getWindow()?.webContents.send('lolzcloud:play-url', { url, track }); } });
   const experience = createPlayerExperience({ app, service, music, wave, lyrics, room, discovery, downloads, media, getWindow, notify: onStateChange, dialog, clipboard, play: async (url, track) => { wave.stop(); await playTrack(url, track); } });
   const shownTrack = () => experience.current();
+  const roomState = () => ({ ...room.getState(), audioLocked: roomAudioLocked });
   async function roomAction(action) {
     if (action?.type === 'leave-local') {
       roomGuestUrl = '';
@@ -90,15 +91,22 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
     }
     if (action?.type === 'broadcast') {
       if (!shownTrack().url || !experience.snapshot().fresh || experience.snapshot().private) throw new Error('Включи неприватный трек, чтобы слушать его вместе.');
-      if (Math.abs((shownTrack().rate || 1) - 1) > .001) {
-        music.configureDsp({ rate: 1 }); getWindow()?.webContents.send('lolzcloud:dsp', music.data.dsp);
+      roomAudioLocked = true; onStateChange();
+      try {
+        // The room uses the source tempo/tone. Personal settings remain saved
+        // and become effective again after leaving or a failed room start.
+        getWindow()?.webContents.send('lolzcloud:dsp', { ...music.data.dsp, rate: 1, pitch: 1, preservesPitch: true });
         for(let attempt=0;attempt<20 && Math.abs((shownTrack().rate||1)-1)>.001;attempt++) await new Promise(resolve=>setTimeout(resolve,100));
+        await room.start(); if (!room.room) throw new Error('Подтверди вход через Lolzteam, затем включи комнату ещё раз.');
+        if (!room.lease) await room.claim(); await room.publish();
+        await session.fromPartition(ROOM_PARTITION).cookies.set({url:room.origin,name:ROOM_COOKIE,value:room.token,path:'/',secure:true,httpOnly:true,sameSite:'lax',expirationDate:room.expires/1000});
+        roomGuestUrl=room.getState().url;
+        return room.getState().url;
+      } finally {
+        roomAudioLocked = false;
+        if (!room.getState().hosting) getWindow()?.webContents.send('lolzcloud:dsp', music.data.dsp);
+        onStateChange();
       }
-      await room.start(); if (!room.room) throw new Error('Подтверди вход через Lolzteam, затем включи комнату ещё раз.');
-      if (!room.lease) await room.claim(); await room.publish();
-      await session.fromPartition(ROOM_PARTITION).cookies.set({url:room.origin,name:ROOM_COOKIE,value:room.token,path:'/',secure:true,httpOnly:true,sameSite:'lax',expirationDate:room.expires/1000});
-      roomGuestUrl=room.getState().url;
-      return room.getState().url;
     }
     const value = action?.type === 'create'
       ? await room.request('/api/rooms', { method: 'POST', body: {} })
@@ -218,7 +226,7 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
       catch { hotkeyErrors.push(key); }
     }
   }
-  function getState() { return { ...music.getState(), source:playbackSource, capabilities:capabilities(), voicetags:voicetags.state(), tools:experience.state(), transport: { repeat: experience.snapshot().local?{mode:experience.current().repeat}:repeat.read(service.playback) }, downloads: downloads.state(), ducking: ducker.state(), safetyConfig: ducker.config(), lyricCache: { ready: [...lyrics.cache.values()].filter(result => !result.loading).length, warming: lyrics.background.size }, miniWindow: miniController.state(), visuals: visuals.state(service.getState(), audio), room: room.getState(), social: socialNotifications.state(), hotkeyErrors, audio: { ...audio }, communityResults, lyrics: lyrics.state(shownTrack()), lyricSettings: lyricSettings.state(), wave: wave.state() }; }
+  function getState() { return { ...music.getState(), source:playbackSource, capabilities:capabilities(), voicetags:voicetags.state(), tools:experience.state(), transport: { repeat: experience.snapshot().local?{mode:experience.current().repeat}:repeat.read(service.playback) }, downloads: downloads.state(), ducking: ducker.state(), safetyConfig: ducker.config(), lyricCache: { ready: [...lyrics.cache.values()].filter(result => !result.loading).length, warming: lyrics.background.size }, miniWindow: miniController.state(), visuals: visuals.state(service.getState(), audio), room: roomState(), social: socialNotifications.state(), hotkeyErrors, audio: { ...audio }, communityResults, lyrics: lyrics.state(shownTrack()), lyricSettings: lyricSettings.state(), wave: wave.state() }; }
   async function act(action) {
     if (/^wave-/.test(action?.type || '') || action?.type === 'play-url') experience.stopLocal();
     switch (action?.type) {
@@ -390,6 +398,11 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
     if (trusted(event) && (status?.source || 'soundcloud') === playbackSource) audio = { attached: Number(status?.attached) || 0, unavailable: status?.unavailable === true, reason: String(status?.reason || '').slice(0, 40), mediaCount: Number(status?.mediaCount) || 0, rate: Number(status?.rate) || 1, volume: Math.max(0, Math.min(1, Number(status?.volume) || 0)), ui: { nativePlayersVisible: Math.max(0, Number(status?.ui?.nativePlayersVisible) || 0), likeAvailable: status?.ui?.likeAvailable === true, repeatAvailable: status?.ui?.repeatAvailable === true, hiddenPromotions: Math.max(0, Number(status?.ui?.hiddenPromotions) || 0) } };
     if (trusted(event) && (status?.source || 'soundcloud') === playbackSource) audio = { ...audio, sampledAt: Math.min(Date.now(), Math.max(Date.now() - 10_000, Number(status?.sampledAt) || 0)), tempo: { url: mediaUrl(status?.tempo?.url), available: status?.tempo?.available === true, method: status?.tempo?.method === 'worklet' ? 'worklet' : 'analyser', onsets: Math.max(0, Math.min(100, Number(status?.tempo?.onsets) || 0)), samples: Math.max(0, Math.min(1000, Number(status?.tempo?.samples) || 0)), bpm: Math.max(0, Math.min(300, Number(status?.tempo?.bpm) || 0)), confidence: Math.max(0, Math.min(1, Number(status?.tempo?.confidence) || 0)), beatAge: Number.isFinite(status?.tempo?.beatAge) ? Math.max(0, Math.min(60, status.tempo.beatAge)) : null } };
     if (trusted(event) && (status?.source || 'soundcloud') === playbackSource) audio.safety = { limiterAvailable: status?.safety?.limiterAvailable === true, peakDb: Math.max(-96, Math.min(24, Number.isFinite(status?.safety?.peakDb) ? status.safety.peakDb : -96)), reductionDb: Math.max(0, Math.min(60, Number(status?.safety?.reductionDb) || 0)), duckGain: Math.max(0, Math.min(1, Number.isFinite(status?.safety?.duckGain) ? status.safety.duckGain : 1)) };
+    if (trusted(event) && (status?.source || 'soundcloud') === playbackSource) {
+      const p = status?.pitch, ratio = value => Number.isFinite(value) && value >= .5 && value <= 2 ? value : 1;
+      const frames = Number.isSafeInteger(p?.processedFrames) && p.processedFrames >= 0 ? p.processedFrames : 0;
+      audio.pitch = { available: p?.available === true, requested: ratio(p?.requested), pitch: ratio(p?.pitch), processedFrames: frames, applied: p?.available === true && p?.applied === true && p?.settled === true && frames > 0 && Number.isFinite(p.pitch) && Number.isFinite(p.requested) && Math.abs(p.pitch - p.requested) <= .001, unavailable: p?.unavailable === true, latencyFrames: Number.isInteger(p?.latencyFrames) && p.latencyFrames >= 0 && p.latencyFrames <= 384000 ? p.latencyFrames : 0 };
+    }
   });
   ipcMain.handle('mini:action', async (event, action) => {
     if (!mini || mini.isDestroyed() || event.sender !== mini.webContents || event.senderFrame !== event.sender.mainFrame) return null;
@@ -434,9 +447,9 @@ function createStudio({ app, service, getWindow, trusted, onStateChange = () => 
     observe() {
       experience.observe();
       const snapshot = service.getState();
-      if (lyricSettings.retry()) { lyricEngine.cooldowns.clear(); lyrics.invalidate(); if (!snapshot.private) void lyrics.load(service.playback); }
+      if (lyricSettings.retry()) { lyricEngine.cooldowns.clear(); lyrics.invalidate({ keepFound: true }); if (!snapshot.private) void lyrics.load(service.playback); }
       const connected = room.getState().authenticated;
-      if (connected !== cloudAuthenticated) { cloudAuthenticated = connected; void socialNotifications.poll(); lyricEngine.cooldowns.clear(); lyrics.invalidate(); if (!snapshot.private) void lyrics.load(service.playback); }
+      if (connected !== cloudAuthenticated) { cloudAuthenticated = connected; void socialNotifications.poll(); lyricEngine.cooldowns.clear(); lyrics.invalidate({ keepFound: true }); if (!snapshot.private) void lyrics.load(service.playback); }
       music.observe(wave.active && wave.waitingUntil && snapshot.playback.url !== wave.current?.url ? { ...snapshot, fresh: false } : snapshot);
       wave.observe(snapshot); visuals.observe(snapshot);
       if (!(wave.active && wave.waitingUntil && snapshot.playback.url !== wave.current?.url)) prefetch.observe(snapshot, wave.active ? wave.queue : null);

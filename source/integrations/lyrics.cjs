@@ -6,6 +6,8 @@ const { parseLrc } = require('./lyric-source.cjs');
 const { writeJson } = require('./durable-json.cjs');
 const {mediaUrl}=require('../app/lib/js/media-source.js');
 const lyricKey = track => [track?.artist || '', track?.title || '', track?.duration || 0].join('\n');
+const lyricQuality = result => result?.lines?.length ? result.lines.filter(line => line.words?.length).length / result.lines.length >= .8 ? 3 : 2 : result?.plain?.trim() ? 1 : result?.instrumental ? 1 : 0;
+const betterResult = (previous, next) => lyricQuality(previous) > lyricQuality(next) ? { ...previous, ...(next?.attempts ? { attempts: next.attempts } : {}) } : next;
 class LyricsLibrary {
   constructor(fetcher = getLyrics, filename = null, now = Date.now) {
     this.now = now;
@@ -21,19 +23,33 @@ class LyricsLibrary {
     return this.overrides.get(key) || (cached ? { ...cached, key } : null) || { key, revision: 0, loading: false, found: false, lines: [], plain: '', error: '', instrumental: false };
   }
   cacheKey(track) { return lyricKey(track) + (this.identities.has(track?.url) ? '\n' + track.url : ''); }
-  nearby(track) {
+  nearby(track, forLoad = false) {
     if (!track?.url) return null;
-    for (const [key, previous] of this.tracks) if (this.cache.has(key) && previous.url === track.url && previous.title === track.title && previous.artist === track.artist && Math.abs((previous.duration || 0) - (track.duration || 0)) <= 1) return key;
+    const url = mediaUrl(track.url); if (!url) return null;
+    for (const [key, previous] of this.tracks) {
+      if (!this.cache.has(key) || mediaUrl(previous.url) !== url) continue;
+      const a = Number(previous.duration) || 0, b = Number(track.duration) || 0;
+      if (a > 0 && b > 0 && Math.abs(a - b) > 2.5) continue;
+      if (forLoad && !a && b > 0 && !this.cache.get(key).lines?.length && !this.pending.has(key)) continue;
+      // A provider's playback badge can replace uploader metadata, or report
+      // duration0 briefly. The canonical URL still identifies this recording.
+      if (lyricQuality(this.cache.get(key)) || this.pending.has(key) || previous.title === track.title && previous.artist === track.artist) return key;
+    }
     return null;
   }
-  abort(key) { this.controllers.get(key)?.abort(); this.controllers.delete(key); this.pending.delete(key); this.cache.delete(key); this.tracks.delete(key); this.background.delete(key); }
+  abort(key) {
+    this.controllers.get(key)?.abort(); this.controllers.delete(key); this.pending.delete(key); this.background.delete(key);
+    const value = this.cache.get(key);
+    if (lyricQuality(value)) this.cache.set(key, { ...value, loading: false, revision: ++this.revision });
+    else { this.cache.delete(key); this.tracks.delete(key); }
+  }
   warm(tracks) {
     const upcoming = tracks.filter(track => track?.title && track.artist && track.url).slice(0, 2), urls = new Set(upcoming.map(track => track.url));
     for (const key of this.background) if (!urls.has(this.tracks.get(key)?.url)) this.abort(key);
     for (const track of upcoming) if (this.background.size < 2) void this.load(track, false, true);
   }
   load(track, force = false, background = false) {
-    const requestedKey = lyricKey(track), key = !force && !this.overrides.has(requestedKey) ? this.nearby(track) || this.cacheKey(track) : this.cacheKey(track);
+    const requestedKey = lyricKey(track), key = !force && !this.overrides.has(requestedKey) ? this.nearby(track, true) || this.cacheKey(track) : this.cacheKey(track);
     const present = result => key === requestedKey ? result : { ...result, key: requestedKey };
     if (!background) {
       for (const [other] of this.controllers) if (other !== key && !this.background.has(other)) this.abort(other);
@@ -48,9 +64,9 @@ class LyricsLibrary {
     this.tracks.set(key, { ...track }); if (background) this.background.add(key);
     this.cache.set(key, { ...this.state(track), loading: true, error: '', revision: ++this.revision });
     const controller = new AbortController(); this.controllers.set(key, controller);
-    const promise = Promise.resolve().then(() => this.fetcher({ ...track, ...this.identities.get(track.url), spotifyId: this.matches.get(requestedKey) || track.spotifyId }, { signal: controller.signal, onProgress: result => {
-      if (!controller.signal.aborted) this.cache.set(key, { ...result, key, loading: true, error: '', revision: ++this.revision });
-    } })).then(result => this.overrides.get(requestedKey) || ({ ...result, key, loading: false, error: '', revision: ++this.revision }),
+    const promise = Promise.resolve().then(() => this.fetcher({ ...track, ...this.identities.get(track.url), variantTitle: track.title, spotifyId: this.matches.get(requestedKey) || track.spotifyId }, { signal: controller.signal, force, onProgress: result => {
+      if (!controller.signal.aborted && this.controllers.get(key) === controller) this.cache.set(key, { ...betterResult(this.cache.get(key), result), key, loading: true, error: '', revision: ++this.revision });
+    } })).then(result => this.overrides.get(requestedKey) || ({ ...betterResult(this.cache.get(key), result), key, loading: false, error: '', revision: ++this.revision }),
       () => ({ ...this.state(track), key, loading: false, error: controller.signal.aborted ? '' : 'Не удалось загрузить текст. Попробуй обновить.', revision: ++this.revision }));
     this.pending.set(key, promise);
     promise.then(result => {
@@ -61,7 +77,13 @@ class LyricsLibrary {
     });
     return promise;
   }
-  invalidate() { for (const controller of this.controllers.values()) controller.abort(); this.controllers.clear(); this.pending.clear(); this.cache.clear(); this.tracks.clear(); this.background.clear(); }
+  invalidate({ keepFound = false } = {}) {
+    for (const controller of this.controllers.values()) controller.abort(); this.controllers.clear(); this.pending.clear(); this.background.clear();
+    for (const [key, result] of this.cache) {
+      if (keepFound && lyricQuality(result)) this.cache.set(key, { ...result, loading: false, revision: ++this.revision });
+      else { this.cache.delete(key); this.tracks.delete(key); }
+    }
+  }
   setSpotify(track, value) {
     const match = String(value || '').trim().match(/^(?:https:\/\/open\.spotify\.com\/(?:intl-[a-z]+\/)?track\/|spotify:track:)?([a-zA-Z0-9]{22})(?:\?.*)?$/);
     if (!track?.title || !match) throw new Error('Нужна ссылка на эту же запись трека в Spotify.');

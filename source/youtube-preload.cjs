@@ -242,17 +242,108 @@ try {
 
 } catch { console.warn("LolzCloud: optional YouTube hook was unavailable."); }
 try {
+/* Fixed-length STFT transposition with a linked stereo phase reference.
+   Derived from the phase-vocoder analysis/synthesis equations (Laroche/Dolson):
+   https://labrosa.ee.columbia.edu/~dpwe/papers/LaroD99-pvoc.pdf
+   No formant-preserving or studio-quality claim. One input/output frame per sample. */
+(root => {
+  function install() {
+    'use strict';
+    class LolzCloudPitch extends AudioWorkletProcessor {
+      static get parameterDescriptors() {
+        return [{ name: 'pitch', defaultValue: 1, minValue: .5, maxValue: 2, automationRate: 'k-rate' }, { name: 'enabled', defaultValue: 0, minValue: 0, maxValue: 1, automationRate: 'k-rate' }];
+      }
+      constructor() {
+        super(); this.size = 2 ** Math.ceil(Math.log2(Math.max(8000, Math.min(384000, sampleRate)) * .04)); this.hop = this.size / 8; this.bins = this.size / 2 + 1; this.capacity = this.size * 2;
+        const channels = 8, bits = Math.log2(this.size); this.input = new Array(channels); this.output = new Array(channels); this.real = new Array(channels); this.imaginary = new Array(channels); this.magnitude = new Array(channels); this.phase = new Array(channels); this.previousPhase = new Array(channels); this.synthesisMagnitude = new Array(channels);
+        for (let c = 0; c < channels; c++) { this.input[c] = new Float32Array(this.size); this.output[c] = new Float64Array(this.capacity); this.real[c] = new Float64Array(this.size); this.imaginary[c] = new Float64Array(this.size); this.magnitude[c] = new Float64Array(this.bins); this.phase[c] = new Float64Array(this.bins); this.previousPhase[c] = new Float64Array(this.bins); this.synthesisMagnitude[c] = new Float64Array(this.bins); }
+        this.window = new Float64Array(this.size); this.cosine = new Float64Array(this.size / 2); this.sine = new Float64Array(this.size / 2); this.reverse = new Uint16Array(this.size);
+        this.peaks = new Uint16Array(this.bins); this.peakCurrent = new Uint8Array(this.bins); this.frequency = new Float64Array(this.bins); this.strength = new Float64Array(this.bins); this.owner = new Uint16Array(this.bins); this.reference = new Uint8Array(this.bins); this.synthesisPhase = new Float64Array(this.bins); this.phaseValid = new Uint8Array(this.bins); this.ratioSum = new Float64Array(this.capacity); this.weightSum = new Float64Array(this.capacity);
+        for (let i = 0; i < this.size; i++) { this.window[i] = .5 - .5 * Math.cos(2 * Math.PI * i / this.size); let value = i, reversed = 0; for (let b = 0; b < bits; b++) { reversed = (reversed << 1) | (value & 1); value >>>= 1; } this.reverse[i] = reversed; }
+        for (let i = 0; i < this.size / 2; i++) { this.cosine[i] = Math.cos(2 * Math.PI * i / this.size); this.sine[i] = Math.sin(2 * Math.PI * i / this.size); }
+        this.cursor = this.outCursor = this.untilFrame = this.frames = this.epoch = this.processedFrames = 0; this.ratio = this.lastPitch = this.target = 1; this.mix = 0; this.smoothing = 1 - Math.exp(-1 / (sampleRate * .012)); this.fade = 1 / Math.max(1, sampleRate * .012);
+        this.port.onmessage = event => { const value = event.data; if (!value || !Number.isSafeInteger(value.epoch) || value.epoch < 0) return;
+          if (value.type === 'reset' && value.epoch > this.epoch) { this.epoch = value.epoch; this.reset(); }
+          else if (value.type === 'status' && value.epoch === this.epoch) this.port.postMessage({ type: 'status', epoch: this.epoch, processedFrames: this.processedFrames, pitch: this.lastPitch, latencyFrames: this.size, wetMix: this.mix, settled: this.mix >= .999 && this.processedFrames > 0 && Math.abs(this.lastPitch - this.target) <= .001 });
+        };
+      }
+      reset() {
+        this.cursor = this.outCursor = this.untilFrame = this.frames = this.processedFrames = 0; this.mix = 0; this.lastPitch = 1;
+        for (let c = 0; c < 8; c++) { this.input[c].fill(0); this.output[c].fill(0); this.previousPhase[c].fill(0); }
+        this.phaseValid.fill(0); this.synthesisPhase.fill(0); this.ratioSum.fill(0); this.weightSum.fill(0);
+      }
+      fft(real, imaginary, inverse) {
+        const n = this.size;
+        for (let i = 0; i < n; i++) { const j = this.reverse[i]; if (j > i) { let temp = real[i]; real[i] = real[j]; real[j] = temp; temp = imaginary[i]; imaginary[i] = imaginary[j]; imaginary[j] = temp; } }
+        for (let width = 2; width <= n; width *= 2) { const half = width / 2, step = n / width;
+          for (let base = 0; base < n; base += width) for (let i = 0; i < half; i++) { const angle = i * step, wr = this.cosine[angle], wi = inverse ? this.sine[angle] : -this.sine[angle], a = base + i, b = a + half, re = real[b] * wr - imaginary[b] * wi, im = real[b] * wi + imaginary[b] * wr; real[b] = real[a] - re; imaginary[b] = imaginary[a] - im; real[a] += re; imaginary[a] += im; }
+        }
+        if (inverse) for (let i = 0; i < n; i++) { real[i] /= n; imaginary[i] /= n; }
+      }
+      frame(channels, start, destination, ratio) {
+        const n = this.size, bins = this.bins, angular = 2 * Math.PI * this.hop / n;
+        this.strength.fill(0); this.peakCurrent.fill(0);
+        for (let c = 0; c < channels; c++) { const re = this.real[c], im = this.imaginary[c], input = this.input[c];
+          for (let i = 0; i < n; i++) { re[i] = input[(start + i) & (n - 1)] * this.window[i]; im[i] = 0; }
+          this.fft(re, im, false);
+          for (let k = 0; k < bins; k++) { const strength = Math.hypot(re[k], im[k]); this.magnitude[c][k] = strength; this.phase[c][k] = Math.atan2(im[k], re[k]); if (strength > this.strength[k]) { this.strength[k] = strength; this.reference[k] = c; } }
+        }
+        let count = 0;
+        for (let k = 0; k < bins; k++) if (this.strength[k] > 1e-10 && (k === 0 || this.strength[k] >= this.strength[k - 1]) && (k === bins - 1 || this.strength[k] > this.strength[k + 1])) { this.peaks[count++] = k; this.peakCurrent[k] = 1; }
+        for (let p = 0; p < count; p++) { const k = this.peaks[p], reference = this.reference[k]; let delta = this.phase[reference][k] - this.previousPhase[reference][k] - angular * k; delta -= 2 * Math.PI * Math.round(delta / (2 * Math.PI));
+          this.frequency[k] = this.frames ? k + delta / angular : k;
+          if (!this.phaseValid[k]) this.synthesisPhase[k] = this.phase[reference][k]; else { this.synthesisPhase[k] += angular * this.frequency[k] * ratio; this.synthesisPhase[k] -= 2 * Math.PI * Math.round(this.synthesisPhase[k] / (2 * Math.PI)); }
+        }
+        this.phaseValid.set(this.peakCurrent);
+        for (let c = 0; c < channels; c++) { this.previousPhase[c].set(this.phase[c]); this.real[c].fill(0); this.imaginary[c].fill(0); }
+        // Move complete peak regions together. Scaling individual bins destroys
+        // their vertical phase relation and can cancel otherwise correct tones.
+        let region = 0;
+        if (count) for (let k = 0; k < bins; k++) { while (region + 1 < count && k > (this.peaks[region] + this.peaks[region + 1]) / 2) region++;
+          const peak = this.peaks[region], reference = this.reference[peak], target = k + Math.round((ratio - 1) * this.frequency[peak]); if (target < 0 || target >= bins) continue;
+          for (let c = 0; c < channels; c++) { const phase = this.synthesisPhase[peak] + this.phase[c][k] - this.phase[reference][peak], magnitude = this.magnitude[c][k]; this.real[c][target] += magnitude * Math.cos(phase); this.imaginary[c][target] += magnitude * Math.sin(phase); }
+        }
+        for (let c = 0; c < channels; c++) { const re = this.real[c], im = this.imaginary[c]; im[0] = im[bins - 1] = 0; for (let k = 1; k < bins - 1; k++) { re[n - k] = re[k]; im[n - k] = -im[k]; }
+          this.fft(re, im, true); const out = this.output[c]; for (let i = 0; i < n; i++) out[(destination + i) & (this.capacity - 1)] += re[i] * this.window[i] / 3;
+        }
+        for (let i = 0; i < n; i++) { const index = (destination + i) & (this.capacity - 1), weight = this.window[i] * this.window[i] / 3; this.weightSum[index] += weight; this.ratioSum[index] += ratio * weight; }
+        this.frames++;
+      }
+      process(inputs, outputs, parameters) {
+        const input = inputs[0], output = outputs[0]; if (!output || !output.length) return true;
+        const length = output[0].length, channels = Math.min(8, output.length), raw = parameters.pitch?.[0], target = Number.isFinite(raw) ? Math.max(.5, Math.min(2, raw)) : 1, active = parameters.enabled?.[0] >= .5 && Math.abs(target - 1) > .000001; this.target = target;
+        for (let i = 0; i < length; i++) {
+          this.ratio += this.smoothing * (target - this.ratio); const destination = active && this.frames >= 9 ? 1 : 0; this.mix += Math.max(-this.fade, Math.min(this.fade, destination - this.mix));
+          for (let c = 0; c < output.length; c++) { const rawSample = input?.[c]?.[i] ?? input?.[0]?.[i] ?? 0, dry = Number.isFinite(rawSample) ? rawSample : 0; if (c >= 8) { output[c][i] = dry; continue; }
+            this.input[c][this.cursor] = dry; const wet = this.output[c][this.outCursor]; this.output[c][this.outCursor] = 0; const value = dry + this.mix * (wet - dry); output[c][i] = Number.isFinite(value) ? value : 0;
+          }
+          const weight = this.weightSum[this.outCursor]; if (input?.length && this.mix > 0 && weight > 1e-10) { this.processedFrames++; this.lastPitch = this.ratioSum[this.outCursor] / weight; } else if (input?.length && !this.mix) this.lastPitch = 1;
+          this.weightSum[this.outCursor] = this.ratioSum[this.outCursor] = 0;
+          if (++this.untilFrame >= this.hop) { this.untilFrame = 0; if (active || this.mix > 0) this.frame(channels, (this.cursor + 1) & (this.size - 1), (this.outCursor + 1) & (this.capacity - 1), this.ratio); else if (this.frames) { this.frames = 0; this.phaseValid.fill(0); } }
+          this.cursor = (this.cursor + 1) & (this.size - 1); this.outCursor = (this.outCursor + 1) & (this.capacity - 1);
+        }
+        return true;
+      }
+    }
+    registerProcessor('lolzcloud-pitch', LolzCloudPitch);
+  }
+  if (typeof AudioWorkletProcessor === 'function') install();
+  else { const source = '(' + install.toString() + ')();'; root.LolzCloudPitchWorkletSource = source; if (typeof module === 'object' && module.exports) module.exports = { source }; }
+})(typeof window === 'object' ? window : globalThis);
+
+} catch { console.warn("LolzCloud: optional YouTube hook was unavailable."); }
+try {
 (() => {
   if (window.__lolzcloudAudioFX) return;
   const audio = new Set(), graphs = new WeakMap(), sources = new WeakMap(), sourceNodes = new WeakMap(), settling = new WeakSet(), impulses = new WeakMap(), corsManaged = new WeakSet(), corsFallback = new WeakSet(), wantedPlayback = new WeakSet();
   const mediaTracks = new WeakMap();
   const intentEpochs = new WeakMap(), fallbackLoading = new WeakSet();
   function playbackIntent(media, wanted) { intentEpochs.set(media,(intentEpochs.get(media)||0)+1);if(wanted)wantedPlayback.add(media);else wantedPlayback.delete(media); }
-  const sourceIntent = media => intentEpochs.set(media,(intentEpochs.get(media)||0)+1);
+  const sourceIntent = media => { intentEpochs.set(media,(intentEpochs.get(media)||0)+1); resetPitch(media); };
   const selectActive = () => [...audio].find(media => !media.paused) || [...audio].at(-1);
   const mediaSelector=window.__lolzcloudYouTube?'audio,video':'audio';
   const isMusicMedia=media=>media?.tagName==='AUDIO'||!!window.__lolzcloudYouTube&&media?.tagName==='VIDEO';
-  const defaults = { enabled: false, gains: [0, 0, 0, 0, 0], preampDb: 0, rate: 1, preservesPitch: false, reverb: 0, echo: 0 };
+  const defaults = { enabled: false, gains: [0, 0, 0, 0, 0], preampDb: 0, rate: 1, preservesPitch: false, pitch: 1, transportEnabled: false, reverb: 0, echo: 0 };
   const status = window.__lolzcloudAudioFX = { config: { ...defaults }, attached: 0, unavailable: false, reason: '', rate: 1, mediaCount: 0, audio };
   const safety = { limiter: true, ceilingDb: -3, duckGain: 1 };
   let normalization = { enabled: false, url: '', gainDb: 0 }, normalizationMeter = { available: false };
@@ -280,7 +371,7 @@ try {
     if (!owner.audioWorklet || !window.LolzCloudTempoWorkletSource || !window.AudioWorkletNode) return null;
     let module = workletModules.get(owner);
     if (!module) {
-      const url = URL.createObjectURL(new Blob([window.LolzCloudTempoWorkletSource, '\n', window.LolzCloudNormalizerSource || ''], { type: 'text/javascript' }));
+      const url = URL.createObjectURL(new Blob([window.LolzCloudTempoWorkletSource, '\n', window.LolzCloudNormalizerSource || '', '\n', window.LolzCloudPitchWorkletSource || ''], { type: 'text/javascript' }));
       module = owner.audioWorklet.addModule(url).finally(() => URL.revokeObjectURL(url)); workletModules.set(owner, module);
     }
     return module;
@@ -358,13 +449,56 @@ try {
     impulses.set(owner, impulse); return impulse;
   }
   function setTempo(media) {
-    const rate = status.config.enabled ? status.config.rate : 1;
+    const active = status.config.enabled || status.config.transportEnabled;
+    const rate = active ? status.config.rate : 1;
     try {
       if (Math.abs(media.playbackRate - rate) > .001) media.playbackRate = rate;
-      media.preservesPitch = status.config.enabled ? status.config.preservesPitch : true;
+      media.preservesPitch = active ? status.config.preservesPitch : true;
       if (desiredVolume !== null) media.volume = desiredVolume;
       status.rate = rate;
     } catch { /* Some advertisement media elements disallow playback changes. */ }
+  }
+  function resetPitch(media) {
+    const graph = graphs.get(media); if (!graph?.pitch) return;
+    graph.pitchEpoch = (graph.pitchEpoch || 0) + 1;
+    graph.pitchMeter = null;
+    graph.pitch.port.postMessage({ type: 'reset', epoch: graph.pitchEpoch });
+  }
+  function applyPitch(media) {
+    const graph = graphs.get(media); if (!graph?.pitch) return;
+    const config = status.config, active = (config.enabled || config.transportEnabled) && config.preservesPitch;
+    const ratio = active ? config.pitch : 1;
+    if (ratio === graph.pitchRatio) return;
+    graph.pitchMeter = null; graph.pitchRatio = ratio;
+    graph.pitch.parameters.get('pitch').setValueAtTime(ratio, graph.context.currentTime);
+    graph.pitch.parameters.get('enabled').setValueAtTime(ratio !== 1 ? 1 : 0, graph.context.currentTime);
+  }
+  function preparePitch(media, graph, source) {
+    if (!window.LolzCloudPitchWorkletSource) { graph.pitchUnavailable = true; return; }
+    const upstream = graph.normalizer || source; let node;
+    try {
+      node = new AudioWorkletNode(graph.context, 'lolzcloud-pitch', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2], channelCount: 2, channelCountMode: 'explicit' });
+      connect(node, graph.filters[0]); disconnect(upstream, graph.filters[0]); connect(upstream, node);
+      graph.pitch = node; graph.pitchRatio = null; graph.pitchEpoch = 0;
+      node.port.onmessage = event => {
+        const row = event.data;
+        if (graph.pitch !== node || row?.type !== 'status' || row.epoch !== graph.pitchEpoch || !Number.isSafeInteger(row.processedFrames) || row.processedFrames < 0 || !Number.isFinite(row.pitch) || row.pitch < .5 || row.pitch > 2 || !Number.isInteger(row.latencyFrames) || row.latencyFrames < 0 || row.latencyFrames > graph.context.sampleRate) return;
+        graph.pitchMeter = { epoch: row.epoch, processedFrames: row.processedFrames, pitch: row.pitch, latencyFrames: row.latencyFrames, settled: row.settled === true };
+      };
+      node.onprocessorerror = () => {
+        if (graph.pitch !== node) return;
+        graph.pitch = null; graph.pitchMeter = null; graph.pitchUnavailable = true;
+        try { disconnect(upstream, node); } catch {} try { disconnect(node); } catch {}
+        node.port.onmessage = null; node.port.close();
+        try { connect(upstream, graph.filters[0]); } catch {}
+      };
+      resetPitch(media);
+      applyPitch(media);
+    } catch {
+      if (node) { try { disconnect(upstream, node); } catch {} try { disconnect(node); } catch {} node.port.close(); }
+      try { connect(upstream, graph.filters[0]); } catch {}
+      graph.pitch = null; graph.pitchUnavailable = true;
+    }
   }
   function attach(media) {
     if (graphs.has(media) || media.readyState < 2 || media.error || (media.paused && !wantedPlayback.has(media))) return;
@@ -423,6 +557,7 @@ try {
         const limiter = new AudioWorkletNode(owner, 'lolzcloud-limiter', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [2], parameterData: { enabled: safety.limiter ? 1 : 0, ceilingDb: safety.ceilingDb } });
         limiter.port.onmessage = event => { const value = event.data; if (Number.isFinite(value?.peakDb) && Number.isFinite(value?.reductionDb)) graph.meter = { peakDb: Math.max(-96, Math.min(24, value.peakDb)), reductionDb: Math.max(0, Math.min(60, value.reductionDb)) }; };
         connect(limiter, output); disconnect(compressor, output); connect(compressor, limiter); graph.limiter = limiter;
+        preparePitch(media, graph, source);
       }).catch(() => { graph.limiterUnavailable = true; });
       status.attached++; status.unavailable = false; status.reason = '';
       applyGraph(media);
@@ -442,6 +577,7 @@ try {
     target(graph.echo.gain, echo * .6); target(graph.feedback.gain, echo * .55);
     target(graph.compressor.threshold, active ? -3 : 0); target(graph.compressor.knee, active ? 8 : 0);
     target(graph.compressor.ratio, active ? 4 : 1); target(graph.compressor.attack, .006); target(graph.compressor.release, .15);
+    applyPitch(media);
   }
   function applySafety(graph) {
     if (!graph) return;
@@ -467,8 +603,9 @@ try {
     media.addEventListener('canplay', () => { setTempo(media); attach(media); });
     media.addEventListener('ratechange', () => setTempo(media));
     media.addEventListener('volumechange', () => graphs.get(media)?.normalizer?.port.postMessage({ inputVolume: media.volume }));
-    media.addEventListener('seeking', () => { if (sources.get(media) === rhythm.record) tracker?.reset(); });
-    media.addEventListener('pause', () => { if(!fallbackLoading.has(media))playbackIntent(media,false);const record = sources.get(media); if (record?.worklet) disconnect(record.worklet); });
+    media.addEventListener('seeking', () => { resetPitch(media); if (sources.get(media) === rhythm.record) tracker?.reset(); });
+    for (const name of ['loadstart', 'emptied']) media.addEventListener(name, () => resetPitch(media));
+    media.addEventListener('pause', () => { resetPitch(media); if(!fallbackLoading.has(media))playbackIntent(media,false);const record = sources.get(media); if (record?.worklet) disconnect(record.worklet); });
     media.addEventListener('ended', () => { playbackIntent(media,false);window.__lolzcloudSnapshot?.(); const url = mediaTracks.get(media); if (url && window.__lolzcloudWaveActive && media.duration > 1 && media.currentTime >= media.duration - .5) console.log('LolzCloudReceive|WaveEnded|' + JSON.stringify({ url })); });
     media.addEventListener('error', () => {
       // Retry a CORS-incompatible source through the original media path before creating a graph.
@@ -494,9 +631,9 @@ try {
       setTempo(media);
       if (!graphs.has(media) && !media.paused) attach(media);
       applyGraph(media);
-      const owner = graphs.get(media)?.context; if (owner?.state === 'suspended') void owner.resume().catch(() => {});
+      const owner = graphs.get(media)?.context; if (!media.paused && owner?.state === 'suspended') void owner.resume().catch(() => {});
     }
-    if (context?.state === 'suspended') void context.resume().catch(() => {});
+    if ([...audio].some(media => !media.paused) && context?.state === 'suspended') void context.resume().catch(() => {});
   }
   const nativePlay = HTMLMediaElement.prototype.play, nativePause = HTMLMediaElement.prototype.pause;
   HTMLMediaElement.prototype.play = function(...args) {
@@ -523,7 +660,7 @@ try {
   window.__lolzcloudSetAudioFX = config => {
     const valid = config && Array.isArray(config.gains) && config.gains.length === 5 && config.gains.every(value => Number.isFinite(value) && Math.abs(value) <= 12);
     if (!valid) return false;
-    status.config = { ...defaults, ...config, gains: [...config.gains], preampDb:Math.max(-12,Math.min(0,Number(config.preampDb)||0)),rate: Math.max(.5, Math.min(2, Number(config.rate) || 1)),
+    status.config = { ...defaults, ...config, enabled: config.enabled === true, preservesPitch: config.preservesPitch === true, transportEnabled: config.transportEnabled === true, gains: [...config.gains], preampDb:Math.max(-12,Math.min(0,Number(config.preampDb)||0)),rate: Math.max(.5, Math.min(2, Number(config.rate) || 1)), pitch: Math.max(.5, Math.min(2, Number(config.pitch) || 1)),
       reverb: Math.max(0, Math.min(.8, Number(config.reverb) || 0)), echo: Math.max(0, Math.min(.8, Number(config.echo) || 0)) };
     apply(); return true;
   };
@@ -553,10 +690,13 @@ try {
   window.__lolzcloudGetAudioState = () => {
     const active = [...audio].find(media => !media.paused);
     const graph = graphs.get(active || status.currentMedia);
+    if (graph?.pitch) graph.pitch.port.postMessage({ type: 'status', epoch: graph.pitchEpoch });
+    const pitchRatio = (status.config.enabled || status.config.transportEnabled) && status.config.preservesPitch ? status.config.pitch : 1;
+    const pitch = { available: !!graph?.pitch, requested: pitchRatio, applied: !!active && graph?.pitchMeter?.epoch === graph?.pitchEpoch && graph?.pitchMeter?.settled === true && Math.abs(graph.pitchMeter.pitch - pitchRatio) <= .001 && graph.pitchMeter.processedFrames > 0, ...(graph?.pitchMeter || {}), unavailable: graph?.pitchUnavailable === true };
     const players = [...document.querySelectorAll('.playControls,#playControls,[data-testid="play-controls"],[data-testid="playback-controls"]')];
     const ui = { nativePlayersVisible: players.filter(node => node.getBoundingClientRect().height > 0 && getComputedStyle(node).visibility !== 'hidden').length,
       likeAvailable: !!document.querySelector('.playbackSoundBadge__like, .playControls .sc-button-like'), repeatAvailable: !!document.querySelector('.playControls .repeatControl, .playControls__repeat'), hiddenPromotions: Number(window.__lolzcloudPromotions?.hidden) || 0 };
-    return { normalization: normalizationMeter, attached: status.attached, unavailable: status.unavailable, reason: status.reason, mediaCount: audio.size, rate: status.rate, volume: desiredVolume ?? active?.volume ?? 1, ui, safety: { limiterAvailable: !!graph?.limiter, limiter: safety.limiter, ceilingDb: safety.ceilingDb, duckGain: safety.duckGain, ...(graph?.meter || { peakDb: -96, reductionDb: 0 }) }, sampledAt: Date.now(), tempo: { url: rhythm.url, available: rhythm.available, method: rhythm.record?.worklet ? 'worklet' : 'analyser', ...(tracker?.state(rhythm.record?.context.currentTime ?? performance.now() / 1000) || { bpm: 0, confidence: 0, beatAge: null }) } };
+    return { normalization: normalizationMeter, pitch, attached: status.attached, unavailable: status.unavailable, reason: status.reason, mediaCount: audio.size, rate: status.rate, volume: desiredVolume ?? active?.volume ?? 1, ui, safety: { limiterAvailable: !!graph?.limiter, limiter: safety.limiter, ceilingDb: safety.ceilingDb, duckGain: safety.duckGain, ...(graph?.meter || { peakDb: -96, reductionDb: 0 }) }, sampledAt: Date.now(), tempo: { url: rhythm.url, available: rhythm.available, method: rhythm.record?.worklet ? 'worklet' : 'analyser', ...(tracker?.state(rhythm.record?.context.currentTime ?? performance.now() / 1000) || { bpm: 0, confidence: 0, beatAge: null }) } };
   };
   if (tracker) setInterval(() => {
     const media = rhythmMedia(), record = media && sources.get(media);

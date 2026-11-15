@@ -1,5 +1,5 @@
 'use strict';
-const DEFAULT_SOUND = Object.freeze({ enabled: false, preset: 'Original', gains: [0, 0, 0, 0, 0], preampDb: 0, rate: 1, preservesPitch: false, reverb: 0, echo: 0 });
+const DEFAULT_SOUND = Object.freeze({ enabled: false, preset: 'Original', gains: [0, 0, 0, 0, 0], preampDb: 0, rate: 1, preservesPitch: false, pitch: 1, transportEnabled: false, reverb: 0, echo: 0 });
 const SOUND_PRESETS = Object.freeze({
   Original: { label: 'Original', description: 'Чистое звучание трека', icon: '◉', color: 'mint', gains: [0, 0, 0, 0, 0] },
   'Speed Up': { label: 'Speed Up', description: 'Быстрее и выше', icon: '↗', color: 'lime', rate: 1.2 },
@@ -19,9 +19,10 @@ function validateSoundPatch(patch) {
   if (!patch || typeof patch !== 'object' || Array.isArray(patch)) throw new Error('Некорректные настройки звука.');
   const result = {};
   for (const [key, value] of Object.entries(patch)) {
-    if (['enabled', 'preservesPitch'].includes(key)) { if (typeof value !== 'boolean') throw new Error('Нужен переключатель звукового эффекта.'); }
+    if (['enabled', 'preservesPitch', 'transportEnabled'].includes(key)) { if (typeof value !== 'boolean') throw new Error('Нужен переключатель звукового эффекта.'); }
     else if (key === 'gains') { if (!validGains(value)) throw new Error('Уровни эквалайзера должны быть от −12 до +12 дБ.'); }
     else if (key === 'rate') { if (!Number.isFinite(value) || value < .5 || value > 2) throw new Error('Выбери скорость от 0,5× до 2×.'); }
+    else if (key === 'pitch') { if (!Number.isFinite(value) || value < .5 || value > 2) throw new Error('Выбери высоту тона от 0,5× до 2×.'); }
     else if (key === 'preampDb') { if (!Number.isFinite(value) || value < -12 || value > 0) throw new Error('Уровень до обработки должен быть от −12 до 0 дБ.'); }
     else if (['reverb', 'echo'].includes(key)) { if (!Number.isFinite(value) || value < 0 || value > .8) throw new Error('Сила эффекта должна быть от 0 до 80%.'); }
     else throw new Error('Неизвестная настройка звука.');
@@ -31,7 +32,7 @@ function validateSoundPatch(patch) {
 }
 function normalizeSound(saved = {}) {
   const result = { ...DEFAULT_SOUND, gains: [...DEFAULT_SOUND.gains] };
-  for (const key of ['enabled', 'gains', 'preampDb', 'rate', 'preservesPitch', 'reverb', 'echo']) {
+  for (const key of ['enabled', 'gains', 'preampDb', 'rate', 'preservesPitch', 'pitch', 'transportEnabled', 'reverb', 'echo']) {
     if (saved[key] !== undefined) { try { Object.assign(result, validateSoundPatch({ [key]: saved[key] })); } catch { /* Ignore malformed saved values. */ } }
   }
   if (typeof saved.preset === 'string') result.preset = saved.preset.slice(0, 32);
