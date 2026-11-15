@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T01:12:12.373Z",
+  "apkSha256": "63bcb7b47b861a6d7045f1af0575d90d5e50bb87e22fc0c794db3e77a5917074",
+  "runId": "aaba4a73-79a6-4ede-af6e-08168444fb59",
+  "checks": [
+    "Actual Android native UI encrypted payload authenticates and decrypts in Node",
+    "Full normalized desktop profile survives native upload and decrypt/preview payload"
+  ],
+  "scope": "Injected isolated API transport; no personal account or live authenticated cloud mutation. Android standard crypto provider and dialog execute on the installed candidate."
+}

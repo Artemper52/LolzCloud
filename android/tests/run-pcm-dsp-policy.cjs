@@ -1,0 +1,6 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),{spawnSync}=require('node:child_process');
+const root=path.resolve(__dirname,'../..'),output=process.env.LOLZCLOUD_PCM_POLICY_OUTPUT||'D:/LolzCloud-Android-Toolchain/android-pcm/policy',classes=path.join(output,'classes');fs.mkdirSync(classes,{recursive:true});
+function run(tool,args){const file=path.join(process.env.JAVA_HOME||'C:/Program Files/Eclipse Adoptium/jdk-21.0.10.7-hotspot','bin',tool+(process.platform==='win32'?'.exe':'')),result=spawnSync(file,args,{encoding:'utf8',windowsHide:true,timeout:60000,maxBuffer:2*1024*1024});if(result.error||result.status!==0)throw result.error||Error(result.stdout+result.stderr);return result.stdout;}
+const mobile=path.join(root,'android/app/src/main/java/com/lolzcloud/mobile');run('javac',['--release','8','-encoding','UTF-8','-d',classes,path.join(mobile,'PortableAudioCurve.java'),path.join(mobile,'PcmDsp.java'),path.join(__dirname,'PcmDspPolicyTest.java')]);
+const report=JSON.parse(run('java',['-Xmx128m','-cp',classes,'com.lolzcloud.mobile.PcmDspPolicyTest']));report.checkedAt=new Date().toISOString();fs.writeFileSync(path.join(output,'pcm-dsp-policy-verification.json'),JSON.stringify(report,null,2)+'\n');console.log('PASS: '+report.checks.length+' real Java DSP policy checks');

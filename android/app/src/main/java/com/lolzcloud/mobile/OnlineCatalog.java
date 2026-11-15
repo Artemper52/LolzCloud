@@ -79,6 +79,7 @@ public final class OnlineCatalog {
             return parseTrack(json, id);
         } catch (java.net.UnknownHostException failure) { throw new IOException("Нет связи с каталогом. Проверь интернет и нажми «Повторить»", failure); }
         catch (java.net.SocketTimeoutException failure) { throw new IOException("Каталог долго отвечает. Нажми «Повторить»", failure); }
+        catch (javax.net.ssl.SSLException failure) { throw new IOException("Защищённое соединение с каталогом прервалось. Нажми «Повторить»", failure); }
         finally { if (active == connection) active = null; connection.disconnect(); }
     }
 

@@ -67,8 +67,11 @@ public final class PlaybackService extends Service {
     }
 
     static void profileImported() {
+        profileImported(true);
+    }
+    static void profileImported(final boolean applySound) {
         final PlaybackService active = running;
-        if (active != null) active.handler.post(() -> { if (running == active && !active.destroyed) active.reloadSettings(); });
+        if (active != null) active.handler.post(() -> { if (running == active && !active.destroyed) { if(applySound)active.reloadSettings();if(active.wave!=null)active.wave.tasteChanged(); } });
     }
 
     /** Main-thread native navigation controller; it creates no service and is never exposed to JavaScript. */
@@ -95,6 +98,13 @@ public final class PlaybackService extends Service {
     private PowerManager.WakeLock preparationWake;
     private LibraryStore store;
     private MediaPlayer media;
+    private PcmPlayback pcm;
+    private WaveSession wave;
+    private boolean waveInternal;
+    private PowerManager.WakeLock waveWake;
+    private long waveWakeGeneration=Long.MIN_VALUE;
+    private long dspRevision=1;
+    private boolean normalization;
     private MediaSession session;
     private AudioManager audio;
     private AudioFocusRequest focusRequest;
@@ -145,6 +155,8 @@ public final class PlaybackService extends Service {
         shuffle = prefs.getBoolean("shuffle", false);
         speed = prefs.getFloat("speed", 1f);
         pitch = prefs.getFloat("pitch", 1f);
+        normalization = prefs.getBoolean("pcm_normalization", false);
+        syncImportedNormalization();
         long savedSleep = prefs.getLong(SLEEP_DEADLINE, 0);
         SleepTimerPolicy.Deadline sleep = SleepTimerPolicy.restore(savedSleep, System.currentTimeMillis(), SystemClock.elapsedRealtime());
         sleepAt = sleep.elapsed;
@@ -172,6 +184,25 @@ public final class PlaybackService extends Service {
         IntentFilter filter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         if (Build.VERSION.SDK_INT >= 33) registerReceiver(noisyReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
         else registerReceiver(noisyReceiver, filter);
+        wave = new WaveSession(store, new WaveSession.Host() {
+            public List<Track> tracks(){return queue();}
+            public int index(){return index;}
+            public Track current(){return PlaybackService.this.current();}
+            public long occurrence(){return sourceGeneration;}
+            public long position(){return PlaybackService.this.position();}
+            public boolean playing(){return isPlaying();}
+            public Track preferred(Track track){Track saved=store.find(track.id);return saved!=null&&!saved.isCatalogReference()&&!saved.uri.startsWith("https:")?new Track(saved.id,track.title,track.artist,saved.uri,saved.duration>0?saved.duration:track.duration,saved.addedAt,track.sourceUrl,track.coverUrl.isEmpty()?saved.coverUrl:track.coverUrl):track;}
+            public void replace(List<Track> tracks){save();queue.clear();queue.addAll(tracks);index=0;previousIndices.clear();cycleVisited.clear();pendingSeek=0;loadCurrent(true);}
+            public int append(List<Track> tracks){
+                // Retain a short back history without allowing a day-long station to grow without bound.
+                if(index>30){int remove=index-20;queue.subList(0,remove).clear();index-=remove;previousIndices.clear();cycleVisited.clear();}
+                int first=queue.size();queue.addAll(tracks);save();return first;
+            }
+            public void trimFuture(){if(index>=0&&index+1<queue.size()){queue.subList(index+1,queue.size()).clear();previousIndices.clear();cycleVisited.clear();save();}}
+            public void select(int selected,boolean play){if(selected<0||selected>=queue.size())return;if(index>=0&&selected!=index)previousIndices.add(index);index=selected;pendingSeek=0;loadCurrent(play);}
+            public void hold(){waveInternal=true;try{pauseInternal(false);}finally{waveInternal=false;}}
+            public void changed(){waveChanged();}
+        });
         handler.post(tick);
         updateSession();
     }
@@ -198,14 +229,16 @@ public final class PlaybackService extends Service {
     public List<Track> queue() { return new ArrayList<>(queue); }
     public int currentIndex() { return index; }
     public boolean isPlaying() {
+        if(pcm!=null)return prepared&&pcm.playing();
         try { return media != null && prepared && media.isPlaying(); }
         catch (IllegalStateException ignored) { return false; }
     }
-    public boolean isLoading() { return playWhenReady && (preparingAudio || media != null && !prepared); }
-    public String loadingMessage() { return !isLoading() ? "" : preparingAudio ? current() != null && current().isCatalogReference() ? "Находим запись из профиля…" : "Готовим трек…" : "Загружаем аудио…"; }
+    public boolean isLoading() { return wave!=null&&wave.buffering() || playWhenReady && (preparingAudio || (media != null || pcm != null) && !prepared || pcm!=null&&prepared&&!pcm.playing()); }
+    public String loadingMessage() { return !isLoading() ? "" : wave!=null&&wave.buffering()?"Подбираем музыку для волны…":preparingAudio ? current() != null && current().isCatalogReference() ? "Находим запись из профиля…" : "Готовим трек…" : pcm!=null?"Готовим нативную обработку звука…":"Загружаем аудио…"; }
     public boolean isPrepared() { return prepared; }
     public long position() {
         try {
+            if(pcm!=null&&prepared&&!seeking)pendingSeek=pcm.position();
             if (media != null && prepared && !seeking) pendingSeek = Math.max(0, media.getCurrentPosition());
             return pendingSeek;
         }
@@ -213,6 +246,7 @@ public final class PlaybackService extends Service {
     }
     public long duration() {
         try {
+            if(pcm!=null&&prepared&&pcm.duration()>0)return pcm.duration();
             if (media != null && prepared) return Math.max(0, media.getDuration());
         } catch (IllegalStateException ignored) { }
         Track track = current();
@@ -220,14 +254,39 @@ public final class PlaybackService extends Service {
     }
     public String error() { return error; }
     public int repeat() { return repeat; }
-    public boolean shuffle() { return shuffle; }
+    public boolean shuffle() { return shuffle && (wave==null||!wave.active()); }
     public float speed() { return speed; }
     public float pitch() { return pitch; }
     public float volume() { return volume; }
     public long sleepRemainingMillis() { return sleepAt == 0 ? 0 : Math.max(0, sleepAt - SystemClock.elapsedRealtime()); }
 
+    public WaveSession.State waveState(){return wave.state();}
+    public void startWave(String prompt,boolean fromCurrent){wave.start(prompt,fromCurrent);}
+    public void stopWave(){wave.stop();}
+    public void retryWave(){wave.retry();}
+    public void shakeWave(){wave.shake();}
+    public void clearWaveRequest(){wave.clearRequest();}
+    public void configureWave(JSONObject patch)throws IOException{wave.configure(patch);}
+    public void reactWave(String kind,long occurrence)throws IOException{wave.react(kind,occurrence);}
+    public long waveOccurrence(){return sourceGeneration;}
+    public boolean canUndoWave(){return wave.canUndo();}
+    public void undoWave()throws IOException{wave.undo();}
+    public void unblockWaveArtist(String name)throws IOException{wave.unblockArtist(name);}
+
+    private void waveChanged(){
+        if(wave==null||destroyed)return;
+        if(wave.loading()){
+            if(waveWake!=null&&waveWakeGeneration!=wave.generation()){try{if(waveWake.isHeld())waveWake.release();}catch(RuntimeException ignored){}waveWake=null;}
+            if(waveWake==null)try{waveWake=((PowerManager)getSystemService(POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"LolzCloud:wave");waveWake.setReferenceCounted(false);waveWake.acquire(27000);waveWakeGeneration=wave.generation();}catch(RuntimeException ignored){}
+            if(wave.buffering()&&!foreground&&!ensureForeground()){wave.paused();return;}
+        }else if(waveWake!=null){try{if(waveWake.isHeld())waveWake.release();}catch(RuntimeException ignored){}waveWake=null;}
+        if(!isPlaying()&&!isLoading()&&foreground){stopForeground(false);foreground=false;}
+        changed(true);
+    }
+
     public void setQueue(List<Track> tracks, int selected, boolean play) {
         if (tracks == null || tracks.isEmpty()) return;
+        if(wave!=null)wave.stop();
         save();
         queue.clear();
         queue.addAll(tracks);
@@ -240,6 +299,7 @@ public final class PlaybackService extends Service {
 
     public void enqueue(Track track) {
         if (track == null) return;
+        if(wave!=null)wave.stop();
         if (queue.isEmpty()) { index = 0; pendingSeek = 0; error = ""; }
         queue.add(track);
         if (index < 0) index = 0;
@@ -261,6 +321,7 @@ public final class PlaybackService extends Service {
 
     public void removeFromQueue(int row) {
         if (row < 0 || row >= queue.size()) return;
+        if(wave!=null)wave.stop();
         boolean removedCurrent = row == index;
         boolean wasPlaying = isPlaying() || playWhenReady;
         queue.remove(row);
@@ -278,6 +339,7 @@ public final class PlaybackService extends Service {
 
     public void playIndex(int selected) {
         if (selected < 0 || selected >= queue.size()) return;
+        if(wave!=null)wave.stop();
         if (index >= 0 && selected != index) previousIndices.add(index);
         index = selected;
         pendingSeek = 0;
@@ -288,6 +350,7 @@ public final class PlaybackService extends Service {
      * Returns true only when the track was appended to the end of the queue. */
     public boolean openBookmark(Track requested, long milliseconds) {
         if (requested == null) return false;
+        if(wave!=null)wave.stop();
         Track stored = store.find(requested.id), track = stored == null ? requested : stored;
         boolean currentRecording = current() != null && current().id.equals(track.id);
         int selected = currentRecording ? index : -1;
@@ -308,6 +371,7 @@ public final class PlaybackService extends Service {
     public void toggle() { if (isPlaying() || isLoading()) pause(); else play(); }
 
     public void play() {
+        if(wave!=null&&wave.playRequested())return;
         if (current() == null) {
             error = "Сначала добавьте музыку в библиотеку";
             changed(false);
@@ -317,6 +381,7 @@ public final class PlaybackService extends Service {
         playWhenReady = true;
         resumeOnFocus = false;
         if (preparingAudio) { if (ensureForeground()) changed(true); return; }
+        if(pcm!=null){if(!prepared){if(ensureForeground())changed(true);return;}if(ensureForeground()&&acquireFocus()){pcm.parameters(speed,pitch);pcm.volume(outputVolume());pcm.play();store.recordPlayed(current());changed(true);}return;}
         if (media == null) { loadCurrent(true); return; }
         if (!prepared) { if (ensureForeground()) changed(true); return; }
         try {
@@ -331,9 +396,11 @@ public final class PlaybackService extends Service {
     public void pause() { pauseInternal(false); }
 
     private void pauseInternal(boolean resumeLater) {
+        if(wave!=null&&!waveInternal)wave.paused();
         resumeOnFocus = resumeLater;
         playWhenReady = false;
-        if (preparingAudio || media != null && !prepared) releasePlayer();
+        if (preparingAudio || (media != null || pcm != null) && !prepared) releasePlayer();
+        if(pcm!=null&&prepared)pcm.pause();
         if (media != null && prepared) {
             try { media.pause(); } catch (IllegalStateException ignored) { }
         }
@@ -344,6 +411,7 @@ public final class PlaybackService extends Service {
     }
 
     public void next() {
+        if(wave!=null&&wave.next(true))return;
         if (queue.isEmpty()) return;
         previousIndices.add(index);
         if (previousIndices.size() > 200) previousIndices.remove(0);
@@ -362,6 +430,7 @@ public final class PlaybackService extends Service {
     }
 
     public void previous() {
+        if(wave!=null)wave.replaying();
         if (queue.isEmpty()) return;
         if (position() > 3_000) { seekTo(0); return; }
         if (!previousIndices.isEmpty()) index = previousIndices.remove(previousIndices.size() - 1);
@@ -372,8 +441,10 @@ public final class PlaybackService extends Service {
     }
 
     public void seekTo(long milliseconds) {
+        if(wave!=null)wave.seeking();
         long length = duration();
         pendingSeek = Math.max(0, length > 0 ? Math.min(milliseconds, length) : milliseconds);
+        if(pcm!=null&&prepared){seeking=true;pcm.seek(pendingSeek);}
         if (media != null && prepared) {
             try { seeking = true; media.seekTo(pendingSeek, MediaPlayer.SEEK_CLOSEST); }
             catch (IllegalStateException ignored) { seeking = false; }
@@ -390,6 +461,7 @@ public final class PlaybackService extends Service {
     }
 
     public void setShuffle(boolean enabled) {
+        if(enabled&&wave!=null)wave.stop();
         shuffle = enabled;
         store.preferences().edit().putBoolean("shuffle", enabled).apply();
         changed(true);
@@ -418,6 +490,7 @@ public final class PlaybackService extends Service {
         volume = Math.max(0f, Math.min(1f, value));
         try { if (media != null) media.setVolume(outputVolume(), outputVolume()); }
         catch (IllegalStateException ignored) { }
+        if(pcm!=null)pcm.volume(outputVolume());
         changed(false);
     }
 
@@ -445,6 +518,7 @@ public final class PlaybackService extends Service {
                 .append(bass.controllable).append(':').append(bass.adjustable).append(':').append(eqAvailable()).append(':').append(reverbAvailable());
         short[] range = eqRange(); key.append(':').append(range[0]).append(':').append(range[1]);
         for (int band = 0; band < eqBandCount(); band++) key.append(':').append(eqCenterHz(band));
+        if(pcm!=null){PcmPlayback.Snapshot state=pcm.snapshot();key.append(":pcm:").append(state.audioSession).append(':').append(state.sampleRate).append(':').append(state.channels);}
         return key.toString();
     }
     public boolean eqAvailable() {
@@ -516,6 +590,7 @@ public final class PlaybackService extends Service {
     /** Includes stored bands from an earlier device/session, without changing queue or timer. */
     public boolean resetEffects() {
         SharedPreferences prefs = store.preferences();
+        syncImportedNormalization(); // Capture an unchecked import before clearing only its DSP selection.
         SharedPreferences.Editor edit = prefs.edit().putFloat("speed", 1f).putFloat("pitch", 1f)
                 .putInt("bass", 0).putBoolean("reverb", false).putInt("loudness", 0).putBoolean("eq_enabled", false);
         for (String key : AudioEffectsPolicy.storedEqBands(prefs.getAll().keySet())) edit.remove(key);
@@ -523,6 +598,7 @@ public final class PlaybackService extends Service {
         try { String neutral = PortableProfile.sound(new JSONObject()).toString(); store.preferences().edit().putString("portable_dsp", neutral).putString("portable_export_dsp", neutral).putBoolean("portable_dsp_apply", true).putBoolean("portable_dsp_pending", false).apply(); }
         catch (IOException | JSONException impossible) { throw new IllegalStateException(impossible); }
         applyPortableGain();
+        updatePcmConfiguration();
         boolean applied = bassBoost == null || AudioEffectsPolicy.applyBass(bassDriver, 0);
         if (equalizer != null) try {
             for (short band = 0; band < equalizer.getNumberOfBands(); band++) equalizer.setBandLevel(band, (short) 0);
@@ -603,22 +679,24 @@ public final class PlaybackService extends Service {
         store.preferences().edit().putString("portable_dsp", sound.toString()).putString("portable_export_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).putBoolean("portable_dsp_pending", false)
                 .putFloat("speed", rate).putFloat("pitch", sound.optBoolean("preservesPitch", false) ? 1f : rate)
                 .putInt("bass", 0).putBoolean("reverb", false).putInt("loudness", 0).apply();
+        syncImportedNormalization(true);
         reloadSettings();
     }
-    public void setPortableEnabled(boolean enabled) { try { JSONObject sound = portableSound().put("enabled", enabled); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"enabled"); try { applyEqPreferences(); } catch (RuntimeException unavailable) { } applyPortableGain(); changed(true); } catch (JSONException impossible) { throw new IllegalStateException(impossible); } }
+    public void setPortableEnabled(boolean enabled) { try { JSONObject sound = portableSound().put("enabled", enabled); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"enabled");updatePcmConfiguration(); changed(true); } catch (JSONException impossible) { throw new IllegalStateException(impossible); } }
     public void setPortableBand(int band, double gain) {
         if (band < 0 || band >= 5 || !Double.isFinite(gain) || gain < -12 || gain > 12) return;
-        try { JSONObject sound = portableSound(); JSONArray gains = sound.getJSONArray("gains"); gains.put(band, gain); sound.put("enabled", true).put("preset", "Custom"); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"gains","enabled","preset"); try { applyEqPreferences(); } catch (RuntimeException unavailable) { } applyPortableGain(); changed(false); }
+        try { JSONObject sound = portableSound(); JSONArray gains = sound.getJSONArray("gains"); gains.put(band, gain); sound.put("enabled", true).put("preset", "Custom"); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"gains","enabled","preset");updatePcmConfiguration(); changed(false); }
         catch (JSONException impossible) { throw new IllegalStateException(impossible); }
     }
     public void setPortablePreamp(double db) {
         if (!Double.isFinite(db) || db < -12 || db > 0) return;
-        try { JSONObject sound = portableSound().put("preampDb", db); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"preampDb"); applyPortableGain(); changed(false); }
+        try { JSONObject sound = portableSound().put("preampDb", db); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"preampDb");updatePcmConfiguration(); changed(false); }
         catch (JSONException impossible) { throw new IllegalStateException(impossible); }
     }
     private void applyPortableGain() {
         JSONObject sound = portableSound(); portableGain = portableSoundActive() && sound.optBoolean("enabled", false) ? (float) Math.pow(10, sound.optDouble("preampDb", 0) / 20d) : 1f;
         try { if (media != null && prepared) media.setVolume(outputVolume(), outputVolume()); } catch (RuntimeException unavailable) { }
+        if(pcm!=null)pcm.volume(outputVolume());
     }
 
     /** Reapply portable preferences after a profile import without restarting playback. */
@@ -628,16 +706,60 @@ public final class PlaybackService extends Service {
         shuffle = prefs.getBoolean("shuffle", false);
         speed = Math.max(.5f, Math.min(2f, prefs.getFloat("speed", 1f)));
         pitch = Math.max(.5f, Math.min(2f, prefs.getFloat("pitch", 1f)));
+        syncImportedNormalization();
         applySpeed();
         setBass(prefs.getInt("bass", 0));
         setReverb(prefs.getBoolean("reverb", false));
         setLoudness(prefs.getInt("loudness", 0));
         try { applyEqPreferences(); } catch (RuntimeException unavailable) { /* Keep honest device availability. */ }
         applyPortableGain();
+        updatePcmConfiguration();
         changed(true);
     }
 
+    public boolean pcmActive(){return pcm!=null;}
+    public PcmPlayback.Snapshot pcmSnapshot(){return pcm==null?null:pcm.snapshot();}
+    public boolean normalization(){return normalization;}
+    public boolean normalizationPending(){return store.preferences().getBoolean("pcm_normalization_pending",false);}
+    public void activateProfileNormalization(){syncImportedNormalization(true);updatePcmConfiguration();changed(false);}
+    public double portableEcho(){return portableSound().optDouble("echo",0);}
+    public double portableReverb(){return portableSound().optDouble("reverb",0);}
+    public void setPortableEffect(String effect,double value){
+        if(!(effect.equals("echo")||effect.equals("reverb"))||!Double.isFinite(value)||value<0||value>.8)return;
+        try{JSONObject sound=portableSound().put(effect,value).put("enabled",true);store.preferences().edit().putString("portable_dsp",sound.toString()).putBoolean("portable_dsp_apply",true).apply();exportPortableKeys(sound,effect,"enabled");updatePcmConfiguration();changed(false);}catch(JSONException impossible){throw new IllegalStateException(impossible);}
+    }
+    public void setNormalization(boolean enabled){
+        try{SharedPreferences prefs=store.preferences();JSONObject snapshot=prefs.contains("portable_profile")?PortableProfile.parse(prefs.getString("portable_profile","")):PortableProfile.normalize(new JSONObject().put("format","lolzcloud-profile").put("version",1));snapshot.getJSONObject("tools").put("normalization",enabled);String json=PortableProfile.normalize(snapshot).toString();prefs.edit().putBoolean("pcm_normalization",enabled).putString("portable_profile",json).putString("pcm_normalization_snapshot",profileFingerprint(json)).putBoolean("pcm_normalization_pending",false).apply();normalization=enabled;updatePcmConfiguration();changed(false);}catch(IOException|JSONException invalid){error="Не удалось сохранить нормализацию: "+invalid.getMessage();changed(true);}
+    }
+    private void syncImportedNormalization(){syncImportedNormalization(false);}
+    private void syncImportedNormalization(boolean explicit){
+        SharedPreferences prefs=store.preferences();if(!prefs.contains("portable_profile"))return;
+        String json=prefs.getString("portable_profile",""),fingerprint=profileFingerprint(json);boolean same=fingerprint.equals(prefs.getString("pcm_normalization_snapshot",""));
+        if(!explicit&&prefs.getBoolean("portable_dsp_pending",false)){if(!same)prefs.edit().putString("pcm_normalization_snapshot",fingerprint).putBoolean("pcm_normalization_pending",true).apply();return;}
+        if(!explicit&&(same||!prefs.getBoolean("portable_dsp_apply",false)))return;
+        try{normalization=PortableProfile.parse(json).getJSONObject("tools").getBoolean("normalization");prefs.edit().putBoolean("pcm_normalization",normalization).putString("pcm_normalization_snapshot",fingerprint).putBoolean("pcm_normalization_pending",false).apply();}catch(IOException|JSONException invalid){/* A damaged sidecar never changes the applied setting. */}
+    }
+    private static String profileFingerprint(String json){try{byte[] hash=java.security.MessageDigest.getInstance("SHA-256").digest(json.getBytes(java.nio.charset.StandardCharsets.UTF_8));StringBuilder result=new StringBuilder();for(byte b:hash)result.append(String.format(java.util.Locale.ROOT,"%02x",b&255));return result.toString();}catch(java.security.NoSuchAlgorithmException impossible){throw new IllegalStateException(impossible);}}
+    private boolean wantsPcm(){return normalization||portableSoundActive()&&portableSoundEnabled();}
+    private PcmDsp.Config pcmConfiguration(){JSONObject sound=portableSound();return new PcmDsp.Config(dspRevision,portableSoundActive()&&sound.optBoolean("enabled",false),portableGains(),sound.optDouble("preampDb",0),sound.optDouble("echo",0),sound.optDouble("reverb",0),normalization);}
+    private void updatePcmConfiguration(){
+        dspRevision++;
+        if(pcm!=null){pcm.configure(pcmConfiguration());pcm.volume(outputVolume());return;}
+        if(media!=null&&wantsPcm()){long at=position();boolean resume=isPlaying()||playWhenReady;pendingSeek=at;loadCurrent(resume);return;}
+        try{applyEqPreferences();}catch(RuntimeException unavailable){}applyPortableGain();
+    }
+    public String pcmStatus(){
+        if(pcm==null)return wantsPcm()?(error.isEmpty()?"Настройки сохранены. Включи трек, чтобы проверить PCM вывод.":error):"Исходный режим. Общая обработка выключена.";
+        PcmPlayback.Snapshot state=pcm.snapshot();if(!prepared)return "Готовим декодер и AudioTrack…";
+        if(state.state.equals("bypassed"))return "AudioTrack · исходный PCM. Обработка выключена.";
+        if(state.appliedRevision!=state.requestedRevision)return "Настройки ожидают вывода PCM. На паузе звук не запускается.";
+        String status="PCM · "+state.sampleRate+" Гц · "+state.channels+" кан. · "+(isPlaying()?"обработка в аудиовыходе":"пауза");
+        if(normalization)status+=state.normalizationMeasured?String.format(java.util.Locale.ROOT,"\nНормализация: %.1f LUFS · %+.1f дБ",state.loudness,state.normalizationDb):"\nИзмеряем громкость: первые3секунды.";
+        return status;
+    }
+
     public void stopPlayback() {
+        if(wave!=null)wave.stop();
         pause();
         pendingSeek = position();
         releasePlayer();
@@ -649,9 +771,11 @@ public final class PlaybackService extends Service {
 
     private void loadCurrent(boolean play) {
         releasePlayer();
+        syncImportedNormalization();
         error = "";
         playWhenReady = play;
         Track track = current();
+        if(wave!=null)wave.loaded(sourceGeneration);
         if (track == null) { changed(true); return; }
         if (track.isCatalogReference()) {
             Track saved = store.find(track.id);
@@ -754,6 +878,7 @@ public final class PlaybackService extends Service {
     }
 
     private void openPlayer(final Track track) {
+        if(wantsPcm()){openPcm(track);return;}
         final MediaPlayer player;
         try { player = new MediaPlayer(); }
         catch (RuntimeException failure) { fail("Не удалось запустить аудиоплеер Android. Нажми «Повторить»"); return; }
@@ -789,13 +914,7 @@ public final class PlaybackService extends Service {
             player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override public void onCompletion(MediaPlayer value) {
                     if (media != value) return;
-                    if (repeat == 2) { seekTo(0); play(); return; }
-                    if (repeat == 0 && ((!shuffle && index >= queue.size() - 1)
-                            || (shuffle && cycleVisited.size() >= queue.size()))) {
-                        pendingSeek = 0;
-                        try { seeking = true; value.seekTo(0); } catch (RuntimeException ignored) { seeking = false; }
-                        pause();
-                    } else next();
+                    naturalEnd();
                 }
             });
             player.setOnErrorListener(new MediaPlayer.OnErrorListener() {
@@ -825,6 +944,28 @@ public final class PlaybackService extends Service {
         } catch (IOException | RuntimeException failure) {
             fail(playbackFailure(track.uri, 0, MediaPlayer.MEDIA_ERROR_IO));
         }
+    }
+
+    private void openPcm(final Track track){
+        final long generation=sourceGeneration;
+        final PcmPlayback player=new PcmPlayback(this,track.uri,pendingSeek,pcmConfiguration(),new PcmPlayback.Listener(){
+            private boolean owns(PcmPlayback value){return pcm==value&&!destroyed&&sourceGeneration==generation;}
+            public void prepared(PcmPlayback value){if(!owns(value))return;if(playerDeadline!=null){handler.removeCallbacks(playerDeadline);playerDeadline=null;}prepared=true;pendingSeek=value.position();value.parameters(speed,pitch);value.volume(outputVolume());if(playWhenReady&&ensureForeground()&&acquireFocus()){value.play();store.recordPlayed(current());}save();changed(true);}
+            public void seeked(PcmPlayback value,long epoch){if(!owns(value)||value.epoch()!=epoch)return;seeking=false;pendingSeek=value.position();save();changed(false);}
+            public void completed(PcmPlayback value,long epoch){if(owns(value)&&value.epoch()==epoch)naturalEnd();}
+            public void failed(PcmPlayback value,String message){if(owns(value))fail(message);}
+            public void stateChanged(PcmPlayback value){if(owns(value))changed(true);}
+        });
+        pcm=player;prepared=false;seeking=false;player.parameters(speed,pitch);player.volume(outputVolume());
+        playerDeadline=()->{if(pcm==player&&!prepared)fail("Подготовка PCM заняла слишком много времени. Нажми «Повторить»");};handler.postDelayed(playerDeadline,30000);player.prepare();changed(true);
+    }
+
+    private void naturalEnd(){
+        if(!playWhenReady)return;
+        if(repeat==2){seekTo(0);play();return;}
+        if(wave!=null&&wave.completed(sourceGeneration))return;
+        if(repeat==0&&((!shuffle&&index>=queue.size()-1)||(shuffle&&cycleVisited.size()>=queue.size()))){seekTo(0);pause();}
+        else next();
     }
 
     private static String playbackFailure(String address, int what, int extra) {
@@ -858,6 +999,7 @@ public final class PlaybackService extends Service {
     }
 
     private void applySpeed() {
+        if(pcm!=null){pcm.parameters(speed,pitch);return;}
         if (media == null || !prepared) return;
         boolean playing = isPlaying();
         try {
@@ -883,7 +1025,7 @@ public final class PlaybackService extends Service {
         if (audio.requestAudioFocus(focusRequest) == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
             hasFocus = true;
             ducked = false;
-            try { if (media != null) media.setVolume(volume, volume); } catch (IllegalStateException ignored) { }
+            applySinkVolume();
             return true;
         }
         abandonFocus();
@@ -902,7 +1044,8 @@ public final class PlaybackService extends Service {
         ducked = false;
     }
 
-    private float outputVolume() { return volume * (ducked ? .2f : 1f) * portableGain; }
+    private float outputVolume() { return volume * (ducked ? .2f : 1f) * (pcm==null?portableGain:1f); }
+    private void applySinkVolume(){try{if(media!=null)media.setVolume(outputVolume(),outputVolume());}catch(IllegalStateException ignored){}if(pcm!=null)pcm.volume(outputVolume());}
 
     private boolean ensureForeground() {
         if (foreground) return true;
@@ -922,6 +1065,7 @@ public final class PlaybackService extends Service {
     }
 
     private void fail(String message) {
+        if(wave!=null)wave.paused();
         pendingSeek = position();
         error = message;
         playWhenReady = false;
@@ -938,6 +1082,7 @@ public final class PlaybackService extends Service {
         if (sourceTask != null) sourceTask.cancel(true);
         sourceCatalog.cancel();
         finishPreparation();
+        if(pcm!=null){pcm.close();pcm=null;}
         if (playerDeadline != null) { handler.removeCallbacks(playerDeadline); playerDeadline = null; }
         prepared = false;
         seeking = false;
@@ -1034,13 +1179,11 @@ public final class PlaybackService extends Service {
                 pauseInternal(resume);
             } else if (change == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
                 ducked = true;
-                try { if (media != null) media.setVolume(outputVolume(), outputVolume()); }
-                catch (IllegalStateException ignored) { }
+                applySinkVolume();
             } else if (change == AudioManager.AUDIOFOCUS_GAIN) {
                 hasFocus = true;
                 ducked = false;
-                try { if (media != null) media.setVolume(volume, volume); }
-                catch (IllegalStateException ignored) { }
+                applySinkVolume();
                 if (resumeOnFocus) { resumeOnFocus = false; play(); }
             }
         }
@@ -1054,6 +1197,7 @@ public final class PlaybackService extends Service {
 
     private final Runnable tick = new Runnable() {
         @Override public void run() {
+            if(wave!=null)wave.tick();
             if (sleepAt > 0 && SystemClock.elapsedRealtime() >= sleepAt) {
                 sleepAt = 0;
                 store.preferences().edit().putLong(SLEEP_DEADLINE, 0).apply();
@@ -1082,6 +1226,8 @@ public final class PlaybackService extends Service {
         destroyed = true;
         if (running == this) running = null;
         save();
+        if(wave!=null)wave.close();
+        if(waveWake!=null){try{if(waveWake.isHeld())waveWake.release();}catch(RuntimeException ignored){}waveWake=null;}
         handler.removeCallbacksAndMessages(null);
         listener = null;
         releasePlayer();

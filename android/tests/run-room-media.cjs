@@ -12,7 +12,7 @@ run(['shell','rm','-f','/sdcard/Android/data/com.lolzcloud.mobile/files/room-med
 const stdout=run(['shell','am','instrument','-w','com.lolzcloud.mobile.test/com.lolzcloud.mobile.test.RoomMediaInstrumentation']);
 fs.writeFileSync(path.join(output,'instrumentation-stdout.txt'),stdout);
 const report=JSON.parse(run(['exec-out','cat','/sdcard/Android/data/com.lolzcloud.mobile/files/room-media-review/android-room-media-test.json']));
-const version=JSON.parse(fs.readFileSync(path.join(project,'version.json'),'utf8')),apk=path.join(project,'output','LolzCloud-Android-'+version.versionName+'.apk');
+const version=JSON.parse(fs.readFileSync(path.join(project,'version.json'),'utf8')),apk=path.join(process.env.LOLZCLOUD_ANDROID_OUTPUT||path.join(project,'output'),'LolzCloud-Android-'+version.versionName+'.apk');
 const sha=crypto.createHash('sha256').update(fs.readFileSync(apk)).digest('hex');
 if(report.apkSha256!==sha||report.version!==version.versionName||report.versionCode!==version.versionCode)throw Error('Installed target does not match the current production artifact.');
 report.generatedAt=new Date().toISOString();report.emulator='emulator-5554';report.api=run(['shell','getprop','ro.build.version.sdk']).trim();

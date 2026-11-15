@@ -40,7 +40,7 @@ if (fs.existsSync(fixtureMetadata)) {
   if (!metadata.fixtureOnly || !metadata.neverInstallNewerApk || metadata.current.versionName !== version.versionName || metadata.current.versionCode !== version.versionCode)
     throw new Error('Updater fixtures do not match the current Android baseline. Run build-update-fixtures.cjs.');
   const hash = file => crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
-  const production = path.join(project, 'output', 'LolzCloud-Android-' + version.versionName + '.apk');
+  const production = path.join(process.env.LOLZCLOUD_ANDROID_OUTPUT || path.join(project, 'output'), 'LolzCloud-Android-' + version.versionName + '.apk');
   if (hash(production) !== metadata.current.sha256) throw new Error('Production APK changed after updater fixture generation. Regenerate fixtures.');
   for (const [name, info] of [['current.apk', metadata.current], ['next.apk', metadata.next], ['wrong-signer.apk', metadata.wrongSigner]])
     if (hash(path.join(fixtureDirectory, name)) !== info.sha256) throw new Error('Updater fixture checksum changed: ' + name);

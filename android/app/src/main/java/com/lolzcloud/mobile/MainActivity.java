@@ -75,6 +75,12 @@ public final class MainActivity extends Activity {
     private Drawable forestArtwork;
     private String soundCapabilities = "";
     private TextView sleepTimerLabel;
+    private EditText wavePromptInput;
+    private String waveDraft="";
+    private TextView waveStatusText,waveCurrentText,waveReasonText,wavePlayButton,waveNextButton,waveLoveButton,waveBanButton,waveArtistButton,waveUndoButton,waveRetryButton,waveStopButton,waveQueueButton,waveClearButton,waveStartButton;
+    private boolean waveRestoreFocus,waveRestoreIme;
+    private int waveRestoreSelection;
+    private AlertDialog waveDialog;
     private static final int IMPORT_AUDIO=41, IMPORT_LYRICS=42, EXPORT_PROFILE=43, IMPORT_PROFILE=44, EXPORT_PROFILE_BACKUP=45;
     private String pendingLyricsId;
     private String pendingProfileCache;
@@ -98,7 +104,7 @@ public final class MainActivity extends Activity {
         searchSource=store.preferences().getString("search_source","soundcloud");
         forestArtwork=getResources().getDrawable(R.drawable.forest_art,getTheme());
         if(saved!=null) { page=saved.getString("page","wave"); filter=saved.getString("filter","all"); query=saved.getString("query",""); pendingLyricsId=saved.getString("pending_lyrics"); }
-        if(saved!=null)restoreCatalog(saved);
+        if(saved!=null){restoreCatalog(saved);waveDraft=saved.getString("wave_draft","");}
         if(!Arrays.asList("soundcloud","youtube","local").contains(searchSource))searchSource="soundcloud";
         updater=new UpdateManager(this,new UpdateManager.Listener(){
             @Override public void onStatus(String message){updateStatus=message;if(statusText!=null)statusText.setText(message);}
@@ -122,8 +128,8 @@ public final class MainActivity extends Activity {
     }
     @Override protected void onResume(){super.onResume();if(updater!=null)updater.resumePendingInstall();if(social!=null){social.addListener(socialListener);social.refresh();}}
     @Override protected void onPause(){if(cloudProfiles!=null)cloudProfiles.suspend();if(social!=null)social.removeListener(socialListener);super.onPause();}
-    @Override protected void onSaveInstanceState(Bundle state){super.onSaveInstanceState(state);state.putString("page",page);state.putString("filter",filter);state.putString("query",query);state.putString("pending_lyrics",pendingLyricsId);state.putString("link_kind",activeLinkKind);state.putString("link_text",linkInput==null?"":linkInput.getText().toString());if(!profileCommitting){state.putString("profile_preview",pendingProfileCache);state.putBoolean("profile_sound",profileSound==null||profileSound.isChecked());if(pendingProfileOwner!=null){state.putString("profile_owner",pendingProfileOwner.id);state.putString("profile_fingerprint",pendingProfileOwner.fingerprint);}}saveCatalog(state);}
-    @Override protected void onDestroy(){alive=false;if(cloudProfiles!=null)cloudProfiles.close();cancelCatalog();cancelLyrics();handler.removeCallbacksAndMessages(null);if(linkDialog!=null)linkDialog.dismiss();if(lyricsDialog!=null)lyricsDialog.dismiss();if(profileDialog!=null)profileDialog.dismiss();if(!isChangingConfigurations()&&!profileCommitting)discardProfilePreview();if(player!=null)player.setListener(null);if(bound)unbindService(connection);io.shutdownNow();catalogIo.shutdownNow();lyricsIo.shutdownNow();artworkIo.shutdownNow();artworkWaiters.clear();if(updater!=null)updater.dispose();super.onDestroy();}
+    @Override protected void onSaveInstanceState(Bundle state){super.onSaveInstanceState(state);state.putString("page",page);state.putString("filter",filter);state.putString("query",query);state.putString("wave_draft",waveDraft);state.putString("pending_lyrics",pendingLyricsId);state.putString("link_kind",activeLinkKind);state.putString("link_text",linkInput==null?"":linkInput.getText().toString());if(!profileCommitting){state.putString("profile_preview",pendingProfileCache);state.putBoolean("profile_sound",profileSound==null||profileSound.isChecked());if(pendingProfileOwner!=null){state.putString("profile_owner",pendingProfileOwner.id);state.putString("profile_fingerprint",pendingProfileOwner.fingerprint);}}saveCatalog(state);}
+    @Override protected void onDestroy(){alive=false;if(cloudProfiles!=null)cloudProfiles.close();cancelCatalog();cancelLyrics();handler.removeCallbacksAndMessages(null);if(linkDialog!=null)linkDialog.dismiss();if(lyricsDialog!=null)lyricsDialog.dismiss();if(waveDialog!=null)waveDialog.dismiss();if(profileDialog!=null)profileDialog.dismiss();if(!isChangingConfigurations()&&!profileCommitting)discardProfilePreview();if(player!=null)player.setListener(null);if(bound)unbindService(connection);io.shutdownNow();catalogIo.shutdownNow();lyricsIo.shutdownNow();artworkIo.shutdownNow();artworkWaiters.clear();if(updater!=null)updater.dispose();super.onDestroy();}
     private final Runnable tick=new Runnable(){@Override public void run(){if(alive){updatePlayback();handler.postDelayed(this,750);}}};
     private int dp(float value){return Math.round(value*getResources().getDisplayMetrics().density);}
     private void theme(){
@@ -141,6 +147,10 @@ public final class MainActivity extends Activity {
 
     private void render(){
         sleepTimerLabel=null;
+        waveRestoreFocus=page.equals("wave")&&wavePromptInput!=null&&wavePromptInput.hasFocus();
+        waveRestoreSelection=waveRestoreFocus?wavePromptInput.getSelectionStart():0;
+        waveRestoreIme=waveRestoreFocus&&Build.VERSION.SDK_INT>=30&&wavePromptInput.getRootWindowInsets()!=null&&wavePromptInput.getRootWindowInsets().isVisible(WindowInsets.Type.ime());
+        wavePromptInput=null;waveStatusText=null;
         boolean restoreSearchFocus=page.equals("search")&&searchInput!=null&&searchInput.hasFocus();
         int selectionStart=restoreSearchFocus?searchInput.getSelectionStart():0,selectionEnd=restoreSearchFocus?searchInput.getSelectionEnd():0;
         boolean restoreIme=restoreSearchFocus&&Build.VERSION.SDK_INT>=30&&searchInput.getRootWindowInsets()!=null&&searchInput.getRootWindowInsets().isVisible(WindowInsets.Type.ime());
@@ -153,6 +163,7 @@ public final class MainActivity extends Activity {
         content=column();content.setPadding(dp(24),dp(8),dp(24),dp(26));scroll.addView(content,new ScrollView.LayoutParams(-1,-2));root.addView(scroll,new LinearLayout.LayoutParams(-1,0,1));
         switch(page){case "search":search();break;case "library":library();break;case "rooms":rooms();break;case "player":nowPlaying();break;case "queue":queue();break;case "lyrics":lyrics();break;case "sound":sound();break;case "profile":profile();break;case "bookmarks":bookmarks();break;default:wave();}
         if(!page.equals("player")&&current()!=null)miniPlayer();if(tabPage())bottomNav();updatePlayback();updateSocialStatus();
+        if(waveRestoreFocus&&wavePromptInput!=null){wavePromptInput.requestFocus();wavePromptInput.setSelection(Math.max(0,Math.min(waveRestoreSelection,wavePromptInput.length())));if(waveRestoreIme)wavePromptInput.post(()->{if(alive&&wavePromptInput!=null)((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).showSoftInput(wavePromptInput,InputMethodManager.SHOW_IMPLICIT);});}
         if(restoreSearchFocus&&searchInput!=null){searchInput.requestFocus();searchInput.setSelection(Math.max(0,Math.min(selectionStart,query.length())),Math.max(0,Math.min(selectionEnd,query.length())));if(restoreIme)searchInput.post(()->{if(alive&&searchInput!=null)((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).showSoftInput(searchInput,InputMethodManager.SHOW_IMPLICIT);});}
     }
     private void header(){
@@ -178,22 +189,79 @@ public final class MainActivity extends Activity {
     }
     private void heading(String title,String subtitle){content.addView(text(title,30,ink,true));if(subtitle!=null&&!subtitle.isEmpty()){TextView s=text(subtitle,14,muted,false);s.setPadding(0,dp(7),0,dp(20));content.addView(s);}}
     private void wave(){
-        heading("Моя волна","Из твоей библиотеки");
-        Cover cover=new Cover(null);LinearLayout.LayoutParams art=new LinearLayout.LayoutParams(dp(232),dp(232));art.gravity=Gravity.CENTER_HORIZONTAL;art.topMargin=dp(4);art.bottomMargin=dp(18);content.addView(cover,art);
-        TextView eyebrow=text(store.tracks().isEmpty()?"НАЧНИ С ЛЮБИМОЙ МУЗЫКИ":"ТВОЯ ЛИЧНАЯ РАДИОСТАНЦИЯ",10,muted,true);eyebrow.setLetterSpacing(.12f);eyebrow.setGravity(Gravity.CENTER);content.addView(eyebrow);
-        gap(12);content.addView(button(store.tracks().isEmpty()?"Добавить музыку":"Включить волну",true,()->{if(store.tracks().isEmpty())importAudio();else startWave(false);}));
-        if(store.tracks().isEmpty()){
-            paragraph("Выбери аудиофайлы на телефоне. LolzCloud соберёт очередь, а любимые треки будут звучать чаще.");section("Онлайн-источники");sourceRows();
-        }else{
-            gap(18);LinearLayout chips=row();chips.addView(chip("Вся музыка",true,()->startWave(false)));chips.addView(chip("Любимые",false,()->startWave(true)));content.addView(horizontal(chips));
-            section("Недавно добавлены");List<Track> list=store.tracks();Collections.reverse(list);for(int i=0;i<Math.min(4,list.size());i++)trackRow(content,list.get(i),list,i,false);
-        }
+        heading("Моя волна","Новая музыка по твоим вкусам");
+        Cover cover=new Cover(null);LinearLayout.LayoutParams art=new LinearLayout.LayoutParams(dp(164),dp(164));art.gravity=Gravity.CENTER_HORIZONTAL;art.bottomMargin=dp(16);content.addView(cover,art);
+        waveCurrentText=text("Твоя личная радиостанция",19,ink,true);waveCurrentText.setTag("wave_current");content.addView(waveCurrentText);
+        waveReasonText=text("Лайки, история и настройки помогают выбирать следующие песни.",13,muted,false);waveReasonText.setPadding(0,dp(6),0,dp(12));content.addView(waveReasonText);
+        waveStatusText=text("",13,muted,false);waveStatusText.setTag("wave_status");waveStatusText.setPadding(0,0,0,dp(12));content.addView(waveStatusText);
+        LinearLayout transport=row();
+        wavePlayButton=button("Пауза",false,()->{if(player!=null)player.toggle();});wavePlayButton.setTag("wave_play");LinearLayout.LayoutParams playSpace=new LinearLayout.LayoutParams(0,-2,1);playSpace.setMargins(0,0,dp(6),dp(12));transport.addView(wavePlayButton,playSpace);
+        waveNextButton=button("Дальше",false,()->{if(player!=null)player.next();});waveNextButton.setTag("wave_next");LinearLayout.LayoutParams nextSpace=new LinearLayout.LayoutParams(0,-2,1);nextSpace.setMargins(dp(6),0,0,dp(12));transport.addView(waveNextButton,nextSpace);content.addView(transport);
+        wavePromptInput=edit("Например: спокойный инди для вечера");wavePromptInput.setTag("wave_prompt");wavePromptInput.setFilters(new InputFilter[]{new InputFilter.LengthFilter(240)});wavePromptInput.setText(waveDraft);wavePromptInput.setMinHeight(dp(56));wavePromptInput.setMaxLines(3);wavePromptInput.setInputType(InputType.TYPE_CLASS_TEXT|InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);wavePromptInput.setImeOptions(EditorInfo.IME_ACTION_DONE|EditorInfo.IME_FLAG_NO_EXTRACT_UI);content.addView(wavePromptInput);
+        wavePromptInput.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int a,int c,int f){}public void onTextChanged(CharSequence s,int a,int b,int c){waveDraft=s.toString();}public void afterTextChanged(Editable e){}});
+        gap(12);waveStartButton=button("Включить волну",true,()->{if(player==null){toast("Плеер подключается. Попробуй ещё раз.");return;}hideKeyboard();player.startWave(waveDraft,false);updateWave();});waveStartButton.setTag("wave_start");content.addView(waveStartButton);
+        TextView from=button("По текущему треку",false,()->{if(player==null)return;hideKeyboard();player.startWave("",true);updateWave();});from.setTag("wave_from_current");gap(8);content.addView(from);
+        waveRetryButton=button("Повторить",true,()->{if(player==null)return;if(!player.error().isEmpty())player.play();else player.retryWave();});waveRetryButton.setTag("wave_retry");gap(8);content.addView(waveRetryButton);
+        waveLoveButton=button("Нравится",false,()->waveReact("love"));waveLoveButton.setTag("wave_love");gap(8);content.addView(waveLoveButton);
+        waveBanButton=button("Больше не предлагать трек",false,()->waveReact("ban"));waveBanButton.setTag("wave_ban");gap(8);content.addView(waveBanButton);
+        waveArtistButton=button("Не предлагать исполнителя",false,()->waveReact("artist-ban"));waveArtistButton.setTag("wave_artist_ban");gap(8);content.addView(waveArtistButton);
+        waveUndoButton=button("Отменить последнюю реакцию",false,()->{if(player!=null)try{player.undoWave();updateWave();}catch(IOException failure){toast(failure.getMessage());}});waveUndoButton.setTag("wave_undo");gap(8);content.addView(waveUndoButton);
+        section("Подбор");actionRow("sound","Настроить волну","Настроение, занятие, язык и новизна",this::waveSettingsDialog,null);
+        waveQueueButton=button("Очередь волны",false,()->navigate("queue"));waveQueueButton.setTag("wave_queue");content.addView(waveQueueButton);
+        gap(8);content.addView(button("Обновить следующие песни",false,()->{if(player!=null)player.shakeWave();}));
+        waveClearButton=button("Убрать запрос из подбора",false,()->{waveDraft="";if(wavePromptInput!=null)wavePromptInput.setText("");if(player!=null)player.clearWaveRequest();});gap(8);content.addView(waveClearButton);
+        waveStopButton=button("Остановить подбор",false,()->{if(player!=null)player.stopWave();updateWave();});waveStopButton.setTag("wave_stop");gap(8);content.addView(waveStopButton);
+        paragraph(store.privateMode()?"Приватный режим: история и реакции не сохраняются и не отправляются. Для подбора используются лайки, настройки и твой явный запрос.":"Для подбора отправляются сведения о публичных треках, вкусах и прослушивании. Аудиофайлы с телефона остаются на устройстве.");
+        section("На телефоне");actionRow("shuffle","Офлайн-микс","Перемешать только сохранённые аудиофайлы",()->startOfflineMix(false),null);actionRow("folder","Добавить аудиофайлы","Через системный проводник",this::importAudio,null);
+        updateWave();
     }
-    private void startWave(boolean liked){
+    private void startOfflineMix(boolean liked){
         List<Track> list=liked?store.liked():store.tracks();if(list.isEmpty()){toast("Сначала отметь любимые треки");return;}
+        for(int i=list.size()-1;i>=0;i--)if(list.get(i).isCatalogReference()||list.get(i).uri.startsWith("https:")||!LibraryStore.isPlayable(this,list.get(i).uri))list.remove(i);
+        if(list.isEmpty()){toast("Добавь аудиофайлы или сохрани онлайн-треки офлайн");return;}
         Collections.shuffle(list);List<Track> history=store.history();Set<String> recent=new HashSet<>();for(int i=0;i<Math.min(8,history.size());i++)recent.add(history.get(i).id);
         Collections.sort(list,(a,b)->{int aw=(recent.contains(a.id)?2:0)-(store.isLiked(a.id)?1:0),bw=(recent.contains(b.id)?2:0)-(store.isLiked(b.id)?1:0);return Integer.compare(aw,bw);});
         playList(list,0);navigate("player");
+    }
+
+    private void updateWave(){
+        if(waveStatusText==null||!page.equals("wave"))return;
+        if(player==null){waveStatusText.setText("Подключаем плеер…");return;}
+        WaveSession.State state=player.waveState();Track track=current();
+        waveCurrentText.setText(state.active&&track!=null&&!state.waiting?track.title+"\n"+track.artist:"Твоя личная радиостанция");
+        waveReasonText.setText(!state.reason.isEmpty()?state.reason:"Лайки, история и настройки помогают выбирать следующие песни.");
+        String failure=!state.error.isEmpty()?state.error:player.error();
+        String status=!failure.isEmpty()?failure:state.waiting&&state.loading?"Подбираем музыку…":state.active?((player.isPlaying()?"Волна играет":player.isLoading()?player.loadingMessage():"Волна на паузе")+" · дальше "+state.queued+" треков"+(state.loading?" · догружаем":"")):"Выбери любимую музыку, задай жанр или опиши, что хочется услышать.";
+        if(!state.request.isEmpty())status+="\nЗапрос: "+state.request;if(!state.note.isEmpty())status+="\n"+state.note;if(!state.context.isEmpty()&&state.active)status+="\n"+state.context;
+        waveStatusText.setText(status);waveStatusText.setTextColor(failure.isEmpty()?muted:Color.rgb(206,115,106));
+        waveStartButton.setText(state.active?"Подобрать новую":"Включить волну");
+        wavePlayButton.setVisibility(state.active?View.VISIBLE:View.GONE);wavePlayButton.setText(player.isPlaying()||player.isLoading()?"Пауза":"Продолжить волну");
+        waveNextButton.setVisibility(state.active?View.VISIBLE:View.GONE);waveNextButton.setEnabled(!state.waiting||!state.loading);
+        waveRetryButton.setVisibility(!failure.isEmpty()&&!state.loading?View.VISIBLE:View.GONE);
+        for(TextView view:new TextView[]{waveLoveButton,waveBanButton,waveArtistButton})view.setVisibility(state.canReact?View.VISIBLE:View.GONE);
+        waveLoveButton.setText(state.loved?"Убрать «Нравится»":"Нравится");waveUndoButton.setVisibility(player.canUndoWave()?View.VISIBLE:View.GONE);
+        waveStopButton.setVisibility(state.active?View.VISIBLE:View.GONE);waveClearButton.setVisibility(state.request.isEmpty()?View.GONE:View.VISIBLE);
+        waveQueueButton.setText(state.active?"Очередь волны · "+state.queued+" дальше":"Открыть очередь");
+    }
+    private void waveReact(String kind){if(player==null)return;try{WaveSession.State state=player.waveState();player.reactWave(kind.equals("love")&&state.loved?"unlove":kind,player.waveOccurrence());updateWave();}catch(IOException failure){toast(failure.getMessage());}}
+
+    private void waveSettingsDialog(){
+        if(player==null){toast("Плеер подключается. Попробуй ещё раз.");return;}
+        try{
+            JSONObject wave=store.waveSettings(),settings=wave.getJSONObject("preferences");LinearLayout form=column();form.setPadding(dp(20),dp(8),dp(20),dp(16));
+            String[] keys={"mood","activity","character","language"};
+            String[][] codes={{"any","calm","energetic","happy","sad"},{"any","focus","relax","workout","sleep"},{"mixed","familiar","discover"},{"any","ru","en","instrumental"}};
+            String[][] labels={{"Любое настроение","Спокойно","Энергично","Радостно","Грустно"},{"Любое занятие","Сосредоточиться","Отдохнуть","Тренировка","Сон"},{"Знакомое и новое","Знакомое","Открытия"},{"Любой язык","Русский","Английский","Без слов"}};
+            Spinner[] selectors=new Spinner[4];
+            for(int i=0;i<4;i++){Spinner choice=new Spinner(this);choice.setMinimumHeight(dp(52));choice.setTag("wave_setting_"+keys[i]);choice.setAdapter(new ArrayAdapter<>(this,android.R.layout.simple_spinner_dropdown_item,labels[i]));int at=Arrays.asList(codes[i]).indexOf(settings.getString(keys[i]));choice.setSelection(Math.max(0,at));form.addView(choice,new LinearLayout.LayoutParams(-1,-2));selectors[i]=choice;}
+            EditText genre=edit("Жанр, например инди");genre.setTag("wave_setting_genre");genre.setText(settings.optString("genre",""));genre.setFilters(new InputFilter[]{new InputFilter.LengthFilter(80)});genre.setSingleLine(true);form.addView(genre);
+            TextView novelty=text("Больше нового",14,ink,true);novelty.setPadding(0,dp(12),0,0);form.addView(novelty);SeekBar adventurous=new SeekBar(this);adventurous.setTag("wave_setting_adventurous");adventurous.setMax(100);adventurous.setProgress((int)Math.round(wave.optDouble("adventurous",.35)*100));form.addView(adventurous);
+            CheckBox context=new CheckBox(this);context.setText("Учитывать время суток и прослушивания");context.setTextColor(ink);context.setChecked(settings.optBoolean("autoContext",true));context.setMinHeight(dp(48));form.addView(context);
+            JSONArray blocked=wave.getJSONArray("blockedArtists");if(blocked.length()>0){form.addView(text("Не предлагать исполнителей",14,ink,true));for(int i=0;i<blocked.length();i++){final String name=blocked.getString(i);TextView restore=button("Вернуть: "+name,false,()->{try{player.unblockWaveArtist(name);toast("Исполнитель снова доступен для подбора");}catch(IOException failure){toast(failure.getMessage());}});form.addView(restore);}}
+            TextView error=text("",13,Color.rgb(206,115,106),false);error.setVisibility(View.GONE);form.addView(error);ScrollView scroll=new ScrollView(this);scroll.addView(form);
+            AlertDialog dialog=new AlertDialog.Builder(this).setTitle("Настройки волны").setView(scroll).setNegativeButton("Отмена",null).setNeutralButton("По умолчанию",null).setPositiveButton("Сохранить",null).create();
+            waveDialog=dialog;dialog.setOnShowListener(d->{dialog.getWindow().setBackgroundDrawable(round(panel,24));dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{try{JSONObject patch=new JSONObject();for(int i=0;i<keys.length;i++)patch.put(keys[i],codes[i][selectors[i].getSelectedItemPosition()]);patch.put("genre",genre.getText().toString()).put("autoContext",context.isChecked()).put("adventurous",adventurous.getProgress()/100d);player.configureWave(patch);dialog.dismiss();updateWave();}catch(IOException|JSONException failure){error.setText(failure.getMessage());error.setVisibility(View.VISIBLE);}});dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(v->{try{player.configureWave(new JSONObject().put("mood","any").put("activity","any").put("character","mixed").put("language","any").put("genre","").put("autoContext",true).put("adventurous",.35));dialog.dismiss();updateWave();}catch(IOException|JSONException failure){error.setText(failure.getMessage());error.setVisibility(View.VISIBLE);}});});dialog.show();
+        }catch(IOException|JSONException failure){toast(failure.getMessage());}
     }
     private void search(){
         heading("Поиск","Выбери, где искать музыку");
@@ -353,23 +421,28 @@ public final class MainActivity extends Activity {
         if(player==null){paragraph("Плеер подключается…");return;}
         soundCapabilities=player.effectsCapabilitiesKey();
         LinearLayout presets=row();presets.addView(chip("Обычная скорость",false,()->tempoPreset(1f,1f)));presets.addView(chip("Slowed",false,()->tempoPreset(.85f,.9f)));presets.addView(chip("Speed up",false,()->tempoPreset(1.2f,1.1f)));content.addView(horizontal(presets));
-        section("Скорость");slider(String.format(Locale.ROOT,"%.2f×",player.speed()),150,Math.round((player.speed()-.5f)*100),value->{player.setSpeed(.5f+value/100f);},value->String.format(Locale.ROOT,"%.2f×",.5f+value/100f));
-        section("Бас на этом устройстве");if(player.bassAvailable()){if(player.bassStrengthSupported())effectSlider("Bass Boost · "+player.bass()/10+"%",100,player.bass()/10,value->player.setBass(value*10),()->player.bass()/10,value->"Bass Boost · "+value+"%");else switchRow("Bass Boost",player.bassStatus(),player.bassEnabled(),enabled->{if(!player.setBass(enabled?1000:0))toast("Аудиосистема не применила эффект.");render();});}else paragraph(player.bassStatus());
+        section("Скорость");slider(String.format(Locale.ROOT,"%.2f×",player.speed()),150,Math.round((player.speed()-.5f)*100),value->player.setSpeed(.5f+value/100f),value->String.format(Locale.ROOT,"%.2f×",.5f+value/100f));
+        section("Тон");slider(String.format(Locale.ROOT,"%.2f×",player.pitch()),150,Math.round((player.pitch()-.5f)*100),value->player.setPitch(.5f+value/100f),value->String.format(Locale.ROOT,"%.2f×",.5f+value/100f));
         section("Переносимый эквалайзер");
         if(player.portableProfilePending()){paragraph("Сохранённый звук из профиля пока не применяется. Текущие настройки продолжают действовать, в том числе на следующих треках.");content.addView(button("Применить звук из профиля",false,()->{player.activatePortableSound();render();}));}
-        if(!player.portableSoundActive()){if(!player.portableProfilePending()){paragraph("Здесь остаётся прежний локальный звук. Общая кривая применится приблизительно по полосам этого устройства.");content.addView(button("Применить сохранённый звук",false,()->{player.activatePortableSound();render();}));}}
-        else{
-            switchRow("Обработка профиля","Пять общих полос; аппаратный результат приблизительный",player.portableSoundEnabled(),enabled->{player.setPortableEnabled(enabled);render();});
-            double[] gains=player.portableGains();final TextView[] actual={null};
-            for(int i=0;i<5;i++){final int band=i;final String hz=(int)PortableAudioCurve.FREQUENCIES[i]+" Гц";SeekBar control=slider(hz+" · "+String.format(Locale.ROOT,"%+.1f dB",gains[i]),240,(int)Math.round((gains[i]+12)*10),value->{player.setPortableBand(band,value/10d-12);if(actual[0]!=null)actual[0].setText(nativeEqDescription());},value->hz+" · "+String.format(Locale.ROOT,"%+.1f dB",value/10d-12));control.setEnabled(player.eqAvailable());}
-            actual[0]=text(nativeEqDescription(),12,muted,false);content.addView(actual[0]);gap(12);
-            slider("Уровень плеера · "+String.format(Locale.ROOT,"%.1f dB",player.portablePreampDb()),120,(int)Math.round((player.portablePreampDb()+12)*10),value->player.setPortablePreamp(value/10d-12),value->"Уровень плеера · "+String.format(Locale.ROOT,"%.1f dB",value/10d-12));
-            paragraph("Ослабление применяется к громкости MediaPlayer. Эхо, нормализация и сила desktop Reverb сохраняются в профиле, но здесь не применяются.");
+        switchRow("Эквалайзер и эффекты","Обработка звука на телефоне",player.portableSoundActive()&&player.portableSoundEnabled(),enabled->{player.setPortableEnabled(enabled);render();});
+        double[] gains=player.portableGains();for(int i=0;i<5;i++){final int band=i;final String hz=(int)PortableAudioCurve.FREQUENCIES[i]+" Гц";slider(hz+" · "+String.format(Locale.ROOT,"%+.1f dB",gains[i]),240,(int)Math.round((gains[i]+12)*10),value->player.setPortableBand(band,value/10d-12),value->hz+" · "+String.format(Locale.ROOT,"%+.1f dB",value/10d-12));}
+        slider("Preamp · "+String.format(Locale.ROOT,"%.1f dB",player.portablePreampDb()),120,(int)Math.round((player.portablePreampDb()+12)*10),value->player.setPortablePreamp(value/10d-12),value->"Preamp · "+String.format(Locale.ROOT,"%.1f dB",value/10d-12));
+        section("Пространство");slider("Reverb · "+Math.round(player.portableReverb()*100)+"%",80,(int)Math.round(player.portableReverb()*100),value->player.setPortableEffect("reverb",value/100d),value->"Reverb · "+value+"%");
+        slider("Эхо 280 мс · "+Math.round(player.portableEcho()*100)+"%",80,(int)Math.round(player.portableEcho()*100),value->player.setPortableEffect("echo",value/100d),value->"Эхо 280 мс · "+value+"%");
+        section("Громкость записей");switchRow("Нормализация","Отдельно от эквалайзера · измерение с первых 3 секунд",player.normalization(),enabled->{player.setNormalization(enabled);render();});
+        if(player.normalizationPending())content.addView(button("Применить нормализацию из профиля",false,()->{player.activateProfileNormalization();render();}));
+        final TextView processing=text(player.pcmStatus(),12,muted,false);processing.setTag("pcm_processing_status");processing.setLineSpacing(dp(3),1);content.addView(processing);
+        handler.postDelayed(new Runnable(){public void run(){if(!alive||!page.equals("sound")||processing.getWindowToken()==null)return;processing.setText(player==null?"Плеер подключается…":player.pcmStatus());handler.postDelayed(this,600);}},600);
+        paragraph("Пять полос, preamp, эхо и алгоритмический Reverb обрабатывают звук на телефоне. Нормализация плавно выравнивает записи; ограничитель сдерживает пики. Для сетевой обработки доступны файлы до 20 МБ.");
+        if(!player.pcmActive()){
+            section("Эффекты устройства");if(player.bassAvailable()){if(player.bassStrengthSupported())effectSlider("Bass Boost · "+player.bass()/10+"%",100,player.bass()/10,value->player.setBass(value*10),()->player.bass()/10,value->"Bass Boost · "+value+"%");else switchRow("Bass Boost",player.bassStatus(),player.bassEnabled(),enabled->{if(!player.setBass(enabled?1000:0))toast("Аудиосистема не применила эффект.");render();});}else paragraph(player.bassStatus());
+            if(player.reverbAvailable())switchRow("Лёгкий Reverb устройства","Исходный режим",player.reverb(),enabled->{if(!player.setReverb(enabled))toast("Аудиосистема не применила эффект.");render();});
         }
-        if(player.reverbAvailable())switchRow("Лёгкий Reverb","Пространство для наушников",player.reverb(),enabled->{if(!player.setReverb(enabled))toast("Аудиосистема не применила эффект.");render();});
         section("Таймер личной музыки");sleepTimerLabel=actionRow("moon",sleepTitle(),"15, 30, 45 или 60 минут",()->sleepDialog());paragraph("Таймер действует на файлы и каталог SoundCloud. Комнаты и YouTube Music он не останавливает.");
-        gap(12);content.addView(button("Сбросить эффекты",false,()->{boolean applied=player.resetEffects();toast(applied?"Эффекты сброшены":"Настройки сброшены. Устройство не подтвердило отключение части эффектов.");render();}));
+        gap(12);content.addView(button("Сбросить эффекты",false,()->{boolean applied=player.resetEffects();toast(applied?"Эффекты сброшены":"Настройки сброшены. Устройство не подтвердило отключение части эффектов.");render();}));paragraph("Нормализация выключается отдельным переключателем.");
     }
+
     private interface ValueAction {void accept(int value);}private interface ValueLabel{String label(int value);}
     private interface EffectAction {boolean apply(int value);}private interface AppliedValue {int read();}
     private void effectSlider(String title,int max,int value,EffectAction action,AppliedValue read,ValueLabel formatter){
@@ -435,7 +508,7 @@ public final class MainActivity extends Activity {
     }
     private void updatePlayback(){
         if(player==null)return;Track t=current();String id=t==null?"":t.id;
-        if(!id.equals(shownTrack)){shownTrack=id;render();return;}
+        if(!id.equals(shownTrack)){shownTrack=id;if(!page.equals("wave")||miniTitle==null||t==null){render();return;}}
         if(page.equals("lyrics")&&t!=null&&lyricsDuration!=lyricDuration(t)){render();return;}
         if(page.equals("sound")&&!soundCapabilities.equals(player.effectsCapabilitiesKey())){render();return;}
         if(sleepTimerLabel!=null&&!sleepTitle().contentEquals(sleepTimerLabel.getText())){String title=sleepTitle();sleepTimerLabel.setText(title);android.view.ViewParent labels=sleepTimerLabel.getParent();if(labels!=null&&labels.getParent() instanceof View)((View)labels.getParent()).setContentDescription(title+". 15, 30, 45 или 60 минут");}
@@ -447,6 +520,7 @@ public final class MainActivity extends Activity {
         if(audioStatusText!=null){String message=player.isLoading()?player.loadingMessage():player.error();audioStatusText.setText(message);audioStatusText.setVisibility(message==null||message.isEmpty()?View.GONE:View.VISIBLE);audioRetryButton.setVisibility(!player.isLoading()&&message!=null&&!message.isEmpty()?View.VISIBLE:View.GONE);}
         if(page.equals("lyrics")&&!lyricViews.isEmpty()){int active=LrcParser.activeLine(lyricLines,player.position());if(active!=activeLyric){for(int i=0;i<lyricViews.size();i++)lyricViews.get(i).setTextColor(i==active?accent:lyricLines.get(i).time<0?ink:muted);activeLyric=active;}}
         String error=player.error();if(error!=null&&!error.isEmpty()&&!error.equals(lastError)){lastError=error;toast(error);}if(error==null||error.isEmpty())lastError="";
+        updateWave();
     }
     private void trackRow(LinearLayout parent,Track t,List<Track> list,int index,boolean queued){
         LinearLayout r=row();r.setGravity(Gravity.CENTER_VERTICAL);r.setMinimumHeight(dp(76));r.setContentDescription(t.title+". "+t.artist);Cover cover=new Cover(t);r.addView(cover,new LinearLayout.LayoutParams(dp(52),dp(52)));LinearLayout labels=column();TextView title=text(t.title,14,ink,true);title.setSingleLine(true);title.setEllipsize(TextUtils.TruncateAt.END);labels.addView(title);String origin=t.isCatalogReference()?"SoundCloud · из профиля · ":t.id.startsWith("soundcloud:")?(t.uri.startsWith("https:")?"SoundCloud · ":"Сохранено · "):t.uri.startsWith("https:")?"Онлайн-поток · ":"";TextView artist=text(origin+t.artist+((t.duration>0)?" · "+format(t.duration):""),12,muted,false);artist.setSingleLine(true);artist.setEllipsize(TextUtils.TruncateAt.END);artist.setPadding(0,dp(5),0,0);labels.addView(artist);LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,-2,1);lp.leftMargin=dp(13);r.addView(labels,lp);r.setOnClickListener(v->{if(queued&&player!=null){player.replaceStoredTrack(rememberTrack(t));player.playIndex(index);}else playList(list,index);navigate("player");});
@@ -463,12 +537,18 @@ public final class MainActivity extends Activity {
             return true;
         });
         if(current()!=null&&current().id.equals(t.id))menu.getMenu().add("Сохранить момент").setOnMenuItemClickListener(v->{
-            if(player==null||current()==null||!current().id.equals(t.id)){toast("Трек сменился. Открой меню текущей записи.");return true;}
-            long position=player.position();try{boolean added=store.addBookmark(t.id,position);toast(added?"Момент сохранён · "+format(position):"Этот момент уже сохранён");}catch(IOException e){toast(e.getMessage());}return true;
+            saveCurrentMoment(t);return true;
         });
         if(store.find(t.id)==null)menu.getMenu().add("Добавить в мою музыку").setOnMenuItemClickListener(v->{rememberTrack(t);toast("Трек добавлен в мою музыку");render();return true;});
         else menu.getMenu().add("Удалить из библиотеки").setOnMenuItemClickListener(v->{new AlertDialog.Builder(this).setTitle("Убрать «"+t.title+"»?").setMessage("Исходный файл останется на телефоне.").setPositiveButton("Убрать",(d,w)->{store.remove(t.id);render();}).setNegativeButton("Отмена",null).show();return true;});
         menu.show();
+    }
+    /** A Wave selection is ephemeral until an explicit save; a moment needs its portable metadata too. */
+    private void saveCurrentMoment(Track track){
+        if(player==null||current()==null||track==null||!current().id.equals(track.id)){toast("Трек сменился. Открой меню текущей записи.");return;}
+        long position=player.position();
+        try{Track saved=rememberTrack(track);boolean added=store.addBookmark(saved.id,position);toast(added?"Момент сохранён · "+format(position):"Этот момент уже сохранён");}
+        catch(IOException failure){toast(failure.getMessage());}
     }
     private Track rememberTrack(Track track){if(track==null)return null;if(track.isCatalogReference()||track.id.startsWith("soundcloud:"))return store.rememberCatalog(track);store.add(track);return track;}
     private void playList(List<Track> tracks,int index){if(player==null){toast("Плеер подключается. Попробуй ещё раз.");return;}if(tracks.isEmpty()||index<0||index>=tracks.size())return;List<Track> resolved=store.resolveCatalog(tracks);resolved.set(index,rememberTrack(resolved.get(index)));hideKeyboard();if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=android.content.pm.PackageManager.PERMISSION_GRANTED&&!store.preferences().getBoolean("notification_permission_asked",false)){store.preferences().edit().putBoolean("notification_permission_asked",true).apply();requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},51);}player.setQueue(resolved,index,true);}
@@ -497,7 +577,7 @@ public final class MainActivity extends Activity {
         profileSound=new CheckBox(this);profileSound.setText("Применить настройки звука");profileSound.setTextColor(ink);profileSound.setChecked(applySound);profileSound.setPadding(0,dp(12),0,dp(12));body.addView(profileSound);
         TextView limit=text("Аппаратный EQ применяется приблизительно по доступным полосам. Эхо, нормализация и другие неподдерживаемые параметры сохраняются для ПК, но не выдаются за применённые.",12,muted,false);body.addView(limit);final TextView error=inlineError();body.addView(error);ScrollView scroll=new ScrollView(this);scroll.addView(body);
         profileDialog=new AlertDialog.Builder(this).setTitle(pendingProfileOwner==null?"Импортировать профиль?":"Восстановить облачную копию?").setView(scroll).setNegativeButton("Отмена",(dialog,which)->discardProfilePreview()).setPositiveButton("Импортировать",null).create();
-        profileDialog.setOnCancelListener(dialog->discardProfilePreview());profileDialog.setOnShowListener(dialog->{profileDialog.getWindow().setBackgroundDrawable(round(panel,24));profileDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view->{if(profileCommitting)return;final boolean sound=profileSound.isChecked();final CloudProfileApi.Identity owner=pendingProfileOwner;profileCommitting=true;view.setEnabled(false);profileDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);profileDialog.setCancelable(false);io.execute(()->{try{int count=commitProfileImport(json,sound,owner);if(sound)PlaybackService.profileImported();handler.post(()->{profileCommitting=false;discardProfilePreview();if(alive){profileDialog.dismiss();profileDialog=null;toast("Профиль объединён · любимых записей: "+count);render();}});}catch(Exception failure){handler.post(()->{profileCommitting=false;if(alive){profileDialog.setCancelable(true);profileDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);profileDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(true);error.setText("Профиль не импортирован: "+failure.getMessage());error.setVisibility(View.VISIBLE);}else discardProfilePreview();});}});});});profileDialog.show();
+        profileDialog.setOnCancelListener(dialog->discardProfilePreview());profileDialog.setOnShowListener(dialog->{profileDialog.getWindow().setBackgroundDrawable(round(panel,24));profileDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view->{if(profileCommitting)return;final boolean sound=profileSound.isChecked();final CloudProfileApi.Identity owner=pendingProfileOwner;profileCommitting=true;view.setEnabled(false);profileDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(false);profileDialog.setCancelable(false);io.execute(()->{try{int count=commitProfileImport(json,sound,owner);PlaybackService.profileImported(sound);handler.post(()->{profileCommitting=false;discardProfilePreview();if(alive){profileDialog.dismiss();profileDialog=null;toast("Профиль объединён · любимых записей: "+count);render();}});}catch(Exception failure){handler.post(()->{profileCommitting=false;if(alive){profileDialog.setCancelable(true);profileDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);profileDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setEnabled(true);error.setText("Профиль не импортирован: "+failure.getMessage());error.setVisibility(View.VISIBLE);}else discardProfilePreview();});}});});});profileDialog.show();
     }
     private int commitProfileImport(String json,boolean sound,CloudProfileApi.Identity owner)throws IOException{if(owner==null)return store.importProfile(json,sound);CloudProfileApi api=new CloudProfileApi();api.verify(owner);return store.importProfile(json,sound,()->{if(Thread.currentThread().isInterrupted()||!api.current(owner))throw new IOException("Аккаунт изменился или восстановление отменено. Копия не применена");});}
     private String readText(Uri uri,int max)throws IOException{try(InputStream in=getContentResolver().openInputStream(uri);ByteArrayOutputStream out=new ByteArrayOutputStream()){if(in==null)throw new IOException("Файл недоступен");byte[] buffer=new byte[8192];int n;while((n=in.read(buffer))!=-1){if(out.size()+n>max)throw new IOException("Файл больше 1 МБ");out.write(buffer,0,n);}return new String(out.toByteArray(),java.nio.charset.StandardCharsets.UTF_8);}}

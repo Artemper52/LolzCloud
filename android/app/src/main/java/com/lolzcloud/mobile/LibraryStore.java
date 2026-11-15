@@ -31,6 +31,8 @@ public final class LibraryStore {
     private java.util.Map<String, Track> offlineCache = new java.util.HashMap<>();
     private java.util.Map<String, Track> trackCache = new java.util.HashMap<>();
     private String aliasCacheJson;
+    private String waveMetadataJson;
+    private JSONObject waveMetadataCache;
     private java.util.Map<String, String> aliasIdCache = new java.util.HashMap<>();
 
     public LibraryStore(Context context) {
@@ -298,6 +300,167 @@ public final class LibraryStore {
         }
     }
 
+    /** Wave changes share the library lock, including asynchronous downloads and profile imports. */
+    public JSONObject waveSettings() throws IOException {
+        synchronized (LOCK) {
+            try {
+                JSONObject wave = portableSnapshot().getJSONObject("wave");
+                if (!prefs.contains("portable_profile")) wave.put("adventurous", .35);
+                return new JSONObject(wave.toString());
+            } catch (JSONException failure) { throw new IOException("Настройки волны повреждены", failure); }
+        }
+    }
+
+    public void configureWave(JSONObject patch) throws IOException {
+        if(patch==null)throw new IOException("Некорректные настройки волны");
+        synchronized (LOCK) {
+            try {
+                JSONObject profile = portableSnapshot(), wave = profile.getJSONObject("wave"), settings = wave.getJSONObject("preferences");
+                for (java.util.Iterator<String> keys = patch.keys(); keys.hasNext();) {
+                    String key = keys.next(); Object value = patch.get(key);
+                    if (key.equals("adventurous")) {
+                        if (!(value instanceof Number) || !Double.isFinite(((Number)value).doubleValue()) || ((Number)value).doubleValue() < 0 || ((Number)value).doubleValue() > 1) throw new IOException("Некорректная новизна волны");
+                        wave.put(key, value);
+                    } else if (key.equals("autoContext")) {
+                        if (!(value instanceof Boolean)) throw new IOException("Некорректная настройка контекста"); settings.put(key, value);
+                    } else {
+                        if (!(value instanceof String)) throw new IOException("Некорректная настройка волны");
+                        String choices = key.equals("mood") ? "any calm energetic happy sad" : key.equals("activity") ? "any focus relax workout sleep" : key.equals("character") ? "mixed familiar discover" : key.equals("language") ? "any ru en instrumental" : "";
+                        if (key.equals("genre")) { String text = (String)value; if (text.length() > 80 || text.matches("(?s).*[\\p{Cntrl}].*")) throw new IOException("Жанр должен быть до 80 символов"); settings.put(key, text.trim()); }
+                        else if (!choices.isEmpty() && java.util.Arrays.asList(choices.split(" ")).contains(value)) settings.put(key, value);
+                        else throw new IOException("Неизвестная настройка волны");
+                    }
+                }
+                writeWaveProfile(profile);
+            } catch (JSONException invalid) { throw new IOException("Настройки волны повреждены", invalid); }
+        }
+    }
+
+    public JSONObject waveMetadata(Track track) {
+        synchronized (LOCK) {
+            JSONObject basic = WaveApi.metadata(track);
+            if (basic == null) return null;
+            try {
+                String json=prefs.getString("wave_metadata","{}");if(waveMetadataCache==null||!json.equals(waveMetadataJson)){waveMetadataCache=new JSONObject(json);waveMetadataJson=json;}
+                JSONObject cached = waveMetadataCache.optJSONObject(track.sourceUrl);
+                JSONObject value = cached == null ? basic : WaveApi.metadata(cached);
+                if (value == null || !value.optString("url").equals(track.sourceUrl)) return basic;
+                // The canonical native identity wins over an older imported URL-only row.
+                value.put("id", basic.get("id")).put("title", basic.get("title")).put("artist", basic.get("artist"));
+                return value;
+            } catch (JSONException invalid) { return basic; }
+        }
+    }
+
+    public void rememberWaveMetadata(List<WaveApi.Row> rows) throws IOException {
+        synchronized (LOCK) {
+            try {
+                JSONObject cache = new JSONObject(prefs.getString("wave_metadata", "{}"));
+                for (WaveApi.Row row : rows) { JSONObject metadata = WaveApi.metadata(row.metadata); if (metadata != null) { cache.remove(metadata.getString("url")); cache.put(metadata.getString("url"), metadata); } }
+                while (cache.length() > 300) cache.remove(cache.keys().next());
+                if (!prefs.edit().putString("wave_metadata", cache.toString()).commit()) throw new IOException("Не удалось сохранить сведения волны");
+            } catch (JSONException invalid) { throw new IOException("Не удалось сохранить сведения волны", invalid); }
+        }
+    }
+
+    /** Build off the UI thread. Local documents and private listening signals are never sent. */
+    public JSONObject waveRequest(String prompt, int cursor, JSONObject anchor, List<JSONObject> recent,
+                                  String current, List<JSONObject> omit, long now) throws IOException {
+        synchronized (LOCK) {
+            try {
+                JSONObject wave = new JSONObject(exportProfile()).getJSONObject("wave"), request = new JSONObject();
+                JSONArray likes = new JSONArray(), history = new JSONArray(), safeRecent = new JSONArray(), safeOmit = new JSONArray();
+                JSONArray original = wave.getJSONArray("likes");
+                for (int i=0;i<original.length();i++) { JSONObject row=WaveApi.metadata(original.getJSONObject(i)); if(row!=null)likes.put(row); }
+                JSONObject feedback = new JSONObject();
+                if (!privateMode()) {
+                    JSONObject savedFeedback = wave.getJSONObject("feedback");
+                    for (java.util.Iterator<String> keys=savedFeedback.keys();keys.hasNext();) { String key=keys.next(); JSONObject old=savedFeedback.getJSONObject(key), row=WaveApi.metadata(old.getJSONObject("track")); if(row!=null&&key.equals(row.getString("url"))) feedback.put(key,new JSONObject().put("track",row).put("skips",old.optInt("skips")).put("loves",old.optInt("loves")).put("banned",old.optBoolean("banned")).put("lastSkippedAt",old.optLong("lastSkippedAt"))); }
+                    JSONArray saved = new JSONArray(prefs.getString("wave_history", "[]"));
+                    for(int i=0;i<Math.min(500,saved.length());i++) { JSONObject old=saved.getJSONObject(i), row=WaveApi.metadata(old); if(row!=null) history.put(row.put("seconds",Math.max(0,Math.min(14400,old.optDouble("seconds",0)))).put("playedAt",old.optLong("playedAt",0)).put("quickSkip",old.optBoolean("quickSkip",false)).put("liked",old.optBoolean("liked",false))); }
+                    for(JSONObject old:recent) { JSONObject row=WaveApi.metadata(old); if(row!=null&&safeRecent.length()<8)safeRecent.put(row); }
+                }
+                for(JSONObject old:omit) { JSONObject row=WaveApi.metadata(old);if(row!=null&&safeOmit.length()<40)safeOmit.put(row); }
+                int offset=-java.util.TimeZone.getDefault().getOffset(now)/60000;
+                request.put("version",1).put("likes",likes).put("history",history).put("feedback",feedback)
+                        .put("preferences",wave.getJSONObject("preferences")).put("adventurous",prefs.contains("portable_profile")?wave.getDouble("adventurous"):.35)
+                        .put("blockedArtists",wave.getJSONArray("blockedArtists")).put("played24h",prunedWavePlayed(wave.getJSONObject("played24h"),now))
+                        .put("recent",safeRecent).put("current",privateMode()?"":WavePolicy.source(current)).put("prompt",prompt)
+                        .put("cursor",cursor).put("anchor",anchor==null?JSONObject.NULL:WaveApi.metadata(anchor)).put("omit",safeOmit).put("utcOffsetMinutes",offset);
+                while(request.toString().getBytes(StandardCharsets.UTF_8).length>WaveApi.MAX_BODY&&history.length()>0)history.remove(history.length()-1);
+                if(request.toString().getBytes(StandardCharsets.UTF_8).length>WaveApi.MAX_BODY)throw new IOException("Вкус волны больше 1 МБ. Уменьши число лайков для подбора.");
+                return request;
+            } catch(JSONException invalid) { throw new IOException("Не удалось подготовить вкус волны",invalid); }
+        }
+    }
+
+    public void markWavePlayed(JSONObject metadata,long now) throws IOException {
+        synchronized(LOCK) {
+            if(privateMode())return;
+            try { JSONObject profile=portableSnapshot(),wave=profile.getJSONObject("wave"),played=prunedWavePlayed(wave.getJSONObject("played24h"),now);
+                for(String key:WaveApi.fingerprints(metadata))played.put(key,now);
+                while(played.length()>2000){String oldest=null;long at=Long.MAX_VALUE;for(java.util.Iterator<String> keys=played.keys();keys.hasNext();){String key=keys.next();long value=played.optLong(key);if(value<at){at=value;oldest=key;}}if(oldest==null)break;played.remove(oldest);}
+                wave.put("played24h",played);writeWaveProfile(profile);
+            } catch(JSONException invalid){throw new IOException("Не удалось сохранить историю волны",invalid);}
+        }
+    }
+
+    public static final class WaveUndo {
+        final String field,key,before,expected;
+        WaveUndo(String field,String key,String before,String expected){this.field=field;this.key=key;this.before=before;this.expected=expected;}
+    }
+    public WaveUndo reactWave(JSONObject metadata,String kind,long position) throws IOException {
+        synchronized(LOCK){
+            if(privateMode())throw new IOException("В приватном режиме реакции не сохраняются");
+            JSONObject safe=WaveApi.metadata(metadata);if(safe==null)throw new IOException("Эта запись не подходит для реакции волны");
+            try { JSONObject profile=portableSnapshot(),wave=profile.getJSONObject("wave");String url=safe.getString("url");
+                if(kind.equals("artist-ban")) { JSONArray blocked=wave.getJSONArray("blockedArtists");String artist=safe.getString("artist");if(artist.isEmpty())throw new IOException("У записи не указан исполнитель");String before=blocked.toString();boolean found=false;for(int i=0;i<blocked.length();i++)if(WavePolicy.normalized(blocked.getString(i)).equals(WavePolicy.normalized(artist)))found=true;if(!found)blocked.put(artist);while(blocked.length()>100)blocked.remove(0);writeWaveProfile(profile);return new WaveUndo("blockedArtists","",before,portableSnapshot().getJSONObject("wave").getJSONArray("blockedArtists").toString()); }
+                JSONObject feedback=wave.getJSONObject("feedback"),old=feedback.optJSONObject(url);String before=old==null?null:old.toString();
+                JSONObject row=old==null?new JSONObject().put("skips",0).put("loves",0).put("banned",false).put("lastSkippedAt",0):new JSONObject(old.toString());row.put("track",safe);
+                if(kind.equals("love"))row.put("loves",1).put("banned",false);
+                else if(kind.equals("unlove"))row.put("loves",0);
+                else if(kind.equals("ban"))row.put("banned",true).put("loves",0);
+                else if(kind.equals("skip")){if(position>=15000)return null;row.put("skips",Math.min(20,row.optInt("skips")+1)).put("lastSkippedAt",System.currentTimeMillis());}
+                else throw new IOException("Неизвестная реакция волны");
+                feedback.put(url,row);if(feedback.length()>2000)throw new IOException("Слишком много реакций волны");writeWaveProfile(profile);
+                JSONObject saved=portableSnapshot().getJSONObject("wave").getJSONObject("feedback").getJSONObject(url);
+                return new WaveUndo("feedback",url,before,saved.toString());
+            }catch(JSONException invalid){throw new IOException("Не удалось сохранить реакцию",invalid);}
+        }
+    }
+
+    public void undoWave(WaveUndo undo) throws IOException {
+        if(undo==null)return;
+        synchronized(LOCK){try{JSONObject profile=portableSnapshot(),wave=profile.getJSONObject("wave");
+            if(undo.field.equals("feedback")){JSONObject feedback=wave.getJSONObject("feedback"),current=feedback.optJSONObject(undo.key);if(current==null||!current.toString().equals(undo.expected))throw new IOException("Реакция уже изменилась. Отмена не применена.");if(undo.before==null)feedback.remove(undo.key);else feedback.put(undo.key,new JSONObject(undo.before));}
+            else if(undo.field.equals("blockedArtists")){if(!wave.getJSONArray("blockedArtists").toString().equals(undo.expected))throw new IOException("Список исполнителей уже изменился");wave.put("blockedArtists",new JSONArray(undo.before));}
+            else throw new IOException("Некорректная отмена");writeWaveProfile(profile);
+        }catch(JSONException invalid){throw new IOException("Не удалось отменить реакцию",invalid);}}
+    }
+
+    public void unblockWaveArtist(String name) throws IOException {
+        synchronized(LOCK){try{JSONObject profile=portableSnapshot(),wave=profile.getJSONObject("wave");JSONArray original=wave.getJSONArray("blockedArtists"),next=new JSONArray();for(int i=0;i<original.length();i++)if(!WavePolicy.normalized(original.getString(i)).equals(WavePolicy.normalized(name)))next.put(original.get(i));wave.put("blockedArtists",next);writeWaveProfile(profile);}catch(JSONException invalid){throw new IOException("Не удалось вернуть исполнителя",invalid);}}
+    }
+
+    /** Seconds are observed from real progress, never inferred from seeks or track duration. Private, not exported. */
+    public void saveWaveListening(String occurrence,JSONObject metadata,long playedAt,double seconds,boolean quickSkip,boolean liked) throws IOException {
+        synchronized(LOCK){if(privateMode()||metadata==null)return;try{JSONObject row=WaveApi.metadata(metadata);if(row==null)return;row.put("occurrence",occurrence).put("playedAt",playedAt).put("seconds",Math.max(0,Math.min(14400,seconds))).put("quickSkip",quickSkip).put("liked",liked);
+            JSONArray before=new JSONArray(prefs.getString("wave_history","[]")),after=new JSONArray().put(row);for(int i=0;i<before.length()&&after.length()<500;i++){JSONObject old=before.getJSONObject(i);if(!occurrence.equals(old.optString("occurrence")))after.put(old);}if(!prefs.edit().putString("wave_history",after.toString()).commit())throw new IOException("Не удалось сохранить прослушивание");
+        }catch(JSONException invalid){throw new IOException("История волны повреждена",invalid);}}
+    }
+
+    private JSONObject prunedWavePlayed(JSONObject input,long now) throws JSONException {
+        JSONObject next=new JSONObject();for(java.util.Iterator<String> keys=input.keys();keys.hasNext();){String key=keys.next();double at=input.optDouble(key,-1);if(key.matches("[a-f0-9]{64}")&&Double.isFinite(at)&&at>now-WavePolicy.DAY&&at<=now+WavePolicy.DAY)next.put(key,at);}return next;
+    }
+    private void writeWaveProfile(JSONObject profile) throws IOException,JSONException {
+        String safe=PortableProfile.normalize(profile).toString();
+        SharedPreferences.Editor edit=prefs.edit().putString("portable_profile",safe);
+        // Wave edits do not turn an unchecked imported normalizer into an applied setting.
+        String previous=prefs.getString("portable_profile","");
+        if(WavePolicy.sha256(previous).equals(prefs.getString("pcm_normalization_snapshot","")))edit.putString("pcm_normalization_snapshot",WavePolicy.sha256(safe));
+        if(!edit.commit())throw new IOException("Не удалось сохранить настройки волны");
+    }
+
     public String lyrics(String id) { return prefs.getString("lyrics_" + id, ""); }
     public void saveLyrics(String id, String text) {
         if (text == null || text.length() > 256_000) throw new IllegalArgumentException("Текст слишком большой");
@@ -471,10 +634,10 @@ public final class LibraryStore {
                 for (Track track : records) {
                     if (!likedIds.contains(track.id)) continue;
                     if (!OnlineCatalog.isSourceUrl(track.sourceUrl) || !seen.add(track.id)) continue;
-                    JSONObject row = new JSONObject();
-                    row.put("id", track.id.startsWith("soundcloud:") ? Long.parseLong(track.id.substring(11)) : JSONObject.NULL)
+                    JSONObject row = waveMetadata(track);
+                    if(row==null)row=new JSONObject().put("id", track.id.startsWith("soundcloud:") ? Long.parseLong(track.id.substring(11)) : JSONObject.NULL)
                             .put("url", track.sourceUrl).put("title", track.title).put("artist", track.artist).put("duration", Math.round(track.duration / 1000d));
-                    if (!track.coverUrl.isEmpty()) row.put("cover", track.coverUrl);
+                    if(!row.has("cover")&&!track.coverUrl.isEmpty())row.put("cover",track.coverUrl);
                     likes.put(PortableProfile.track(row));
                 }
                 wave.put("likes", likes);
@@ -572,7 +735,7 @@ public final class LibraryStore {
 
     private JSONObject portableSnapshot() throws IOException, JSONException {
         if (prefs.contains("portable_profile")) return PortableProfile.parse(prefs.getString("portable_profile", ""));
-        return PortableProfile.normalize(new JSONObject().put("format", "lolzcloud-profile").put("version", 1));
+        return PortableProfile.normalize(new JSONObject().put("format", "lolzcloud-profile").put("version", 1).put("wave",new JSONObject().put("adventurous",.35)));
     }
 
     private static void validateLegacy(JSONObject profile, String json) throws IOException, JSONException {
