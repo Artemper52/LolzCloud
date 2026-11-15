@@ -62,7 +62,10 @@ public final class PlaybackService extends Service {
         final PlaybackService active = running;
         if (active == null || track == null) return;
         active.handler.post(() -> {
-            if (running == active && !active.destroyed) active.replaceStoredTrack(track);
+            if (running == active && !active.destroyed) {
+                Track saved=active.store.find(track.id);
+                if(saved!=null&&saved.uri.equals(track.uri))active.replaceStoredTrack(saved);
+            }
         });
     }
 
@@ -75,7 +78,13 @@ public final class PlaybackService extends Service {
     }
 
     /** Main-thread native navigation controller; it creates no service and is never exposed to JavaScript. */
-    static void pauseForOnlineRoom() { if (running != null) running.pause(); }
+    static void pauseForOnlineRoom() { if (running != null) running.blockSoloForRoom(); }
+
+    public interface RoomReply { void complete(boolean success); }
+    public interface RoomController {
+        void command(String nativeToken,RoomTransportPolicy.Snapshot owner,String command,long value,RoomReply reply);
+        void release(String nativeToken,RoomTransportPolicy.Snapshot owner,RoomReply reply);
+    }
 
     public interface Listener { void onStateChanged(); }
     public final class LocalBinder extends Binder {
@@ -146,6 +155,12 @@ public final class PlaybackService extends Service {
     private String error = "";
     private String metadataId = "";
     private long metadataDuration = -1;
+    private final RoomTransportPolicy.Lease roomLease=new RoomTransportPolicy.Lease();
+    private java.lang.ref.WeakReference<RoomController> roomController=new java.lang.ref.WeakReference<>(null);
+    private String roomToken="",suspendedRoomToken="",roomFailure="";
+    private long roomSeen,soloSequence;
+    private RoomTransportPolicy.Snapshot suspendedRoomOwner;
+    private boolean roomBlocked,soloPending;
 
     @Override public void onCreate() {
         super.onCreate();
@@ -168,13 +183,13 @@ public final class PlaybackService extends Service {
         session = new MediaSession(this, "LolzCloud");
         session.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS | MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS);
         session.setCallback(new MediaSession.Callback() {
-            @Override public void onPlay() { play(); }
-            @Override public void onPause() { pause(); }
-            @Override public void onSkipToNext() { next(); }
-            @Override public void onSkipToPrevious() { previous(); }
-            @Override public void onSeekTo(long pos) { seekTo(pos); }
-            @Override public void onStop() { stopPlayback(); }
-            @Override public void onSetPlaybackSpeed(float value) { setSpeed(value); }
+            @Override public void onPlay() { systemMedia("play",0); }
+            @Override public void onPause() { systemMedia("pause",0); }
+            @Override public void onSkipToNext() { systemMedia("next",0); }
+            @Override public void onSkipToPrevious() { systemMedia("previous",0); }
+            @Override public void onSeekTo(long pos) { systemMedia("seek",pos); }
+            @Override public void onStop() { systemMedia("stop",0); }
+            @Override public void onSetPlaybackSpeed(float value) { if(!roomBlocked)setSpeed(value); }
         }, handler);
         session.setActive(true);
         NotificationChannel channel = new NotificationChannel(CHANNEL, "Музыка LolzCloud", NotificationManager.IMPORTANCE_LOW);
@@ -211,11 +226,11 @@ public final class PlaybackService extends Service {
 
     @Override public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent == null ? null : intent.getAction();
-        if (ACTION_PLAY.equals(action)) play();
-        else if (ACTION_PAUSE.equals(action)) pause();
-        else if (ACTION_NEXT.equals(action)) next();
-        else if (ACTION_PREVIOUS.equals(action)) previous();
-        else if (ACTION_STOP.equals(action)) stopPlayback();
+        if (ACTION_PLAY.equals(action)) systemMedia("play",0);
+        else if (ACTION_PAUSE.equals(action)) systemMedia("pause",0);
+        else if (ACTION_NEXT.equals(action)) systemMedia("next",0);
+        else if (ACTION_PREVIOUS.equals(action)) systemMedia("previous",0);
+        else if (ACTION_STOP.equals(action)) systemMedia("stop",0);
         else if (ACTION_KEEP.equals(action) && !foreground) stopSelf(startId);
         return START_NOT_STICKY;
     }
@@ -223,6 +238,73 @@ public final class PlaybackService extends Service {
     public void setListener(Listener listener) {
         this.listener = listener;
         if (listener != null) listener.onStateChanged();
+    }
+
+    private void blockSoloForRoom(){
+        ++soloSequence;soloPending=false;roomBlocked=true;resumeOnFocus=false;
+        long position=position();if(wave!=null)wave.stop();pauseInternal(false);releasePlayer();pendingSeek=position;error="";
+    }
+    void enterOnlineRoom(String token,String roomId,RoomController controller){
+        if(destroyed||roomLease.owns(token))return;
+        roomToken=token;roomController=new java.lang.ref.WeakReference<>(controller);roomLease.begin(token,roomId);roomSeen=SystemClock.elapsedRealtime();roomFailure="";
+        blockSoloForRoom();changed(true);
+    }
+    void onlineRoomSnapshot(String token,RoomTransportPolicy.Snapshot next){
+        if(destroyed)return;
+        if(!roomLease.owns(token)){
+            if(!token.equals(suspendedRoomToken)||!RoomTransportPolicy.afterRelease(next,suspendedRoomOwner))return;
+            RoomController controller=roomController.get();if(controller==null)return;
+            enterOnlineRoom(token,next.roomId,controller);
+        }
+        RoomTransportPolicy.Snapshot old=roomLease.snapshot();boolean accepted=roomLease.accept(token,next);
+        if(!accepted&&(old==null||!old.sameOwner(next)||old.revision!=next.revision))return;
+        boolean wasStale=SystemClock.elapsedRealtime()-roomSeen>3500;roomSeen=SystemClock.elapsedRealtime();
+        if(accepted){roomFailure="";if(next.active){if(!ensureForeground())roomFailure=error;}else if(foreground){stopForeground(false);foreground=false;}changed(true);}else if(wasStale)changed(true);
+    }
+    void onlineRoomReleased(String token,RoomTransportPolicy.Snapshot state){if(roomLease.owns(token)&&!state.active)onlineRoomSnapshot(token,state);}
+    void leaveOnlineRoom(String token){
+        if(!roomLease.clear(token)){
+            if(!roomToken.isEmpty()||!token.equals(suspendedRoomToken))return;
+            // A final Join/focus change can precede the next250ms snapshot. Closing
+            // that suspended document must retire paused/pending solo, not resume it.
+            suspendedRoomToken="";suspendedRoomOwner=null;roomController.clear();
+            if(isPlaying())return; // An explicitly selected, already-playing solo remains its owner.
+            blockSoloForRoom();
+        }
+        ++soloSequence;soloPending=false;roomBlocked=true;roomToken="";roomController.clear();suspendedRoomToken="";roomFailure="";
+        if(foreground){stopForeground(true);foreground=false;}((NotificationManager)getSystemService(NOTIFICATION_SERVICE)).cancel(NOTIFICATION_ID);updateSession();
+    }
+    private void takeSoloOwnership(){
+        RoomTransportPolicy.Snapshot state=roomLease.snapshot();
+        suspendedRoomToken=roomToken;suspendedRoomOwner=state;
+        roomLease.clear(roomToken);roomToken="";roomBlocked=false;soloPending=false;roomFailure="";error="";metadataId="";metadataDuration=-1;
+        if(foreground){stopForeground(true);foreground=false;}
+    }
+    /** A solo user gesture must receive a synchronous room-release acknowledgment before audio starts. */
+    private boolean handoffToSolo(Runnable action){
+        if(!roomBlocked&&!soloPending)return false;
+        final RoomController controller=roomController.get();
+        if(controller==null||roomToken.isEmpty()){++soloSequence;takeSoloOwnership();return false;}
+        final long request=++soloSequence;final String token=roomToken;final RoomTransportPolicy.Snapshot expected=roomLease.snapshot();soloPending=true;
+        controller.release(token,expected,okay->{
+            if(request!=soloSequence||destroyed||!roomLease.owns(token))return;
+            RoomTransportPolicy.Snapshot current=roomLease.snapshot();
+            if(!okay||expected!=null&&(current==null||!expected.sameOwner(current))){soloPending=false;roomFailure="Комната не подтвердила остановку. Открой её и повтори.";error=roomFailure;changed(true);return;}
+            takeSoloOwnership();action.run();
+        });changed(true);return true;
+    }
+    public void openOnlineSource(Runnable open){if(handoffToSolo(()->openOnlineSource(open)))return;pause();open.run();}
+    private void systemMedia(String command,long value){
+        if(roomBlocked||soloPending){
+            RoomTransportPolicy.Snapshot state=roomLease.snapshot();RoomController controller=roomController.get();final String token=roomToken;
+            if(state==null||!state.active||controller==null||token.isEmpty())return;
+            if(command.equals("stop")){
+                controller.release(token,state,okay->{if(roomLease.owns(token)&&state.sameOwner(roomLease.snapshot())&&okay)leaveOnlineRoom(token);});return;
+            }
+            if(!state.capabilities.contains(command))return;
+            controller.command(token,state,command,Math.max(0,value),okay->{if(roomLease.owns(token)&&state.sameOwner(roomLease.snapshot())&&!okay){roomFailure="Команда комнаты не подтверждена. Открой комнату и повтори.";changed(true);}});return;
+        }
+        if(command.equals("play"))play();else if(command.equals("pause"))pause();else if(command.equals("next"))next();else if(command.equals("previous"))previous();else if(command.equals("seek"))seekTo(value);else if(command.equals("stop"))stopPlayback();
     }
 
     public Track current() { return index >= 0 && index < queue.size() ? queue.get(index) : null; }
@@ -233,8 +315,8 @@ public final class PlaybackService extends Service {
         try { return media != null && prepared && media.isPlaying(); }
         catch (IllegalStateException ignored) { return false; }
     }
-    public boolean isLoading() { return wave!=null&&wave.buffering() || playWhenReady && (preparingAudio || (media != null || pcm != null) && !prepared || pcm!=null&&prepared&&!pcm.playing()); }
-    public String loadingMessage() { return !isLoading() ? "" : wave!=null&&wave.buffering()?"Подбираем музыку для волны…":preparingAudio ? current() != null && current().isCatalogReference() ? "Находим запись из профиля…" : "Готовим трек…" : pcm!=null?"Готовим нативную обработку звука…":"Загружаем аудио…"; }
+    public boolean isLoading() { return soloPending || wave!=null&&wave.buffering() || playWhenReady && (preparingAudio || (media != null || pcm != null) && !prepared || pcm!=null&&prepared&&!pcm.playing()); }
+    public String loadingMessage() { return !isLoading() ? "" : soloPending?"Останавливаем комнату…":wave!=null&&wave.buffering()?"Подбираем музыку для волны…":preparingAudio ? current() != null && current().isCatalogReference() ? "Находим запись из профиля…" : "Готовим трек…" : pcm!=null?"Готовим нативную обработку звука…":"Загружаем аудио…"; }
     public boolean isPrepared() { return prepared; }
     public long position() {
         try {
@@ -265,7 +347,7 @@ public final class PlaybackService extends Service {
     public long sleepRemainingMillis() { return sleepAt == 0 ? 0 : Math.max(0, sleepAt - SystemClock.elapsedRealtime()); }
 
     public WaveSession.State waveState(){return wave.state();}
-    public void startWave(String prompt,boolean fromCurrent){wave.start(prompt,fromCurrent);}
+    public void startWave(String prompt,boolean fromCurrent){if(handoffToSolo(()->startWave(prompt,fromCurrent)))return;wave.start(prompt,fromCurrent);}
     public void stopWave(){wave.stop();}
     public void retryWave(){wave.retry();}
     public void shakeWave(){wave.shake();}
@@ -290,11 +372,12 @@ public final class PlaybackService extends Service {
 
     public void setQueue(List<Track> tracks, int selected, boolean play) {
         if (tracks == null || tracks.isEmpty()) return;
+        final List<Track> requested=new ArrayList<>(tracks);if(handoffToSolo(()->setQueue(requested,selected,play)))return;
         if(wave!=null)wave.stop();
         save();
         queue.clear();
-        queue.addAll(tracks);
-        index = Math.max(0, Math.min(selected, queue.size() - 1));
+        int before=0;for(int i=0;i<tracks.size();i++){Track track=store.reconcileTrack(tracks.get(i));if(track!=null){if(i<selected)before++;queue.add(track);}}
+        index = queue.isEmpty()?-1:Math.min(before,queue.size()-1);
         previousIndices.clear();
         cycleVisited.clear();
         pendingSeek = 0;
@@ -302,6 +385,7 @@ public final class PlaybackService extends Service {
     }
 
     public void enqueue(Track track) {
+        track=store.reconcileTrack(track);
         if (track == null) return;
         if(wave!=null)wave.stop();
         if (queue.isEmpty()) { index = 0; pendingSeek = 0; error = ""; }
@@ -313,6 +397,7 @@ public final class PlaybackService extends Service {
 
     /** A completed offline download replaces the active source without resetting its queue or position. */
     public void replaceStoredTrack(Track track) {
+        track=store.reconcileTrack(track);
         if (destroyed || track == null) return;
         Track playing = current();
         boolean replaceCurrent = playing != null && playing.id.equals(track.id) && !playing.uri.equals(track.uri);
@@ -321,6 +406,23 @@ public final class PlaybackService extends Service {
         for (int i = 0; i < queue.size(); i++) if (queue.get(i).id.equals(track.id)) queue.set(i, track);
         if (replaceCurrent) { pendingSeek = resumePosition; loadCurrent(resume); }
         else { save(); changed(true); }
+    }
+
+    /** Explicit user removal owns the decoder generation; it never starts a replacement stream. */
+    public long removeOfflineTrack(Track expected,boolean removeLibrary)throws IOException {
+        if(destroyed||expected==null)throw new IOException("Плеер недоступен. Повтори удаление");
+        Track copy=store.offlineCopy(expected.id);
+        if(copy==null||!copy.uri.equals(expected.uri))throw new IOException("Загрузка уже изменилась. Открой меню заново");
+        Track playing=current();boolean owned=playing!=null&&playing.uri.equals(copy.uri);long position=position();int oldIndex=index;
+        if(owned){pause();releasePlayer();pendingSeek=position;}
+        try{return store.removeOffline(copy,removeLibrary).bytes;}
+        finally{
+            int selected=0;boolean keptCurrent=false;ArrayList<Track> retained=new ArrayList<>();
+            for(int i=0;i<queue.size();i++){Track track=store.reconcileTrack(queue.get(i));if(track==null)continue;if(i<oldIndex)selected++;if(i==oldIndex)keptCurrent=true;retained.add(track);}
+            queue.clear();queue.addAll(retained);index=queue.isEmpty()?-1:Math.min(selected,queue.size()-1);
+            if(owned){pendingSeek=keptCurrent?position:0;playWhenReady=false;error="";}
+            previousIndices.clear();cycleVisited.clear();save();changed(true);
+        }
     }
 
     public void removeFromQueue(int row) {
@@ -343,6 +445,7 @@ public final class PlaybackService extends Service {
 
     public void playIndex(int selected) {
         if (selected < 0 || selected >= queue.size()) return;
+        if(handoffToSolo(()->playIndex(selected)))return;
         if(wave!=null)wave.stop();
         if (index >= 0 && selected != index) previousIndices.add(index);
         index = selected;
@@ -354,6 +457,7 @@ public final class PlaybackService extends Service {
      * Returns true only when the track was appended to the end of the queue. */
     public boolean openBookmark(Track requested, long milliseconds) {
         if (requested == null) return false;
+        if(handoffToSolo(()->openBookmark(requested,milliseconds)))return false;
         if(wave!=null)wave.stop();
         Track stored = store.find(requested.id), track = stored == null ? requested : stored;
         boolean currentRecording = current() != null && current().id.equals(track.id);
@@ -375,6 +479,7 @@ public final class PlaybackService extends Service {
     public void toggle() { if (isPlaying() || isLoading()) pause(); else play(); }
 
     public void play() {
+        if(handoffToSolo(this::play))return;
         if(wave!=null&&wave.playRequested())return;
         if (current() == null) {
             error = "Сначала добавьте музыку в библиотеку";
@@ -397,7 +502,7 @@ public final class PlaybackService extends Service {
         } catch (RuntimeException failure) { fail("Не удалось начать воспроизведение. Попробуйте снова"); }
     }
 
-    public void pause() { pauseInternal(false); }
+    public void pause() { ++soloSequence;soloPending=false;pauseInternal(false); }
 
     private void pauseInternal(boolean resumeLater) {
         if(wave!=null&&!waveInternal)wave.paused();
@@ -415,6 +520,7 @@ public final class PlaybackService extends Service {
     }
 
     public void next() {
+        if(handoffToSolo(this::next))return;
         if(wave!=null&&wave.next(true))return;
         if (queue.isEmpty()) return;
         previousIndices.add(index);
@@ -434,6 +540,7 @@ public final class PlaybackService extends Service {
     }
 
     public void previous() {
+        if(handoffToSolo(this::previous))return;
         if(wave!=null)wave.replaying();
         if (queue.isEmpty()) return;
         if (position() > 3_000) { seekTo(0); return; }
@@ -445,10 +552,12 @@ public final class PlaybackService extends Service {
     }
 
     public void seekTo(long milliseconds) {
+        if(handoffToSolo(()->seekTo(milliseconds)))return;
         if(wave!=null)wave.seeking();
         long length = duration();
         pendingSeek = Math.max(0, length > 0 ? Math.min(milliseconds, length) : milliseconds);
-        if(pcm!=null&&prepared){seeking=true;pcm.seek(pendingSeek);}
+        // PCM owns a queued seek/epoch even before its decoder is prepared.
+        if(pcm!=null){seeking=true;pcm.seek(pendingSeek);}
         if (media != null && prepared) {
             try { seeking = true; media.seekTo(pendingSeek, MediaPlayer.SEEK_CLOSEST); }
             catch (IllegalStateException ignored) { seeking = false; }
@@ -761,6 +870,7 @@ public final class PlaybackService extends Service {
         pause();
         pendingSeek = position();
         releasePlayer();
+        if(roomBlocked){changed(false);return;}
         if (foreground) { stopForeground(true); foreground = false; }
         ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).cancel(NOTIFICATION_ID);
         stopSelf();
@@ -1098,7 +1208,7 @@ public final class PlaybackService extends Service {
 
     private void changed(boolean refreshNotification) {
         updateSession();
-        if (refreshNotification && current() != null) {
+        if (refreshNotification && (current() != null || roomBlocked&&!roomToken.isEmpty())) {
             ((NotificationManager) getSystemService(NOTIFICATION_SERVICE)).notify(NOTIFICATION_ID, notification());
         }
         if (listener != null) {
@@ -1108,6 +1218,7 @@ public final class PlaybackService extends Service {
 
     private void updateSession() {
         if (session == null) return;
+        if(roomBlocked||soloPending){updateRoomSession();return;}
         Track track = current();
         int state = error.length() > 0 ? PlaybackState.STATE_ERROR : isLoading() ? PlaybackState.STATE_BUFFERING
                 : isPlaying() ? PlaybackState.STATE_PLAYING : track == null ? PlaybackState.STATE_NONE : PlaybackState.STATE_PAUSED;
@@ -1134,7 +1245,32 @@ public final class PlaybackService extends Service {
         }
     }
 
+    private long roomPosition(RoomTransportPolicy.Snapshot state){return state==null?0:Math.min(state.duration>0?state.duration:86400000,state.position+(state.playing?Math.min(3500,Math.max(0,SystemClock.elapsedRealtime()-roomSeen)):0));}
+    private void updateRoomSession(){
+        RoomTransportPolicy.Snapshot value=roomLease.snapshot();boolean attached=!roomToken.isEmpty(),stale=SystemClock.elapsedRealtime()-roomSeen>3500;
+        int state=!attached?PlaybackState.STATE_NONE:value==null||stale?PlaybackState.STATE_BUFFERING:!roomFailure.isEmpty()?PlaybackState.STATE_ERROR:!value.active?PlaybackState.STATE_STOPPED:value.playing?PlaybackState.STATE_PLAYING:PlaybackState.STATE_PAUSED;
+        long actions=0;if(value!=null&&value.active){if(value.capabilities.contains("play"))actions|=PlaybackState.ACTION_PLAY;if(value.capabilities.contains("pause"))actions|=PlaybackState.ACTION_PAUSE;if(value.capabilities.contains("play")||value.capabilities.contains("pause"))actions|=PlaybackState.ACTION_PLAY_PAUSE;if(value.capabilities.contains("next"))actions|=PlaybackState.ACTION_SKIP_TO_NEXT;if(value.capabilities.contains("previous"))actions|=PlaybackState.ACTION_SKIP_TO_PREVIOUS;if(value.capabilities.contains("seek"))actions|=PlaybackState.ACTION_SEEK_TO;actions|=PlaybackState.ACTION_STOP;}
+        PlaybackState.Builder playback=new PlaybackState.Builder().setActions(actions).setState(state,roomPosition(value),state==PlaybackState.STATE_PLAYING?1f:0f,SystemClock.elapsedRealtime());
+        if(!roomFailure.isEmpty())playback.setErrorMessage(roomFailure);else if(stale&&attached)playback.setErrorMessage("Открой комнату, чтобы восстановить управление");session.setPlaybackState(playback.build());
+        if(!attached){session.setMetadata(null);metadataId="";metadataDuration=-1;return;}
+        String id=value==null?"room:pending":"room:"+value.roomId+":"+value.documentId+":"+value.epoch+":"+value.url;
+        session.setMetadata(new MediaMetadata.Builder().putString(MediaMetadata.METADATA_KEY_MEDIA_ID,id).putString(MediaMetadata.METADATA_KEY_TITLE,value==null||value.title.isEmpty()?"Комната LolzCloud":value.title).putString(MediaMetadata.METADATA_KEY_ARTIST,value==null||value.artist.isEmpty()?"Слушаем вместе":value.artist).putLong(MediaMetadata.METADATA_KEY_DURATION,value==null?0:value.duration).build());metadataId=id;metadataDuration=value==null?0:value.duration;
+    }
+
+    private Notification roomNotification(){
+        RoomTransportPolicy.Snapshot state=roomLease.snapshot();String id=state==null?"":state.roomId;
+        String url=id.isEmpty()?"https://lolzcloud.com/rooms":"https://lolzcloud.com/room/"+id;
+        PendingIntent open=PendingIntent.getActivity(this,10,new Intent(this,OnlineActivity.class).putExtra("url",url).putExtra("title","Комната LolzCloud").setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP),PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
+        boolean playing=state!=null&&state.active&&state.playing;
+        Notification.Builder notice=new Notification.Builder(this,CHANNEL).setSmallIcon(android.R.drawable.ic_media_play).setContentTitle(state==null||state.title.isEmpty()?"Комната LolzCloud":state.title).setContentText(!roomFailure.isEmpty()?roomFailure:state==null?"Подключаем управление комнатой…":state.artist.isEmpty()?"Слушаем вместе":state.artist).setContentIntent(open).setVisibility(Notification.VISIBILITY_PUBLIC).setCategory(Notification.CATEGORY_TRANSPORT).setOnlyAlertOnce(true).setOngoing(playing).setShowWhen(false).setColor(0xffa5e5bd).setDeleteIntent(action(ACTION_STOP,4));
+        int count=0;if(state!=null&&state.capabilities.contains("previous")){notice.addAction(new Notification.Action.Builder(android.R.drawable.ic_media_previous,"В начало",action(ACTION_PREVIOUS,1)).build());count++;}
+        if(state!=null&&state.capabilities.contains(playing?"pause":"play")){notice.addAction(new Notification.Action.Builder(playing?android.R.drawable.ic_media_pause:android.R.drawable.ic_media_play,playing?"Пауза":"Слушать",action(playing?ACTION_PAUSE:ACTION_PLAY,2)).build());count++;}
+        if(state!=null&&state.capabilities.contains("next")){notice.addAction(new Notification.Action.Builder(android.R.drawable.ic_media_next,"Далее",action(ACTION_NEXT,3)).build());count++;}
+        int[] compact=new int[count];for(int i=0;i<count;i++)compact[i]=i;return notice.setStyle(new Notification.MediaStyle().setMediaSession(session.getSessionToken()).setShowActionsInCompactView(compact)).build();
+    }
+
     private Notification notification() {
+        if(roomBlocked||soloPending)return roomNotification();
         Track track = current();
         PendingIntent open = PendingIntent.getActivity(this, 0,
                 new Intent(this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP),
@@ -1189,7 +1325,7 @@ public final class PlaybackService extends Service {
 
     private final BroadcastReceiver noisyReceiver = new BroadcastReceiver() {
         @Override public void onReceive(Context context, Intent intent) {
-            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) pause();
+            if (AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) systemMedia("pause",0);
         }
     };
 
@@ -1207,6 +1343,7 @@ public final class PlaybackService extends Service {
                 // Refresh only at meaningful events and persistence checkpoints, not twice a second.
                 if (SystemClock.elapsedRealtime() - lastSave >= 10_000) { save(); updateSession(); }
             }
+            if(roomBlocked&&!roomToken.isEmpty()&&SystemClock.elapsedRealtime()-roomSeen>3500)updateSession();
             if (listener != null) {
                 try { listener.onStateChanged(); } catch (RuntimeException ignored) { }
             }

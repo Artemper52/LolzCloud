@@ -29,6 +29,7 @@ public final class RoomAssets {
         routes.put("/cloud/room-sync.js", new Route("room-sync.js", "text/javascript"));
         routes.put("/cloud/room-players.js", new Route("room-players.js", "text/javascript"));
         routes.put("/cloud/media-source.js", new Route("media-source.js", "text/javascript"));
+        routes.put("/app/room-transport.js", new Route("room-transport.js", "text/javascript"));
         routes.put("/cloud/room.js", new Route("room.js", "text/javascript"));
         routes.put("/cloud/social.js", new Route("social.js", "text/javascript"));
         routes.put("/cloud/social.css", new Route("social.css", "text/css"));

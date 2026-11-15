@@ -34,6 +34,8 @@ public final class LibraryStore {
     private String waveMetadataJson;
     private JSONObject waveMetadataCache;
     private java.util.Map<String, String> aliasIdCache = new java.util.HashMap<>();
+    private String retiredCacheJson;
+    private java.util.Map<String,Track> retiredCache=new java.util.HashMap<>();
 
     public LibraryStore(Context context) {
         this.context = context.getApplicationContext();
@@ -45,6 +47,7 @@ public final class LibraryStore {
     public Track find(String id) {
         synchronized (LOCK) { String canonical = canonicalId(id); for (Track track : readTracks("tracks")) if (track.id.equals(canonical)) return track; return null; }
     }
+    public boolean sameRecording(String first,String second){synchronized(LOCK){return first!=null&&second!=null&&canonicalId(first).equals(canonicalId(second));}}
 
     private String canonicalId(String id) {
         if (id == null || !id.startsWith("soundcloud-url:")) return id;
@@ -102,6 +105,7 @@ public final class LibraryStore {
 
     public void add(Track track) {
         synchronized (LOCK) {
+            track=reconcileTrack(track);if(track==null)return;
             List<Track> tracks = readTracks("tracks");
             for (Track item : tracks) if (item.id.equals(track.id)) return;
             tracks.add(track);
@@ -112,6 +116,7 @@ public final class LibraryStore {
     /** Search pages stay ephemeral; only a selected/liked/queued catalog track is remembered. */
     public Track rememberCatalog(Track candidate) {
         if (candidate == null) return null;
+        candidate=reconcileTrack(candidate);if(candidate==null)return null;
         if (candidate.isCatalogReference()) { Track known = find(candidate.id); if (known != null) return known; add(candidate); return candidate; }
         if (!candidate.id.matches("soundcloud:[1-9][0-9]{0,15}")) { add(candidate); return candidate; }
         synchronized (LOCK) {
@@ -182,6 +187,7 @@ public final class LibraryStore {
 
     /** A known offline document always wins over the same result returned by a later search. */
     public Track resolveCatalog(Track candidate) {
+        candidate=reconcileTrack(candidate);
         if (candidate == null || !candidate.id.startsWith("soundcloud:")) return candidate;
         Track stored = find(candidate.id);
         if (stored != null) {
@@ -198,7 +204,8 @@ public final class LibraryStore {
         java.util.Map<String, Track> local = new java.util.HashMap<>();
         for (Track track : tracks()) { String scheme = Uri.parse(track.uri).getScheme(); if ("file".equals(scheme) || "content".equals(scheme)) local.put(track.id, track); }
         List<Track> resolved = new ArrayList<>();
-        for (Track candidate : candidates) {
+        for (Track value : candidates) {
+            Track candidate=reconcileTrack(value);if(candidate==null)continue;
             Track saved = local.get(candidate.id);
             resolved.add(saved == null || !candidate.id.startsWith("soundcloud:") ? candidate : new Track(saved.id,
                     candidate.title, candidate.artist, saved.uri, saved.duration > 0 ? saved.duration : candidate.duration,
@@ -229,7 +236,9 @@ public final class LibraryStore {
             if (!found) throw new IOException("Трек уже удалён из библиотеки");
             List<Track> queue = replaceTrack(readTracks("queue"), source, replacement);
             List<Track> history = replaceTrack(readTracks("history"), source, replacement);
-            if (!prefs.edit().putString("tracks", tracksJson(tracks)).putString("queue", tracksJson(queue))
+            JSONObject origins=offlineRows("offline_origins");
+            try{origins.put(replacement.uri,source.toJson());}catch(JSONException invalid){throw new IOException("Не удалось сохранить источник загрузки",invalid);}
+            if (!prefs.edit().putString("offline_origins",origins.toString()).putString("tracks", tracksJson(tracks)).putString("queue", tracksJson(queue))
                     .putString("history", tracksJson(history)).commit()) throw new IOException("Не удалось сохранить библиотеку. Проверь свободное место");
         }
     }
@@ -252,6 +261,77 @@ public final class LibraryStore {
                 for (Track track : readTracks(key)) if (track.uri.equals(uri)) return true;
             return false;
         }
+    }
+
+    private JSONObject offlineRows(String key){try{return new JSONObject(prefs.getString(key,"{}"));}catch(JSONException invalid){return new JSONObject();}}
+    private Track offlineFallback(Track track){
+        if(OnlineCatalog.isSourceUrl(track.sourceUrl)&&(track.id.matches("soundcloud:[1-9][0-9]{0,15}")||track.id.startsWith("soundcloud-url:"))){
+            Track reference=track.withUri("",track.duration);if(reference.isCatalogReference())return reference;
+        }
+        try{
+            JSONObject origin=offlineRows("offline_origins").optJSONObject(track.uri);
+            if(origin!=null){Track source=Track.fromJson(origin);if(source.id.equals(track.id)&&isDirectHttps(Uri.parse(source.uri)))return track.withUri(source.uri,track.duration);}
+        }catch(JSONException ignored){}
+        return null;
+    }
+    /** Old queue snapshots and stale search rows cannot resurrect a retired private file. */
+    public Track reconcileTrack(Track track){
+        if(track==null)return null;
+        synchronized(LOCK){
+            String json=prefs.getString("offline_retired","{}");
+            if(!json.equals(retiredCacheJson)){
+                java.util.Map<String,Track> next=new java.util.HashMap<>();JSONObject rows=offlineRows("offline_retired");
+                for(java.util.Iterator<String> keys=rows.keys();keys.hasNext();){String uri=keys.next();if(OfflineFiles.owned(context.getFilesDir(),uri)==null)continue;JSONObject row=rows.optJSONObject(uri);if(row==null)continue;Track replacement=null;try{JSONObject value=row.optJSONObject("replacement");if(value!=null){Track candidate=Track.fromJson(value);if(candidate.isCatalogReference()||isDirectHttps(Uri.parse(candidate.uri)))replacement=candidate;}}catch(JSONException ignored){}next.put(uri,replacement);}
+                retiredCache=next;retiredCacheJson=json;
+            }
+            if(retiredCache.containsKey(track.uri))return retiredCache.get(track.uri);
+            File file=OfflineFiles.owned(context.getFilesDir(),track.uri);
+            return file!=null&&!file.isFile()?offlineFallback(track):track;
+        }
+    }
+    /** Includes a failed unlink, so the same visible action can retry freeing its private bytes. */
+    public Track offlineCopy(String id){
+        synchronized(LOCK){
+            String canonical=canonicalId(id);Track current=find(canonical);
+            if(current!=null&&OfflineFiles.owned(context.getFilesDir(),current.uri)!=null)return current;
+            for(String key:new String[]{"queue","history"})for(Track track:readTracks(key))if(canonicalId(track.id).equals(canonical)&&OfflineFiles.owned(context.getFilesDir(),track.uri)!=null)return track;
+            JSONObject retired=offlineRows("offline_retired");
+            for(java.util.Iterator<String> keys=retired.keys();keys.hasNext();){String uri=keys.next();File file=OfflineFiles.owned(context.getFilesDir(),uri);JSONObject row=retired.optJSONObject(uri);if(file==null||!file.isFile()||row==null)continue;try{Track original=Track.fromJson(row.getJSONObject("original"));if(canonicalId(original.id).equals(canonical))return original;}catch(JSONException ignored){}}
+            return null;
+        }
+    }
+    public static final class OfflineRemoval {
+        public final String uri;public final Track replacement;public final long bytes;
+        OfflineRemoval(String uri,Track replacement,long bytes){this.uri=uri;this.replacement=replacement;this.bytes=bytes;}
+    }
+    /** Call after releasing a decoder that owns expected.uri. SAF/external documents never enter here. */
+    public OfflineRemoval removeOffline(Track expected,boolean removeLibrary)throws IOException{
+        synchronized(LOCK){
+            Track original=offlineCopy(expected.id);if(original==null||!original.uri.equals(expected.uri))throw new IOException("Загрузка уже изменилась. Открой меню заново");
+            File file=OfflineFiles.owned(context.getFilesDir(),original.uri);if(file==null)throw new IOException("Исходный файл не принадлежит загрузкам LolzCloud");
+            Track replacement=offlineFallback(original);JSONObject retired=offlineRows("offline_retired");
+            try{
+                if(!retired.has(original.uri)&&retired.length()>=512){
+                    java.util.Iterator<String> keys=retired.keys();while(keys.hasNext()&&retired.length()>=512){String uri=keys.next();File old=OfflineFiles.owned(context.getFilesDir(),uri);if(old!=null&&!old.exists())keys.remove();}
+                    if(retired.length()>=512)throw new IOException("Не удалось завершить прежние удаления загрузок");
+                }
+                retired.put(original.uri,new JSONObject().put("original",original.toJson()).put("replacement",replacement==null?JSONObject.NULL:replacement.toJson()));
+            }catch(JSONException invalid){throw new IOException("Не удалось сохранить удаление загрузки",invalid);}
+            List<Track> tracks=replaceUri(readTracks("tracks"),original.uri,replacement),queue=readTracks("queue"),history=replaceUri(readTracks("history"),original.uri,replacement);
+            int oldIndex=savedIndex(),nextIndex=0;for(int i=0;i<Math.min(oldIndex,queue.size());i++)if(!queue.get(i).uri.equals(original.uri)||replacement!=null)nextIndex++;
+            boolean removedCurrent=oldIndex>=0&&oldIndex<queue.size()&&queue.get(oldIndex).uri.equals(original.uri)&&replacement==null;
+            queue=replaceUri(queue,original.uri,replacement);nextIndex=queue.isEmpty()?-1:Math.min(nextIndex,queue.size()-1);
+            SharedPreferences.Editor edit=prefs.edit().putString("offline_retired",retired.toString()).putString("tracks",tracksJson(tracks)).putString("queue",tracksJson(queue)).putString("history",tracksJson(history)).putInt("queue_index",nextIndex);
+            if(removedCurrent)edit.putLong("queue_position",0);
+            if(!edit.commit())throw new IOException("Не удалось сохранить удаление. Файл оставлен на телефоне");
+            long bytes=OfflineFiles.delete(context.getFilesDir(),original.uri);
+            JSONObject origins=offlineRows("offline_origins");origins.remove(original.uri);prefs.edit().putString("offline_origins",origins.toString()).apply();
+            if(removeLibrary)remove(original.id);
+            return new OfflineRemoval(original.uri,replacement,bytes);
+        }
+    }
+    private static List<Track> replaceUri(List<Track> rows,String uri,Track replacement){
+        List<Track> result=new ArrayList<>();for(Track row:rows){if(row.uri.equals(uri)){if(replacement!=null)result.add(replacement);}else result.add(row);}return result;
     }
 
     public void remove(String id) {
@@ -461,10 +541,18 @@ public final class LibraryStore {
         if(!edit.commit())throw new IOException("Не удалось сохранить настройки волны");
     }
 
-    public String lyrics(String id) { return prefs.getString("lyrics_" + id, ""); }
+    public String lyrics(String id) { synchronized(LOCK){return prefs.getString("lyrics_" + canonicalId(id), "");} }
     public void saveLyrics(String id, String text) {
         if (text == null || text.length() > 256_000) throw new IllegalArgumentException("Текст слишком большой");
-        prefs.edit().putString("lyrics_" + id, text).apply();
+        synchronized(LOCK){prefs.edit().putString("lyrics_" + canonicalId(id), text).apply();}
+    }
+    /** A confirmation opened for an older import must not remove a newer file. */
+    public boolean removeLyrics(String id,String expected) {
+        synchronized(LOCK){
+            id=canonicalId(id);String key="lyrics_"+id;
+            if(expected==null||!expected.equals(prefs.getString(key,"")))return false;
+            prefs.edit().remove(key).apply();return true;
+        }
     }
 
     public boolean privateMode() { return prefs.getBoolean("private_mode", false); }
@@ -517,10 +605,13 @@ public final class LibraryStore {
 
     public void saveQueue(List<Track> queue, int index, long position) {
         synchronized (LOCK) {
+            int selected=0;for(int i=0;i<Math.min(Math.max(index,0),queue.size());i++)if(reconcileTrack(queue.get(i))!=null)selected++;
+            boolean kept=index>=0&&index<queue.size()&&reconcileTrack(queue.get(index))!=null;
+            List<Track> normalized=preferOffline(queue);selected=normalized.isEmpty()?-1:Math.min(selected,normalized.size()-1);
             JSONArray array = new JSONArray();
-            for (Track track : preferOffline(queue)) array.put(track.toJson());
-            prefs.edit().putString("queue", array.toString()).putInt("queue_index", index)
-                    .putLong("queue_position", Math.max(0, position)).apply();
+            for (Track track : normalized) array.put(track.toJson());
+            prefs.edit().putString("queue", array.toString()).putInt("queue_index", selected)
+                    .putLong("queue_position", kept?Math.max(0, position):0).apply();
         }
     }
 
@@ -540,7 +631,8 @@ public final class LibraryStore {
             offlineCache = offline; trackCache = all; offlineCacheJson = libraryJson;
         }
         List<Track> result = new ArrayList<>(snapshot.size());
-        for (Track track : snapshot) {
+        for (Track original : snapshot) {
+            Track track=reconcileTrack(original);if(track==null)continue;
             if (track.isCatalogReference()) { Track resolved = trackCache.get(canonicalId(track.id)); if (resolved != null && !resolved.isCatalogReference()) { result.add(resolved); continue; } }
             Track local = offlineCache.get(track.id);
             result.add(local != null && isDirectHttps(Uri.parse(track.uri)) ? local : track);
@@ -901,7 +993,7 @@ public final class LibraryStore {
         try {
             JSONArray array = new JSONArray(prefs.getString(key, "[]"));
             for (int i = 0; i < array.length(); i++) {
-                try { tracks.add(Track.fromJson(array.getJSONObject(i))); }
+                try { Track track=reconcileTrack(Track.fromJson(array.getJSONObject(i)));if(track!=null)tracks.add(track); }
                 catch (JSONException ignored) { /* Keep valid rows if a single entry is damaged. */ }
             }
         } catch (JSONException ignored) { }
@@ -910,7 +1002,7 @@ public final class LibraryStore {
 
     private void writeTracks(String key, List<Track> tracks) {
         JSONArray array = new JSONArray();
-        for (Track track : tracks) array.put(track.toJson());
+        for (Track value : tracks){Track track=reconcileTrack(value);if(track!=null)array.put(track.toJson());}
         prefs.edit().putString(key, array.toString()).apply();
     }
 

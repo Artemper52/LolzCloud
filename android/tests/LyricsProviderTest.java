@@ -65,6 +65,7 @@ public final class LyricsProviderTest {
         Script marked=new Script(reply(200,"["+original+"]"));result=new LyricsProvider(marked).lookup(Arrays.asList(speed));
         check(result.timed&&result.adapted&&Math.abs(result.adaptationRate-1.25)<.000001&&result.referenceDuration==100000&&result.duration==80000,"A verified marked speedup adapts by original/source duration instead of native playback speed");
         check(LrcParser.parse(result.text).get(0).time==8000&&result.text.contains("<00:08.400>"),"Line and enhanced word timestamps are divided by the source ratio exactly once");
+        check(!LrcParser.parse(result.text).get(0).words.isEmpty()&&LrcParser.parse(result.text).get(0).words.get(0).time==8400,"Adapted word data reaches the native model already scaled once, without a playback-speed factor");
         check(marked.paths.size()==1&&marked.paths.get(0).startsWith("/api/search?")&&!marked.paths.get(0).contains("speedup")&&!marked.paths.get(0).contains("duration="),"Marked versions use one cleaned canonical search and avoid an expensive wrong-duration get");
         result=LyricsProvider.selectVariant(new org.json.JSONArray().put(original).put(record("Fixture Song (speedup)","Fixture Singer",80,"[00:03]Exact version fixture",null)),speed);
         check(result.timed&&!result.adapted&&LrcParser.parse(result.text).get(0).time==3000,"Exact modified recording and matching duration win over inferred original timing");

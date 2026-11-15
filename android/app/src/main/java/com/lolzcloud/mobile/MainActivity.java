@@ -62,6 +62,7 @@ public final class MainActivity extends Activity {
     private List<LrcParser.Line> lyricLines = Collections.emptyList();
     private final ArrayList<TextView> lyricViews = new ArrayList<>();
     private int activeLyric = -2;
+    private int activeLyricWord = -2;
     private LyricsRepository lyricsRepository;
     private Future<?> lyricsTask;
     private LyricsProvider.Result automaticLyrics;
@@ -131,7 +132,7 @@ public final class MainActivity extends Activity {
     @Override protected void onPause(){if(cloudProfiles!=null)cloudProfiles.suspend();if(social!=null)social.removeListener(socialListener);super.onPause();}
     @Override protected void onSaveInstanceState(Bundle state){super.onSaveInstanceState(state);state.putString("page",page);state.putString("filter",filter);state.putString("query",query);state.putString("wave_draft",waveDraft);state.putString("pending_lyrics",pendingLyricsId);state.putString("link_kind",activeLinkKind);state.putString("link_text",linkInput==null?"":linkInput.getText().toString());if(!profileCommitting){state.putString("profile_preview",pendingProfileCache);state.putBoolean("profile_sound",profileSound==null||profileSound.isChecked());if(pendingProfileOwner!=null){state.putString("profile_owner",pendingProfileOwner.id);state.putString("profile_fingerprint",pendingProfileOwner.fingerprint);}}saveCatalog(state);}
     @Override protected void onDestroy(){alive=false;if(cloudProfiles!=null)cloudProfiles.close();cancelCatalog();cancelLyrics();handler.removeCallbacksAndMessages(null);if(linkDialog!=null)linkDialog.dismiss();if(lyricsDialog!=null)lyricsDialog.dismiss();if(waveDialog!=null)waveDialog.dismiss();if(profileDialog!=null)profileDialog.dismiss();if(!isChangingConfigurations()&&!profileCommitting)discardProfilePreview();if(player!=null)player.setListener(null);if(bound)unbindService(connection);io.shutdownNow();catalogIo.shutdownNow();lyricsIo.shutdownNow();artworkIo.shutdownNow();artworkWaiters.clear();if(updater!=null)updater.dispose();super.onDestroy();}
-    private final Runnable tick=new Runnable(){@Override public void run(){if(alive){updatePlayback();handler.postDelayed(this,750);}}};
+    private final Runnable tick=new Runnable(){@Override public void run(){if(alive){updatePlayback();handler.postDelayed(this,page.equals("lyrics")?100:750);}}};
     private int dp(float value){return Math.round(value*getResources().getDisplayMetrics().density);}
     private void theme(){
         String selected=store.preferences().getString("theme","forest");
@@ -369,7 +370,7 @@ public final class MainActivity extends Activity {
         audioStatusText=text("",13,muted,false);audioStatusText.setTag("audio_status");audioStatusText.setLineSpacing(dp(3),1);audioStatusText.setPadding(0,0,0,dp(10));content.addView(audioStatusText);
         audioRetryButton=button("Повторить",false,()->{if(player!=null)player.play();});audioRetryButton.setTag("audio_retry");content.addView(audioRetryButton);
         LinearLayout tools=row();smallAction(tools,"lyrics","Текст",()->navigate("lyrics"));smallAction(tools,"queue","Очередь",()->navigate("queue"));smallAction(tools,"sliders","Звук",()->navigate("sound"));content.addView(tools);
-        TextView source=text(t.uri.startsWith("https:")?(t.id.startsWith("soundcloud:")?"SoundCloud · играет в LolzCloud":"Прямой аудиопоток · HTTPS"):(t.id.startsWith("soundcloud:")?"SoundCloud · сохранено на телефоне":"Музыка с телефона · доступна без сети"),11,muted,false);source.setGravity(Gravity.CENTER);source.setPadding(0,dp(22),0,0);content.addView(source);
+        TextView source=text(t.isCatalogReference()?"SoundCloud · сетевой источник · нужен интернет":t.uri.startsWith("https:")?(t.id.startsWith("soundcloud:")?"SoundCloud · играет в LolzCloud":"Прямой аудиопоток · HTTPS"):(t.id.startsWith("soundcloud:")?"SoundCloud · сохранено на телефоне":"Музыка с телефона · доступна без сети"),11,muted,false);source.setGravity(Gravity.CENTER);source.setPadding(0,dp(22),0,0);content.addView(source);
     }
     private void queue(){
         heading("Дальше звучит",player==null?"Нет активной очереди":player.queue().size()+" "+plural(player.queue().size(),"трек","трека","треков"));
@@ -393,9 +394,20 @@ public final class MainActivity extends Activity {
             if(automaticLyrics!=null&&automaticLyrics.found())paragraph(automaticLyrics.adapted?String.format(Locale.ROOT,"LRCLIB · Под версию · %.2f× (по длительности)",automaticLyrics.adaptationRate):"LRCLIB · "+(automaticLyrics.timed?"строки с таймкодами":automaticLyrics.versionMismatch?"другая длительность · без таймкодов":"без таймкодов"));
         }
         for(LrcParser.Line line:lyricLines){TextView v=text(line.text,23,line.time<0?ink:muted,true);v.setLineSpacing(dp(4),1);v.setPadding(0,dp(12),0,dp(12));if(line.time>=0){v.setContentDescription("Перейти к "+format(line.time)+": "+line.text);v.setOnClickListener(w->{Track active=current();if(player!=null&&active!=null&&active.id.equals(t.id))player.seekTo(line.time);});}lyricViews.add(v);content.addView(v);}
+        activeLyricWord=-2;
         gap(18);
         if(!own){TextView retry=button("Повторить поиск",false,()->{requestLyrics(t,true);render();});retry.setTag("lyrics_retry");retry.setEnabled(!lyricsLoading);retry.setAlpha(lyricsLoading?.45f:1f);content.addView(retry);gap(8);TextView match=button("Уточнить название и исполнителя",false,()->lyricsIdentityDialog(t));match.setTag("lyrics_identity");content.addView(match);gap(8);}
         content.addView(button(own?"Заменить свой файл":"Добавить свой TXT / LRC",false,()->importLyrics(t.id)));
+        if(own){gap(8);TextView remove=button("Убрать свой текст",false,()->removeOwnLyrics(t,imported));remove.setTag("lyrics_remove_own");content.addView(remove);}
+    }
+    private void removeOwnLyrics(Track recording,String imported){
+        AlertDialog confirm=new AlertDialog.Builder(this).setTitle("Убрать свой текст?").setMessage("Для «"+recording.title+"» снова будет доступен автоматический поиск. Исходный TXT / LRC останется на телефоне.")
+                .setNegativeButton("Отмена",null).setPositiveButton("Убрать",(dialog,which)->{
+                    if(!store.removeLyrics(recording.id,imported)){toast("Текст уже изменился. Открой его заново.");return;}
+                    Track active=current();if(active!=null&&store.sameRecording(active.id,recording.id)&&page.equals("lyrics")){requestLyrics(active,false);render();}
+                    toast("Свой текст убран");
+                }).create();
+        lyricsDialog=confirm;confirm.setOnDismissListener(dialog->{if(lyricsDialog==confirm)lyricsDialog=null;});confirm.show();
     }
     private long lyricDuration(Track track){long value=player==null?0:player.duration();return value>0?value:track.duration;}
     private void cancelLyrics(){lyricsGeneration++;if(lyricsTask!=null)lyricsTask.cancel(true);lyricsTask=null;if(lyricsRepository!=null)lyricsRepository.cancel();lyricsLoading=false;lyricsRequestKey="";}
@@ -525,9 +537,22 @@ public final class MainActivity extends Activity {
         if(shuffleIcon!=null){shuffleIcon.color=player.shuffle()?accent:muted;shuffleIcon.setSelected(player.shuffle());shuffleIcon.setContentDescription("Перемешивание "+(player.shuffle()?"включено":"выключено"));shuffleIcon.invalidate();repeatIcon.color=player.repeat()>0?accent:muted;repeatIcon.setGlyph(player.repeat()==2?"repeatOne":"repeat");repeatIcon.setContentDescription(player.repeat()==0?"Повтор выключен":player.repeat()==1?"Повтор очереди":"Повтор трека");}
         if(progress!=null){long total=player.duration(),pos=player.position();if(!seeking)progress.setProgress(total>0?(int)Math.min(10000,pos*10000/total):0);elapsed.setText(format(pos));remaining.setText(format(total));}
         if(audioStatusText!=null){String message=player.isLoading()?player.loadingMessage():player.error();audioStatusText.setText(message);audioStatusText.setVisibility(message==null||message.isEmpty()?View.GONE:View.VISIBLE);audioRetryButton.setVisibility(!player.isLoading()&&message!=null&&!message.isEmpty()?View.VISIBLE:View.GONE);}
-        if(page.equals("lyrics")&&!lyricViews.isEmpty()){int active=LrcParser.activeLine(lyricLines,player.position());if(active!=activeLyric){for(int i=0;i<lyricViews.size();i++)lyricViews.get(i).setTextColor(i==active?accent:lyricLines.get(i).time<0?ink:muted);activeLyric=active;}}
+        if(page.equals("lyrics")&&!lyricViews.isEmpty())updateLyricHighlight(player.position());
         String error=player.error();if(error!=null&&!error.isEmpty()&&!error.equals(lastError)){lastError=error;toast(error);}if(error==null||error.isEmpty())lastError="";
         updateWave();
+    }
+    private void updateLyricHighlight(long position){
+        int active=LrcParser.activeLine(lyricLines,position);
+        if(active!=activeLyric){
+            for(int i=0;i<lyricViews.size();i++){TextView view=lyricViews.get(i);view.setText(lyricLines.get(i).text);view.setTextColor(i==active?(lyricLines.get(i).words.isEmpty()?accent:ink):lyricLines.get(i).time<0?ink:muted);}
+            activeLyric=active;activeLyricWord=-2;
+        }
+        if(active<0||active>=lyricViews.size())return;
+        LrcParser.Line line=lyricLines.get(active);int word=LrcParser.activeWord(line,position);
+        if(word==activeLyricWord)return;activeLyricWord=word;
+        SpannableString styled=new SpannableString(line.text);
+        if(word>=0){LrcParser.Word selected=line.words.get(word);styled.setSpan(new android.text.style.ForegroundColorSpan(accent),selected.startOffset,selected.endOffset,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);}
+        lyricViews.get(active).setText(styled);
     }
     private void trackRow(LinearLayout parent,Track t,List<Track> list,int index,boolean queued){
         LinearLayout r=row();r.setGravity(Gravity.CENTER_VERTICAL);r.setMinimumHeight(dp(76));r.setContentDescription(t.title+". "+t.artist);Cover cover=new Cover(t);r.addView(cover,new LinearLayout.LayoutParams(dp(52),dp(52)));LinearLayout labels=column();TextView title=text(t.title,14,ink,true);title.setSingleLine(true);title.setEllipsize(TextUtils.TruncateAt.END);labels.addView(title);String origin=t.isCatalogReference()?"SoundCloud · из профиля · ":t.id.startsWith("soundcloud:")?(t.uri.startsWith("https:")?"SoundCloud · ":"Сохранено · "):t.uri.startsWith("https:")?"Онлайн-поток · ":"";TextView artist=text(origin+t.artist+((t.duration>0)?" · "+format(t.duration):""),12,muted,false);artist.setSingleLine(true);artist.setEllipsize(TextUtils.TruncateAt.END);artist.setPadding(0,dp(5),0,0);labels.addView(artist);LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(0,-2,1);lp.leftMargin=dp(13);r.addView(labels,lp);r.setOnClickListener(v->{if(queued&&player!=null){player.replaceStoredTrack(rememberTrack(t));player.playIndex(index);}else playList(list,index);navigate("player");});
@@ -543,12 +568,24 @@ public final class MainActivity extends Activity {
             final Track download=rememberTrack(t);io.execute(()->{try{Track saved=StreamDownloads.save(getApplicationContext(),download,store);Track stored=store.find(saved.id);final Track canonical=stored==null?saved:stored;PlaybackService.offlineSaved(canonical);handler.post(()->{if(alive){toast("Трек сохранён и доступен без сети");render();}});}catch(Exception error){handler.post(()->{if(alive)toast("Не удалось сохранить: "+error.getMessage());});}finally{handler.post(()->downloading.remove(t.id));}});
             return true;
         });
+        final Track offlineCopy=store.offlineCopy(t.id);
+        if(offlineCopy!=null)menu.getMenu().add("Удалить загрузку с телефона").setOnMenuItemClickListener(v->{confirmOfflineRemoval(offlineCopy,false);return true;});
         if(current()!=null&&current().id.equals(t.id))menu.getMenu().add("Сохранить момент").setOnMenuItemClickListener(v->{
             saveCurrentMoment(t);return true;
         });
         if(store.find(t.id)==null)menu.getMenu().add("Добавить в мою музыку").setOnMenuItemClickListener(v->{rememberTrack(t);toast("Трек добавлен в мою музыку");render();return true;});
-        else menu.getMenu().add("Удалить из библиотеки").setOnMenuItemClickListener(v->{new AlertDialog.Builder(this).setTitle("Убрать «"+t.title+"»?").setMessage("Исходный файл останется на телефоне.").setPositiveButton("Убрать",(d,w)->{store.remove(t.id);render();}).setNegativeButton("Отмена",null).show();return true;});
+        else menu.getMenu().add("Удалить из библиотеки").setOnMenuItemClickListener(v->{if(offlineCopy!=null)confirmOfflineRemoval(offlineCopy,true);else new AlertDialog.Builder(this).setTitle("Убрать «"+t.title+"»?").setMessage("Исходный файл останется на телефоне.").setPositiveButton("Убрать",(d,w)->{store.remove(t.id);render();}).setNegativeButton("Отмена",null).show();return true;});
         menu.show();
+    }
+    private void confirmOfflineRemoval(Track copy,boolean removeLibrary){
+        String message="Освободится место, занятое копией LolzCloud. "+(removeLibrary?"Запись будет убрана из библиотеки. ":"Любимое, моменты и доступный сетевой источник останутся. ")+"Если эта копия играет, воспроизведение приостановится. Старые загрузки без сетевого источника будут убраны из очереди.";
+        new AlertDialog.Builder(this).setTitle(removeLibrary?"Удалить запись и загрузку?":"Удалить загрузку с телефона?").setMessage(message).setNegativeButton("Отмена",null)
+                .setPositiveButton("Удалить",(dialog,which)->{
+                    if(player==null){toast("Плеер подключается. Попробуй ещё раз.");return;}
+                    try{long bytes=player.removeOfflineTrack(copy,removeLibrary);toast("Загрузка удалена · "+String.format(Locale.ROOT,"%.1f МБ",bytes/1048576d));}
+                    catch(IOException failure){toast(failure.getMessage());}
+                    render();
+                }).show();
     }
     /** A Wave selection is ephemeral until an explicit save; a moment needs its portable metadata too. */
     private void saveCurrentMoment(Track track){
@@ -557,8 +594,8 @@ public final class MainActivity extends Activity {
         try{Track saved=rememberTrack(track);boolean added=store.addBookmark(saved.id,position);toast(added?"Момент сохранён · "+format(position):"Этот момент уже сохранён");}
         catch(IOException failure){toast(failure.getMessage());}
     }
-    private Track rememberTrack(Track track){if(track==null)return null;if(track.isCatalogReference()||track.id.startsWith("soundcloud:"))return store.rememberCatalog(track);store.add(track);return track;}
-    private void playList(List<Track> tracks,int index){if(player==null){toast("Плеер подключается. Попробуй ещё раз.");return;}if(tracks.isEmpty()||index<0||index>=tracks.size())return;List<Track> resolved=store.resolveCatalog(tracks);resolved.set(index,rememberTrack(resolved.get(index)));hideKeyboard();if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=android.content.pm.PackageManager.PERMISSION_GRANTED&&!store.preferences().getBoolean("notification_permission_asked",false)){store.preferences().edit().putBoolean("notification_permission_asked",true).apply();requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},51);}player.setQueue(resolved,index,true);}
+    private Track rememberTrack(Track track){track=store.reconcileTrack(track);if(track==null)return null;if(track.isCatalogReference()||track.id.startsWith("soundcloud:"))return store.rememberCatalog(track);store.add(track);return track;}
+    private void playList(List<Track> tracks,int index){if(player==null){toast("Плеер подключается. Попробуй ещё раз.");return;}if(tracks.isEmpty()||index<0||index>=tracks.size())return;if(store.reconcileTrack(tracks.get(index))==null){toast("Эта загрузка удалена. Добавь источник заново.");return;}int selected=0;for(int i=0;i<index;i++)if(store.reconcileTrack(tracks.get(i))!=null)selected++;List<Track> resolved=store.resolveCatalog(tracks);resolved.set(selected,rememberTrack(resolved.get(selected)));hideKeyboard();if(Build.VERSION.SDK_INT>=33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)!=android.content.pm.PackageManager.PERMISSION_GRANTED&&!store.preferences().getBoolean("notification_permission_asked",false)){store.preferences().edit().putBoolean("notification_permission_asked",true).apply();requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS},51);}player.setQueue(resolved,selected,true);}
     private void importAudio(){Intent intent=new Intent(Intent.ACTION_OPEN_DOCUMENT);intent.setType("audio/*");intent.addCategory(Intent.CATEGORY_OPENABLE);intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);try{startActivityForResult(intent,IMPORT_AUDIO);}catch(ActivityNotFoundException e){toast("На телефоне нет приложения для выбора файлов");}}
     private void importLyrics(String id){pendingLyricsId=id;Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT);i.addCategory(Intent.CATEGORY_OPENABLE);i.setType("*/*");i.putExtra(Intent.EXTRA_MIME_TYPES,new String[]{"text/plain","application/octet-stream","application/x-subrip"});startActivityForResult(i,IMPORT_LYRICS);}
     private void exportProfile(){createProfileDocument(false);}
@@ -625,7 +662,7 @@ public final class MainActivity extends Activity {
     private TextView inlineError(){TextView label=text("",13,store.preferences().getString("theme","forest").equals("paper")?0xffb3261e:0xffffb4ab,false);label.setPadding(0,dp(8),0,dp(4));label.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);label.setVisibility(View.GONE);return label;}
     private void showInlineError(TextView label,String message){if(label!=null){label.setText(message);label.setVisibility(View.VISIBLE);}}
     private void hideDialogKeyboard(View input){((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(input.getWindowToken(),0);}
-    private void openOnline(String url,String title){if(OnlineCatalog.isSoundCloudAddress(url)){openSoundCloud(url);return;}if(player!=null&&SocialPolicy.startsPlayback(url))player.pause();hideKeyboard();startActivity(new Intent(this,OnlineActivity.class).putExtra("url",url).putExtra("title",title));}
+    private void openOnline(String url,String title){if(OnlineCatalog.isSoundCloudAddress(url)){openSoundCloud(url);return;}Runnable open=()->{hideKeyboard();startActivity(new Intent(this,OnlineActivity.class).putExtra("url",url).putExtra("title",title));};if(player!=null&&SocialPolicy.startsPlayback(url)&&!SocialPolicy.roomPage(url))player.openOnlineSource(open);else{if(player!=null&&SocialPolicy.roomPage(url))player.pause();open.run();}}
     private void external(String url){try{startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url)));}catch(ActivityNotFoundException e){toast("Установи браузер, чтобы открыть ссылку");}}
     private void hideKeyboard(){View focus=getCurrentFocus();if(focus!=null){((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(focus.getWindowToken(),0);focus.clearFocus();}}
     private void toast(String message){if(alive)Toast.makeText(this,message,Toast.LENGTH_LONG).show();}

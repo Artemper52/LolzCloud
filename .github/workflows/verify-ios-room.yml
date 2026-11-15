@@ -1,0 +1,37 @@
+name: Verify native iOS room media ownership
+'on':
+  push:
+    branches: ['codex/recover-ios-room-0.1.6']
+    paths: ['ios/**', '.github/ios-room-inputs.json', '.github/workflows/ios.yml', '.github/workflows/verify-ios-room.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: native-room-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      ref: ${{ steps.source.outputs.ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Verify exact native source and ancestry
+        id: source
+        run: |
+          set -eu
+          test "$GITHUB_REF" = refs/heads/codex/recover-ios-room-0.1.6
+          git merge-base --is-ancestor f7a58a94841f7709388ad003ea40f092f0625d79 HEAD
+          node -e 'const fs=require("node:fs"),c=require("node:crypto"),a=require("node:assert/strict"),m=require("./.github/ios-room-inputs.json");a.equal(m.version,"0.1.6");a.equal(m.build,7);for(const r of m.canonical)a.equal(c.createHash("sha256").update(fs.readFileSync(r.file)).digest("hex"),r.sha256,r.file);console.log("Exact native inputs:",m.canonical.length)'
+          printf 'ref=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+  apple-sdk:
+    needs: source
+    uses: ./.github/workflows/ios.yml
+    with:
+      source_ref: ${{ needs.source.outputs.ref }}

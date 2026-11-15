@@ -29,6 +29,7 @@ public final class RoomAssetsPolicyTest {
         matches("https://lolzcloud.com/cloud/room-sync.js", "room-sync.js", "text/javascript");
         matches("https://lolzcloud.com/cloud/room-players.js", "room-players.js", "text/javascript");
         matches("https://lolzcloud.com/cloud/media-source.js", "media-source.js", "text/javascript");
+        matches("https://lolzcloud.com/app/room-transport.js", "room-transport.js", "text/javascript");
         matches("https://lolzcloud.com/assets/logo.svg", "logo.svg", "image/svg+xml");
         matches("https://lolzcloud.com/social?tab=friends&user=42", "social.html", "text/html");
         matches("https://lolzcloud.com/cloud/social.js", "social.js", "text/javascript");

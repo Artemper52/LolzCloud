@@ -6,6 +6,7 @@ const adb = path.join(sdk, 'platform-tools/adb.exe'), serial = 'emulator-5554';
 const output = process.env.LOLZCLOUD_CATALOG_TEST_OUTPUT || 'D:/LolzCloud-Android-Toolchain/native-catalog-review';
 function command(args, options = {}) { const result = spawnSync(adb, ['-s', serial, ...args], { encoding: 'utf8', windowsHide: true, timeout: 30000, maxBuffer: 1024 * 1024, ...options }); if (result.error || result.status) throw result.error || new Error(result.stderr || result.stdout || 'adb failed'); return result.stdout; }
 async function main() {
+  const phaseIndex=process.argv.indexOf('--phase'),phase=phaseIndex<0?'':process.argv[phaseIndex+1];if(phase&&!['audio-audit','audio-retry','offline-removal','pending-seek'].includes(phase))throw Error('Unexpected catalog phase.');
   if (command(['shell', 'getprop', 'ro.kernel.qemu']).trim() !== '1' || command(['shell', 'getprop', 'sys.boot_completed']).trim() !== '1') throw new Error('Only a booted emulator-5554 is permitted.');
   fs.mkdirSync(output, { recursive: true });
   const testApk = path.join(__dirname, '../build/instrumentation/LolzCloud-core-tests.apk');
@@ -13,7 +14,7 @@ async function main() {
   process.stdout.write(command(['install', '-r', testApk], { timeout: 60000 }));
   const target = fs.createWriteStream(path.join(output, 'instrumentation-stdout.txt'));
   await new Promise((resolve, reject) => {
-    const child = spawn(adb, ['-s', serial, 'shell', 'am', 'instrument', '-w', 'com.lolzcloud.mobile.test/com.lolzcloud.mobile.test.CatalogInstrumentation'], { windowsHide: true });
+    const child = spawn(adb, ['-s', serial, 'shell', 'am', 'instrument', '-w', ...(phase?['-e','phase',phase]:[]), 'com.lolzcloud.mobile.test/com.lolzcloud.mobile.test.CatalogInstrumentation'], { windowsHide: true });
     const timer = setTimeout(() => { child.kill(); reject(new Error('Catalog instrumentation exceeded six minutes.')); }, 360000);
     child.stdout.on('data', data => { target.write(data); process.stdout.write(data); }); child.stderr.on('data', data => { target.write(data); process.stderr.write(data); });
     child.on('error', reject); child.on('close', code => { clearTimeout(timer); target.end(); code ? reject(new Error('am instrument failed: ' + code)) : resolve(); });

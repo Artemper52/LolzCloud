@@ -41,6 +41,7 @@ public final class OnlineActivity extends Activity {
     private static final int BACKGROUND = 0xff111314;
     private static final int FOREGROUND = 0xfff2f2eb;
     private WebView webView;
+    private RoomTransportBridge roomTransport;
     private ProgressBar progress;
     private TextView address;
     private TextView pageTitle, errorHeading, errorText;
@@ -170,6 +171,7 @@ public final class OnlineActivity extends Activity {
         root.addView(errorPanel, new LinearLayout.LayoutParams(-1, 0, 1));
 
         webView = new WebView(this);
+        roomTransport=new RoomTransportBridge(this,webView);
         webView.setBackgroundColor(BACKGROUND);
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -234,6 +236,7 @@ public final class OnlineActivity extends Activity {
                     showError("Не удалось открыть этот адрес. Вернись на предыдущую страницу.");
                     return;
                 }
+                if(roomTransport!=null)roomTransport.started(url);
                 pauseForRoomEntry(url);
                 if (navigationFailure.holds(url)) {
                     progress.setVisibility(View.GONE);
@@ -246,6 +249,8 @@ public final class OnlineActivity extends Activity {
                 progress.setVisibility(View.VISIBLE);
                 updateHeading(url, initialTitle);
             }
+
+            @Override public void onPageCommitVisible(WebView view,String url){if(roomTransport!=null)roomTransport.committed(url);}
 
             @Override public void onPageFinished(WebView view, String url) {
                 progress.setVisibility(View.GONE);
@@ -314,6 +319,7 @@ public final class OnlineActivity extends Activity {
         setContentView(root);
         root.requestApplyInsets();
         Bundle webState = state == null ? null : state.getBundle("source-webview");
+        if(!accountRequired)pauseForRoomEntry(initialUrl);
         if (accountRequired) {
             showAccountPrompt("Подключи приложение через браузер. Cookies форума остаются в браузере; LolzCloud получит собственную сессию после подтверждения кода.");
             if (state == null && !accountFlowOpen) webView.post(() -> requestAccountLogin(null, false));
@@ -667,7 +673,10 @@ public final class OnlineActivity extends Activity {
     @Override protected void onDestroy() {
         backRequest++;
         cancelImageChooser();
+        if(roomTransport!=null){roomTransport.close();roomTransport=null;}
         if (webView != null) { webView.stopLoading(); webView.destroy(); webView = null; }
         super.onDestroy();
     }
+    /** Explicitly opening another trusted room closes this old audio document before its replacement. */
+    void finishRoomForHandoff(){if(roomTransport!=null){roomTransport.close();roomTransport=null;}if(webView!=null){webView.stopLoading();webView.destroy();webView=null;}finish();}
 }

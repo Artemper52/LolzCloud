@@ -16,6 +16,6 @@ const sha=crypto.createHash('sha256').update(fs.readFileSync(apk)).digest('hex')
 if(report.apkSha256!==sha||report.version!==version.versionName||report.versionCode!==version.versionCode)throw new Error('Installed test target does not match the current production artifact.');
 report.generatedAt=new Date().toISOString();report.emulator='emulator-5554';
 const serialized=JSON.stringify(report,null,2)+'\n';fs.writeFileSync(path.join(output,'android-lyrics-verification.json'),serialized);
-for(const file of report.screenshots||[]){if(!/^\/(?:sdcard|storage\/emulated\/0)\/Android\/data\/com\.lolzcloud\.mobile\/files\/lyrics-review\/lyrics-[a-z]+\.png$/.test(file))throw new Error('Unexpected screenshot path');run(['pull',file,path.join(output,path.basename(file))]);}
+for(const file of report.screenshots||[]){if(!/^\/(?:sdcard|storage\/emulated\/0)\/Android\/data\/com\.lolzcloud\.mobile\/files\/lyrics-review\/lyrics-[a-z]+(?:-[a-z]+)*\.png$/.test(file))throw new Error('Unexpected screenshot path');run(['pull',file,path.join(output,path.basename(file))]);}
 if(report.status!=='passed')throw new Error(report.error||'Lyrics checks failed');
 console.log('PASS: '+report.checks.length+' actual native lyrics behavior checks. Artifacts: '+output);
