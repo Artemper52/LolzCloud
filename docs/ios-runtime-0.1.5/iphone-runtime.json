@@ -1,0 +1,66 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T14:05:12.954Z",
+  "scope": "Hosted XCTest on a fresh disposable iOS Simulator. No physical-device, external Document Provider, signing or personal-account verification.",
+  "version": "0.1.5",
+  "commit": "f7a58a94841f7709388ad003ea40f092f0625d79",
+  "sourceHashes": {
+    "App.swift": "3b5c81223f5a8cc905f825c805ae1b716a9b6dd168ba0a28a834d89cf51bcf71",
+    "MediaPolicy.swift": "e1497aa0f6564aff26211dcb634072dfd6b3ab5ab2ea215927355e6e7abc4c5e",
+    "NativePlayer.swift": "ae5beed1ed3373f041072f69a25e921e590f627214879fe58dda2e193853adc0",
+    "AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
+    "AudioEffectsPolicy.swift": "6896cb5c5f14f552cf874ce2abb051a9223c8107818eaee1f706ac1415a05f80",
+    "NativeAudioEffects.swift": "acf5527e749b4ed5a512ea63c2e96245b46c928d4cdfd8f3f619894999bcbc82",
+    "NativeCatalog.swift": "757ee942d3f9d6e9854f8b2ffed1bdb3ebcd8da0d25e45ac22be8c8795937c0f",
+    "NativeProfileShare.swift": "2818dccc99e4c9e61c8603ca979ccf77b62389797a0fdaf5bc75734665eb23c5",
+    "NativeRatePolicy.swift": "fc6feb5626219cdec2f0a3e6b4f2233ae7c19e15f183ef57f84a7c5abb18da39",
+    "DSPCore.c": "f8c4d8ccdf7651a5ef795207abbd69435a417885f3e08279f246afbc32fc443e",
+    "PitchCore.c": "577adbdad248f57bf66b53146eabf21b6b90acddae5ad6c7acef19bf1b7b3e0b",
+    "PCMStream.c": "c457db11ca8452c64d8ed61843e09203090df24ef9ccf29ecca45110e54cc5cf",
+    "NativeAudioTap.c": "357042c12d2a2e7c4e1b7d3703be8b5b090b6cf5734105cac29f01112dfb2e43"
+  },
+  "simulator": {
+    "uuid": "D20C0C08-5FE5-4FA0-B24E-3625AF520276",
+    "family": "iphone",
+    "device": "iPhone 16",
+    "runtime": "iOS 26.2",
+    "version": "26.2"
+  },
+  "xcresult": "/Users/runner/work/_temp/ios-runtime/NativeRuntime.xcresult",
+  "tests": {
+    "devicesAndConfigurations": [
+      {
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "D20C0C08-5FE5-4FA0-B24E-3625AF520276",
+          "deviceName": "LolzCloud-runtime-1794751625343",
+          "modelName": "iPhone 16",
+          "osBuildNumber": "23C54",
+          "osVersion": "26.2",
+          "platform": "iOS Simulator"
+        },
+        "expectedFailures": 0,
+        "failedTests": 0,
+        "passedTests": 17,
+        "skippedTests": 0,
+        "testPlanConfiguration": {
+          "configurationId": "1",
+          "configurationName": "Test Scheme Action"
+        }
+      }
+    ],
+    "environmentDescription": "LolzCloudRuntime · Built with macOS 15.8.2",
+    "expectedFailures": 0,
+    "failedTests": 0,
+    "finishTime": 1794752107.029,
+    "passedTests": 17,
+    "result": "Passed",
+    "skippedTests": 0,
+    "startTime": 1794751865.982,
+    "statistics": [],
+    "testFailures": [],
+    "title": "Test - LolzCloudRuntime",
+    "topInsights": [],
+    "totalTestCount": 17
+  }
+}

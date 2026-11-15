@@ -1,0 +1,172 @@
+{
+  "status": "published-and-public-byte-verified",
+  "release": "20261115-social-0.9.23-18ab51d0",
+  "version": "0.9.23",
+  "current": "/opt/lolzcloud-server/releases/20261115-social-0.9.23-18ab51d0",
+  "previous": "/opt/lolzcloud-server/releases/20261115-social-0.9.22-f798f619",
+  "previousReleasePreserved": true,
+  "health": {
+    "ok": true,
+    "version": "0.9.23",
+    "roomProtocol": 2,
+    "socialProtocol": 1,
+    "oauthConfigured": true,
+    "spicyConfigured": true
+  },
+  "pwaCount": 26,
+  "pwaFiles": [
+    {
+      "name": "app.css",
+      "size": 22196,
+      "sha256": "9009c62e3918ee15d9e526f75b275751363fb93b69f31a5b278b483064ab6994"
+    },
+    {
+      "name": "app.js",
+      "size": 109015,
+      "sha256": "717488069a937285bfa90b55d80a7497a6f54d67a1fb33a378acd721c70434ed"
+    },
+    {
+      "name": "core.js",
+      "size": 9897,
+      "sha256": "20a8d5b82f1c392438cd6655dd0f40f253e6d8ce6aace96e123dba4edca97daf"
+    },
+    {
+      "name": "effects-policy.js",
+      "size": 5822,
+      "sha256": "bf64ce15a3bf67c957cb4a71e0ada1562c243d7a72bd81d8cc80b32e1c25ec8d"
+    },
+    {
+      "name": "effects.js",
+      "size": 15926,
+      "sha256": "38b99aab18e973a71178ff07f48a6e9b3f14e5a72be1dc7c6e3a6a4cf6c52b4b"
+    },
+    {
+      "name": "icon-192.png",
+      "size": 7875,
+      "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4"
+    },
+    {
+      "name": "icon-512.png",
+      "size": 9687,
+      "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef"
+    },
+    {
+      "name": "icon.svg",
+      "size": 366,
+      "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6"
+    },
+    {
+      "name": "imports.js",
+      "size": 2375,
+      "sha256": "9c025444b795b53b730d27723d18006a743c11601f22c86b2f89bea9d384abc2"
+    },
+    {
+      "name": "index.html",
+      "size": 27501,
+      "sha256": "99f1eb4bbcfaf75b662b12b06dd740aed53e214aa0f0909e5286b490249c09eb"
+    },
+    {
+      "name": "limiter-worklet.js",
+      "size": 2197,
+      "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112"
+    },
+    {
+      "name": "lyric-tempo.js",
+      "size": 9015,
+      "sha256": "fd820683ae0016c0d03db791386650d836b001d3a3872e7ea0d3c944e9205bb3"
+    },
+    {
+      "name": "lyrics.js",
+      "size": 8186,
+      "sha256": "1ec2bda958ca4f56db27886fa49b51c54114bb9ac65e497264a920c06e6baf2c"
+    },
+    {
+      "name": "manifest.webmanifest",
+      "size": 440,
+      "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7"
+    },
+    {
+      "name": "normalization-worklet.js",
+      "size": 3376,
+      "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664"
+    },
+    {
+      "name": "offline.js",
+      "size": 6286,
+      "sha256": "90356fe86dbb0140ee054e9fb3ebc50291cf5b4765e841bd827c30dc2d97f205"
+    },
+    {
+      "name": "pitch-worklet.js",
+      "size": 10303,
+      "sha256": "7002ef718d7928978c3674ea721a5a248b0a028d698add83e81757cf632bbfc5"
+    },
+    {
+      "name": "profile-cloud.js",
+      "size": 9042,
+      "sha256": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64"
+    },
+    {
+      "name": "profile-crypto-worker.js",
+      "size": 4898,
+      "sha256": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66"
+    },
+    {
+      "name": "profile-crypto.js",
+      "size": 2972,
+      "sha256": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206"
+    },
+    {
+      "name": "profile-policy.js",
+      "size": 9653,
+      "sha256": "93caf6e8b253316e4e9267a28c7b28356480ccf5308ac17aac560dee553bcc0e"
+    },
+    {
+      "name": "profile.js",
+      "size": 15541,
+      "sha256": "aeb95b56609cd3d77d5d5a6cda0c360132694837f1d027855016eac0df309429"
+    },
+    {
+      "name": "sw.js",
+      "size": 1920,
+      "sha256": "e6f320559a5f4b9f3fdb48149396e9727427c0ec407403ea778c830048c5e940"
+    },
+    {
+      "name": "vendor-scrypt-3.0.1.js",
+      "size": 17811,
+      "sha256": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d"
+    },
+    {
+      "name": "wave-history.js",
+      "size": 2065,
+      "sha256": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3"
+    },
+    {
+      "name": "wave.js",
+      "size": 15089,
+      "sha256": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4"
+    }
+  ],
+  "serviceWorker": 8,
+  "services": {
+    "lolzcloud": {
+      "active": true,
+      "pid": 4134082
+    },
+    "lolzcloud-music": {
+      "active": true,
+      "pid": 4109267
+    },
+    "lolzcloud-telegram": {
+      "active": true,
+      "pid": 4109542
+    }
+  },
+  "reconciliation": {
+    "publisherReexecuted": false,
+    "servicesRestartedByReconciliation": false,
+    "firstObserver": "Python urllib received HTTP403 after the reviewed publisher had succeeded; the immutable failure receipt is retained",
+    "successfulObserver": "Actual public HTTPS curl from origin host; same client used by the publisher smoke"
+  },
+  "privateStateBackup": "server-only 0700 directory / 0600 files; not downloaded",
+  "checkedAt": "2026-11-15T14:22:11.932Z"
+}
