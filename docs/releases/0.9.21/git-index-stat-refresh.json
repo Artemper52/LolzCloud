@@ -1,0 +1,14 @@
+{
+  "status": "index-content-unchanged-stat-cache-refreshed",
+  "checkedAt": "2026-11-15T17:48:01.408Z",
+  "cause": "Root read-only-intended git status refreshed Git index stat cache at17:45:38UTC; no add/reset/checkout/commit",
+  "priorIndexSha256": "ddb79f8ddb4f505a12bd687c0c6df46acc27d2b14077284217004544c74f535e",
+  "currentIndexSha256": "817cfa5f89d8f889a8b23afdb45313530202ff9c73f55a585add735aba98c28b",
+  "head": "ec8fe2fa88ead02ed1fca9c435d8932b3c1ce794",
+  "branch": "release/0.9.5",
+  "stagedChanges": "",
+  "stagedEntriesMatchHEAD": true,
+  "indexRestored": false,
+  "productFilesChanged": false,
+  "futureReadOnlyGitOptionalLocksDisabled": true
+}

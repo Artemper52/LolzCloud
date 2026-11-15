@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T17:43:07.848164+00:00",
+  "sourceCommit": "7577990efd3f9987321cadae68098096c6f95029",
+  "root": "/opt/lolzcloud-builds/release-0.9.21-source-7577990e/source",
+  "uid": 986,
+  "resourceLimits": {
+    "uid": 986,
+    "memoryMax": 3221225472,
+    "cpuQuotaPercent": 150.0,
+    "cgroup": "/system.slice/lolzcloud-source21-7577990e.service",
+    "frozenDependenciesReadOnly": true
+  },
+  "node": "v24.22.2",
+  "checkExitCode": 0,
+  "testExitCode": 0,
+  "counts": {
+    "tests": 564,
+    "pass": 564,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "javascriptCheck": "JavaScript syntax checked: 309 files.",
+  "tapSha256": "bbe82adef1947940de02f90ebb6b5891c7d1c1e734fcbc31411c210ca2e1835b",
+  "taskOwnedTemp": "/opt/lolzcloud-builds/release-0.9.21-source-7577990e/tmp",
+  "taskOwnedUpdaterFixtures": "/opt/lolzcloud-builds/release-0.9.21-source-7577990e/linux-updater-fixtures",
+  "originalBuildRootSourceMutated": false,
+  "noDeployment": true
+}

@@ -1,0 +1,43 @@
+{
+  "status": "published-github-inventory-verified",
+  "receipt": {
+    "status": "published",
+    "release": "20261115T181135-platforms-0.9.21-28b45629",
+    "version": "0.9.21",
+    "previous": "/srv/lolzcloud/releases/20261115T175045-platforms-0.9.21-120d2900/downloads",
+    "destination": "/srv/lolzcloud/releases/20261115T181135-platforms-0.9.21-28b45629/downloads",
+    "files": [
+      {
+        "name": "platforms.json",
+        "size": 7844,
+        "sha256": "21801b6ac85b02e3f210465b7c09fdfd9e0788b1bee0579a105eae8d6cb112a4",
+        "source": "upload"
+      }
+    ]
+  },
+  "all22SHA256AndInodesPreserved": true,
+  "mutableInventoryUsesNewInode": true,
+  "oldInventoryPreserved": true,
+  "preservedHelperAliases": {
+    "LolzCloud-browser-helper-1.2.0-chromium.zip": "/srv/lolzcloud/releases/20261105-v10-094/downloads/LolzCloud-browser-helper-1.2.0-chromium.zip",
+    "LolzCloud-browser-helper-1.2.0-firefox.zip": "/srv/lolzcloud/releases/20261105-v10-094/downloads/LolzCloud-browser-helper-1.2.0-firefox.zip"
+  },
+  "githubRelease": 446251893,
+  "sourceCommit": "7577990efd3f9987321cadae68098096c6f95029",
+  "runId": 43743988958,
+  "publicInventorySha256": "21801b6ac85b02e3f210465b7c09fdfd9e0788b1bee0579a105eae8d6cb112a4",
+  "pidsBefore": {
+    "lolzcloud": "4149036",
+    "lolzcloud-music": "4109267",
+    "lolzcloud-telegram": "4109542"
+  },
+  "pidsAfter": {
+    "lolzcloud": "4149036",
+    "lolzcloud-music": "4109267",
+    "lolzcloud-telegram": "4109542"
+  },
+  "servicesUnrestarted": true,
+  "websitePreserved": true,
+  "mainServerPreserved": true,
+  "checkedAt": "2026-11-15T18:13:26.745Z"
+}

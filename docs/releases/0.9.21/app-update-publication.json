@@ -1,0 +1,74 @@
+{
+  "status": "published-and-verified",
+  "modern": "20261115T170113-updates-0.9.21-13be6bd1",
+  "android": "20261115T171717-android-0.1.11-54f4129a",
+  "previous": "/srv/lolzcloud/releases/20261115T145410-platforms-0.9.20-8c1e6fac/downloads",
+  "current": "/srv/lolzcloud/releases/20261115T171717-android-0.1.11-54f4129a/downloads",
+  "windowsVersion": "0.9.21",
+  "androidVersion": "0.1.11",
+  "androidVersionCode": 12,
+  "publicManifestsExact": true,
+  "publicHTTPSFiles": [
+    {
+      "name": "LolzCloud-0.9.21-win-x64.zip",
+      "size": 196706829,
+      "sha256": "9a299f727a37173cd95ea417fef1dc74277bf06f0f0d320cb7fa6410ebbbc9dd"
+    },
+    {
+      "name": "LolzCloud-0.9.21-win-x64-Setup.exe",
+      "size": 146408053,
+      "sha256": "ec601852357f8b82608df62d4126c8b4a8e0db5620c6b8daee894c84beffaacc"
+    },
+    {
+      "name": "LolzCloud-0.9.21-win-x64-Setup.exe.blockmap",
+      "size": 152448,
+      "sha256": "985ff651efde11e485b5505b73253469caa28b8ea414da2e9de2fe2c3e8e43b3"
+    },
+    {
+      "name": "latest.yml",
+      "size": 366,
+      "sha256": "7e6a73f07f587703c6aa4ddc622ca93db92c19061b9b06c6fa1f2c652ecdf2a8"
+    },
+    {
+      "name": "update.json",
+      "size": 565,
+      "sha256": "6e36be4947b869d6cd08001e8ac1eb060e5f2abbbb7b0c25013ff44973ce444a"
+    },
+    {
+      "name": "LolzCloud-Android-0.1.11.apk",
+      "size": 2643565,
+      "sha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076"
+    },
+    {
+      "name": "LolzCloud-Android-0.1.11.apk.sha256",
+      "size": 95,
+      "sha256": "2ad8d7651c2c867aa954133380b7528e4a3e04375a8ac770f0036757e80a5f81"
+    },
+    {
+      "name": "android-update.json",
+      "size": 441,
+      "sha256": "086a8f14cbcf1bdb891f0571bf79cc0b6de5ac82bda43a64ecce0f8e7a0b4435"
+    }
+  ],
+  "olderImmutableFilesVerified": 17,
+  "preservedHelperAliases": {
+    "LolzCloud-browser-helper-1.2.0-chromium.zip": "/srv/lolzcloud/releases/20261105-v10-094/downloads/LolzCloud-browser-helper-1.2.0-chromium.zip",
+    "LolzCloud-browser-helper-1.2.0-firefox.zip": "/srv/lolzcloud/releases/20261105-v10-094/downloads/LolzCloud-browser-helper-1.2.0-firefox.zip"
+  },
+  "servicesUnrestarted": true,
+  "pidsBefore": {
+    "lolzcloud": "4149036",
+    "lolzcloud-music": "4109267",
+    "lolzcloud-telegram": "4109542"
+  },
+  "pidsAfter": {
+    "lolzcloud": "4149036",
+    "lolzcloud-music": "4109267",
+    "lolzcloud-telegram": "4109542"
+  },
+  "mainServerVersion": "0.9.24",
+  "mainServerCurrent": "/opt/lolzcloud-server/releases/20261115-social-0.9.24-de1d1af2",
+  "sourceCommit": "7577990efd3f9987321cadae68098096c6f95029",
+  "mirrorPlanSha256": "1ad9ed06c6760abf4cd0f29c0cd33569f4fbfc9d93d385923cf89ac209e64c6a",
+  "checkedAt": "2026-11-15T17:53:47.614Z"
+}

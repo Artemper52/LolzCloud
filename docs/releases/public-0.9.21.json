@@ -1,0 +1,126 @@
+{
+  "status": "published-and-verified",
+  "checkedAt": "2026-11-15T18:15:42.993Z",
+  "versions": {
+    "desktop": "0.9.21",
+    "android": "0.1.11",
+    "androidVersionCode": 12,
+    "nativeIOS": "0.1.6",
+    "nativeIOSBuild": 7,
+    "pwa": "0.9.24",
+    "serviceWorker": 9,
+    "browserHelpers": "1.2.0"
+  },
+  "source": {
+    "commit": "7577990efd3f9987321cadae68098096c6f95029",
+    "branch": "codex/recover-music-0.9.21",
+    "archive": "LolzCloud-0.9.21-source.zip",
+    "bytes": 30291037,
+    "sha256": "f43bd845a431bf07cb83d23af863acf415a666f4027a7d7bb9d90f92000a0598",
+    "rawGitFiles": 1438,
+    "overlays": 0,
+    "canonical": {
+      "native": {
+        "files": 37,
+        "exact": 37
+      },
+      "pwa": {
+        "files": 29,
+        "exact": 29
+      },
+      "desktop": {
+        "files": 155,
+        "exact": 155
+      },
+      "room": {
+        "files": 13,
+        "exact": 13
+      },
+      "tools": {
+        "files": 5,
+        "exact": 5
+      },
+      "android": {
+        "files": 67,
+        "exact": 67
+      },
+      "websiteChanged": {
+        "files": 5,
+        "exact": 5
+      },
+      "website13": {
+        "files": 13,
+        "exact": 13
+      }
+    }
+  },
+  "github": {
+    "url": "https://github.com/Artemper52/LolzCloud/releases/tag/v0.9.21",
+    "releaseId": 446251893,
+    "tag": "v0.9.21",
+    "latest": true,
+    "workflowCommit": "66ef838cb08463e50786acca37e04bf29f14ab71",
+    "runId": 43743988958,
+    "run": "https://github.com/Artemper52/LolzCloud/actions/runs/43743988958",
+    "artifact": 14173079853,
+    "artifactBytes": 7579,
+    "artifactSha256": "550442fbe1e639f6c28e92a766f77b3bdfccde525953b8434e24bfda8a4199ce",
+    "files": 22,
+    "bytes": 1080680462,
+    "officialFullByteChecks": 22,
+    "githubFullByteChecks": 22
+  },
+  "android": {
+    "versionName": "0.1.11",
+    "versionCode": 12,
+    "packageName": "com.lolzcloud.mobile",
+    "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.11.apk",
+    "size": 2643565,
+    "sha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+    "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+    "sourceSha256": "c8652cae0af6550cfa5f1d652537040abd98a8545a4a39f7de403408d62e85ca"
+  },
+  "checks": {
+    "linuxSource": {
+      "passed": 564,
+      "failed": 0,
+      "skipped": 0
+    },
+    "androidRuntimeSuites": 15,
+    "nativeSDKPolicy": 102,
+    "nativeIphone": 20,
+    "nativeIpad": 20,
+    "websiteUI": 22,
+    "publicHTTPS": 68,
+    "publicDesktopUpdateCases": 4,
+    "publicAndroidPolicyCases": 2
+  },
+  "deployment": {
+    "site": "/srv/lolzcloud/releases/20261115T165156-website-0.9.21-c66cb5fa",
+    "downloads": "/srv/lolzcloud/releases/20261115T181135-platforms-0.9.21-28b45629/downloads",
+    "mainServer": "20261115-social-0.9.24-de1d1af2",
+    "older17VersionedFilesPreserved": true,
+    "all22FilesPreservedDuringMetadataUpdate": true,
+    "serviceRestartsDuringDownloads": false
+  },
+  "originalWorkspaceGit": {
+    "head": "ec8fe2fa88ead02ed1fca9c435d8932b3c1ce794",
+    "branch": "release/0.9.5",
+    "stagedEntriesMatchHEAD": true,
+    "stagedContentsUnchangedAtRecordedReadback": true,
+    "sourcePreparationIndexSha256": "ddb79f8ddb4f505a12bd687c0c6df46acc27d2b14077284217004544c74f535e",
+    "currentIndexSha256": "817cfa5f89d8f889a8b23afdb45313530202ff9c73f55a585add735aba98c28b",
+    "indexBytesUnchangedSinceSourcePreparation": false,
+    "indexStatCacheRefreshedBeforePublication": true,
+    "indexRestored": false,
+    "gitCommandsRunByRecorder": 0,
+    "explanation": "Root read-only-intended git status refreshed Git index stat cache at17:45:38UTC; no add/reset/checkout/commit"
+  },
+  "limits": [
+    "Fourteen final site binary availability checks use HTTP Range; complete22 official and22 GitHub file hashes are established by the mirror and platform receipts.",
+    "Desktop public updater checks execute unchanged product modules on host Node with Windows/legacy flags. Android public updater checks execute unchanged Java release policy on host JVM; neither probe installs an update.",
+    "Native iOS20+20 hosted Simulator tests and SDK102 policy checks do not prove physical iPhone/iPad, ControlCenter or Safari behavior. IPA remains unsigned and needs the user’s own Apple signing.",
+    "Physical Windows7 and ARM64 Linux runtime were not tested. Android15 instrumentation suites share cases and are not summed as unique checks.",
+    "Original HEAD, branch and staged contents stayed unchanged; an earlier root git status refreshed index stat bytes, recorded with both SHA256 values. This recorder invokes no Git commands or index rewrite."
+  ]
+}

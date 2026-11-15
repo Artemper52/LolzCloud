@@ -1,0 +1,297 @@
+{
+  "status": "passed",
+  "startedAt": "2026-11-15T18:15:09.535Z",
+  "sourceCommit": "7577990efd3f9987321cadae68098096c6f95029",
+  "planSha256": "1ad9ed06c6760abf4cd0f29c0cd33569f4fbfc9d93d385923cf89ac209e64c6a",
+  "probe": "Origin-host Node actual public official/GitHub HTTPS, exact unchanged20/21 product updater modules; local host JVM actual unchanged10/11 Android policy",
+  "desktopCases": [
+    {
+      "legacy": false,
+      "currentVersion": "0.9.20",
+      "offeredVersion": "0.9.21",
+      "status": "available",
+      "available": true,
+      "selectedFeed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/",
+      "attemptedFeeds": 2,
+      "validFeeds": 2,
+      "feedFallback": false,
+      "installCalled": false
+    },
+    {
+      "legacy": false,
+      "currentVersion": "0.9.21",
+      "offeredVersion": "0.9.21",
+      "status": "current",
+      "available": false,
+      "selectedFeed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/",
+      "attemptedFeeds": 2,
+      "validFeeds": 2,
+      "feedFallback": false,
+      "installCalled": false
+    },
+    {
+      "legacy": true,
+      "currentVersion": "0.9.20",
+      "offeredVersion": "0.9.21",
+      "status": "available",
+      "available": true,
+      "selectedFeed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/",
+      "attemptedFeeds": 2,
+      "validFeeds": 2,
+      "feedFallback": false,
+      "installCalled": false
+    },
+    {
+      "legacy": true,
+      "currentVersion": "0.9.21",
+      "offeredVersion": "0.9.21",
+      "status": "current",
+      "available": false,
+      "selectedFeed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/",
+      "attemptedFeeds": 2,
+      "validFeeds": 2,
+      "feedFallback": false,
+      "installCalled": false
+    }
+  ],
+  "androidCases": [
+    {
+      "currentVersion": "0.1.10",
+      "currentVersionCode": 11,
+      "offeredVersion": "0.1.11",
+      "offeredVersionCode": 12,
+      "status": "available",
+      "available": true,
+      "installCalled": false
+    },
+    {
+      "currentVersion": "0.1.11",
+      "currentVersionCode": 12,
+      "offeredVersion": "0.1.11",
+      "offeredVersionCode": 12,
+      "status": "current",
+      "available": false,
+      "installCalled": false
+    }
+  ],
+  "requests": [
+    {
+      "url": "https://github.com/Artemper52/LolzCloud/releases/latest/download/update.json",
+      "legacy": false,
+      "currentVersion": "0.9.20",
+      "state": "passed",
+      "startedAt": "2026-11-15T18:15:09.536Z",
+      "status": 200,
+      "bytes": 565,
+      "sha256": "6e36be4947b869d6cd08001e8ac1eb060e5f2abbbb7b0c25013ff44973ce444a",
+      "finalHost": "release-assets.githubusercontent.com",
+      "finishedAt": "2026-11-15T18:15:10.402Z"
+    },
+    {
+      "url": "https://lolzcloud.com/downloads/update.json",
+      "legacy": false,
+      "currentVersion": "0.9.20",
+      "state": "passed",
+      "startedAt": "2026-11-15T18:15:09.555Z",
+      "status": 200,
+      "bytes": 565,
+      "sha256": "6e36be4947b869d6cd08001e8ac1eb060e5f2abbbb7b0c25013ff44973ce444a",
+      "finalHost": "lolzcloud.com",
+      "finishedAt": "2026-11-15T18:15:09.631Z"
+    },
+    {
+      "url": "https://github.com/Artemper52/LolzCloud/releases/latest/download/update.json",
+      "legacy": false,
+      "currentVersion": "0.9.21",
+      "state": "passed",
+      "startedAt": "2026-11-15T18:15:10.403Z",
+      "status": 200,
+      "bytes": 565,
+      "sha256": "6e36be4947b869d6cd08001e8ac1eb060e5f2abbbb7b0c25013ff44973ce444a",
+      "finalHost": "release-assets.githubusercontent.com",
+      "finishedAt": "2026-11-15T18:15:10.510Z"
+    },
+    {
+      "url": "https://lolzcloud.com/downloads/update.json",
+      "legacy": false,
+      "currentVersion": "0.9.21",
+      "state": "passed",
+      "startedAt": "2026-11-15T18:15:10.404Z",
+      "status": 200,
+      "bytes": 565,
+      "sha256": "6e36be4947b869d6cd08001e8ac1eb060e5f2abbbb7b0c25013ff44973ce444a",
+      "finalHost": "lolzcloud.com",
+      "finishedAt": "2026-11-15T18:15:10.431Z"
+    },
+    {
+      "url": "https://github.com/Artemper52/LolzCloud/releases/latest/download/update-legacy.json",
+      "legacy": true,
+      "currentVersion": "0.9.20",
+      "state": "passed",
+      "startedAt": "2026-11-15T18:15:10.510Z",
+      "status": 200,
+      "bytes": 588,
+      "sha256": "cbabe12c8a7bba9b1b6b92a89e6e5883851a91beaa4233bdbaeced248e40258c",
+      "finalHost": "release-assets.githubusercontent.com",
+      "finishedAt": "2026-11-15T18:15:10.936Z"
+    },
+    {
+      "url": "https://lolzcloud.com/downloads/update-legacy.json",
+      "legacy": true,
+      "currentVersion": "0.9.20",
+      "state": "passed",
+      "startedAt": "2026-11-15T18:15:10.511Z",
+      "status": 200,
+      "bytes": 588,
+      "sha256": "cbabe12c8a7bba9b1b6b92a89e6e5883851a91beaa4233bdbaeced248e40258c",
+      "finalHost": "lolzcloud.com",
+      "finishedAt": "2026-11-15T18:15:10.558Z"
+    },
+    {
+      "url": "https://github.com/Artemper52/LolzCloud/releases/latest/download/update-legacy.json",
+      "legacy": true,
+      "currentVersion": "0.9.21",
+      "state": "passed",
+      "startedAt": "2026-11-15T18:15:10.937Z",
+      "status": 200,
+      "bytes": 588,
+      "sha256": "cbabe12c8a7bba9b1b6b92a89e6e5883851a91beaa4233bdbaeced248e40258c",
+      "finalHost": "release-assets.githubusercontent.com",
+      "finishedAt": "2026-11-15T18:15:11.364Z"
+    },
+    {
+      "url": "https://lolzcloud.com/downloads/update-legacy.json",
+      "legacy": true,
+      "currentVersion": "0.9.21",
+      "state": "passed",
+      "startedAt": "2026-11-15T18:15:10.937Z",
+      "status": 200,
+      "bytes": 588,
+      "sha256": "cbabe12c8a7bba9b1b6b92a89e6e5883851a91beaa4233bdbaeced248e40258c",
+      "finalHost": "lolzcloud.com",
+      "finishedAt": "2026-11-15T18:15:10.976Z"
+    },
+    {
+      "url": "https://lolzcloud.com/downloads/android-update.json",
+      "state": "passed",
+      "status": 200,
+      "bytes": 441,
+      "sha256": "086a8f14cbcf1bdb891f0571bf79cc0b6de5ac82bda43a64ecce0f8e7a0b4435",
+      "finalHost": "lolzcloud.com"
+    },
+    {
+      "url": "https://api.github.com/repos/Artemper52/LolzCloud/releases?per_page=30",
+      "state": "passed",
+      "status": 200,
+      "bytes": 646510,
+      "sha256": "2aafc64757f4e6c3923666566ddc2c024d01633e98f377e791bcc901ba9480dd",
+      "finalHost": "api.github.com"
+    }
+  ],
+  "installCalled": false,
+  "downloadCalled": false,
+  "personalAccountsUsed": false,
+  "sources": [
+    {
+      "name": "source/integrations/app-updates.cjs",
+      "sha256": "ea3648c194c55846aa15f093cf21198ed46b7b5fe717fefec5b563241648e9f0"
+    },
+    {
+      "name": "source/integrations/portable-update.cjs",
+      "sha256": "e6586ce7fcb8f540eb5ef83a8769f6b65422855b2813043fbd26cb0cf51498e8"
+    },
+    {
+      "name": "source/integrations/update-temporary.cjs",
+      "sha256": "6292ebd3e2bfd856212e6f6e13e10912e4352e07ec3da3fdd586d7b474987bd9"
+    }
+  ],
+  "partialFeedFallback": false,
+  "androidPublic": {
+    "metadata": {
+      "versionName": "0.1.11",
+      "versionCode": 12,
+      "packageName": "com.lolzcloud.mobile",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.11.apk",
+      "size": 2643565,
+      "sha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+      "sourceSha256": "c8652cae0af6550cfa5f1d652537040abd98a8545a4a39f7de403408d62e85ca"
+    },
+    "mirrorBytes": 441,
+    "mirrorSha256": "086a8f14cbcf1bdb891f0571bf79cc0b6de5ac82bda43a64ecce0f8e7a0b4435",
+    "githubBytes": 646510,
+    "githubSha256": "2aafc64757f4e6c3923666566ddc2c024d01633e98f377e791bcc901ba9480dd"
+  },
+  "androidPolicy": {
+    "path": "android/app/src/main/java/com/lolzcloud/mobile/AndroidReleasePolicy.java",
+    "sha256": "9ca6dbe7d613eabfb6073718c10935bf2ae448a54b6845dd8558c381508e9ffc",
+    "unchangedBetween": [
+      "0.1.10",
+      "0.1.11"
+    ],
+    "actualJavaExecution": true,
+    "androidRuntimeExecution": false
+  },
+  "cases": [
+    {
+      "legacy": false,
+      "currentVersion": "0.9.20",
+      "offeredVersion": "0.9.21",
+      "status": "available",
+      "available": true,
+      "selectedFeed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/",
+      "attemptedFeeds": 2,
+      "validFeeds": 2,
+      "feedFallback": false,
+      "installCalled": false
+    },
+    {
+      "legacy": false,
+      "currentVersion": "0.9.21",
+      "offeredVersion": "0.9.21",
+      "status": "current",
+      "available": false,
+      "selectedFeed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/",
+      "attemptedFeeds": 2,
+      "validFeeds": 2,
+      "feedFallback": false,
+      "installCalled": false
+    },
+    {
+      "legacy": true,
+      "currentVersion": "0.9.20",
+      "offeredVersion": "0.9.21",
+      "status": "available",
+      "available": true,
+      "selectedFeed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/",
+      "attemptedFeeds": 2,
+      "validFeeds": 2,
+      "feedFallback": false,
+      "installCalled": false
+    },
+    {
+      "legacy": true,
+      "currentVersion": "0.9.21",
+      "offeredVersion": "0.9.21",
+      "status": "current",
+      "available": false,
+      "selectedFeed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/",
+      "attemptedFeeds": 2,
+      "validFeeds": 2,
+      "feedFallback": false,
+      "installCalled": false
+    }
+  ],
+  "counts": {
+    "desktop": 4,
+    "android": 2,
+    "total": 6
+  },
+  "finishedAt": "2026-11-15T18:15:13.717Z",
+  "limits": [
+    "Desktop check() executes real product source with actual HTTPS feed bodies; this is a check-only host Node probe with Windows/legacy app-version flags, not a running Windows/Electron UI or installation.",
+    "The product intentionally permits one valid public feed when the other fails. Every attempt and sanitized failure is retained; each decision requires at least one genuine validated response. The adapter bounds individual HTTPS requests to30 seconds rather than the product15-second signal.",
+    "Android uses actual HTTPS metadata/releases and the unchanged pure Java AndroidReleasePolicy on the host JVM. It does not claim Android PackageInstaller, device update UI, APK signature validation or installation.",
+    "No updater install(), download(), app restart or real user account is invoked."
+  ]
+}

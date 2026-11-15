@@ -1,0 +1,129 @@
+{
+  "status": "published-and-origin-verified",
+  "receipt": {
+    "status": "published",
+    "release": "20261115T165156-website-0.9.21-c66cb5fa",
+    "version": "0.9.21",
+    "previous": "/srv/lolzcloud/releases/20261115T141741-website-0.9.20-1b587b49",
+    "destination": "/srv/lolzcloud/releases/20261115T165156-website-0.9.21-c66cb5fa",
+    "downloads": "/srv/lolzcloud/releases/20261115T175045-platforms-0.9.21-120d2900/downloads",
+    "files": [
+      {
+        "name": "index.html",
+        "size": 12176,
+        "sha256": "739540bf167a8517888886aad0b3912d49848e425f498d8c7b44bec7e1ce28ac"
+      },
+      {
+        "name": "app.js",
+        "size": 5731,
+        "sha256": "b3eeea84c681bd8825f53e1f2cedc1c384ccf376c879bf9c87889961d323b590"
+      },
+      {
+        "name": "site-config.js",
+        "size": 1409,
+        "sha256": "103bac87f2d7195b62f42894aab0f974810dfba743b87709547e6adede579667"
+      },
+      {
+        "name": "style.css",
+        "size": 13750,
+        "sha256": "ee775bd4799ee126ab356a7e1af80da7a5cc12e4843c58591c10463d4ac298a6"
+      },
+      {
+        "name": "downloads.css",
+        "size": 5475,
+        "sha256": "c06f7b6b1d24f494702b7e917bacd2e343cc8570ae716c40143cebf53a3a9b5c"
+      },
+      {
+        "name": "install.html",
+        "size": 24574,
+        "sha256": "3bcd4cf43fa33237491969df9e39eaebc48fd5a0477b9c1f3b2c9857cc4d65a4"
+      },
+      {
+        "name": "install.js",
+        "size": 198,
+        "sha256": "cb749cac3621f6076f2181f3f218e315cd6e5f49e96234c47d709cde18219c43"
+      },
+      {
+        "name": "assets/logo.svg",
+        "size": 396,
+        "sha256": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512"
+      },
+      {
+        "name": "assets/lyrics.png",
+        "size": 466926,
+        "sha256": "68d7bd25cef2e91230fb61b613e86e43cd8db86575885db039102809e77e0024"
+      },
+      {
+        "name": "assets/mini.png",
+        "size": 208458,
+        "sha256": "f077fddaae2e91bd45fb1d1eabff964ecdd4a67e137a1c391beaab309a7db1f7"
+      },
+      {
+        "name": "assets/record.svg",
+        "size": 3353,
+        "sha256": "ba31b0fa22b3f202223aec6400f9b2b665fa5cda321a1ca0afa4756cee1a535b"
+      },
+      {
+        "name": "assets/sound.png",
+        "size": 277759,
+        "sha256": "149ae16294bc08be918479ee655b763eaa2fff6057b5a119dfb8afa4d12bcf0d"
+      },
+      {
+        "name": "assets/wave.png",
+        "size": 501215,
+        "sha256": "079fcb00a64ec53828b3f13308d79702d02ed7c4d6346694787e2dbd1b5e55cd"
+      }
+    ]
+  },
+  "preflight": {
+    "uploads": [
+      {
+        "name": "website.tar.gz",
+        "bytes": 1474906,
+        "sha256": "86a5a06010b0a05bd3d87973b268253166d5cb2b3ce108f999531680be7ad556"
+      },
+      {
+        "name": "plan.json",
+        "bytes": 2100,
+        "sha256": "793f1561f3dfb28aaba6318ed6e3e09ba995746fdf58a0e448906e42d6e47096"
+      },
+      {
+        "name": "publish.cjs",
+        "bytes": 3376,
+        "sha256": "a576f1ee4feee1618b897a5a2aa04a63dac78cdb8c95b16cb7c1d03e45967f39"
+      }
+    ],
+    "requiredPayloads": 14,
+    "requiredFullSHA256Passed": true,
+    "inventorySha256": "dfdcc7d8158c7cbbb6b897b97afd852822306b3f36776606631baf9845fd2459"
+  },
+  "current": "/srv/lolzcloud/releases/20261115T165156-website-0.9.21-c66cb5fa",
+  "downloads": "/srv/lolzcloud/releases/20261115T175045-platforms-0.9.21-120d2900/downloads",
+  "previousPreserved": true,
+  "filesSHA256Passed": 13,
+  "preservedHelperAliases": {
+    "LolzCloud-browser-helper-1.2.0-chromium.zip": "/srv/lolzcloud/releases/20261105-v10-094/downloads/LolzCloud-browser-helper-1.2.0-chromium.zip",
+    "LolzCloud-browser-helper-1.2.0-firefox.zip": "/srv/lolzcloud/releases/20261105-v10-094/downloads/LolzCloud-browser-helper-1.2.0-firefox.zip"
+  },
+  "backup": {
+    "path": "/var/backups/lolzcloud-website/20261115T165156-website-0.9.21-c66cb5fa",
+    "directoryMode": "0700",
+    "fileMode": "0600"
+  },
+  "servicesUnrestarted": true,
+  "pidsBefore": {
+    "lolzcloud": "4149036",
+    "lolzcloud-music": "4109267",
+    "lolzcloud-telegram": "4109542"
+  },
+  "pidsAfter": {
+    "lolzcloud": "4149036",
+    "lolzcloud-music": "4109267",
+    "lolzcloud-telegram": "4109542"
+  },
+  "mainCurrent": "/opt/lolzcloud-server/releases/20261115-social-0.9.24-de1d1af2",
+  "sourceCommit": "7577990efd3f9987321cadae68098096c6f95029",
+  "mirrorPlanSha256": "1ad9ed06c6760abf4cd0f29c0cd33569f4fbfc9d93d385923cf89ac209e64c6a",
+  "remoteIntent": "/opt/lolzcloud-server/uploads/20261115T165156-website-0.9.21-c66cb5fa/website-promotion-intent.json",
+  "checkedAt": "2026-11-15T17:59:22.461Z"
+}

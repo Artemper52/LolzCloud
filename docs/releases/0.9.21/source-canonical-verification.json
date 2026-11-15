@@ -1,0 +1,2002 @@
+{
+  "native": {
+    "label": "Native0.1.6 exact55 compiled canonical inputs",
+    "files": 37,
+    "exact": 37,
+    "results": [
+      {
+        "path": "ios/KernelTests/pitch-probe.c",
+        "expected": "661f1cee89fd5bbd0904a6ced649a33d731cdc0201d27444d424218ff97a77f7",
+        "actual": "661f1cee89fd5bbd0904a6ced649a33d731cdc0201d27444d424218ff97a77f7",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud.xcodeproj/project.pbxproj",
+        "expected": "c886e236ad88fa32fb2167e0f92147108029714f5d9b200ae6bd79eb37138394",
+        "actual": "c886e236ad88fa32fb2167e0f92147108029714f5d9b200ae6bd79eb37138394",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/AccountLogin.swift",
+        "expected": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
+        "actual": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/App.swift",
+        "expected": "1c6866502e19d58f07da0a7affdd52704e4028b3d272b7708e38197ea49ebf58",
+        "actual": "1c6866502e19d58f07da0a7affdd52704e4028b3d272b7708e38197ea49ebf58",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/AudioEffectsPolicy.swift",
+        "expected": "6896cb5c5f14f552cf874ce2abb051a9223c8107818eaee1f706ac1415a05f80",
+        "actual": "6896cb5c5f14f552cf874ce2abb051a9223c8107818eaee1f706ac1415a05f80",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/DSP/DSPCore.c",
+        "expected": "f8c4d8ccdf7651a5ef795207abbd69435a417885f3e08279f246afbc32fc443e",
+        "actual": "f8c4d8ccdf7651a5ef795207abbd69435a417885f3e08279f246afbc32fc443e",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/DSP/NativeAudioEffectsBridge.h",
+        "expected": "b2a95cc7ee4c027b32d49a7f97a25dab0e5734e5381ae24cb0a48ccf30795317",
+        "actual": "b2a95cc7ee4c027b32d49a7f97a25dab0e5734e5381ae24cb0a48ccf30795317",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/DSP/NativeAudioTap.c",
+        "expected": "357042c12d2a2e7c4e1b7d3703be8b5b090b6cf5734105cac29f01112dfb2e43",
+        "actual": "357042c12d2a2e7c4e1b7d3703be8b5b090b6cf5734105cac29f01112dfb2e43",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/DSP/NativeAudioTap.h",
+        "expected": "e1e6fc7beed917df0d1e6a3e8e0af48736772e9c4288a0c9bb08f550a879ca5b",
+        "actual": "e1e6fc7beed917df0d1e6a3e8e0af48736772e9c4288a0c9bb08f550a879ca5b",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/DSP/PCMStream.c",
+        "expected": "c457db11ca8452c64d8ed61843e09203090df24ef9ccf29ecca45110e54cc5cf",
+        "actual": "c457db11ca8452c64d8ed61843e09203090df24ef9ccf29ecca45110e54cc5cf",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/DSP/PitchCore.c",
+        "expected": "577adbdad248f57bf66b53146eabf21b6b90acddae5ad6c7acef19bf1b7b3e0b",
+        "actual": "577adbdad248f57bf66b53146eabf21b6b90acddae5ad6c7acef19bf1b7b3e0b",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/DSP/include/LCDSPCore.h",
+        "expected": "3e58e30abd74bda5831788b0a43ec0f7ee9cfbea3f0fdc206bcbac6603c68f86",
+        "actual": "3e58e30abd74bda5831788b0a43ec0f7ee9cfbea3f0fdc206bcbac6603c68f86",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/DSP/include/LCPCMStream.h",
+        "expected": "a277ed54f1422c59801669cbbee18e50b5d9fa2d80f8735d74977bb4f494765c",
+        "actual": "a277ed54f1422c59801669cbbee18e50b5d9fa2d80f8735d74977bb4f494765c",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/DSP/include/LCPitchCore.h",
+        "expected": "909204e813ca5adcfa4a2a5989d74a161fa00c04137517ae1aa09a08feeb45a6",
+        "actual": "909204e813ca5adcfa4a2a5989d74a161fa00c04137517ae1aa09a08feeb45a6",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/Info.plist",
+        "expected": "53c5cc0a3bd94221aacbd18efca650d5f9e36e5ebf42982364e22ccfae0e8a64",
+        "actual": "53c5cc0a3bd94221aacbd18efca650d5f9e36e5ebf42982364e22ccfae0e8a64",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/MediaPolicy.swift",
+        "expected": "9674f8c92c96eb695579f85b21e97fe943d8a6d272f445c728c669d07d3d9f68",
+        "actual": "9674f8c92c96eb695579f85b21e97fe943d8a6d272f445c728c669d07d3d9f68",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/NativeAudioEffects.swift",
+        "expected": "acf5527e749b4ed5a512ea63c2e96245b46c928d4cdfd8f3f619894999bcbc82",
+        "actual": "acf5527e749b4ed5a512ea63c2e96245b46c928d4cdfd8f3f619894999bcbc82",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/NativeCatalog.swift",
+        "expected": "757ee942d3f9d6e9854f8b2ffed1bdb3ebcd8da0d25e45ac22be8c8795937c0f",
+        "actual": "757ee942d3f9d6e9854f8b2ffed1bdb3ebcd8da0d25e45ac22be8c8795937c0f",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/NativePlayer.swift",
+        "expected": "4b4a1c885eb257d8f1f7056efc4b55c10f3445a66718d71cc036a3f6fe562d78",
+        "actual": "4b4a1c885eb257d8f1f7056efc4b55c10f3445a66718d71cc036a3f6fe562d78",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/NativeProfileShare.swift",
+        "expected": "2818dccc99e4c9e61c8603ca979ccf77b62389797a0fdaf5bc75734665eb23c5",
+        "actual": "2818dccc99e4c9e61c8603ca979ccf77b62389797a0fdaf5bc75734665eb23c5",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/NativeRatePolicy.swift",
+        "expected": "fc6feb5626219cdec2f0a3e6b4f2233ae7c19e15f183ef57f84a7c5abb18da39",
+        "actual": "fc6feb5626219cdec2f0a3e6b4f2233ae7c19e15f183ef57f84a7c5abb18da39",
+        "matches": true
+      },
+      {
+        "path": "ios/LolzCloud/NativeRoomPolicy.swift",
+        "expected": "b8e270f95827c199ffb621c33f71440c28ab82f7156a810c379aa8ee7965008f",
+        "actual": "b8e270f95827c199ffb621c33f71440c28ab82f7156a810c379aa8ee7965008f",
+        "matches": true
+      },
+      {
+        "path": "ios/Package.swift",
+        "expected": "ee1c6f0e44288f2805a3ea569a34980eee379394dbf8de33d30329d7900a35cd",
+        "actual": "ee1c6f0e44288f2805a3ea569a34980eee379394dbf8de33d30329d7900a35cd",
+        "matches": true
+      },
+      {
+        "path": "ios/ROOM_HANDOFF.md",
+        "expected": "6c03c15d304b3307946d212ca41100304a4e09007df736b3dfa3f7ab154f5f06",
+        "actual": "6c03c15d304b3307946d212ca41100304a4e09007df736b3dfa3f7ab154f5f06",
+        "matches": true
+      },
+      {
+        "path": "ios/RuntimeTests/NativeRuntimeTests.swift",
+        "expected": "23180de87d573262cd0937e58880962b1fd09ddec03dbcc571680a4dc7e18f99",
+        "actual": "23180de87d573262cd0937e58880962b1fd09ddec03dbcc571680a4dc7e18f99",
+        "matches": true
+      },
+      {
+        "path": "ios/Tests/AdvancedAudioEffectsTests.swift",
+        "expected": "0e99d1eb1f560792f840bbb7275a8ccf5bf6f0756a9d91cc07e84efcfb5295d0",
+        "actual": "0e99d1eb1f560792f840bbb7275a8ccf5bf6f0756a9d91cc07e84efcfb5295d0",
+        "matches": true
+      },
+      {
+        "path": "ios/Tests/AudioEffectsTests.swift",
+        "expected": "ba52ce833fff36f9298f0389a945ad10a09748fee2ac2b8ef30b3b9d83832c0b",
+        "actual": "ba52ce833fff36f9298f0389a945ad10a09748fee2ac2b8ef30b3b9d83832c0b",
+        "matches": true
+      },
+      {
+        "path": "ios/Tests/ImportedAudioMetadataTests.swift",
+        "expected": "9f6baf6c20fd878f27532c8825a7120a64d347a2d8e6284b10c2ca58417c6054",
+        "actual": "9f6baf6c20fd878f27532c8825a7120a64d347a2d8e6284b10c2ca58417c6054",
+        "matches": true
+      },
+      {
+        "path": "ios/Tests/IndependentPitchTests.swift",
+        "expected": "245cd5750555eed82e801648eaa69fd76cace4b8b34572fec82bd764200a0729",
+        "actual": "245cd5750555eed82e801648eaa69fd76cace4b8b34572fec82bd764200a0729",
+        "matches": true
+      },
+      {
+        "path": "ios/Tests/MediaPolicyTests.swift",
+        "expected": "fc6ea87bafb7987286b934f721437874d314e5d3f1e4678f90cf53beb32f4913",
+        "actual": "fc6ea87bafb7987286b934f721437874d314e5d3f1e4678f90cf53beb32f4913",
+        "matches": true
+      },
+      {
+        "path": "ios/Tests/NativeCatalogTests.swift",
+        "expected": "94a90789e7387938dc9b1b031848e06460d875685f92c91bc00c5e525fc600e0",
+        "actual": "94a90789e7387938dc9b1b031848e06460d875685f92c91bc00c5e525fc600e0",
+        "matches": true
+      },
+      {
+        "path": "ios/Tests/NativeRatePolicyTests.swift",
+        "expected": "3305d55b34791621426f1fc7008ee59b2f638b47bc8065d0cf120eb3f34ee3e2",
+        "actual": "3305d55b34791621426f1fc7008ee59b2f638b47bc8065d0cf120eb3f34ee3e2",
+        "matches": true
+      },
+      {
+        "path": "ios/Tests/NativeRoomPolicyTests.swift",
+        "expected": "74219eb7034924a022aa9b8653c374f9ac3fd0b8c5924eb7167c552035307d9a",
+        "actual": "74219eb7034924a022aa9b8653c374f9ac3fd0b8c5924eb7167c552035307d9a",
+        "matches": true
+      },
+      {
+        "path": "ios/Tests/PortableProfileFileTests.swift",
+        "expected": "6217c5e690cd983c3fe90985d8213435aee1070dcd8aa135b5d3dd9390dbac1f",
+        "actual": "6217c5e690cd983c3fe90985d8213435aee1070dcd8aa135b5d3dd9390dbac1f",
+        "matches": true
+      },
+      {
+        "path": "ios/tools/CheckProject.swift",
+        "expected": "4ea2beec30661dc32b6ff73e92e0d97e810db1baa5d223e54706efc47f059c01",
+        "actual": "4ea2beec30661dc32b6ff73e92e0d97e810db1baa5d223e54706efc47f059c01",
+        "matches": true
+      },
+      {
+        "path": "ios/tools/project.cjs",
+        "expected": "539ed3b268dd86760e38e6b11af6b3ab10309c1e89f662adde09feadbe9a2d13",
+        "actual": "539ed3b268dd86760e38e6b11af6b3ab10309c1e89f662adde09feadbe9a2d13",
+        "matches": true
+      },
+      {
+        "path": "ios/tools/runtime-project.cjs",
+        "expected": "c23972585b7c99e3bbe8ece8a6a53eef04147fb3c6891f05b336edfd0e9f5492",
+        "actual": "c23972585b7c99e3bbe8ece8a6a53eef04147fb3c6891f05b336edfd0e9f5492",
+        "matches": true
+      }
+    ]
+  },
+  "pwa": {
+    "label": "PWA24/SW9 assets",
+    "files": 29,
+    "exact": 29,
+    "results": [
+      {
+        "path": "server/public/app/app.css",
+        "expected": "8b7140c75fc575339789e67809fcdf31015cb613add868a7095046824c827f56",
+        "actual": "8b7140c75fc575339789e67809fcdf31015cb613add868a7095046824c827f56",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/app.js",
+        "expected": "9f84bb0a802f89e5574498925aef0f3b450257960b7b7a2578b7739afa74d91a",
+        "actual": "9f84bb0a802f89e5574498925aef0f3b450257960b7b7a2578b7739afa74d91a",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/audio-metadata.js",
+        "expected": "7c0e4e894f060f75c62cb0baafabea6cb3c17e8abaa49cf5d2634b4d94011770",
+        "actual": "7c0e4e894f060f75c62cb0baafabea6cb3c17e8abaa49cf5d2634b4d94011770",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/core.js",
+        "expected": "0f58186762de522eb5f8022cd5af963a5992f88076f5a0153a788b08a702506b",
+        "actual": "0f58186762de522eb5f8022cd5af963a5992f88076f5a0153a788b08a702506b",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/effects-policy.js",
+        "expected": "bf64ce15a3bf67c957cb4a71e0ada1562c243d7a72bd81d8cc80b32e1c25ec8d",
+        "actual": "bf64ce15a3bf67c957cb4a71e0ada1562c243d7a72bd81d8cc80b32e1c25ec8d",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/effects.js",
+        "expected": "38b99aab18e973a71178ff07f48a6e9b3f14e5a72be1dc7c6e3a6a4cf6c52b4b",
+        "actual": "38b99aab18e973a71178ff07f48a6e9b3f14e5a72be1dc7c6e3a6a4cf6c52b4b",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/icon-192.png",
+        "expected": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4",
+        "actual": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/icon-512.png",
+        "expected": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef",
+        "actual": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/icon.svg",
+        "expected": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6",
+        "actual": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/imports.js",
+        "expected": "6b36f3e7f079930a2b0416b0ad96d1273da9ef2c2951cd12fd4793073138bc83",
+        "actual": "6b36f3e7f079930a2b0416b0ad96d1273da9ef2c2951cd12fd4793073138bc83",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/index.html",
+        "expected": "ffa8e4dda2ecd87cd4a919aeba3372766aacdc19637534d5b4c88f1a63e737ea",
+        "actual": "ffa8e4dda2ecd87cd4a919aeba3372766aacdc19637534d5b4c88f1a63e737ea",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/limiter-worklet.js",
+        "expected": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112",
+        "actual": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/lyric-tempo.js",
+        "expected": "fd820683ae0016c0d03db791386650d836b001d3a3872e7ea0d3c944e9205bb3",
+        "actual": "fd820683ae0016c0d03db791386650d836b001d3a3872e7ea0d3c944e9205bb3",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/lyric-view.js",
+        "expected": "d77b6a6d83be5c2c7ad3cec5448d296c29c1c5d20be4f6b899c8583d7402b120",
+        "actual": "d77b6a6d83be5c2c7ad3cec5448d296c29c1c5d20be4f6b899c8583d7402b120",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/lyrics.js",
+        "expected": "1ec2bda958ca4f56db27886fa49b51c54114bb9ac65e497264a920c06e6baf2c",
+        "actual": "1ec2bda958ca4f56db27886fa49b51c54114bb9ac65e497264a920c06e6baf2c",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/manifest.webmanifest",
+        "expected": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7",
+        "actual": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/normalization-worklet.js",
+        "expected": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664",
+        "actual": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/offline.js",
+        "expected": "90356fe86dbb0140ee054e9fb3ebc50291cf5b4765e841bd827c30dc2d97f205",
+        "actual": "90356fe86dbb0140ee054e9fb3ebc50291cf5b4765e841bd827c30dc2d97f205",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/pitch-worklet.js",
+        "expected": "7002ef718d7928978c3674ea721a5a248b0a028d698add83e81757cf632bbfc5",
+        "actual": "7002ef718d7928978c3674ea721a5a248b0a028d698add83e81757cf632bbfc5",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/profile-cloud.js",
+        "expected": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64",
+        "actual": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/profile-crypto-worker.js",
+        "expected": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66",
+        "actual": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/profile-crypto.js",
+        "expected": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206",
+        "actual": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/profile-policy.js",
+        "expected": "93caf6e8b253316e4e9267a28c7b28356480ccf5308ac17aac560dee553bcc0e",
+        "actual": "93caf6e8b253316e4e9267a28c7b28356480ccf5308ac17aac560dee553bcc0e",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/profile.js",
+        "expected": "aeb95b56609cd3d77d5d5a6cda0c360132694837f1d027855016eac0df309429",
+        "actual": "aeb95b56609cd3d77d5d5a6cda0c360132694837f1d027855016eac0df309429",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/room-transport.js",
+        "expected": "bb4d1ac5cc88ae77c9eca78637922942d8a4df8dd42bcd25cfda0fdc72da9b46",
+        "actual": "bb4d1ac5cc88ae77c9eca78637922942d8a4df8dd42bcd25cfda0fdc72da9b46",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/sw.js",
+        "expected": "92e195f5925bd58c4771a249360b032ff3bd2fd1ffd5b036df02be04fce9b1c8",
+        "actual": "92e195f5925bd58c4771a249360b032ff3bd2fd1ffd5b036df02be04fce9b1c8",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/vendor-scrypt-3.0.1.js",
+        "expected": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d",
+        "actual": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/wave-history.js",
+        "expected": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3",
+        "actual": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/wave.js",
+        "expected": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4",
+        "actual": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4",
+        "matches": true
+      }
+    ]
+  },
+  "desktop": {
+    "label": "Desktop0.9.21 build input",
+    "files": 155,
+    "exact": 155,
+    "results": [
+      {
+        "path": "LICENSE",
+        "expected": "9603b8617369e99fa42b7692fde3358967adf307be202c820c7e402fa1f884b1",
+        "actual": "9603b8617369e99fa42b7692fde3358967adf307be202c820c7e402fa1f884b1",
+        "matches": true
+      },
+      {
+        "path": "THIRD_PARTY_NOTICES.md",
+        "expected": "00f826a6d02f2ec144e302790cc5693e73ebfb7e675c9fcbda340e14f5adc852",
+        "actual": "00f826a6d02f2ec144e302790cc5693e73ebfb7e675c9fcbda340e14f5adc852",
+        "matches": true
+      },
+      {
+        "path": "config/app.json",
+        "expected": "229168d855f49cbf6a5df066792190aa5180ea0d0a3eb28e2e90c2732bbe029a",
+        "actual": "229168d855f49cbf6a5df066792190aa5180ea0d0a3eb28e2e90c2732bbe029a",
+        "matches": true
+      },
+      {
+        "path": "package.json",
+        "expected": "4f0cd63a4aec715b3dfd89d73aaaf5aa54dbcf99b229e0c5baaaf8d1df5bf397",
+        "actual": "4f0cd63a4aec715b3dfd89d73aaaf5aa54dbcf99b229e0c5baaaf8d1df5bf397",
+        "matches": true
+      },
+      {
+        "path": "source/.gitignore",
+        "expected": "be06b068089d38710d2403a3e829078f8fd63e35e8a54436dade729f0e4c98ad",
+        "actual": "be06b068089d38710d2403a3e829078f8fd63e35e8a54436dade729f0e4c98ad",
+        "matches": true
+      },
+      {
+        "path": "source/app/index.html",
+        "expected": "2247ec95cc278691d4266aa2f25f09698f7bc8e0fc478c9403c5181c32f14a9a",
+        "actual": "2247ec95cc278691d4266aa2f25f09698f7bc8e0fc478c9403c5181c32f14a9a",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/assets/fonts/InterVariable.woff2",
+        "expected": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+        "actual": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/assets/icon.ico",
+        "expected": "9ed97c45b919adea0ad2c617af3fc77fe37dbc0930652c9ce1061a64c9bc6566",
+        "actual": "9ed97c45b919adea0ad2c617af3fc77fe37dbc0930652c9ce1061a64c9bc6566",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/assets/logo.png",
+        "expected": "293832d473389593aa3cae77be14f6cfde6cadd209305323f736a7db9691cff4",
+        "actual": "293832d473389593aa3cae77be14f6cfde6cadd209305323f736a7db9691cff4",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/assets/logo.svg",
+        "expected": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512",
+        "actual": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/controls.css",
+        "expected": "0acb405c01e7c10e48851fdb82dea96347c2021c81ce5f52a579a82fdda8b189",
+        "actual": "0acb405c01e7c10e48851fdb82dea96347c2021c81ce5f52a579a82fdda8b189",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/features.css",
+        "expected": "888c42d7e9c506e5c09951eb196ae9126ca0ec0b0ea8a6fd102235fa36631536",
+        "actual": "888c42d7e9c506e5c09951eb196ae9126ca0ec0b0ea8a6fd102235fa36631536",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/lolzteam.css",
+        "expected": "461adbb1a590bab72f680d94649b18cb3a37053d11cc120e3dd5238b22752f8e",
+        "actual": "461adbb1a590bab72f680d94649b18cb3a37053d11cc120e3dd5238b22752f8e",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/lyrics.css",
+        "expected": "bcc75e0cf1137522eab2f884e8c7d59f76e44e2454799b1afe2d8e607dc35e9a",
+        "actual": "bcc75e0cf1137522eab2f884e8c7d59f76e44e2454799b1afe2d8e607dc35e9a",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/mini-polish.css",
+        "expected": "81b01a7fdcdbb9b9d86a9a34081e8acc4ff1d45f2ebfcac5b00a1b3341f5a766",
+        "actual": "81b01a7fdcdbb9b9d86a9a34081e8acc4ff1d45f2ebfcac5b00a1b3341f5a766",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/mini.css",
+        "expected": "dc5c0eb516b93556f72801f832a97eabaff2b3ebabddeb9c3805c50b53a0181e",
+        "actual": "dc5c0eb516b93556f72801f832a97eabaff2b3ebabddeb9c3805c50b53a0181e",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/player-tools.css",
+        "expected": "dac3220a3df39eb357e2931f12ccbddeb75fa0d8910b6f4863c308fb3c4f90e6",
+        "actual": "dac3220a3df39eb357e2931f12ccbddeb75fa0d8910b6f4863c308fb3c4f90e6",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/room-lobby.css",
+        "expected": "67d45e1a5f3dc1d196f0c53cf0d856493d971f259c3e01258e925c62e74fe5f5",
+        "actual": "67d45e1a5f3dc1d196f0c53cf0d856493d971f259c3e01258e925c62e74fe5f5",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/room-stage.css",
+        "expected": "043675226d768bf83baec8f1d2e8f8089b124ce53dce304857c001c209aeaa68",
+        "actual": "043675226d768bf83baec8f1d2e8f8089b124ce53dce304857c001c209aeaa68",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/shell-panels.css",
+        "expected": "f80d396f5c1e94c96b0b49e30e1fb28aed28c837434d0edfbf2230369ba1bdca",
+        "actual": "f80d396f5c1e94c96b0b49e30e1fb28aed28c837434d0edfbf2230369ba1bdca",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/shell-polish.css",
+        "expected": "d503f3754809954fefa7e29ee15f3cf480d8c70b998cd024f680c8c4f4b61680",
+        "actual": "d503f3754809954fefa7e29ee15f3cf480d8c70b998cd024f680c8c4f4b61680",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/shell.css",
+        "expected": "b526aedd6c658132cd3d377a63263e2b4953960ac34062a44b6cfeaf3b7fc1f4",
+        "actual": "b526aedd6c658132cd3d377a63263e2b4953960ac34062a44b6cfeaf3b7fc1f4",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/sound-lab.css",
+        "expected": "bcc2f7a6e8f7a728c4b1cf0b36b6323ab6409125f610d76bc0a6cbb847271f5a",
+        "actual": "bcc2f7a6e8f7a728c4b1cf0b36b6323ab6409125f610d76bc0a6cbb847271f5a",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/soundcloud-login.css",
+        "expected": "3326956b4f69f640ffc5f93bd1bc787815849b87af44a451936f317950d53b31",
+        "actual": "3326956b4f69f640ffc5f93bd1bc787815849b87af44a451936f317950d53b31",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/studio-interface.css",
+        "expected": "3b0af55faaf09d836b5bdd5257fe1d02203892b5a3a452e7289cebcba9ca4b0b",
+        "actual": "3b0af55faaf09d836b5bdd5257fe1d02203892b5a3a452e7289cebcba9ca4b0b",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/studio-updates.css",
+        "expected": "5add5ada2c5a0ceee60f0ad1194f804b2d5decd75108e953593ba0713c473f75",
+        "actual": "5add5ada2c5a0ceee60f0ad1194f804b2d5decd75108e953593ba0713c473f75",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/typography.css",
+        "expected": "f74f759c49423ec691f57f5e2e223381530697a4891a9f96b11dfc9b9f292e1d",
+        "actual": "f74f759c49423ec691f57f5e2e223381530697a4891a9f96b11dfc9b9f292e1d",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/voicetags.css",
+        "expected": "6368768e3ff608d5174d3c6418eb0ee9408e31047b9eb02b2f00a53d2064a6aa",
+        "actual": "6368768e3ff608d5174d3c6418eb0ee9408e31047b9eb02b2f00a53d2064a6aa",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/wave.css",
+        "expected": "af631b28e6f9acef258c90b6ec9436b73f9415de075aa95b2d97d3f4073b73dd",
+        "actual": "af631b28e6f9acef258c90b6ec9436b73f9415de075aa95b2d97d3f4073b73dd",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/css/youtube-music.css",
+        "expected": "dd449e7c71226ab31be057d885788d028268a55f5fdb3fd592fd6f7233036d9b",
+        "actual": "dd449e7c71226ab31be057d885788d028268a55f5fdb3fd592fd6f7233036d9b",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/app-updates.js",
+        "expected": "e1cef35302ea7c317c45e84338a3fe4d57bc2024cd3b4cad04bfb681ec324c2f",
+        "actual": "e1cef35302ea7c317c45e84338a3fe4d57bc2024cd3b4cad04bfb681ec324c2f",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/artwork.js",
+        "expected": "ce16e710f440f696176ca9f3490966b45ff717a7f4ec9ee77a2ebacf554091e7",
+        "actual": "ce16e710f440f696176ca9f3490966b45ff717a7f4ec9ee77a2ebacf554091e7",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/features.js",
+        "expected": "5e251d6798d6fe5665f5ec6f41c85bccfa37128fdcbc9a7c29a7b689b50ecf85",
+        "actual": "5e251d6798d6fe5665f5ec6f41c85bccfa37128fdcbc9a7c29a7b689b50ecf85",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/host.js",
+        "expected": "b1fabd625a692d5463c4f29a1907aa4c4138f132a6a636afc1bd33ac4b433fd7",
+        "actual": "b1fabd625a692d5463c4f29a1907aa4c4138f132a6a636afc1bd33ac4b433fd7",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/local-player.js",
+        "expected": "247a0070e4c14b325b83fd49b257df6d479b81658743c3e26af493ad4eed64d4",
+        "actual": "247a0070e4c14b325b83fd49b257df6d479b81658743c3e26af493ad4eed64d4",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/lolzteam.js",
+        "expected": "df38708eeb2a2571d5f25742ad5da9f1f24dd1f24933dfa654c5ee8bad507f1f",
+        "actual": "df38708eeb2a2571d5f25742ad5da9f1f24dd1f24933dfa654c5ee8bad507f1f",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/lyric-tempo.js",
+        "expected": "fd820683ae0016c0d03db791386650d836b001d3a3872e7ea0d3c944e9205bb3",
+        "actual": "fd820683ae0016c0d03db791386650d836b001d3a3872e7ea0d3c944e9205bb3",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/lyrics-view.js",
+        "expected": "d4f0f3fa4adf70eb6feedec37224a32c528d8971d3a27aeea3dc4b3f745f5bac",
+        "actual": "d4f0f3fa4adf70eb6feedec37224a32c528d8971d3a27aeea3dc4b3f745f5bac",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/media-source.js",
+        "expected": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c",
+        "actual": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/mini.js",
+        "expected": "da0497c999fb9103d4eceff6e62439cfed31168a5616428d63e557bf06cbce92",
+        "actual": "da0497c999fb9103d4eceff6e62439cfed31168a5616428d63e557bf06cbce92",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/player-tools.js",
+        "expected": "fb71eaff554901fef8b1f4111f83fb447268f9b3f5d79a0195519f384fdc52f9",
+        "actual": "fb71eaff554901fef8b1f4111f83fb447268f9b3f5d79a0195519f384fdc52f9",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/range-controls.js",
+        "expected": "79986fb891e59c6aa577fc5e87c4dabd4ce649e9836a0df0f6acc754373d2a91",
+        "actual": "79986fb891e59c6aa577fc5e87c4dabd4ce649e9836a0df0f6acc754373d2a91",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/room-lobby.js",
+        "expected": "67d03f73cada5d51e8586d25a74c5a489904dbd63fba932a3e9f6858c5a9b9cd",
+        "actual": "67d03f73cada5d51e8586d25a74c5a489904dbd63fba932a3e9f6858c5a9b9cd",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/soundcloud-login.js",
+        "expected": "e68b33c953a91cdf4a268684910b1a824c6d57d1f1ee06a389699e4cdb5e9430",
+        "actual": "e68b33c953a91cdf4a268684910b1a824c6d57d1f1ee06a389699e4cdb5e9430",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/track-colors.js",
+        "expected": "3ca2d213ea66121a094a6780d9ff48a4b355d687ee555f997fdc726e5278fe0f",
+        "actual": "3ca2d213ea66121a094a6780d9ff48a4b355d687ee555f997fdc726e5278fe0f",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/track-visuals.js",
+        "expected": "46a5ae25fa9270914a976851eec7d1b183c822c3182e441dfd0358f18b11aafa",
+        "actual": "46a5ae25fa9270914a976851eec7d1b183c822c3182e441dfd0358f18b11aafa",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/voicetags.js",
+        "expected": "f832309aab7f48cc2a2d76204fee8171c338a570a58bd87ca84e7525663b1a36",
+        "actual": "f832309aab7f48cc2a2d76204fee8171c338a570a58bd87ca84e7525663b1a36",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/wave-view.js",
+        "expected": "b7439f973c2cc7df2e4c8970034c1e00c6cdd49d8c6d60c353e5db67864e820b",
+        "actual": "b7439f973c2cc7df2e4c8970034c1e00c6cdd49d8c6d60c353e5db67864e820b",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/webview-layout.js",
+        "expected": "20c4adc0fcf94b6b2ee126e578fa4ddbf7ed2c00614332b184ce190c4d522df7",
+        "actual": "20c4adc0fcf94b6b2ee126e578fa4ddbf7ed2c00614332b184ce190c4d522df7",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/js/youtube-music.js",
+        "expected": "d15826a1f50775093281b86ee9193751c2d8ff7e1ae9909c4173b4f599398656",
+        "actual": "d15826a1f50775093281b86ee9193751c2d8ff7e1ae9909c4173b4f599398656",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/room-client/.gitignore",
+        "expected": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+        "actual": "240a3e0d37d2e86b614063f5347eb02d4f99ca6c254de6b82871ff8d95532a7d",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/room/room.html",
+        "expected": "f26a8ebb608287550f684d860ec52d16df58363d143aa1164c7d7bbc85725809",
+        "actual": "f26a8ebb608287550f684d860ec52d16df58363d143aa1164c7d7bbc85725809",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/room/room.js",
+        "expected": "e69b02cd85903822cab119170d349fee925d35c0f10174d2caae5df49d11a48a",
+        "actual": "e69b02cd85903822cab119170d349fee925d35c0f10174d2caae5df49d11a48a",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/templates/features.html",
+        "expected": "23f6689100c448b0144a19c3a48c89652df0ac1551c48382cf684f1e1d6875dd",
+        "actual": "23f6689100c448b0144a19c3a48c89652df0ac1551c48382cf684f1e1d6875dd",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/templates/lolzteam.html",
+        "expected": "d8685075d39e01a105dbff4d0d8028318cb4f914c4cea623270218de28384d75",
+        "actual": "d8685075d39e01a105dbff4d0d8028318cb4f914c4cea623270218de28384d75",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/templates/player-tools.html",
+        "expected": "e1d078aed7a43a2ebc8760b93a74e68b0d116ae2889f57b92749e294ad2584ef",
+        "actual": "e1d078aed7a43a2ebc8760b93a74e68b0d116ae2889f57b92749e294ad2584ef",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/templates/soundcloud-login.html",
+        "expected": "b749f3ea89a14a773a6bfd30f10855466cc75c07ba8dc36adbbe4a68ce16d1b7",
+        "actual": "b749f3ea89a14a773a6bfd30f10855466cc75c07ba8dc36adbbe4a68ce16d1b7",
+        "matches": true
+      },
+      {
+        "path": "source/app/mini.html",
+        "expected": "05cbf2962d244bcd56ff629938db3f4cf2fe548f2e63114df51402413603b7e3",
+        "actual": "05cbf2962d244bcd56ff629938db3f4cf2fe548f2e63114df51402413603b7e3",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/bookmark.js",
+        "expected": "81c6a37ade7814ff79ec5c11ca2c1ea5a9a7c98d3b96d97d8917c197e36a75b9",
+        "actual": "81c6a37ade7814ff79ec5c11ca2c1ea5a9a7c98d3b96d97d8917c197e36a75b9",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/helper-firefox.zip",
+        "expected": "87ffd46eef97e8f183997999b63c2b4e58078232ccf3ea97276193b22cb9a5bb",
+        "actual": "87ffd46eef97e8f183997999b63c2b4e58078232ccf3ea97276193b22cb9a5bb",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/helper.zip",
+        "expected": "96593a474113a0e7a87f4990153c8f93f562112dc18945f35419f5d8f2cbe010",
+        "actual": "96593a474113a0e7a87f4990153c8f93f562112dc18945f35419f5d8f2cbe010",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/helper/background.js",
+        "expected": "9687011d4ab59a8a79852a0e9991c037b2d89474be6df2f672e7b2c290f6809d",
+        "actual": "9687011d4ab59a8a79852a0e9991c037b2d89474be6df2f672e7b2c290f6809d",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/helper/bridge.js",
+        "expected": "3a0b9d68f27bea592902f7264d3f95de73747e6c9190500e3c0527dfb316a367",
+        "actual": "3a0b9d68f27bea592902f7264d3f95de73747e6c9190500e3c0527dfb316a367",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/helper/content.js",
+        "expected": "bf55776a0d3fa3d7cd0f53197a6d68552a0429aec31109ebde7df5c045a8a125",
+        "actual": "bf55776a0d3fa3d7cd0f53197a6d68552a0429aec31109ebde7df5c045a8a125",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/helper/manifest.json",
+        "expected": "726376fda45b10fa77e1d5a91d0a737ae59ff5f5d7c5ff2213cd3b11b3cada87",
+        "actual": "726376fda45b10fa77e1d5a91d0a737ae59ff5f5d7c5ff2213cd3b11b3cada87",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/helper/popup.css",
+        "expected": "4081fe51d8a9dfdf33fcce7af0b38389cff8079ea297c33a168eb72e076b9cee",
+        "actual": "4081fe51d8a9dfdf33fcce7af0b38389cff8079ea297c33a168eb72e076b9cee",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/helper/popup.html",
+        "expected": "5a72c088a54c12ddc09701162c28273c5e5923775b4ae047620fa01b1bed95dd",
+        "actual": "5a72c088a54c12ddc09701162c28273c5e5923775b4ae047620fa01b1bed95dd",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/helper/popup.js",
+        "expected": "64562b26019ad6a1ea93e5c48e58ef97a4f534434ba048a01af7aafaba996e6d",
+        "actual": "64562b26019ad6a1ea93e5c48e58ef97a4f534434ba048a01af7aafaba996e6d",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/index.html",
+        "expected": "e0a561d28d7c4a910c89c862ee0c3621b863206f68e5c826f01efc9e07c7327b",
+        "actual": "e0a561d28d7c4a910c89c862ee0c3621b863206f68e5c826f01efc9e07c7327b",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/receive.html",
+        "expected": "32557d3506a21b8ac9d776fa00896deace917e4c24aef9f06216cd5f6e9194a3",
+        "actual": "32557d3506a21b8ac9d776fa00896deace917e4c24aef9f06216cd5f6e9194a3",
+        "matches": true
+      },
+      {
+        "path": "source/app/session-transfer/style.css",
+        "expected": "9f4a12d406391ce9854935b7facdda767a992ac78c8e72ce361fafc6e1a489f2",
+        "actual": "9f4a12d406391ce9854935b7facdda767a992ac78c8e72ce361fafc6e1a489f2",
+        "matches": true
+      },
+      {
+        "path": "source/guest-preload.cjs",
+        "expected": "adab7271f7cf241d5c041226eed20c8bea7a391693004ce714c3083d7d84c7a2",
+        "actual": "adab7271f7cf241d5c041226eed20c8bea7a391693004ce714c3083d7d84c7a2",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/app-config.cjs",
+        "expected": "ba217ee205199e84e7184b8dc70af8a79b0f678a8bdb9d7b3397dd2964067266",
+        "actual": "ba217ee205199e84e7184b8dc70af8a79b0f678a8bdb9d7b3397dd2964067266",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/app-updates.cjs",
+        "expected": "ea3648c194c55846aa15f093cf21198ed46b7b5fe717fefec5b563241648e9f0",
+        "actual": "ea3648c194c55846aa15f093cf21198ed46b7b5fe717fefec5b563241648e9f0",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/audio-download.cjs",
+        "expected": "72e3ea41bfd880be33d88890fa9838b935bfd8f7eae69a3b7add64a7e8ceeba9",
+        "actual": "72e3ea41bfd880be33d88890fa9838b935bfd8f7eae69a3b7add64a7e8ceeba9",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/audio-ducker.cjs",
+        "expected": "0463aa27eb3332836c4eb7ce5ee4828b07d15acfbc846bed76c5ade2c226fdf6",
+        "actual": "0463aa27eb3332836c4eb7ce5ee4828b07d15acfbc846bed76c5ade2c226fdf6",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/browser-profiles.cjs",
+        "expected": "5ec1f270bf02167aa0806b6d18d9d2cc19cdc10858799ff4d3fc502bfe904677",
+        "actual": "5ec1f270bf02167aa0806b6d18d9d2cc19cdc10858799ff4d3fc502bfe904677",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/browser-session-identity.cjs",
+        "expected": "a4bf10ab2eef5662c50d64007db788883fd199a24755f28dbec7402d02c81464",
+        "actual": "a4bf10ab2eef5662c50d64007db788883fd199a24755f28dbec7402d02c81464",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/browser-session.cjs",
+        "expected": "f995c45c130e480f444c78927fbbc2947c630dc3e51152d04d45f65795ca2c75",
+        "actual": "f995c45c130e480f444c78927fbbc2947c630dc3e51152d04d45f65795ca2c75",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/clipboard.cjs",
+        "expected": "23e7b3e151c4a61dfe203f30d5ef0ae25d4b047dedf3e1489269e5c9cf3d5143",
+        "actual": "23e7b3e151c4a61dfe203f30d5ef0ae25d4b047dedf3e1489269e5c9cf3d5143",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/discord.cjs",
+        "expected": "6a681cf78944bb94b7c4f72b60a04dc9217a75e6ff3350f6a268cf439f3c61b9",
+        "actual": "6a681cf78944bb94b7c4f72b60a04dc9217a75e6ff3350f6a268cf439f3c61b9",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/discovery.cjs",
+        "expected": "de65485458d3d2e33a421f94345a5dd379d2a2bf293dec4d7880d273866f451e",
+        "actual": "de65485458d3d2e33a421f94345a5dd379d2a2bf293dec4d7880d273866f451e",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/downloads.cjs",
+        "expected": "f8266e8a4b822efdef2b6a2d88d4d1b10477966116ef7296c405cb105f0ce6c6",
+        "actual": "f8266e8a4b822efdef2b6a2d88d4d1b10477966116ef7296c405cb105f0ce6c6",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/durable-json.cjs",
+        "expected": "3ccb643e25e92ee5abb933448610b7af6c9cf6906a0d0383c5f02e4f25a82fd2",
+        "actual": "3ccb643e25e92ee5abb933448610b7af6c9cf6906a0d0383c5f02e4f25a82fd2",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/legacy-runtime.cjs",
+        "expected": "8971bf38ab67af3921c6e197b8ae41bb8fe37a62ee30a87d89c13969a975d486",
+        "actual": "8971bf38ab67af3921c6e197b8ae41bb8fe37a62ee30a87d89c13969a975d486",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/linux-appimage-update.cjs",
+        "expected": "d8c7da02a5ffec48e0e724369b47b5c7c05d80d0eaf5ca18bc9efb8577ba3ee5",
+        "actual": "d8c7da02a5ffec48e0e724369b47b5c7c05d80d0eaf5ca18bc9efb8577ba3ee5",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/linux-appimage-update.sh",
+        "expected": "b583923be0f97cd701c5d24fefb21d5a2aaf263ab918dd285f42ca5e4bc61204",
+        "actual": "b583923be0f97cd701c5d24fefb21d5a2aaf263ab918dd285f42ca5e4bc61204",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/local-library.cjs",
+        "expected": "ef593106212e4a4431b5e9cb8727f6875b26eb98d1053c1cd4b3a4195353f97b",
+        "actual": "ef593106212e4a4431b5e9cb8727f6875b26eb98d1053c1cd4b3a4195353f97b",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lolzteam/api.cjs",
+        "expected": "c9fbde8f5caf1bd00309e385ef7ac5a3541eee6f357c7767bf471d7bc6048170",
+        "actual": "c9fbde8f5caf1bd00309e385ef7ac5a3541eee6f357c7767bf471d7bc6048170",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lolzteam/index.cjs",
+        "expected": "bbd138a5b2044ea623f9b33088dd57f09f80c00e7ba21955dda81266a3c30a51",
+        "actual": "bbd138a5b2044ea623f9b33088dd57f09f80c00e7ba21955dda81266a3c30a51",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lolzteam/service.cjs",
+        "expected": "965a7551e90c09c52052e490318cff98f23ab9a189394ee87af90f01f591d8d2",
+        "actual": "965a7551e90c09c52052e490318cff98f23ab9a189394ee87af90f01f591d8d2",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lolzteam/status.cjs",
+        "expected": "5c147d440fdcc5666527f010732d82b10495b365efc5aea4ae7104a6f3577fdb",
+        "actual": "5c147d440fdcc5666527f010732d82b10495b365efc5aea4ae7104a6f3577fdb",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lolzteam/store.cjs",
+        "expected": "768e95a4b5298a0da8ca0cedb127a15a733921cdaa070872861513b60868e6b3",
+        "actual": "768e95a4b5298a0da8ca0cedb127a15a733921cdaa070872861513b60868e6b3",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lyric-formats.cjs",
+        "expected": "a0389f4abe5e1d84cf3afd01fed5291807bc1b58d414d76f9fb19c31c61bbd07",
+        "actual": "a0389f4abe5e1d84cf3afd01fed5291807bc1b58d414d76f9fb19c31c61bbd07",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lyric-identity.cjs",
+        "expected": "8c4bc67bf405a2474a4d2df0e4126a8f92f93ddaec0e7fd0b66b5e492f08523c",
+        "actual": "8c4bc67bf405a2474a4d2df0e4126a8f92f93ddaec0e7fd0b66b5e492f08523c",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lyric-match.cjs",
+        "expected": "358e43f449c63cb7b067ac092439068bdff482c69336b948b0e5632f8bce01ed",
+        "actual": "358e43f449c63cb7b067ac092439068bdff482c69336b948b0e5632f8bce01ed",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lyric-prefetch.cjs",
+        "expected": "e61988e8a060f2dfc64a039b0e91360c180df227e6cff04785d6368a6746fba0",
+        "actual": "e61988e8a060f2dfc64a039b0e91360c180df227e6cff04785d6368a6746fba0",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lyric-providers.cjs",
+        "expected": "71429f294eb60582dff292002dba188a4a5c2104a175c1e613683003155838df",
+        "actual": "71429f294eb60582dff292002dba188a4a5c2104a175c1e613683003155838df",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lyric-settings.cjs",
+        "expected": "bf07e812b59c02d2adf23a706d91babbe86c015a5c343ef9a9b4d74489bc31e3",
+        "actual": "bf07e812b59c02d2adf23a706d91babbe86c015a5c343ef9a9b4d74489bc31e3",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lyric-source.cjs",
+        "expected": "d7aa9652e237f11bf2f9001e8e4bbc105d9e08d7d8deedd0c4a1ee3006482a9a",
+        "actual": "d7aa9652e237f11bf2f9001e8e4bbc105d9e08d7d8deedd0c4a1ee3006482a9a",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/lyrics.cjs",
+        "expected": "9dd0a255dfc87555d82c6355ecac862f5035c46cb39a0a97aadd612a048f9118",
+        "actual": "9dd0a255dfc87555d82c6355ecac862f5035c46cb39a0a97aadd612a048f9118",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/mini-window.cjs",
+        "expected": "72f686e03744d0b08d35fa6335952c69f6cca78f9a08db2a623f3bebc664464b",
+        "actual": "72f686e03744d0b08d35fa6335952c69f6cca78f9a08db2a623f3bebc664464b",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/music.cjs",
+        "expected": "afecb395d3eaef4ec7c5330a5ad556c3135da587ccf5c278782d64906661393c",
+        "actual": "afecb395d3eaef4ec7c5330a5ad556c3135da587ccf5c278782d64906661393c",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/playback-history.cjs",
+        "expected": "47c201d08d75954a5d33549a10aad3484481b93d45247eecfcd6ba379b328ea7",
+        "actual": "47c201d08d75954a5d33549a10aad3484481b93d45247eecfcd6ba379b328ea7",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/player-experience.cjs",
+        "expected": "473bf263fafb463a83685ddae4177e7fd58dc677cdfc38fb8f17925c96555f27",
+        "actual": "473bf263fafb463a83685ddae4177e7fd58dc677cdfc38fb8f17925c96555f27",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/player-tools.cjs",
+        "expected": "cdbbebcc60291819cd771170aba8acf673e9068ee1a242c3cc77355f0280aefe",
+        "actual": "cdbbebcc60291819cd771170aba8acf673e9068ee1a242c3cc77355f0280aefe",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/portable-profile.cjs",
+        "expected": "211b4b6313e4c3828af125a2db43ef4b723f5b45da4ad07b57bccbeef580ddf3",
+        "actual": "211b4b6313e4c3828af125a2db43ef4b723f5b45da4ad07b57bccbeef580ddf3",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/portable-update.cjs",
+        "expected": "e6586ce7fcb8f540eb5ef83a8769f6b65422855b2813043fbd26cb0cf51498e8",
+        "actual": "e6586ce7fcb8f540eb5ef83a8769f6b65422855b2813043fbd26cb0cf51498e8",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/portable-update.ps1",
+        "expected": "447840131251e48a12005de68f49597cd77ceac212f610aa739706f8d025f6b7",
+        "actual": "447840131251e48a12005de68f49597cd77ceac212f610aa739706f8d025f6b7",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/profile-migration.cjs",
+        "expected": "297e1730c7398ff1a803a66311e714b004daa85fec3c073f179feaa0194fd8ad",
+        "actual": "297e1730c7398ff1a803a66311e714b004daa85fec3c073f179feaa0194fd8ad",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/profiles.cjs",
+        "expected": "0f2ec4a0194375680810c0b442b04f38adc26978f66b65025049dd04e170155b",
+        "actual": "0f2ec4a0194375680810c0b442b04f38adc26978f66b65025049dd04e170155b",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/release-radar.cjs",
+        "expected": "79e4bcf590b201f3ac84d126426d206d8b1e8dafd58856eb7aa12a33e2aace64",
+        "actual": "79e4bcf590b201f3ac84d126426d206d8b1e8dafd58856eb7aa12a33e2aace64",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/repeat-intent.cjs",
+        "expected": "6c974f25e8dff6342adc2d288186930800de1d0fce8e1de0599056535fe38d26",
+        "actual": "6c974f25e8dff6342adc2d288186930800de1d0fce8e1de0599056535fe38d26",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/room-client.cjs",
+        "expected": "505788c85814b41d017649ff666382c37df4fdc0f72e86355820bf4c9654b14b",
+        "actual": "505788c85814b41d017649ff666382c37df4fdc0f72e86355820bf4c9654b14b",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/room-view.cjs",
+        "expected": "c6da0a3160d7604843bb67417f9a28d61af4ef7291f7a4806fe890611397cbf1",
+        "actual": "c6da0a3160d7604843bb67417f9a28d61af4ef7291f7a4806fe890611397cbf1",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/room.cjs",
+        "expected": "761bdadfc815d15386e664ec613820f3445d5b64df083ad4084cbdb5f9064c43",
+        "actual": "761bdadfc815d15386e664ec613820f3445d5b64df083ad4084cbdb5f9064c43",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/sc-profile.cjs",
+        "expected": "ff5b424ab8aa8d47fe13077922739281a3a3f60e31670547343f4466ca7221e9",
+        "actual": "ff5b424ab8aa8d47fe13077922739281a3a3f60e31670547343f4466ca7221e9",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/secure-storage.cjs",
+        "expected": "7c8ced4c07955d28d2c49dae17db2d28950fd8e03dc21fb11ef5e7071e25e098",
+        "actual": "7c8ced4c07955d28d2c49dae17db2d28950fd8e03dc21fb11ef5e7071e25e098",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/self-test.cjs",
+        "expected": "0688f55c27cc41bc5ac4be760b6d460fd010a1b875af8b5a02278b9cfe5d405a",
+        "actual": "0688f55c27cc41bc5ac4be760b6d460fd010a1b875af8b5a02278b9cfe5d405a",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/session-import.cjs",
+        "expected": "d70860172c092073f7262c49b1801e459ddc3620d918d5a821be2246becf8f2a",
+        "actual": "d70860172c092073f7262c49b1801e459ddc3620d918d5a821be2246becf8f2a",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/session-recovery.cjs",
+        "expected": "a6f64477d8bbecbe9f35b26bccfb8a774d9a235367fbfac355709b19997c0629",
+        "actual": "a6f64477d8bbecbe9f35b26bccfb8a774d9a235367fbfac355709b19997c0629",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/social-notifications.cjs",
+        "expected": "503694482403a6885c62b1a956530ea50a9eacf70d88310d86e54db5edd5f9e0",
+        "actual": "503694482403a6885c62b1a956530ea50a9eacf70d88310d86e54db5edd5f9e0",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/sound-protection.cjs",
+        "expected": "9f96c080f5bdfff3839ed68b727421c1b1bd002926dbf2f6711f635b25f1817c",
+        "actual": "9f96c080f5bdfff3839ed68b727421c1b1bd002926dbf2f6711f635b25f1817c",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/sound-settings.cjs",
+        "expected": "8230713bf3eb5a6c4e2ebc8641b5c9f1dc05ce772ef4c907e76335603af53402",
+        "actual": "8230713bf3eb5a6c4e2ebc8641b5c9f1dc05ce772ef4c907e76335603af53402",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/soundcloud-client.cjs",
+        "expected": "98f845454c507dfa184422e6e73b00e0eec8122261a383b4b67e4b93dd8eebf5",
+        "actual": "98f845454c507dfa184422e6e73b00e0eec8122261a383b4b67e4b93dd8eebf5",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/soundcloud-session.cjs",
+        "expected": "1750a329fb8f5a06f9c537c8c87e5e9935cb96f996e44b02af420f7ec63d1c79",
+        "actual": "1750a329fb8f5a06f9c537c8c87e5e9935cb96f996e44b02af420f7ec63d1c79",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/studio.cjs",
+        "expected": "b7eb98dcde21f10b986d18c9b3fd42836ad4901e424b88c6517e4dbe7dc3fe22",
+        "actual": "b7eb98dcde21f10b986d18c9b3fd42836ad4901e424b88c6517e4dbe7dc3fe22",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/track-visuals.cjs",
+        "expected": "1512ca009f60f864cf2322ad624309e68364bfba5faacdf113306be8acf41801",
+        "actual": "1512ca009f60f864cf2322ad624309e68364bfba5faacdf113306be8acf41801",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/update-temporary.cjs",
+        "expected": "6292ebd3e2bfd856212e6f6e13e10912e4352e07ec3da3fdd586d7b474987bd9",
+        "actual": "6292ebd3e2bfd856212e6f6e13e10912e4352e07ec3da3fdd586d7b474987bd9",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/voicetags.cjs",
+        "expected": "85c85b03fb14cc0d3af328a28110369ac6f004c8ca09789771c70bb357907950",
+        "actual": "85c85b03fb14cc0d3af328a28110369ac6f004c8ca09789771c70bb357907950",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/wave-history.cjs",
+        "expected": "190176887cc5e3e2f639c9b45bf2601ad9d7a23812c8a28491fd7c0f0c4e9452",
+        "actual": "190176887cc5e3e2f639c9b45bf2601ad9d7a23812c8a28491fd7c0f0c4e9452",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/wave-preferences.cjs",
+        "expected": "016eeaccaaa7c804da945ef76b80ebe1ef969aee08136fb636026230d833e8b8",
+        "actual": "016eeaccaaa7c804da945ef76b80ebe1ef969aee08136fb636026230d833e8b8",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/wave-request.cjs",
+        "expected": "0b3930470a1e192e40982ac61a6f37f40034bd3ac5e1dfc6ad5477d66fb95b16",
+        "actual": "0b3930470a1e192e40982ac61a6f37f40034bd3ac5e1dfc6ad5477d66fb95b16",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/wave.cjs",
+        "expected": "44484e2a04c7f18c9f1287a5f1b26cc0809de7f34100c3e00b9b8832d2ead816",
+        "actual": "44484e2a04c7f18c9f1287a5f1b26cc0809de7f34100c3e00b9b8832d2ead816",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/windows/audio-sessions.cs",
+        "expected": "4dd957051abbaf35b5487e5db85df9c1675e42a8974cac476fce7b473c9c7f10",
+        "actual": "4dd957051abbaf35b5487e5db85df9c1675e42a8974cac476fce7b473c9c7f10",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/windows/audio-sessions.ps1",
+        "expected": "485a3104cea5d17c30adc8df5f66558b34266098b5bac494bccf10592e40748b",
+        "actual": "485a3104cea5d17c30adc8df5f66558b34266098b5bac494bccf10592e40748b",
+        "matches": true
+      },
+      {
+        "path": "source/integrations/youtube-music.cjs",
+        "expected": "9dd2adc02d1c990611d0c0855167d2d86fc3128d05e7bbd08c9ac5fe399667ec",
+        "actual": "9dd2adc02d1c990611d0c0855167d2d86fc3128d05e7bbd08c9ac5fe399667ec",
+        "matches": true
+      },
+      {
+        "path": "source/legacy-profiles.json",
+        "expected": "960f01e5022f53ea8b9f8a92ab7950c4355400b1a99a397693e5d66af1e778b2",
+        "actual": "960f01e5022f53ea8b9f8a92ab7950c4355400b1a99a397693e5d66af1e778b2",
+        "matches": true
+      },
+      {
+        "path": "source/main.js",
+        "expected": "0e9fae9dba7ec655bbf9aa0c9db3335817889cc3ec6018346c371f2e9e444410",
+        "actual": "0e9fae9dba7ec655bbf9aa0c9db3335817889cc3ec6018346c371f2e9e444410",
+        "matches": true
+      },
+      {
+        "path": "source/package.json",
+        "expected": "9f1db35681bac686a2604a794fa3dbf236291a559184a15dff7bb1b32d6c9828",
+        "actual": "9f1db35681bac686a2604a794fa3dbf236291a559184a15dff7bb1b32d6c9828",
+        "matches": true
+      },
+      {
+        "path": "source/plugins/beat-tracker.js",
+        "expected": "5fe11da52101b32ca2f1b346ddf057cfa958d167e13ee8942672951bb7f3f83c",
+        "actual": "5fe11da52101b32ca2f1b346ddf057cfa958d167e13ee8942672951bb7f3f83c",
+        "matches": true
+      },
+      {
+        "path": "source/plugins/infoticker.js",
+        "expected": "9eb41139588470b3d827b60b79dd5f10e17ef7dbd6f212387e48aed164629a2e",
+        "actual": "9eb41139588470b3d827b60b79dd5f10e17ef7dbd6f212387e48aed164629a2e",
+        "matches": true
+      },
+      {
+        "path": "source/plugins/normalization-worklet.js",
+        "expected": "b3cdd397c68f4648ae5651b2062d1d8c134ea0404b2e1bf91d13634e8bb83501",
+        "actual": "b3cdd397c68f4648ae5651b2062d1d8c134ea0404b2e1bf91d13634e8bb83501",
+        "matches": true
+      },
+      {
+        "path": "source/plugins/pitch-worklet.js",
+        "expected": "7002ef718d7928978c3674ea721a5a248b0a028d698add83e81757cf632bbfc5",
+        "actual": "7002ef718d7928978c3674ea721a5a248b0a028d698add83e81757cf632bbfc5",
+        "matches": true
+      },
+      {
+        "path": "source/plugins/playback-control.js",
+        "expected": "9e31b01ac8e81fe739218ca397ddee5933f4a8760f9e2957c3529be07a714198",
+        "actual": "9e31b01ac8e81fe739218ca397ddee5933f4a8760f9e2957c3529be07a714198",
+        "matches": true
+      },
+      {
+        "path": "source/plugins/promotions.js",
+        "expected": "96d01d162c3f5aa533fe1f9aa87473b5553a74400ecf468a443f9dd3affec2c1",
+        "actual": "96d01d162c3f5aa533fe1f9aa87473b5553a74400ecf468a443f9dd3affec2c1",
+        "matches": true
+      },
+      {
+        "path": "source/plugins/repeat-control.js",
+        "expected": "c335dd4c55286641da5a63bda5c7e6bc863af060d0a359249837420335429b38",
+        "actual": "c335dd4c55286641da5a63bda5c7e6bc863af060d0a359249837420335429b38",
+        "matches": true
+      },
+      {
+        "path": "source/plugins/sound-effects.js",
+        "expected": "871663672d0398dc45ac5ca26f16ba4a27d7ede496a1895a45bc5f2462512b9c",
+        "actual": "871663672d0398dc45ac5ca26f16ba4a27d7ede496a1895a45bc5f2462512b9c",
+        "matches": true
+      },
+      {
+        "path": "source/plugins/tempo-worklet.js",
+        "expected": "46b53414aee4265bab3c46939bbb1002179c47ed56b72fd0034524ab8a53949e",
+        "actual": "46b53414aee4265bab3c46939bbb1002179c47ed56b72fd0034524ab8a53949e",
+        "matches": true
+      },
+      {
+        "path": "source/plugins/verification.js",
+        "expected": "e0e835d1276a7e4e9d0ad48d182ad3743711fd8993810af73a14b1c4a6df6258",
+        "actual": "e0e835d1276a7e4e9d0ad48d182ad3743711fd8993810af73a14b1c4a6df6258",
+        "matches": true
+      },
+      {
+        "path": "source/plugins/youtube-control.js",
+        "expected": "7f508b93c39de41e6922201e0ac94bd8fd2840907249fe032d25b40c5dedd423",
+        "actual": "7f508b93c39de41e6922201e0ac94bd8fd2840907249fe032d25b40c5dedd423",
+        "matches": true
+      },
+      {
+        "path": "source/preload.js",
+        "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "actual": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "matches": true
+      },
+      {
+        "path": "source/room-preload.cjs",
+        "expected": "000e04f19ad1ee1c330f1ce62e01e2ce0070108e72de1bbf465c1a041b252ea2",
+        "actual": "000e04f19ad1ee1c330f1ce62e01e2ce0070108e72de1bbf465c1a041b252ea2",
+        "matches": true
+      },
+      {
+        "path": "source/themes/lolzcloud.css",
+        "expected": "3f660d882f982a0b6b5d513e60bf9a2e7c87dcb10907e347cc9295a28b65916c",
+        "actual": "3f660d882f982a0b6b5d513e60bf9a2e7c87dcb10907e347cc9295a28b65916c",
+        "matches": true
+      },
+      {
+        "path": "source/youtube-preload.cjs",
+        "expected": "037b9c6d24c0034ceae7111f4b4c54747fce48b083f0e30f58722ec96cab4b26",
+        "actual": "037b9c6d24c0034ceae7111f4b4c54747fce48b083f0e30f58722ec96cab4b26",
+        "matches": true
+      }
+    ]
+  },
+  "room": {
+    "label": "Frozen shared room13 inputs",
+    "files": 13,
+    "exact": 13,
+    "results": [
+      {
+        "path": "server/public/room.html",
+        "expected": "aa2e1421e267107360ba890321d5455f2eaf9f1f567d542e366d8dd1c88a8ff4",
+        "actual": "aa2e1421e267107360ba890321d5455f2eaf9f1f567d542e366d8dd1c88a8ff4",
+        "matches": true
+      },
+      {
+        "path": "server/public/room.css",
+        "expected": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340",
+        "actual": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340",
+        "matches": true
+      },
+      {
+        "path": "server/public/room.js",
+        "expected": "a1825c77e73d61e83633fb54a8556928f0225b866fc3acb82ac3cef37b505937",
+        "actual": "a1825c77e73d61e83633fb54a8556928f0225b866fc3acb82ac3cef37b505937",
+        "matches": true
+      },
+      {
+        "path": "server/public/room-sync.js",
+        "expected": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab",
+        "actual": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab",
+        "matches": true
+      },
+      {
+        "path": "server/public/room-players.js",
+        "expected": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9",
+        "actual": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9",
+        "matches": true
+      },
+      {
+        "path": "server/public/media-source.js",
+        "expected": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c",
+        "actual": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c",
+        "matches": true
+      },
+      {
+        "path": "server/public/app/room-transport.js",
+        "expected": "bb4d1ac5cc88ae77c9eca78637922942d8a4df8dd42bcd25cfda0fdc72da9b46",
+        "actual": "bb4d1ac5cc88ae77c9eca78637922942d8a4df8dd42bcd25cfda0fdc72da9b46",
+        "matches": true
+      },
+      {
+        "path": "server/public/site.js",
+        "expected": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616",
+        "actual": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616",
+        "matches": true
+      },
+      {
+        "path": "server/public/social.html",
+        "expected": "d905f78fe734677728c9e3d3b9e426f8d7fd984c4fdc66a7ea5318834aefd3fe",
+        "actual": "d905f78fe734677728c9e3d3b9e426f8d7fd984c4fdc66a7ea5318834aefd3fe",
+        "matches": true
+      },
+      {
+        "path": "server/public/social.js",
+        "expected": "c3e8b8c0c185afd7fa7f13c5692bfe8339c8e2aeeb139fb70485a1d0c50da601",
+        "actual": "c3e8b8c0c185afd7fa7f13c5692bfe8339c8e2aeeb139fb70485a1d0c50da601",
+        "matches": true
+      },
+      {
+        "path": "server/public/social.css",
+        "expected": "d16d9131ad980d13e441a7ae866d2b08e7c4b58e0a387ec892a1de1aa80ffa86",
+        "actual": "d16d9131ad980d13e441a7ae866d2b08e7c4b58e0a387ec892a1de1aa80ffa86",
+        "matches": true
+      },
+      {
+        "path": "source/app/lib/assets/logo.svg",
+        "expected": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512",
+        "actual": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512",
+        "matches": true
+      },
+      {
+        "path": "server/public/rooms.html",
+        "expected": "6a50ba012f3ec1876f9a2a0bf82cc20e06fa98b9d7983f58e824ca32925e7020",
+        "actual": "6a50ba012f3ec1876f9a2a0bf82cc20e06fa98b9d7983f58e824ca32925e7020",
+        "matches": true
+      }
+    ]
+  },
+  "tools": {
+    "label": "Frozen build tools5 inputs",
+    "files": 5,
+    "exact": 5,
+    "results": [
+      {
+        "path": "tools/prepare.cjs",
+        "expected": "a0d947698d523dfc6715d876da5786d4b0d8413577139b6d99fbc3a790953698",
+        "actual": "a0d947698d523dfc6715d876da5786d4b0d8413577139b6d99fbc3a790953698",
+        "matches": true
+      },
+      {
+        "path": "tools/build.cjs",
+        "expected": "f04e74e52d44e061ea1c562da827c33b643b24d88fc5a019a86ac5b0ccd6433d",
+        "actual": "f04e74e52d44e061ea1c562da827c33b643b24d88fc5a019a86ac5b0ccd6433d",
+        "matches": true
+      },
+      {
+        "path": "tools/build-setup.cjs",
+        "expected": "3908e027200b2d179598cb4408cabafc58d3ee9eb7776d03ccdc387db24049b0",
+        "actual": "3908e027200b2d179598cb4408cabafc58d3ee9eb7776d03ccdc387db24049b0",
+        "matches": true
+      },
+      {
+        "path": "tools/windows-artifacts.cjs",
+        "expected": "46c0b15f9c9ccb49014085d8645d985ee67efd05a26ec2e01f07c031d56a4dc7",
+        "actual": "46c0b15f9c9ccb49014085d8645d985ee67efd05a26ec2e01f07c031d56a4dc7",
+        "matches": true
+      },
+      {
+        "path": "tools/update-manifests.cjs",
+        "expected": "581efcbbc2e53ddde22828912abd19d1637d29c370e8e85f4bdaff9cedeb4e71",
+        "actual": "581efcbbc2e53ddde22828912abd19d1637d29c370e8e85f4bdaff9cedeb4e71",
+        "matches": true
+      }
+    ]
+  },
+  "android": {
+    "label": "Android0.1.11 final R4 after12 generated assets",
+    "files": 67,
+    "exact": 67,
+    "results": [
+      {
+        "path": "android/app/src/main/AndroidManifest.xml",
+        "expected": "716c09db93c526446cd6a7f44542c4b584312faadede8c3556dfe11f7017e79e",
+        "actual": "716c09db93c526446cd6a7f44542c4b584312faadede8c3556dfe11f7017e79e",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/licenses/wg-scrypt-Apache-2.0.txt",
+        "expected": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "actual": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/licenses/wg-scrypt-provenance.json",
+        "expected": "a5f7cef3ca08957aea60417f6c3eabef96bd924f5dda9ecc16f57e5948ab3af0",
+        "actual": "a5f7cef3ca08957aea60417f6c3eabef96bd924f5dda9ecc16f57e5948ab3af0",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/room-client/logo.svg",
+        "expected": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512",
+        "actual": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/room-client/media-source.js",
+        "expected": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c",
+        "actual": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/room-client/room-players.js",
+        "expected": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9",
+        "actual": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/room-client/room-sync.js",
+        "expected": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab",
+        "actual": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/room-client/room-transport.js",
+        "expected": "bb4d1ac5cc88ae77c9eca78637922942d8a4df8dd42bcd25cfda0fdc72da9b46",
+        "actual": "bb4d1ac5cc88ae77c9eca78637922942d8a4df8dd42bcd25cfda0fdc72da9b46",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/room-client/room.css",
+        "expected": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340",
+        "actual": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/room-client/room.html",
+        "expected": "aa2e1421e267107360ba890321d5455f2eaf9f1f567d542e366d8dd1c88a8ff4",
+        "actual": "aa2e1421e267107360ba890321d5455f2eaf9f1f567d542e366d8dd1c88a8ff4",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/room-client/room.js",
+        "expected": "a1825c77e73d61e83633fb54a8556928f0225b866fc3acb82ac3cef37b505937",
+        "actual": "a1825c77e73d61e83633fb54a8556928f0225b866fc3acb82ac3cef37b505937",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/room-client/site.js",
+        "expected": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616",
+        "actual": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/room-client/social.css",
+        "expected": "d16d9131ad980d13e441a7ae866d2b08e7c4b58e0a387ec892a1de1aa80ffa86",
+        "actual": "d16d9131ad980d13e441a7ae866d2b08e7c4b58e0a387ec892a1de1aa80ffa86",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/room-client/social.html",
+        "expected": "d905f78fe734677728c9e3d3b9e426f8d7fd984c4fdc66a7ea5318834aefd3fe",
+        "actual": "d905f78fe734677728c9e3d3b9e426f8d7fd984c4fdc66a7ea5318834aefd3fe",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/assets/room-client/social.js",
+        "expected": "c3e8b8c0c185afd7fa7f13c5692bfe8339c8e2aeeb139fb70485a1d0c50da601",
+        "actual": "c3e8b8c0c185afd7fa7f13c5692bfe8339c8e2aeeb139fb70485a1d0c50da601",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lambdaworks/crypto/PBKDF.java",
+        "expected": "ed6a6325daa5674e658deff7d9e4371dddba56e51b5eca69c51d721aeccbe9de",
+        "actual": "ed6a6325daa5674e658deff7d9e4371dddba56e51b5eca69c51d721aeccbe9de",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lambdaworks/crypto/SCrypt.java",
+        "expected": "1901fb26a3ee3b1d3a3889a3172f8e3ff13a04588c969b564020d58e9530a140",
+        "actual": "1901fb26a3ee3b1d3a3889a3172f8e3ff13a04588c969b564020d58e9530a140",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/AccountApi.java",
+        "expected": "ea06f3d98796c795b9c8f97a46340223d1dc9742f0346b23dcc6427b2c6e13b0",
+        "actual": "ea06f3d98796c795b9c8f97a46340223d1dc9742f0346b23dcc6427b2c6e13b0",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/AccountCookieCommit.java",
+        "expected": "45f26c697201383da6a74c89e204fa2da4689ce5ae750fcac8b30d01903ea940",
+        "actual": "45f26c697201383da6a74c89e204fa2da4689ce5ae750fcac8b30d01903ea940",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/AccountLoginActivity.java",
+        "expected": "95ad11d8a0b9f55b7c4f75a8069c9d95e641329cec34f978fdb64ec8482f10d9",
+        "actual": "95ad11d8a0b9f55b7c4f75a8069c9d95e641329cec34f978fdb64ec8482f10d9",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/AccountLoginController.java",
+        "expected": "bed424100fa7bbdd00d7a1ede5f9b08d17b28e630c1cc4b3336f3424465c7730",
+        "actual": "bed424100fa7bbdd00d7a1ede5f9b08d17b28e630c1cc4b3336f3424465c7730",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/AccountPolicy.java",
+        "expected": "982494c43f535e8564f6c98ca35bb9ff84a89cff4838c0f726b7cbc27e6e434b",
+        "actual": "982494c43f535e8564f6c98ca35bb9ff84a89cff4838c0f726b7cbc27e6e434b",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/AndroidReleasePolicy.java",
+        "expected": "9ca6dbe7d613eabfb6073718c10935bf2ae448a54b6845dd8558c381508e9ffc",
+        "actual": "9ca6dbe7d613eabfb6073718c10935bf2ae448a54b6845dd8558c381508e9ffc",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/AudioEffectsPolicy.java",
+        "expected": "607a4d194334f121037d67a871e6d4d855c7094801846e901872bd4b99334d7b",
+        "actual": "607a4d194334f121037d67a871e6d4d855c7094801846e901872bd4b99334d7b",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/AudioPreparation.java",
+        "expected": "8f7055917a0656c891f90f79b10c90d59a44c90c1c62af39c8410a976e17cbba",
+        "actual": "8f7055917a0656c891f90f79b10c90d59a44c90c1c62af39c8410a976e17cbba",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/CloudProfileApi.java",
+        "expected": "11dc998951b6b69bcea481614c736e94391de9e59630a1e622ecd5a7959a2b77",
+        "actual": "11dc998951b6b69bcea481614c736e94391de9e59630a1e622ecd5a7959a2b77",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/CloudProfileDialog.java",
+        "expected": "94358850bf6baa6d9558641cbd5b6ef4a19360c4b71b039b7a91a29fb35f6540",
+        "actual": "94358850bf6baa6d9558641cbd5b6ef4a19360c4b71b039b7a91a29fb35f6540",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/LibraryStore.java",
+        "expected": "a9fcef4211ceac22713cfd16bb3d89a2d9d4269c9106b50bd4bb8e22c6decb1d",
+        "actual": "a9fcef4211ceac22713cfd16bb3d89a2d9d4269c9106b50bd4bb8e22c6decb1d",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/LinkPolicy.java",
+        "expected": "6cf99d78c69b51a6197c9e363f0e0f8d859428ffeb55fafbaf55acd2340418f1",
+        "actual": "6cf99d78c69b51a6197c9e363f0e0f8d859428ffeb55fafbaf55acd2340418f1",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/LolzCloudApplication.java",
+        "expected": "7afef9c56b71f1f6b97269adb90f58cdacf9285211be5d1c86aa86fc7aea6ef6",
+        "actual": "7afef9c56b71f1f6b97269adb90f58cdacf9285211be5d1c86aa86fc7aea6ef6",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/LrcParser.java",
+        "expected": "e7b8e97f1d4e4e4d9d4f75be54c7a4e8e0f7158165752c1300bb136fc16da8a0",
+        "actual": "e7b8e97f1d4e4e4d9d4f75be54c7a4e8e0f7158165752c1300bb136fc16da8a0",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/LyricsMetadata.java",
+        "expected": "4bb2a88c07b6ef59bf46ae74676ed3cf7021cc5be15ba61e388bc51cd6e092cd",
+        "actual": "4bb2a88c07b6ef59bf46ae74676ed3cf7021cc5be15ba61e388bc51cd6e092cd",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/LyricsProvider.java",
+        "expected": "c9273e5aa43036862098dc26d8b9305c250097cb5d11a9ba28dfc0509f2eada9",
+        "actual": "c9273e5aa43036862098dc26d8b9305c250097cb5d11a9ba28dfc0509f2eada9",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/LyricsRepository.java",
+        "expected": "90717bc2e93b3428def642e778fe7774e27d7e8c8b69202368334610fc3698d5",
+        "actual": "90717bc2e93b3428def642e778fe7774e27d7e8c8b69202368334610fc3698d5",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/MainActivity.java",
+        "expected": "b60e95b064372b469f4630a5b2a27f215e4b7d28762162519e8d5d611cb16093",
+        "actual": "b60e95b064372b469f4630a5b2a27f215e4b7d28762162519e8d5d611cb16093",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/OfflineFiles.java",
+        "expected": "4da59b0dbb48787fd6c434c468b2efa3b735cc47d339eda00e49e43d20a4b809",
+        "actual": "4da59b0dbb48787fd6c434c468b2efa3b735cc47d339eda00e49e43d20a4b809",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/OnlineActivity.java",
+        "expected": "0806613e07b35c0edf41526d61b047152aad662e00d886b58a9b7c284dee91ee",
+        "actual": "0806613e07b35c0edf41526d61b047152aad662e00d886b58a9b7c284dee91ee",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/OnlineCatalog.java",
+        "expected": "7561b439fcf1b3dbe8177a477ad9cb46cd73c6b729029c9cd6bcd8a2fe6eaba7",
+        "actual": "7561b439fcf1b3dbe8177a477ad9cb46cd73c6b729029c9cd6bcd8a2fe6eaba7",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/PcmDsp.java",
+        "expected": "6f7b2fd1e252d15c4839cf60648b14e280300ed0136c0bc241a4a51e62a07df9",
+        "actual": "6f7b2fd1e252d15c4839cf60648b14e280300ed0136c0bc241a4a51e62a07df9",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/PcmPlayback.java",
+        "expected": "f23c37b1fce0138c082a30abe096d12b4b9fc9252b757713fd74773e705f2b29",
+        "actual": "f23c37b1fce0138c082a30abe096d12b4b9fc9252b757713fd74773e705f2b29",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/PitchPolicy.java",
+        "expected": "60c4a696edec19eb760967da2869d2cddcefed4ec9250f76d557e8b490a92ce1",
+        "actual": "60c4a696edec19eb760967da2869d2cddcefed4ec9250f76d557e8b490a92ce1",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/PlaybackService.java",
+        "expected": "8b34a13e7d49f6e8286e914c2683279cc3a639c504b95f220239a547837744c8",
+        "actual": "8b34a13e7d49f6e8286e914c2683279cc3a639c504b95f220239a547837744c8",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/PortableAudioCurve.java",
+        "expected": "3b2859684bbefa12a5fe212e141c48291332207fcf7387ea79eef3ac7a613a4a",
+        "actual": "3b2859684bbefa12a5fe212e141c48291332207fcf7387ea79eef3ac7a613a4a",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/PortableProfile.java",
+        "expected": "7aaa8b1a1b5eaa7e499392ca8c0b397c86b1780aa7cb417406f78aff7986d077",
+        "actual": "7aaa8b1a1b5eaa7e499392ca8c0b397c86b1780aa7cb417406f78aff7986d077",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/ProfileCrypto.java",
+        "expected": "410d6a3f52be8a3c6c87c0953b972cff25f0db28c1975665326c2096860d95d9",
+        "actual": "410d6a3f52be8a3c6c87c0953b972cff25f0db28c1975665326c2096860d95d9",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/ProfileJson.java",
+        "expected": "0d50e134fc09128f53a34664089422a8f37515b7244310f91d083ef29ce76b53",
+        "actual": "0d50e134fc09128f53a34664089422a8f37515b7244310f91d083ef29ce76b53",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/RoomAssets.java",
+        "expected": "de0065ebcf5a272ef425ef78994733087edeb91ff12d2e0db03ac6a191530d90",
+        "actual": "de0065ebcf5a272ef425ef78994733087edeb91ff12d2e0db03ac6a191530d90",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/RoomTransportBridge.java",
+        "expected": "d230a48f26d8d8f4473c6c1af592e76905edc27ccdc1f5493459abd045f094bc",
+        "actual": "d230a48f26d8d8f4473c6c1af592e76905edc27ccdc1f5493459abd045f094bc",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/RoomTransportPolicy.java",
+        "expected": "88d844b54a27d3f35893696366a08d5534ad9a509b9b3eac7819b8e7730de863",
+        "actual": "88d844b54a27d3f35893696366a08d5534ad9a509b9b3eac7819b8e7730de863",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/SleepTimerPolicy.java",
+        "expected": "d485f965fca458abc9955750b6b41d87ceadc6804a1618d75913e12adb58573e",
+        "actual": "d485f965fca458abc9955750b6b41d87ceadc6804a1618d75913e12adb58573e",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/SocialApi.java",
+        "expected": "00dba9890de404b5bb1180fdfca2ce718caba3e545c02241cddd962faac65624",
+        "actual": "00dba9890de404b5bb1180fdfca2ce718caba3e545c02241cddd962faac65624",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/SocialNotificationJobService.java",
+        "expected": "22ae1d6f87ac411bd443476807c64e9a57a81032a262c8c3448b0462d46111d7",
+        "actual": "22ae1d6f87ac411bd443476807c64e9a57a81032a262c8c3448b0462d46111d7",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/SocialNotifications.java",
+        "expected": "f8f54b7f40496afacf7d0345d3889742c6e026d0c8543e6a17ccaea079ef2cab",
+        "actual": "f8f54b7f40496afacf7d0345d3889742c6e026d0c8543e6a17ccaea079ef2cab",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/SocialPolicy.java",
+        "expected": "fa3c6f26248890d6a540243b0775e4d4658a56324edb36c05c1175b646680aa4",
+        "actual": "fa3c6f26248890d6a540243b0775e4d4658a56324edb36c05c1175b646680aa4",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/SourceBrowser.java",
+        "expected": "bd4f1148deb9e1be5b1c1d810b01c416962485877967389d159e4404d54052d2",
+        "actual": "bd4f1148deb9e1be5b1c1d810b01c416962485877967389d159e4404d54052d2",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/StreamDownloads.java",
+        "expected": "8d266a1ef9be3efe50fc5a8b4b3d4e5468433a4021aaccf712e52faa930bde10",
+        "actual": "8d266a1ef9be3efe50fc5a8b4b3d4e5468433a4021aaccf712e52faa930bde10",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/Track.java",
+        "expected": "b4d0fc9b0140d9e6ad8b6559b5a096b0ea727645167d6355242307de0f0f4211",
+        "actual": "b4d0fc9b0140d9e6ad8b6559b5a096b0ea727645167d6355242307de0f0f4211",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/UpdateFileProvider.java",
+        "expected": "9c07dc521c527437ca091fe12fb0a2823596f76005bb7e7c18c6944a4e3866e4",
+        "actual": "9c07dc521c527437ca091fe12fb0a2823596f76005bb7e7c18c6944a4e3866e4",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/UpdateManager.java",
+        "expected": "22485ec5c2cb84729d62a4d4a036f812512eb426ad98194ad21ef09914a117f1",
+        "actual": "22485ec5c2cb84729d62a4d4a036f812512eb426ad98194ad21ef09914a117f1",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/WaveApi.java",
+        "expected": "278fa0f42113a1ea85c55b3c32426475e164014309a41ead5f7c52b78a10ab73",
+        "actual": "278fa0f42113a1ea85c55b3c32426475e164014309a41ead5f7c52b78a10ab73",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/WavePolicy.java",
+        "expected": "83c0c084105f174c98774449bc8842c78ac8b5b3882e804819f63c6fbf4f2e20",
+        "actual": "83c0c084105f174c98774449bc8842c78ac8b5b3882e804819f63c6fbf4f2e20",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/java/com/lolzcloud/mobile/WaveSession.java",
+        "expected": "dc7e1910c08ab675fcdf0c03c13c3f2466f67557a78a8f03990705a51f115789",
+        "actual": "dc7e1910c08ab675fcdf0c03c13c3f2466f67557a78a8f03990705a51f115789",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/res/drawable-nodpi/forest_art.png",
+        "expected": "02745fc1ec103b1435ed2e9c3d705f9f12b5bceaf80f87ef0545d09ac92ef22e",
+        "actual": "02745fc1ec103b1435ed2e9c3d705f9f12b5bceaf80f87ef0545d09ac92ef22e",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/res/drawable/ic_launcher.xml",
+        "expected": "b61186b90f01aea389689f5e992ae214efbf3215e2e7fe81a12898fb1ac1ddf0",
+        "actual": "b61186b90f01aea389689f5e992ae214efbf3215e2e7fe81a12898fb1ac1ddf0",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/res/values/ids.xml",
+        "expected": "369fc50e19a2318cef45fe824373f0e8ed6ab5a277f8bd29cabbabed4ac8ed8c",
+        "actual": "369fc50e19a2318cef45fe824373f0e8ed6ab5a277f8bd29cabbabed4ac8ed8c",
+        "matches": true
+      },
+      {
+        "path": "android/app/src/main/res/values/styles.xml",
+        "expected": "cc01c68fe7333c0fbc5ba9ad16b8a510b08ae35cf672cbe9852f0577b70ab20b",
+        "actual": "cc01c68fe7333c0fbc5ba9ad16b8a510b08ae35cf672cbe9852f0577b70ab20b",
+        "matches": true
+      },
+      {
+        "path": "android/version.json",
+        "expected": "d72c82753609249f00c2dd1f82815f2db332d4d51cf79945a0ea9a8994e83201",
+        "actual": "d72c82753609249f00c2dd1f82815f2db332d4d51cf79945a0ea9a8994e83201",
+        "matches": true
+      }
+    ]
+  },
+  "websiteChanged": {
+    "label": "Frozen five website/source update files",
+    "files": 5,
+    "exact": 5,
+    "results": [
+      {
+        "path": "website/index.html",
+        "expected": "739540bf167a8517888886aad0b3912d49848e425f498d8c7b44bec7e1ce28ac",
+        "actual": "739540bf167a8517888886aad0b3912d49848e425f498d8c7b44bec7e1ce28ac",
+        "matches": true
+      },
+      {
+        "path": "website/install.html",
+        "expected": "3bcd4cf43fa33237491969df9e39eaebc48fd5a0477b9c1f3b2c9857cc4d65a4",
+        "actual": "3bcd4cf43fa33237491969df9e39eaebc48fd5a0477b9c1f3b2c9857cc4d65a4",
+        "matches": true
+      },
+      {
+        "path": "website/site-config.js",
+        "expected": "103bac87f2d7195b62f42894aab0f974810dfba743b87709547e6adede579667",
+        "actual": "103bac87f2d7195b62f42894aab0f974810dfba743b87709547e6adede579667",
+        "matches": true
+      },
+      {
+        "path": "tools/deploy-website.cjs",
+        "expected": "6c0d5025b5ae3d3c0db8a5516c60725f57aa43674fc479129c972de8f1538fe6",
+        "actual": "6c0d5025b5ae3d3c0db8a5516c60725f57aa43674fc479129c972de8f1538fe6",
+        "matches": true
+      },
+      {
+        "path": "tests/website-ui.cjs",
+        "expected": "f1b4a5652840df6864069ddf024e126726f686895a3fd93e1dc59e1e41d510da",
+        "actual": "f1b4a5652840df6864069ddf024e126726f686895a3fd93e1dc59e1e41d510da",
+        "matches": true
+      }
+    ]
+  },
+  "website13": {
+    "label": "Staged full website13 exact raw source",
+    "files": 13,
+    "exact": 13,
+    "results": [
+      {
+        "path": "website/index.html",
+        "expected": "739540bf167a8517888886aad0b3912d49848e425f498d8c7b44bec7e1ce28ac",
+        "actual": "739540bf167a8517888886aad0b3912d49848e425f498d8c7b44bec7e1ce28ac",
+        "matches": true
+      },
+      {
+        "path": "website/app.js",
+        "expected": "b3eeea84c681bd8825f53e1f2cedc1c384ccf376c879bf9c87889961d323b590",
+        "actual": "b3eeea84c681bd8825f53e1f2cedc1c384ccf376c879bf9c87889961d323b590",
+        "matches": true
+      },
+      {
+        "path": "website/site-config.js",
+        "expected": "103bac87f2d7195b62f42894aab0f974810dfba743b87709547e6adede579667",
+        "actual": "103bac87f2d7195b62f42894aab0f974810dfba743b87709547e6adede579667",
+        "matches": true
+      },
+      {
+        "path": "website/style.css",
+        "expected": "ee775bd4799ee126ab356a7e1af80da7a5cc12e4843c58591c10463d4ac298a6",
+        "actual": "ee775bd4799ee126ab356a7e1af80da7a5cc12e4843c58591c10463d4ac298a6",
+        "matches": true
+      },
+      {
+        "path": "website/downloads.css",
+        "expected": "c06f7b6b1d24f494702b7e917bacd2e343cc8570ae716c40143cebf53a3a9b5c",
+        "actual": "c06f7b6b1d24f494702b7e917bacd2e343cc8570ae716c40143cebf53a3a9b5c",
+        "matches": true
+      },
+      {
+        "path": "website/install.html",
+        "expected": "3bcd4cf43fa33237491969df9e39eaebc48fd5a0477b9c1f3b2c9857cc4d65a4",
+        "actual": "3bcd4cf43fa33237491969df9e39eaebc48fd5a0477b9c1f3b2c9857cc4d65a4",
+        "matches": true
+      },
+      {
+        "path": "website/install.js",
+        "expected": "cb749cac3621f6076f2181f3f218e315cd6e5f49e96234c47d709cde18219c43",
+        "actual": "cb749cac3621f6076f2181f3f218e315cd6e5f49e96234c47d709cde18219c43",
+        "matches": true
+      },
+      {
+        "path": "website/assets/logo.svg",
+        "expected": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512",
+        "actual": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512",
+        "matches": true
+      },
+      {
+        "path": "website/assets/lyrics.png",
+        "expected": "68d7bd25cef2e91230fb61b613e86e43cd8db86575885db039102809e77e0024",
+        "actual": "68d7bd25cef2e91230fb61b613e86e43cd8db86575885db039102809e77e0024",
+        "matches": true
+      },
+      {
+        "path": "website/assets/mini.png",
+        "expected": "f077fddaae2e91bd45fb1d1eabff964ecdd4a67e137a1c391beaab309a7db1f7",
+        "actual": "f077fddaae2e91bd45fb1d1eabff964ecdd4a67e137a1c391beaab309a7db1f7",
+        "matches": true
+      },
+      {
+        "path": "website/assets/record.svg",
+        "expected": "ba31b0fa22b3f202223aec6400f9b2b665fa5cda321a1ca0afa4756cee1a535b",
+        "actual": "ba31b0fa22b3f202223aec6400f9b2b665fa5cda321a1ca0afa4756cee1a535b",
+        "matches": true
+      },
+      {
+        "path": "website/assets/sound.png",
+        "expected": "149ae16294bc08be918479ee655b763eaa2fff6057b5a119dfb8afa4d12bcf0d",
+        "actual": "149ae16294bc08be918479ee655b763eaa2fff6057b5a119dfb8afa4d12bcf0d",
+        "matches": true
+      },
+      {
+        "path": "website/assets/wave.png",
+        "expected": "079fcb00a64ec53828b3f13308d79702d02ed7c4d6346694787e2dbd1b5e55cd",
+        "actual": "079fcb00a64ec53828b3f13308d79702d02ed7c4d6346694787e2dbd1b5e55cd",
+        "matches": true
+      }
+    ]
+  }
+}

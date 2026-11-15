@@ -1,0 +1,296 @@
+{
+  "status": "passed",
+  "version": "0.1.11",
+  "versionCode": 12,
+  "createdAt": "2026-11-15T17:12:39.219Z",
+  "artifact": {
+    "status": "private-candidate",
+    "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+    "bytes": 2643565,
+    "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+    "sourceDigest": "c8652cae0af6550cfa5f1d652537040abd98a8545a4a39f7de403408d62e85ca",
+    "dexMatchesPackaged": true,
+    "canonicalRawZipNames": true,
+    "dex": {
+      "size": 573232,
+      "sha256": "10c6c7d8e7ac06aae578e05d671c517f3d008b3932c7755c74cbb7c59264a011"
+    },
+    "path": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\LolzCloud-Android-0.1.11.apk"
+  },
+  "runtimeSuites": [
+    {
+      "name": "pending-seek",
+      "status": "passed",
+      "checks": 23,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/pending-seek.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\pending-seek\\android-catalog-verification.json",
+      "phase": "pending-seek",
+      "scope": null,
+      "preferencesRestored": null
+    },
+    {
+      "name": "lyrics",
+      "status": "passed",
+      "checks": 51,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/lyrics.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\lyrics\\android-lyrics-verification.json",
+      "phase": "lyrics",
+      "scope": "Declared bounded LRCLIB transport fixtures; real native UI, source LRC line highlighting/seeking, MediaPlayer, private cache/import priority/cancel. No substituted media SDK, real-user account or room navigation.",
+      "preferencesRestored": null
+    },
+    {
+      "name": "offline-removal",
+      "status": "passed",
+      "checks": 24,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/offline-removal.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\offline-removal\\android-catalog-verification.json",
+      "phase": "offline-removal",
+      "scope": null,
+      "preferencesRestored": null
+    },
+    {
+      "name": "room-transport",
+      "status": "passed",
+      "checks": 44,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/room-transport.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\room-transport\\android-room-transport-verification.json",
+      "phase": "room-transport",
+      "scope": "Actual production Android room bridge/MediaSession/notification service, MediaPlayer and PCM renderer handoff, shared bundled room-transport.js, real cross-origin HTMLAudio clocks and MotionEvent Join. Declared room/provider fixtures; no personal OAuth, public room membership, SoundCloud/YouTube SDK or physical speaker fidelity claim.",
+      "preferencesRestored": null
+    },
+    {
+      "name": "catalog",
+      "status": "passed",
+      "checks": 56,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/catalog.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\catalog\\android-catalog-verification.json",
+      "phase": "catalog",
+      "scope": null,
+      "preferencesRestored": null
+    },
+    {
+      "name": "portable",
+      "status": "passed",
+      "checks": 36,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/portable.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\portable-retry1\\android-portable-profile-verification.json",
+      "phase": "portable",
+      "scope": "Actual Java JSON/SharedPreferences/SAF DocumentsUI and native MediaPlayer; synthetic desktop data is explicitly separate from real public SoundCloud Gno playback. No personal account/cloud, physical device or acoustic EQ response claim.",
+      "preferencesRestored": true
+    },
+    {
+      "name": "cloud",
+      "status": "passed",
+      "checks": 24,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/cloud.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\cloud\\android-cloud-profile-verification.json",
+      "phase": "cloud",
+      "scope": "Actual Android scrypt/AES-GCM providers and native dialog widgets, encrypted revision requests, strict owner/cookie/ABA/409/cancel guards. Explicit fixture account only. Personal OAuth, live authenticated server roundtrip and physical devices are not tested.",
+      "preferencesRestored": true
+    },
+    {
+      "name": "wave",
+      "status": "passed",
+      "checks": 33,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/wave.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\wave\\android-wave-verification.json",
+      "phase": "full",
+      "scope": "Real public /music/wave + known liked MP3 through MediaCodec/DSP/AudioTrack; genuine native start/pause touch. Cancellation/refill/end tests then use an explicitly controlled provider and generated private WAV fixtures with test metadata. Actual service, SharedPreferences, natural audio completions, background and Activity recreation. No personal account, protected-source, physical acoustic or arbitrary provider-success claim.",
+      "preferencesRestored": true
+    },
+    {
+      "name": "bookmark",
+      "status": "passed",
+      "checks": 4,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/bookmark.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\bookmark\\android-wave-verification.json",
+      "phase": "bookmark",
+      "scope": "Declared provider fixture -> actual PCM -> genuine native PopupMenu -> moment list and portable JSON. No live Wave API or personal account in this focused phase.",
+      "preferencesRestored": true
+    },
+    {
+      "name": "pitch",
+      "status": "passed",
+      "checks": 44,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/pitch.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\pitch\\android-pitch-verification.json",
+      "phase": "pitch",
+      "scope": "Isolated Android emulator; actual production portable/settings transactions and service/MediaPlayer/PCM lifecycles. Separate test APK UID obtains real system MediaProjection consent and captures only production MEDIA output after AudioTrack/PlaybackParams. Generated1000Hz WAV, FFT32768, no microphone, physical DAC, personal OAuth or public cloud PUT.",
+      "preferencesRestored": true
+    },
+    {
+      "name": "pcm",
+      "status": "passed",
+      "checks": 30,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/pcm.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\pcm\\android-pcm-effects-verification.json",
+      "phase": "pcm",
+      "scope": "Actual system decoder/raw PCM -> production DSP -> positive AudioTrack.write return samples and playback head. Real separate test-APK UID transient audio-focus request, background, queue/race, imported settings, sleep fixture deadline, public catalog MP3/offline. Isolated emulator; no personal account, physical acoustic output or room/YouTube effects claim.",
+      "preferencesRestored": true
+    },
+    {
+      "name": "room",
+      "status": "passed",
+      "checks": 13,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/room.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\room\\android-room-media-verification.json",
+      "phase": "room",
+      "scope": "Real Android WebView media pipeline using declared intercepted HTTPS main/child/audio fixtures, genuine generated PCM WAV, actual MotionEvent touches and audio clock. Not a real SoundCloud/YouTube provider, personal login, room membership or system audio fidelity test. Login is native-intercepted and is not opened by this test.",
+      "preferencesRestored": null
+    },
+    {
+      "name": "audio-audit",
+      "status": "passed",
+      "checks": 20,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/audio-audit.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\audio-audit\\android-catalog-verification.json",
+      "phase": "audio-audit",
+      "scope": null,
+      "preferencesRestored": null
+    },
+    {
+      "name": "comfort",
+      "status": "passed",
+      "checks": 25,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/comfort.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\comfort\\android-audio-comfort-verification.json",
+      "phase": "comfort",
+      "scope": "Actual native MediaPlayer/AudioEffect readback/SharedPreferences/MainActivity and genuine Service recreation using generated 30s silent WAV files. Pure host driver tests cover fixed/rounded/failed hardware variants separately. No physical acoustic response, WebView-room timer, process-kill test or personal account is claimed.",
+      "preferencesRestored": true
+    },
+    {
+      "name": "social",
+      "status": "passed",
+      "checks": 50,
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "report": "runtime/social.json",
+      "rawReport": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\social\\android-social-core-verification.json",
+      "phase": "social",
+      "scope": "Real private offline storage/MediaPlayer and real Android NotificationManager; social events are isolated fixtures, not a personal-account login.",
+      "preferencesRestored": null
+    }
+  ],
+  "hostPolicy": {
+    "status": "passed",
+    "checks": 191,
+    "report": "host-policy.json"
+  },
+  "bundledAssets": {
+    "status": "passed",
+    "checks": 12,
+    "report": "room-assets.json"
+  },
+  "cleanup": {
+    "status": "passed",
+    "report": "device-receipt.json"
+  },
+  "failedAttempts": [
+    {
+      "candidate": "r1",
+      "report": "attempt-history/r1/lyrics/android-lyrics-verification.json",
+      "apkSha256": "f378ae3ccacd85d7374ce5201e505f25b2c2ff6a25c97119ebab185f3eed245d",
+      "error": "java.lang.AssertionError: Track switching while the dialog is open edits only its captured recording"
+    },
+    {
+      "candidate": "r1",
+      "report": "attempt-history/r1/offline-removal/android-catalog-verification.json",
+      "apkSha256": "f378ae3ccacd85d7374ce5201e505f25b2c2ff6a25c97119ebab185f3eed245d",
+      "error": "java.io.IOException: Загрузка уже изменилась. Открой меню заново"
+    },
+    {
+      "candidate": "r1",
+      "report": "attempt-history/r1/offline-removal-diagnostics/android-catalog-verification.json",
+      "apkSha256": "f378ae3ccacd85d7374ce5201e505f25b2c2ff6a25c97119ebab185f3eed245d",
+      "error": "java.lang.AssertionError: Native owned-file guard: files=/data/user/0/com.lolzcloud.mobile/files canonical=/data/data/com.lolzcloud.mobile/files raw=/data/user/0/com.lolzcloud.mobile/files/offline/dc999714-71c8-41a5-8d4b-6f75b50ab02a.audio canonicalFile=/data/data/com.lolzcloud.mobile/files/offline/dc999714-71c8-41a5-8d4b-6f75b50ab02a.audio uri=file:///data/user/0/com.lolzcloud.mobile/files/offline/dc999714-71c8-41a5-8d4b-6f75b50ab02a.audio authority=null"
+    },
+    {
+      "candidate": "r1",
+      "report": "attempt-history/r1/room-transport/android-room-transport-verification.json",
+      "apkSha256": "f378ae3ccacd85d7374ce5201e505f25b2c2ff6a25c97119ebab185f3eed245d",
+      "error": "java.lang.AssertionError: Host system seek reaches the real room audio clock in source seconds"
+    },
+    {
+      "candidate": "r2",
+      "report": "attempt-history/r2/offline-removal/android-catalog-verification.json",
+      "apkSha256": "f08023f382de33dcb6e4b24929b4948cd8d731cfffcdf2e87a26a593a6495df5",
+      "error": "java.lang.AssertionError: Numeric and permalink aliases retain both exact queue occurrences as nonplayable references"
+    },
+    {
+      "candidate": "r2",
+      "report": "attempt-history/r2/room-transport/android-room-transport-verification.json",
+      "apkSha256": "f08023f382de33dcb6e4b24929b4948cd8d731cfffcdf2e87a26a593a6495df5",
+      "error": "java.lang.AssertionError: A closed room's system commands cannot silently resume the prior solo queue"
+    },
+    {
+      "candidate": "r3",
+      "report": "attempt-history/r3/audio-audit/android-catalog-verification.json",
+      "apkSha256": "b872acf7d65368e0cc3a8478ee4fd877eca8b24650c1639e17704917e39f5db2",
+      "error": "java.lang.AssertionError: Late decoder callbacks preserve the final selected track and seek"
+    },
+    {
+      "candidate": "r3",
+      "report": "attempt-history/r3/audio-audit-diagnostics/android-catalog-verification.json",
+      "apkSha256": "b872acf7d65368e0cc3a8478ee4fd877eca8b24650c1639e17704917e39f5db2",
+      "error": "java.lang.AssertionError: Late decoder callbacks preserve the final selected track and seek; index=2 position=76 pending=76 elapsed=278 speed=1.2"
+    },
+    {
+      "candidate": "r3",
+      "report": "attempt-history/r3/catalog/android-catalog-verification.json",
+      "apkSha256": "b872acf7d65368e0cc3a8478ee4fd877eca8b24650c1639e17704917e39f5db2",
+      "error": "java.io.IOException: Нет связи с каталогом. Проверь интернет и повтори поиск"
+    },
+    {
+      "candidate": "r3",
+      "report": "attempt-history/r3/cohort-final.json",
+      "apkSha256": "b872acf7d65368e0cc3a8478ee4fd877eca8b24650c1639e17704917e39f5db2",
+      "error": "Error: audio-audit failed"
+    },
+    {
+      "candidate": "r3",
+      "report": "attempt-history/r3/cohort.json",
+      "apkSha256": "b872acf7d65368e0cc3a8478ee4fd877eca8b24650c1639e17704917e39f5db2",
+      "error": "Error: catalog failed"
+    },
+    {
+      "candidate": "r3",
+      "report": "attempt-history/r3/pending-seek-repro/android-catalog-verification.json",
+      "apkSha256": "b872acf7d65368e0cc3a8478ee4fd877eca8b24650c1639e17704917e39f5db2",
+      "error": "java.lang.AssertionError: A seek issued before preparation survives on the final source: processing=true position=27"
+    },
+    {
+      "candidate": "r4",
+      "report": "attempt-history/r4/cohort.json",
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "error": "Error: portable failed"
+    },
+    {
+      "candidate": "r4",
+      "report": "attempt-history/r4/portable/android-portable-profile-verification.json",
+      "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+      "error": "java.lang.AssertionError: Profile document absent: LolzCloud profile QA|Files from LolzCloud profile QA / Declared portable JSON fixtures|Grid view|Show roots|LolzCloud profile QA|More options|Desktop profile.json|2:01 AM, 4.00 kB, JSON document|Preview the file Desktop profile.json|export-221ce43b-a4bf-4c86-9e46-de46d3ab556d.json|3:55 AM, 2.70 kB, JSON document|Preview the file export-221ce43b-a4bf-4c86-9e46-de46d3ab556d.json|export-41f9d50c-695a-461d-bc71-929d9e5f7069.json|2:14 AM, 2.70 kB, JSON document|Preview the file export-41f9d50c-695a-461d-bc71-929d9e5f7069.json|export-61e2c6af-4853-4274-9ccf-b0464c5030d2.json|2:09 AM, 2.70 kB, JSON document|Preview the file export-61e2c6af-4853-4274-9ccf-b0464c5030d2.json|export-68bb30f6-62e8-407a-8334-6d3947c2cefb.json|7:45 PM, 2.77 kB, JSON document|Preview the file export-68bb30f6-62e8-407a-8334-6d3947c2cefb.json|export-7ad3c3cf-b915-4bb0-93f0-2f91ec12b5d2.json|4:11 AM, 2.70 kB, JSON document|Preview the file export-7ad3c3cf-b915-4bb0-93f0-2f91ec12b5d2.json|export-7c04c721-e01a-4318-a5b3-f32842cdb1ce.json|8:01 PM, 2.77 kB, JSON document|Preview the file export-7c04c721-e01a-4318-a5b3-f32842cdb1ce.json|export-8bacd59d-849d-40d0-b8d8-f2afc10297a9.json|2:01 AM, 2.70 kB, JSON document|Preview the file export-8bacd59d-849d-40d0-b8d8-f2afc10297a9.json|export-96e00953-3f1f-4c3c-b22d-041c43a6d95e.json|5:10 AM, 2.70 kB, JSON document|Preview the file export-96e00953-3f1f-4c3c-b22d-041c43a6d95e.json|export-a8b11fe5-e7a1-4d85-a526-700228d86790.json|1:24 PM, 2.70 kB, JSON document|Preview the file export-a8b11fe5-e7a1-4d85-a526-700228d86790.json|export-cea8a311-6134-4c3d-a95e-53b02cfad2a0.json|4:09 AM, 2.70 kB, JSON document|Preview the file export-cea8a311-6134-4c3d-a95e-53b02cfad2a0.json|export-ed5be104-3986-48bc-9bf3-10c6c4e4e026.json|4:21 PM, 2.77 kB, JSON document|Preview the file export-ed5be104-3986-48bc-9bf3-10c6c4e4e026.json|"
+    }
+  ],
+  "scope": [
+    "Owned API35 Android emulator only; no physical phone, DAC/headphones or vendor Doze claim.",
+    "Room tests use actual MediaController and real cross-origin decoded HTMLAudio plus the bundled production room transport module; the room/provider document is a declared fixture, not live SoundCloud/YouTube SDK or personal OAuth.",
+    "Cloud API transport is an isolated fixture; actual Android crypto/dialogs are exercised without a personal-account server PUT.",
+    "Pitch proof uses actual AudioPlaybackCapture after AudioTrack; digital output is measured, not physical loudspeaker output.",
+    "Audio-audit focus callbacks are intentionally injected and identified separately from real OS-focus PCM checks.",
+    "Counts are overlapping suite assertions, not independent user scenarios.",
+    "This local staging proof does not assert publication."
+  ]
+}
