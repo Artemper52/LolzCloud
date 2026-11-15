@@ -1,0 +1,114 @@
+{
+  "status": "passed",
+  "scope": "Exact staged current engine and utility; actual anonymous LRCLIB HTTPS, original/current durations independently corroborated with public SoundCloud metadata; no audio download, no personal account, no lyric text exported",
+  "cases": [
+    {
+      "id": "2006992171",
+      "duration": 93,
+      "elapsedMs": 93,
+      "queries": 1,
+      "found": true,
+      "adapted": true,
+      "tempo": {
+        "rate": 1.1935483870967742,
+        "referenceDuration": 111,
+        "sourceDuration": 93,
+        "method": "duration",
+        "estimated": true,
+        "referenceEvidence": "catalog-consensus"
+      },
+      "recordId": 38487699,
+      "lineCount": 29,
+      "firstTime": 0.176,
+      "lastTime": 83.382,
+      "timingSha256": "9dd72f82933c80564cc5dbe7ccb7ebd07a2afe0f0f4cfb63e1a8adc5656e00c1"
+    },
+    {
+      "id": "2097182523",
+      "duration": 86,
+      "elapsedMs": 2,
+      "queries": 0,
+      "found": true,
+      "adapted": true,
+      "tempo": {
+        "rate": 1.2906976744186047,
+        "referenceDuration": 111,
+        "sourceDuration": 86,
+        "method": "duration",
+        "estimated": true,
+        "referenceEvidence": "catalog-consensus"
+      },
+      "recordId": 38487699,
+      "lineCount": 29,
+      "firstTime": 0.163,
+      "lastTime": 77.106,
+      "timingSha256": "9119a84b3cdeb1944363d4920908b7d2214363c5ef8c65682b1466383e51afa9"
+    },
+    {
+      "id": "2215259861",
+      "duration": 139,
+      "elapsedMs": 2,
+      "queries": 0,
+      "found": true,
+      "adapted": true,
+      "tempo": {
+        "rate": 0.7985611510791367,
+        "referenceDuration": 111,
+        "sourceDuration": 139,
+        "method": "duration",
+        "estimated": true,
+        "referenceEvidence": "catalog-consensus"
+      },
+      "recordId": 38487699,
+      "lineCount": 29,
+      "firstTime": 0.263,
+      "lastTime": 124.624,
+      "timingSha256": "088bab151715e752a645dd2cdfa2bc6bd18cd0776198687d63ccccd487c1f781"
+    }
+  ],
+  "totalQueries": 1,
+  "warm": {
+    "elapsedMs": 1,
+    "queries": 0
+  },
+  "sourceHash": "c95f7a46236f3a409f1d54f73d4cbbda40fe01b11f388534875baae7d5c50d74",
+  "stage": "/opt/lolzcloud-builds/lyrics-tempo-live-20261115132929-fe070e",
+  "archive": {
+    "size": 17077,
+    "sha256": "c95f7a46236f3a409f1d54f73d4cbbda40fe01b11f388534875baae7d5c50d74"
+  },
+  "sourceFiles": [
+    {
+      "file": "source/integrations/lyric-providers.cjs",
+      "sha256": "71429f294eb60582dff292002dba188a4a5c2104a175c1e613683003155838df"
+    },
+    {
+      "file": "source/integrations/lyric-identity.cjs",
+      "sha256": "8c4bc67bf405a2474a4d2df0e4126a8f92f93ddaec0e7fd0b66b5e492f08523c"
+    },
+    {
+      "file": "source/integrations/lyric-formats.cjs",
+      "sha256": "a0389f4abe5e1d84cf3afd01fed5291807bc1b58d414d76f9fb19c31c61bbd07"
+    },
+    {
+      "file": "source/integrations/lyric-match.cjs",
+      "sha256": "358e43f449c63cb7b067ac092439068bdff482c69336b948b0e5632f8bce01ed"
+    },
+    {
+      "file": "source/integrations/lyric-settings.cjs",
+      "sha256": "bf07e812b59c02d2adf23a706d91babbe86c015a5c343ef9a9b4d74489bc31e3"
+    },
+    {
+      "file": "source/integrations/secure-storage.cjs",
+      "sha256": "7c8ced4c07955d28d2c49dae17db2d28950fd8e03dc21fb11ef5e7071e25e098"
+    },
+    {
+      "file": "source/integrations/durable-json.cjs",
+      "sha256": "3ccb643e25e92ee5abb933448610b7af6c9cf6906a0d0383c5f02e4f25a82fd2"
+    },
+    {
+      "file": "source/app/lib/js/lyric-tempo.js",
+      "sha256": "fd820683ae0016c0d03db791386650d836b001d3a3872e7ea0d3c944e9205bb3"
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "status": "candidate-verified-not-published",
+  "version": "0.9.20",
+  "checkedAt": "2026-11-15T13:41:23.487Z",
+  "canonical": {
+    "files": 155,
+    "builds": [
+      {
+        "flavor": "modern",
+        "exact": 154,
+        "packagingEquivalent": 1,
+        "sha256": "6407be43ae9048bcb37545369c3fab7a5713111922ceb6d1bc7b60cfe06adee9"
+      },
+      {
+        "flavor": "legacy",
+        "exact": 154,
+        "packagingEquivalent": 1,
+        "sha256": "6407be43ae9048bcb37545369c3fab7a5713111922ceb6d1bc7b60cfe06adee9"
+      }
+    ],
+    "completePayload": {
+      "totalFiles": 3007,
+      "identical": 3007,
+      "payloadEquivalent": [],
+      "completeNameSetIdentical": true
+    }
+  },
+  "artifacts": [
+    {
+      "name": "LolzCloud-0.9.20-win-x64-Setup.exe",
+      "size": 146405865,
+      "sha256": "f4510fcc776143e31a7e8de75b94f4bb24b1950892b4891aebd0c7779a7a7018",
+      "sha512": "TfmSuuW3A8/jUbZdT7ZmR1slsH9ltFMSYBywF7/+ZfYy7ui6DGABizDlCs1t9a1Tt5vF5myelJWQxtJdT38mPA=="
+    },
+    {
+      "name": "LolzCloud-0.9.20-win-x64-Setup.exe.blockmap",
+      "size": 152544,
+      "sha256": "3b0b5701e96eeba980145020f81041f02534b5e8b5ca326d62db1e58d7b74139",
+      "sha512": "OUVdPBiV4dggE1aoHia827Y6NpIh2uFkOXz1SE4dFT0aCMBY6FBEY6Pgvf3x4J4ZuuS0sDOq9EOrtxyS4BZv8Q=="
+    },
+    {
+      "name": "LolzCloud-0.9.20-win-x64.zip",
+      "size": 196703136,
+      "sha256": "9e301f5bb5a2e12d6bfe73900aa2a5c13b84447f83fae4df7c4b840b28808c25",
+      "sha512": "Jvl4MsBODyk3gvo93fmODeLHXjZcv0w4vrU8qvSYn9h0zfc8mhrD7ErfX6y1gs3c6VfshXoTiKtZxzzQp2bu5A=="
+    },
+    {
+      "name": "LolzCloud-0.9.20-win7-legacy-Setup.exe",
+      "size": 99550972,
+      "sha256": "24ae08a6ece6dcbabc97d5cbafc95d8530f759a915675ca88777800550da16da",
+      "sha512": "jCa+EMMPlnIebSnfyC3OZjKipstBMwUSR8oCX0qVMceaCwhBLDN0hiAEILvhMDKWSaB+4rHFNqO9jBS6m6olmg=="
+    },
+    {
+      "name": "LolzCloud-0.9.20-win7-legacy-Setup.exe.blockmap",
+      "size": 104985,
+      "sha256": "1afdbdc46cb08b84eaced6b38a17a9a6ea6bd96a1f44d15fcaf48d2cff78b336",
+      "sha512": "dtYGduY+4wYlnQd6KtOFoAEEygrtwabR3ldc0O5JNBul0wTYWEygrbarapBDE2E+MsLM+4KiSlYCBjN3HdsPZQ=="
+    },
+    {
+      "name": "LolzCloud-0.9.20-win7-legacy-x64.zip",
+      "size": 134420209,
+      "sha256": "81ccdbfe5284674cbde4f3388689355afd421fd1d1899bd83a3c1387904c390a",
+      "sha512": "X92Pc0bC1LLcM01aYooKjpbnHW6xvqEN04XR08GcNZcXlIptnzF1WAu774041c2gxEs7vuX317UaDcED+J+giQ=="
+    }
+  ],
+  "manifests": [
+    {
+      "file": "update.json",
+      "version": "0.9.20",
+      "channel": "latest",
+      "artifactChecks": true,
+      "yamlSha512": true,
+      "blockmapCoverage": 146405865
+    },
+    {
+      "file": "update-legacy.json",
+      "version": "0.9.20",
+      "channel": "legacy",
+      "artifactChecks": true,
+      "yamlSha512": true,
+      "blockmapCoverage": 99550972
+    }
+  ],
+  "updater": {
+    "checks": 10,
+    "oldVersion": "0.9.19",
+    "newVersion": "0.9.20",
+    "setupUpgrade": "passed",
+    "profileRetained": true,
+    "lowSpaceRejection": "passed",
+    "corruptInstallerRejection": "passed"
+  },
+  "node": {
+    "total": 526,
+    "passed": 510,
+    "failed": 0,
+    "skipped": 16,
+    "skipReason": "Linux-specific AppImage updater tests; verified in the separate native Linux run"
+  },
+  "syntaxFiles": 303,
+  "originalGitUntouched": true,
+  "limits": [
+    "Current Windows x64 only; legacy Electron22 runs on the current OS, not physical Windows7.",
+    "Public availability is verified after publication."
+  ]
+}

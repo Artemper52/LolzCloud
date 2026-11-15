@@ -1,0 +1,25 @@
+{
+  "status": "failed",
+  "phase": "ready-transition",
+  "error": "Error: Script failed to execute, this normally means an error was thrown. Check the renderer console for the error.",
+  "errors": [
+    "Uncaught TypeError: Cannot read properties of null (reading 'textContent')"
+  ],
+  "calls": [
+    {
+      "id": 0,
+      "force": false
+    },
+    {
+      "id": 1,
+      "force": false
+    },
+    {
+      "id": 2,
+      "force": false
+    }
+  ],
+  "assertions": [
+    "Each current/upcoming song was requested once"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "status": "passed",
+  "scope": "Real desktop UI, Studio, LyricPrefetcher, LyricsLibrary and Electron IPC; declared synthetic remote catalogue/provider/lyrics",
+  "assertions": [
+    "Each current/upcoming song was requested once",
+    "A ready cached transition sends no redundant lyric IPC",
+    "Ready text survives duration 100.4",
+    "Ready text survives duration 101.9",
+    "Unknown/jitter metadata causes no provider request",
+    "An empty final response retains useful prefetched lines",
+    "Partial promotion shares its original provider request",
+    "A settled cached lyric is not reported missing",
+    "Explicit failed refresh retains known lyrics",
+    "Explicit refresh issues exactly one deliberate request",
+    "UI tone/tempo controls enable only transport",
+    "The full UI has no uncaught script errors"
+  ],
+  "calls": [
+    {
+      "id": 0,
+      "force": false
+    },
+    {
+      "id": 1,
+      "force": false
+    },
+    {
+      "id": 2,
+      "force": false
+    },
+    {
+      "id": 2,
+      "force": true
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "status": "candidate-verified-not-published",
+  "version": "0.9.20",
+  "checkedAt": "2026-11-15T13:41:23.494Z",
+  "desktopPitch": {
+    "cases": 9,
+    "actualAudio": "HTMLMediaElement→WebAudio→AudioWorklet→downstream MediaRecorder",
+    "source": "Declared provider/IPC fixtures, real processing",
+    "physicalAudio": false
+  },
+  "desktopCache": {
+    "checks": 12,
+    "actualFlow": "Real Studio/LyricPrefetcher/LyricsLibrary/full DOM/Electron IPC",
+    "remoteResponses": "synthetic"
+  },
+  "live": {
+    "sourceHash": "c95f7a46236f3a409f1d54f73d4cbbda40fe01b11f388534875baae7d5c50d74",
+    "records": [
+      {
+        "id": "2006992171",
+        "duration": 93,
+        "tempo": {
+          "rate": 1.1935483870967742,
+          "referenceDuration": 111,
+          "sourceDuration": 93,
+          "method": "duration",
+          "estimated": true,
+          "referenceEvidence": "catalog-consensus"
+        },
+        "lineCount": 29,
+        "elapsedMs": 93,
+        "queries": 1
+      },
+      {
+        "id": "2097182523",
+        "duration": 86,
+        "tempo": {
+          "rate": 1.2906976744186047,
+          "referenceDuration": 111,
+          "sourceDuration": 86,
+          "method": "duration",
+          "estimated": true,
+          "referenceEvidence": "catalog-consensus"
+        },
+        "lineCount": 29,
+        "elapsedMs": 2,
+        "queries": 0
+      },
+      {
+        "id": "2215259861",
+        "duration": 139,
+        "tempo": {
+          "rate": 0.7985611510791367,
+          "referenceDuration": 111,
+          "sourceDuration": 139,
+          "method": "duration",
+          "estimated": true,
+          "referenceEvidence": "catalog-consensus"
+        },
+        "lineCount": 29,
+        "elapsedMs": 2,
+        "queries": 0
+      }
+    ],
+    "totalRequests": 1,
+    "warm": {
+      "elapsedMs": 1,
+      "queries": 0
+    },
+    "timingMethod": "Whole-recording duration estimate; no acoustic fingerprint or non-uniform time-stretch detection"
+  },
+  "limits": [
+    "Catalogue agreement is evidence for a duration reference, not an authoritative tempo measurement.",
+    "Trims, extended versions, different arrangements, direction mismatches and weak/conflicting catalogue clusters retain plain text.",
+    "First desktop UI fixture failed because it queried a nonexistent DOM ID; preserved, corrected selector, full UI then passed.",
+    "Earlier DSP prototype and fixture failures remain in private provenance; final accepted kernel is phase-locked."
+  ]
+}

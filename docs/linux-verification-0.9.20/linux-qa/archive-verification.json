@@ -1,0 +1,48 @@
+[
+  {
+    "arch": "x64",
+    "entries": 81,
+    "executables": [
+      {
+        "path": "LolzCloud-linux-x64/LolzCloud",
+        "elfMachine": 62,
+        "mode": "0o755"
+      },
+      {
+        "path": "LolzCloud-linux-x64/chrome-sandbox",
+        "elfMachine": 62,
+        "mode": "0o755"
+      },
+      {
+        "path": "LolzCloud-linux-x64/resources/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg",
+        "elfMachine": 62,
+        "mode": "0o755"
+      }
+    ],
+    "status": "passed",
+    "executed": true
+  },
+  {
+    "arch": "arm64",
+    "entries": 81,
+    "executables": [
+      {
+        "path": "LolzCloud-linux-arm64/LolzCloud",
+        "elfMachine": 183,
+        "mode": "0o755"
+      },
+      {
+        "path": "LolzCloud-linux-arm64/chrome-sandbox",
+        "elfMachine": 183,
+        "mode": "0o755"
+      },
+      {
+        "path": "LolzCloud-linux-arm64/resources/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg",
+        "elfMachine": 183,
+        "mode": "0o755"
+      }
+    ],
+    "status": "passed",
+    "executed": false
+  }
+]
