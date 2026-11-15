@@ -114,6 +114,35 @@ final class IndependentPitchTests: XCTestCase {
         let steady = measured(result[48_000..<72_000]); XCTAssertEqual(steady.hz,1365,accuracy:4); XCTAssertGreaterThan(steady.rms,0.05)
         XCTAssertGreaterThan(measured(result.suffix(4800)).rms,0.03,"End-of-stream must drain the compensated processor")
     }
+    func testMidstreamStartLargerThanLookaheadResetsAndDrainsWithoutOldTail() throws {
+        let core = try XCTUnwrap(LCDSPCreate()); defer { LCDSPRelease(core) }
+        let gains = [Float](repeating:0,count:5)
+        XCTAssertEqual(gains.withUnsafeBufferPointer { LCDSPConfigurePitch(core,1,$0.baseAddress,$0.count,0,0.4,0.4,0,1.5,2) },1)
+        XCTAssertEqual(LCDSPPrepare(core,rate,1,4096),1)
+        let stream = try XCTUnwrap(LCPCMStreamCreate(core,1,4096)); defer { LCPCMStreamDestroy(stream) }
+        let source = PitchPCMSource(tone(910)), context = Unmanaged.passUnretained(source).toOpaque()
+        for _ in 0..<3 {
+            var count: UInt32 = 0, flags: UInt32 = 0
+            XCTAssertEqual(LCPCMStreamRender(stream,pitchReadPCM,context,4096,&count,&flags),1)
+            XCTAssertEqual(count,4096)
+        }
+        // A source discontinuity can arrive on a normal pull, whose returned
+        // chunk is larger than the new stream's 2048-frame lookahead.
+        source.samples = [Float](repeating:0,count:11_111); source.position = 0; source.start = true
+        var output = [Float](), ended = false
+        for attempt in 0..<10 {
+            var count: UInt32 = 0, flags: UInt32 = 0
+            let accepted = LCPCMStreamRender(stream,pitchReadPCM,context,4096,&count,&flags)
+            XCTAssertEqual(accepted,1,"A valid midstream Start must re-prime instead of disabling the tap")
+            guard accepted == 1 else { return }
+            if attempt == 0 { XCTAssertNotEqual(flags & UInt32(LCPCMStart),0) }
+            if count > 0 { output.append(contentsOf:UnsafeBufferPointer(start:LCPCMStreamChannel(stream,0),count:Int(count))) }
+            if flags & UInt32(LCPCMEnd) != 0 { ended = true; break }
+        }
+        XCTAssertTrue(ended); XCTAssertEqual(output.count,11_111)
+        XCTAssertTrue(output.allSatisfy { $0 == 0 },"Seek/discontinuity must clear old pitch, reverb and echo tails")
+        XCTAssertEqual(LCDSPReadMetrics(core).processedFrames,11_111)
+    }
     func testSettingsDoNotAcknowledgeWithoutActualFramesAndCannotStartPlayback() throws {
         let core = try XCTUnwrap(LCDSPCreate()); defer { LCDSPRelease(core) }
         _ = configure(core,pitch:1.5); _ = LCDSPPrepare(core,rate,1,1024)

@@ -44,14 +44,22 @@ int LCPCMStreamRender(LCPCMStream *s,LCPCMRead read,void *context,uint32_t reque
             if(!actual)break;
             for(uint32_t ch=0;ch<s->channels;ch++)memset(s->input[ch],0,actual*sizeof(float));
         }
-        LCDSPProcess(s->core,s->input[0],s->channels==2?s->input[1]:NULL,actual,1);
-        if(s->primeRemaining){
-            if(actual>s->primeRemaining)return 0;
-            s->primeRemaining-=actual;
-            if(!s->primeRemaining)LCDSPBeginOutputTimeline(s->core);
-        }else{
-            for(uint32_t ch=0;ch<s->channels;ch++)memcpy(s->output[ch]+produced,s->input[ch],actual*sizeof(float));
-            produced+=actual;s->outputFrames+=actual;
+        /* StartOfStream may arrive on a normal-sized source pull. Split that
+           chunk at the new lookahead boundary instead of rejecting valid
+           frames or counting the priming portion as audible output. */
+        for(uint32_t offset=0;offset<actual;){
+            uint32_t part=actual-offset;
+            if(s->primeRemaining&&part>s->primeRemaining)part=s->primeRemaining;
+            if(!s->primeRemaining&&part>requested-produced)return 0;
+            LCDSPProcess(s->core,s->input[0]+offset,s->channels==2?s->input[1]+offset:NULL,part,1);
+            if(s->primeRemaining){
+                s->primeRemaining-=part;
+                if(!s->primeRemaining)LCDSPBeginOutputTimeline(s->core);
+            }else{
+                for(uint32_t ch=0;ch<s->channels;ch++)memcpy(s->output[ch]+produced,s->input[ch]+offset,part*sizeof(float));
+                produced+=part;s->outputFrames+=part;
+            }
+            offset+=part;
         }
     }
     if(produced&&s->pendingStart){*flags|=LCPCMStart;s->pendingStart=0;}
