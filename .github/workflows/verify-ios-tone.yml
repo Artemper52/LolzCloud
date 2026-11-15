@@ -1,0 +1,41 @@
+name: Verify native iOS independent tone
+'on':
+  push:
+    branches: ['codex/recover-ios-tone-0.1.5']
+    paths: ['ios/**', '.github/workflows/ios.yml', '.github/workflows/verify-ios-tone.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: native-tone-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      ref: ${{ steps.source.outputs.ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify release19 ancestry and isolated branch
+        id: source
+        run: |
+          set -eu
+          test "$GITHUB_REF" = refs/heads/codex/recover-ios-tone-0.1.5
+          git merge-base --is-ancestor 856bac233ecd49e97cd99a81575eb38682e4658e HEAD
+          printf 'ref=%s\n' "$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: node --test ios/tools/select-xcode.test.cjs ios/tools/version.test.cjs
+  apple-sdk:
+    needs: source
+    uses: ./.github/workflows/ios.yml
+    with:
+      source_ref: ${{ needs.source.outputs.ref }}

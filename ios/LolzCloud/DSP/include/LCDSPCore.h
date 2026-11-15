@@ -15,6 +15,9 @@ typedef struct {
     float inputRMS, outputRMS, headroomDb;
     uint32_t normalizationMeasured, normalizationFrames, energyWindowFrames;
     float loudnessDb, normalizationGainDb, normalizationTargetDb, peakDb, limiterReductionDb;
+    uint32_t pitchLatencyFrames, pitchReady;
+    uint64_t pitchProcessedFrames;
+    float pitchRatio;
 } LCDSPMetrics;
 /* First 2.56 seconds of 10 ms input/output energy after a discontinuity or
    settings change. Atomic diagnostic reads never copy PCM or enter rendering. */
@@ -29,10 +32,16 @@ void LCDSPRelease(LCDSPCore *core);
 int LCDSPConfigure(LCDSPCore *core, int enabled, const float *gains, size_t count, float preampDb, uint32_t revision);
 int LCDSPConfigureAdvanced(LCDSPCore *core, int enabled, const float *gains, size_t count, float preampDb,
                           float reverb, float echo, int normalization, uint32_t revision);
+int LCDSPConfigurePitch(LCDSPCore *core,int enabled,const float *gains,size_t count,float preampDb,
+                       float reverb,float echo,int normalization,float pitch,uint32_t revision);
 int LCDSPPrepare(LCDSPCore *core, double sampleRate, uint32_t channels, uint32_t maximumFrames);
 void LCDSPUnprepare(LCDSPCore *core);
 void LCDSPUnavailable(LCDSPCore *core, uint32_t reason);
 void LCDSPReset(LCDSPCore *core);
+/* Tap-only fixed latency mode. Prime exactly this many frames, discard their
+   output, then begin the aligned timeline; flush the same lookahead at EOF. */
+uint32_t LCDSPUsePitchLookahead(LCDSPCore *core);
+void LCDSPBeginOutputTimeline(LCDSPCore *core);
 /* Planar: stride=1. Interleaved stereo: right=left+1, stride=2. */
 void LCDSPProcess(LCDSPCore *core, float *left, float *right, uint32_t frames, uint32_t stride);
 LCDSPMetrics LCDSPReadMetrics(const LCDSPCore *core);

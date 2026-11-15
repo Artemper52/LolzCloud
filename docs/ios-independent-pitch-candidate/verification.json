@@ -1,0 +1,129 @@
+{
+  "status": "local-verified-apple-sdk-runtime-pending",
+  "checkedAt": "2026-11-15T12:54:10.896Z",
+  "version": "0.1.5",
+  "build": 6,
+  "baseReceiptCommit": "856bac233ecd49e97cd99a81575eb38682e4658e",
+  "branch": "codex/recover-ios-tone-0.1.5",
+  "sourceInputs": 31,
+  "inputDigest": "4444bae6eea7b466dab3ece3d2621050e5f4259dc82831fd8844d33e8012911d",
+  "policy": {
+    "normal": {
+      "passed": 83,
+      "failed": 0
+    },
+    "addressSanitizer": {
+      "passed": 83,
+      "failed": 0,
+      "leakSanitizerEnabled": false
+    },
+    "swiftParse": "passed including all app and new hosted tests",
+    "versionNode": {
+      "passed": 2,
+      "failed": 0
+    },
+    "generatedProject": {
+      "objects": 44,
+      "nativeSources": 13,
+      "appleSDK": false
+    }
+  },
+  "kernel": {
+    "status": "passed",
+    "cases": 24,
+    "asan": true,
+    "leakSanitizerEnabled": true,
+    "renderHeapCalls": 0,
+    "fullPipelineTimelineFrames": 48000,
+    "maxRelativeCrossingFrequencyError": 0.001136364,
+    "minRMS": 0.057465,
+    "maxRMS": 0.070711,
+    "stereo": "inverted right=-left*0.5, max error<1e-7",
+    "targetSpectralAmplitudeDominates": true,
+    "originalToneSuppressed": true,
+    "source": "Generated PCM through actual C, not an AVPlayer/physical output proof"
+  },
+  "nativeRuntime": {
+    "status": "pending",
+    "expected": 17,
+    "old14SourceBodiesUnchanged": true,
+    "newTests": [
+      "testActualIndependentPitchMeasuresDownstreamPCMAtDifferentTempos",
+      "testActualIndependentPitchPauseSeekDuplicateQueueAndLegacyACK",
+      "testActualTapLatencyCompensationKeepsFirstAndLastPCMAndEOFDuration"
+    ],
+    "requiredFamilies": [
+      "iphone",
+      "ipad"
+    ],
+    "requiredRealPCM": [
+      "local WAV",
+      "seeded genuine cached MP3"
+    ],
+    "independentPairs": {
+      "tempo": [
+        0.75,
+        1.5
+      ],
+      "pitch": [
+        0.5,
+        1.25,
+        2
+      ]
+    },
+    "physicalDeviceTested": false
+  },
+  "protocol": {
+    "legacyDiscovery": {
+      "effectsSchema": 2,
+      "maxEffectsSchema": 3,
+      "independentPitch": 1
+    },
+    "requestSchema": [
+      3,
+      6,
+      7
+    ],
+    "pitchDefault": 1,
+    "pitchBounds": [
+      0.5,
+      2
+    ],
+    "enabledMasterExcludesPitch": true,
+    "exactShapeEcho": true,
+    "currentClientRequestAndIndependentEffectsRevision": true,
+    "capabilityPitchOnlyAfterSupportedActualFrames": true
+  },
+  "baselineDesktop19": {
+    "independentPitchScalar": false,
+    "preservesPitchCheckboxOnly": true,
+    "sourceCommit": "a98eef6f2ef1403cc621c99fa82ae6398c5ed440",
+    "file": "source/integrations/sound-settings.cjs"
+  },
+  "published14Preserved": [
+    {
+      "name": "LolzCloud-iOS-0.1.4-unsigned.ipa",
+      "sha256": "59437333340311d22d87740cbca673765b31916aa6aad14a14e82b26b7a2f9a2",
+      "unchanged": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.4-simulator.zip",
+      "sha256": "599659f85b1b0f3f239b6bbfe28e45f7b0fbd9318057fa55b4a7af4e29a2054f",
+      "unchanged": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.4-source.zip",
+      "sha256": "c0e6fcd98322248c60397bbfb97c8a5cc7d07da985834142614cec49006096b8",
+      "unchanged": true
+    }
+  ],
+  "published19SourceArchiveUnchanged": true,
+  "genericPublishedPointer": "0.1.4 unchanged",
+  "limits": [
+    "Apple SDK compile and hosted17 actual iPhone/iPad simulator tests have not yet run on these sources.",
+    "No physical iPhone/iPad, acoustic/Bluetooth/AirPlay/phone-call or exhaustive-codec test.",
+    "No formant-preservation or subjective complex-music quality claim.",
+    "Swift ASAN disables LSan for XCTest; standalone C ASAN/LSan is enabled.",
+    "No new public build/signing/deploy/tag/GitHub write by this task."
+  ]
+}

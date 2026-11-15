@@ -23,7 +23,7 @@ try require(targets.count == 1,"Expected one application target")
 let target = targets.first!, phases = target.value["buildPhases"] as! [String]
 let sources = phases.compactMap { objects[$0] }.first { $0["isa"] as? String == "PBXSourcesBuildPhase" }!
 let built = (sources["files"] as! [String]).compactMap { objects[$0]?["fileRef"] as? String }.compactMap { objects[$0]?["path"] as? String }
-let expected = Set(["App.swift","MediaPolicy.swift","NativePlayer.swift","AccountLogin.swift","AudioEffectsPolicy.swift","NativeAudioEffects.swift","NativeCatalog.swift","NativeProfileShare.swift","NativeRatePolicy.swift","DSP/DSPCore.c","DSP/NativeAudioTap.c"])
+let expected = Set(["App.swift","MediaPolicy.swift","NativePlayer.swift","AccountLogin.swift","AudioEffectsPolicy.swift","NativeAudioEffects.swift","NativeCatalog.swift","NativeProfileShare.swift","NativeRatePolicy.swift","DSP/DSPCore.c","DSP/PitchCore.c","DSP/PCMStream.c","DSP/NativeAudioTap.c"])
 try require(Set(built) == expected,"Every native source must enter the application target")
 for filename in built { try require(FileManager.default.fileExists(atPath:root.appendingPathComponent("LolzCloud/"+filename).path),"Missing source: "+filename) }
 let info = try PropertyListSerialization.propertyList(from:Data(contentsOf:root.appendingPathComponent("LolzCloud/Info.plist")),options:[],format:nil) as! [String:Any]

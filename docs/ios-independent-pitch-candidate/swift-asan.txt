@@ -1,0 +1,223 @@
+Generated iPhone/iPad Xcode project
+Test Suite 'All tests' started at 2026-11-15 12:31:03.268
+Test Suite 'debug.xctest' started at 2026-11-15 12:31:03.280
+Test Suite 'AdvancedAudioEffectsTests' started at 2026-11-15 12:31:03.280
+Test Case 'AdvancedAudioEffectsTests.testAdvancedControlRejectsNonfiniteBoundsAndNonBooleanFlags' started at 2026-11-15 12:31:03.280
+Test Case 'AdvancedAudioEffectsTests.testAdvancedControlRejectsNonfiniteBoundsAndNonBooleanFlags' passed (0.003 seconds)
+Test Case 'AdvancedAudioEffectsTests.testDisabledModulesAndGlobalBypassDoNotHideWetAudio' started at 2026-11-15 12:31:03.283
+Test Case 'AdvancedAudioEffectsTests.testDisabledModulesAndGlobalBypassDoNotHideWetAudio' passed (0.016 seconds)
+Test Case 'AdvancedAudioEffectsTests.testDisablingNormalizationReturnsSmoothlyToUnityWithoutHiddenMetering' started at 2026-11-15 12:31:03.299
+Test Case 'AdvancedAudioEffectsTests.testDisablingNormalizationReturnsSmoothlyToUnityWithoutHiddenMetering' passed (0.533 seconds)
+Test Case 'AdvancedAudioEffectsTests.testEchoImpulseArrivesAt280MillisecondsWithBoundedFeedback' started at 2026-11-15 12:31:03.831
+Test Case 'AdvancedAudioEffectsTests.testEchoImpulseArrivesAt280MillisecondsWithBoundedFeedback' passed (0.031 seconds)
+Test Case 'AdvancedAudioEffectsTests.testNormalizationConvergesAtOneDbPerSecondAndSurvivesOtherSettings' started at 2026-11-15 12:31:03.862
+Test Case 'AdvancedAudioEffectsTests.testNormalizationConvergesAtOneDbPerSecondAndSurvivesOtherSettings' passed (0.999 seconds)
+Test Case 'AdvancedAudioEffectsTests.testNormalizationSilenceGateAndResetNeverAmplifySilence' started at 2026-11-15 12:31:04.861
+Test Case 'AdvancedAudioEffectsTests.testNormalizationSilenceGateAndResetNeverAmplifySilence' passed (0.573 seconds)
+Test Case 'AdvancedAudioEffectsTests.testPreparedAdvancedGraphHandlesSupportedRatesAndInterleavedStereo' started at 2026-11-15 12:31:05.434
+Test Case 'AdvancedAudioEffectsTests.testPreparedAdvancedGraphHandlesSupportedRatesAndInterleavedStereo' passed (0.099 seconds)
+Test Case 'AdvancedAudioEffectsTests.testReprepareAndDisableReenableCannotReplayOldDelayMemory' started at 2026-11-15 12:31:05.532
+Test Case 'AdvancedAudioEffectsTests.testReprepareAndDisableReenableCannotReplayOldDelayMemory' passed (0.192 seconds)
+Test Case 'AdvancedAudioEffectsTests.testReverbHasFiniteDecayingTailAndDiscontinuityClearsIt' started at 2026-11-15 12:31:05.725
+Test Case 'AdvancedAudioEffectsTests.testReverbHasFiniteDecayingTailAndDiscontinuityClearsIt' passed (0.171 seconds)
+Test Case 'AdvancedAudioEffectsTests.testSchemaTwoStrictBoundsAndLegacyPreferenceMigration' started at 2026-11-15 12:31:05.895
+Test Case 'AdvancedAudioEffectsTests.testSchemaTwoStrictBoundsAndLegacyPreferenceMigration' passed (0.004 seconds)
+Test Case 'AdvancedAudioEffectsTests.testWetLimiterIsStereoLinkedFiniteAndBoundedUnderExtremeInput' started at 2026-11-15 12:31:05.899
+Test Case 'AdvancedAudioEffectsTests.testWetLimiterIsStereoLinkedFiniteAndBoundedUnderExtremeInput' passed (0.004 seconds)
+Test Suite 'AdvancedAudioEffectsTests' passed at 2026-11-15 12:31:05.903
+	 Executed 11 tests, with 0 failures (0 unexpected) in 2.622 (2.622) seconds
+Test Suite 'AudioEffectsTests' started at 2026-11-15 12:31:05.903
+Test Case 'AudioEffectsTests.testAllFiveBandsApplyTheirExpectedFrequencyResponse' started at 2026-11-15 12:31:05.903
+Test Case 'AudioEffectsTests.testAllFiveBandsApplyTheirExpectedFrequencyResponse' passed (0.26 seconds)
+Test Case 'AudioEffectsTests.testBypassIsBitExactForFinitePCMAndCountsRealFrames' started at 2026-11-15 12:31:06.163
+Test Case 'AudioEffectsTests.testBypassIsBitExactForFinitePCMAndCountsRealFrames' passed (0.001 seconds)
+Test Case 'AudioEffectsTests.testControlMailboxRemainsFiniteUnderConcurrentBoundedUpdates' started at 2026-11-15 12:31:06.164
+Test Case 'AudioEffectsTests.testControlMailboxRemainsFiniteUnderConcurrentBoundedUpdates' passed (1.751 seconds)
+Test Case 'AudioEffectsTests.testInvalidConfigurationAndUnavailableFormatCannotClaimApplied' started at 2026-11-15 12:31:07.915
+Test Case 'AudioEffectsTests.testInvalidConfigurationAndUnavailableFormatCannotClaimApplied' passed (0.001 seconds)
+Test Case 'AudioEffectsTests.testNonfiniteInputAndExtremeBoostRemainFiniteBounded' started at 2026-11-15 12:31:07.916
+Test Case 'AudioEffectsTests.testNonfiniteInputAndExtremeBoostRemainFiniteBounded' passed (0.008 seconds)
+Test Case 'AudioEffectsTests.testPCMCrossingMeterMeasuresToneAndResetsWithTheStream' started at 2026-11-15 12:31:07.924
+Test Case 'AudioEffectsTests.testPCMCrossingMeterMeasuresToneAndResetsWithTheStream' passed (0.133 seconds)
+Test Case 'AudioEffectsTests.testParameterRevisionIsConsumedWithoutRestart' started at 2026-11-15 12:31:08.057
+Test Case 'AudioEffectsTests.testParameterRevisionIsConsumedWithoutRestart' passed (0.133 seconds)
+Test Case 'AudioEffectsTests.testPeakingBandChangesFrequencyBalanceWithHeadroom' started at 2026-11-15 12:31:08.190
+Test Case 'AudioEffectsTests.testPeakingBandChangesFrequencyBalanceWithHeadroom' passed (0.063 seconds)
+Test Case 'AudioEffectsTests.testPreampAppliesMeasuredGainAndRevisionOnlyAfterFrames' started at 2026-11-15 12:31:08.253
+Test Case 'AudioEffectsTests.testPreampAppliesMeasuredGainAndRevisionOnlyAfterFrames' passed (0.057 seconds)
+Test Case 'AudioEffectsTests.testSettingsRejectBooleansNonfiniteWrongShapeAndUnknownFields' started at 2026-11-15 12:31:08.310
+Test Case 'AudioEffectsTests.testSettingsRejectBooleansNonfiniteWrongShapeAndUnknownFields' passed (0.002 seconds)
+Test Case 'AudioEffectsTests.testSilentPrefetchTailCannotEraseMeasuredEffectEnergy' started at 2026-11-15 12:31:08.312
+Test Case 'AudioEffectsTests.testSilentPrefetchTailCannotEraseMeasuredEffectEnergy' passed (0.049 seconds)
+Test Case 'AudioEffectsTests.testStereoPlanarAndInterleavedKeepIndependentState' started at 2026-11-15 12:31:08.361
+Test Case 'AudioEffectsTests.testStereoPlanarAndInterleavedKeepIndependentState' passed (0.027 seconds)
+Test Suite 'AudioEffectsTests' passed at 2026-11-15 12:31:08.388
+	 Executed 12 tests, with 0 failures (0 unexpected) in 2.485 (2.485) seconds
+Test Suite 'IndependentPitchTests' started at 2026-11-15 12:31:08.388
+Test Case 'IndependentPitchTests.testFiniteLimiterAndInvalidRatios' started at 2026-11-15 12:31:08.388
+Test Case 'IndependentPitchTests.testFiniteLimiterAndInvalidRatios' passed (0.048 seconds)
+Test Case 'IndependentPitchTests.testNonunityTimelineKeepsFrameCountAndLastAudio' started at 2026-11-15 12:31:08.436
+Test Case 'IndependentPitchTests.testNonunityTimelineKeepsFrameCountAndLastAudio' passed (0.568 seconds)
+Test Case 'IndependentPitchTests.testOutOfBandContentIsDiscardedRatherThanAliased' started at 2026-11-15 12:31:09.003
+Test Case 'IndependentPitchTests.testOutOfBandContentIsDiscardedRatherThanAliased' passed (0.552 seconds)
+Test Case 'IndependentPitchTests.testPitchBoundsAndPersistedPreferenceMigration' started at 2026-11-15 12:31:09.555
+Test Case 'IndependentPitchTests.testPitchBoundsAndPersistedPreferenceMigration' passed (0.002 seconds)
+Test Case 'IndependentPitchTests.testPitchChangeSmoothingAndSeekClearAllOldTail' started at 2026-11-15 12:31:09.557
+Test Case 'IndependentPitchTests.testPitchChangeSmoothingAndSeekClearAllOldTail' passed (0.385 seconds)
+Test Case 'IndependentPitchTests.testPitchProcessorIsFiniteAcrossPreparedRateAndStereoLayouts' started at 2026-11-15 12:31:09.942
+Test Case 'IndependentPitchTests.testPitchProcessorIsFiniteAcrossPreparedRateAndStereoLayouts' passed (3.789 seconds)
+Test Case 'IndependentPitchTests.testPitchStillProcessesWhenAllSavedEffectsAreDisabled' started at 2026-11-15 12:31:13.732
+Test Case 'IndependentPitchTests.testPitchStillProcessesWhenAllSavedEffectsAreDisabled' passed (0.981 seconds)
+Test Case 'IndependentPitchTests.testRealLowMidHighToneFrequencyAndEnergyAcrossRatios' started at 2026-11-15 12:31:14.713
+Test Case 'IndependentPitchTests.testRealLowMidHighToneFrequencyAndEnergyAcrossRatios' passed (17.036 seconds)
+Test Case 'IndependentPitchTests.testSchemaThreeExactShapeAndLegacyPitchDefaults' started at 2026-11-15 12:31:31.749
+Test Case 'IndependentPitchTests.testSchemaThreeExactShapeAndLegacyPitchDefaults' passed (0.002 seconds)
+Test Case 'IndependentPitchTests.testSettingsDoNotAcknowledgeWithoutActualFramesAndCannotStartPlayback' started at 2026-11-15 12:31:31.751
+Test Case 'IndependentPitchTests.testSettingsDoNotAcknowledgeWithoutActualFramesAndCannotStartPlayback' passed (0.169 seconds)
+Test Case 'IndependentPitchTests.testTapTimelineAbsorbsLatencyAndDrainsExactShortAndFullDuration' started at 2026-11-15 12:31:31.920
+Test Case 'IndependentPitchTests.testTapTimelineAbsorbsLatencyAndDrainsExactShortAndFullDuration' passed (0.105 seconds)
+Test Case 'IndependentPitchTests.testUnityAndDisabledFXAreExactBypass' started at 2026-11-15 12:31:32.024
+Test Case 'IndependentPitchTests.testUnityAndDisabledFXAreExactBypass' passed (0.023 seconds)
+Test Suite 'IndependentPitchTests' passed at 2026-11-15 12:31:32.048
+	 Executed 12 tests, with 0 failures (0 unexpected) in 23.659 (23.659) seconds
+Test Suite 'MediaPolicyTests' started at 2026-11-15 12:31:32.048
+Test Case 'MediaPolicyTests.testAccountAndAudioNeverFollowRedirects' started at 2026-11-15 12:31:32.048
+Test Case 'MediaPolicyTests.testAccountAndAudioNeverFollowRedirects' passed (0.013 seconds)
+Test Case 'MediaPolicyTests.testAccountIdentityRejectsBooleanFractionalAndInvalidIdentifiers' started at 2026-11-15 12:31:32.062
+Test Case 'MediaPolicyTests.testAccountIdentityRejectsBooleanFractionalAndInvalidIdentifiers' passed (0.007 seconds)
+Test Case 'MediaPolicyTests.testBridgeRequiresExactOwnApplicationPathAndOrigin' started at 2026-11-15 12:31:32.069
+Test Case 'MediaPolicyTests.testBridgeRequiresExactOwnApplicationPathAndOrigin' passed (0.001 seconds)
+Test Case 'MediaPolicyTests.testCancelledPreparationCannotFinishLater' started at 2026-11-15 12:31:32.070
+Test Case 'MediaPolicyTests.testCancelledPreparationCannotFinishLater' passed (0.003 seconds)
+Test Case 'MediaPolicyTests.testColdPreparationPollsUntilReadyWithBoundedRequestTimeout' started at 2026-11-15 12:31:32.072
+Test Case 'MediaPolicyTests.testColdPreparationPollsUntilReadyWithBoundedRequestTimeout' passed (0.005 seconds)
+Test Case 'MediaPolicyTests.testCrashCleanupRemovesOnlyOwnedStagesAndCountsOrphanAudioTowardsQuota' started at 2026-11-15 12:31:32.078
+Test Case 'MediaPolicyTests.testCrashCleanupRemovesOnlyOwnedStagesAndCountsOrphanAudioTowardsQuota' passed (0.015 seconds)
+Test Case 'MediaPolicyTests.testDuplicateQueuePreservesOccurrenceAndValidatesExplicitIndex' started at 2026-11-15 12:31:32.092
+Test Case 'MediaPolicyTests.testDuplicateQueuePreservesOccurrenceAndValidatesExplicitIndex' passed (0.002 seconds)
+Test Case 'MediaPolicyTests.testFailedLocalIndexCommitLeavesOriginalAndOtherMusicIntact' started at 2026-11-15 12:31:32.094
+Test Case 'MediaPolicyTests.testFailedLocalIndexCommitLeavesOriginalAndOtherMusicIntact' passed (0.006 seconds)
+Test Case 'MediaPolicyTests.testInterruptedLocalCommitRecoversIndexExactlyOnce' started at 2026-11-15 12:31:32.100
+Test Case 'MediaPolicyTests.testInterruptedLocalCommitRecoversIndexExactlyOnce' passed (0.008 seconds)
+Test Case 'MediaPolicyTests.testInvalidQueueCannotReplaceWorkingQueue' started at 2026-11-15 12:31:32.108
+Test Case 'MediaPolicyTests.testInvalidQueueCannotReplaceWorkingQueue' passed (0.026 seconds)
+Test Case 'MediaPolicyTests.testIssuedMediaAddress' started at 2026-11-15 12:31:32.134
+Test Case 'MediaPolicyTests.testIssuedMediaAddress' passed (0.001 seconds)
+Test Case 'MediaPolicyTests.testLateOrRepeatedEndCannotConsumeAnotherQueueItem' started at 2026-11-15 12:31:32.135
+Test Case 'MediaPolicyTests.testLateOrRepeatedEndCannotConsumeAnotherQueueItem' passed (0.0 seconds)
+Test Case 'MediaPolicyTests.testLegacyNetworkIndexAndPrivateLocalMetadataSurviveRoundTrip' started at 2026-11-15 12:31:32.135
+Test Case 'MediaPolicyTests.testLegacyNetworkIndexAndPrivateLocalMetadataSurviveRoundTrip' passed (0.002 seconds)
+Test Case 'MediaPolicyTests.testLoadingPlaybackResumesOnlyWhenSystemAllows' started at 2026-11-15 12:31:32.138
+Test Case 'MediaPolicyTests.testLoadingPlaybackResumesOnlyWhenSystemAllows' passed (0.0 seconds)
+Test Case 'MediaPolicyTests.testLocalPublicTrackCannotSelectAPathOrNetworkURL' started at 2026-11-15 12:31:32.138
+Test Case 'MediaPolicyTests.testLocalPublicTrackCannotSelectAPathOrNetworkURL' passed (0.001 seconds)
+Test Case 'MediaPolicyTests.testLocalRegistryRejectsMissingFilesAndSymbolicLinks' started at 2026-11-15 12:31:32.139
+Test Case 'MediaPolicyTests.testLocalRegistryRejectsMissingFilesAndSymbolicLinks' passed (0.019 seconds)
+Test Case 'MediaPolicyTests.testMixedQueueUsesTheSameRepeatShuffleAndPreviousRules' started at 2026-11-15 12:31:32.158
+Test Case 'MediaPolicyTests.testMixedQueueUsesTheSameRepeatShuffleAndPreviousRules' passed (0.001 seconds)
+Test Case 'MediaPolicyTests.testNativeClientRejectsStaleIntentsAndEchoesSystemQueueOwnership' started at 2026-11-15 12:31:32.159
+Test Case 'MediaPolicyTests.testNativeClientRejectsStaleIntentsAndEchoesSystemQueueOwnership' passed (0.0 seconds)
+Test Case 'MediaPolicyTests.testNewDocumentHandshakeRetiresOldClientAndValidatesRequestNumbers' started at 2026-11-15 12:31:32.160
+Test Case 'MediaPolicyTests.testNewDocumentHandshakeRetiresOldClientAndValidatesRequestNumbers' passed (0.001 seconds)
+Test Case 'MediaPolicyTests.testOfflineRetryReplacesOnlyAnUnindexedOrphanAndRollsBackIndexFailure' started at 2026-11-15 12:31:32.160
+Test Case 'MediaPolicyTests.testOfflineRetryReplacesOnlyAnUnindexedOrphanAndRollsBackIndexFailure' passed (0.005 seconds)
+Test Case 'MediaPolicyTests.testOversizedDownloadIsCancelledBeforeItCanFinish' started at 2026-11-15 12:31:32.165
+Test Case 'MediaPolicyTests.testOversizedDownloadIsCancelledBeforeItCanFinish' passed (0.002 seconds)
+Test Case 'MediaPolicyTests.testPairingCannotRedirectToAnotherOriginOrCode' started at 2026-11-15 12:31:32.167
+Test Case 'MediaPolicyTests.testPairingCannotRedirectToAnotherOriginOrCode' passed (0.001 seconds)
+Test Case 'MediaPolicyTests.testPauseOrNewSelectionCancelsInterruptionResume' started at 2026-11-15 12:31:32.168
+Test Case 'MediaPolicyTests.testPauseOrNewSelectionCancelsInterruptionResume' passed (0.0 seconds)
+Test Case 'MediaPolicyTests.testPlaybackRateBoundsPreserveThePreviousSetting' started at 2026-11-15 12:31:32.168
+Test Case 'MediaPolicyTests.testPlaybackRateBoundsPreserveThePreviousSetting' passed (0.0 seconds)
+Test Case 'MediaPolicyTests.testPreparationDeadlineAndNetworkRetriesAreFinite' started at 2026-11-15 12:31:32.168
+Test Case 'MediaPolicyTests.testPreparationDeadlineAndNetworkRetriesAreFinite' passed (0.002 seconds)
+Test Case 'MediaPolicyTests.testPreparationRequiresSignedOwnAudioAndExactReadyIdentity' started at 2026-11-15 12:31:32.170
+Test Case 'MediaPolicyTests.testPreparationRequiresSignedOwnAudioAndExactReadyIdentity' passed (0.001 seconds)
+Test Case 'MediaPolicyTests.testQueueNextPreviousAndEndRepeatDoNotSkipTracks' started at 2026-11-15 12:31:32.171
+Test Case 'MediaPolicyTests.testQueueNextPreviousAndEndRepeatDoNotSkipTracks' passed (0.001 seconds)
+Test Case 'MediaPolicyTests.testQueueSnapshotPreservesNativeSelectionAcrossStaleForegroundIndex' started at 2026-11-15 12:31:32.173
+Test Case 'MediaPolicyTests.testQueueSnapshotPreservesNativeSelectionAcrossStaleForegroundIndex' passed (0.001 seconds)
+Test Case 'MediaPolicyTests.testReplayRestartsEndedTrackAndPreservesMidTrackRetry' started at 2026-11-15 12:31:32.174
+Test Case 'MediaPolicyTests.testReplayRestartsEndedTrackAndPreservesMidTrackRetry' passed (0.0 seconds)
+Test Case 'MediaPolicyTests.testShuffleExcludesCurrentAndPreviousReturnsToThePlayedTrack' started at 2026-11-15 12:31:32.174
+Test Case 'MediaPolicyTests.testShuffleExcludesCurrentAndPreviousReturnsToThePlayedTrack' passed (0.001 seconds)
+Test Case 'MediaPolicyTests.testSleepOffAndReplacementRejectOldDeadline' started at 2026-11-15 12:31:32.175
+Test Case 'MediaPolicyTests.testSleepOffAndReplacementRejectOldDeadline' passed (0.0 seconds)
+Test Case 'MediaPolicyTests.testStagingUsesGeneratedNameBoundsBytesAndPreservesOriginal' started at 2026-11-15 12:31:32.175
+Test Case 'MediaPolicyTests.testStagingUsesGeneratedNameBoundsBytesAndPreservesOriginal' passed (0.004 seconds)
+Test Case 'MediaPolicyTests.testTimeRejectsNaNBooleanAndInvalidValues' started at 2026-11-15 12:31:32.179
+Test Case 'MediaPolicyTests.testTimeRejectsNaNBooleanAndInvalidValues' passed (0.0 seconds)
+Test Case 'MediaPolicyTests.testTrackAndFileIdentity' started at 2026-11-15 12:31:32.180
+Test Case 'MediaPolicyTests.testTrackAndFileIdentity' passed (0.001 seconds)
+Test Suite 'MediaPolicyTests' passed at 2026-11-15 12:31:32.181
+	 Executed 34 tests, with 0 failures (0 unexpected) in 0.132 (0.132) seconds
+Test Suite 'NativeCatalogTests' started at 2026-11-15 12:31:32.181
+Test Case 'NativeCatalogTests.testExplicitReferencesHaveNoAudioURLAndSurviveCodable' started at 2026-11-15 12:31:32.181
+Test Case 'NativeCatalogTests.testExplicitReferencesHaveNoAudioURLAndSurviveCodable' passed (0.005 seconds)
+Test Case 'NativeCatalogTests.testLocalFilesNeverUseCatalogueAndCancellationNeverCommitsAReply' started at 2026-11-15 12:31:32.186
+Test Case 'NativeCatalogTests.testLocalFilesNeverUseCatalogueAndCancellationNeverCommitsAReply' passed (0.002 seconds)
+Test Case 'NativeCatalogTests.testMetadataCannotSubstituteIdentityRedirectOrUnboundedData' started at 2026-11-15 12:31:32.188
+Test Case 'NativeCatalogTests.testMetadataCannotSubstituteIdentityRedirectOrUnboundedData' passed (0.01 seconds)
+Test Case 'NativeCatalogTests.testNumericIdentityResolvesThroughFixedMetadataEndpoint' started at 2026-11-15 12:31:32.198
+Test Case 'NativeCatalogTests.testNumericIdentityResolvesThroughFixedMetadataEndpoint' passed (0.102 seconds)
+Test Case 'NativeCatalogTests.testQueueKeepsExactDuplicateOccurrenceAndResolvedMetadataAcrossStaleReferenceSnapshot' started at 2026-11-15 12:31:32.300
+Test Case 'NativeCatalogTests.testQueueKeepsExactDuplicateOccurrenceAndResolvedMetadataAcrossStaleReferenceSnapshot' passed (0.007 seconds)
+Test Case 'NativeCatalogTests.testURLReferenceMatchesTheExactPermalinkRatherThanTheFirstSearchResult' started at 2026-11-15 12:31:32.308
+Test Case 'NativeCatalogTests.testURLReferenceMatchesTheExactPermalinkRatherThanTheFirstSearchResult' passed (0.004 seconds)
+Test Suite 'NativeCatalogTests' passed at 2026-11-15 12:31:32.312
+	 Executed 6 tests, with 0 failures (0 unexpected) in 0.131 (0.131) seconds
+Test Suite 'NativeRatePolicyTests' started at 2026-11-15 12:31:32.312
+Test Case 'NativeRatePolicyTests.testNewDocumentStartsAtRevisionOneAndLegacyCannotUndoAdvancedChoice' started at 2026-11-15 12:31:32.312
+Test Case 'NativeRatePolicyTests.testNewDocumentStartsAtRevisionOneAndLegacyCannotUndoAdvancedChoice' passed (0.001 seconds)
+Test Case 'NativeRatePolicyTests.testNewTransportMustExplicitlyRebindSameRevisionWithoutRelabelledAck' started at 2026-11-15 12:31:32.313
+Test Case 'NativeRatePolicyTests.testNewTransportMustExplicitlyRebindSameRevisionWithoutRelabelledAck' passed (0.001 seconds)
+Test Case 'NativeRatePolicyTests.testPitchChoiceDoesNotChangePlaybackOrSleepIntent' started at 2026-11-15 12:31:32.314
+Test Case 'NativeRatePolicyTests.testPitchChoiceDoesNotChangePlaybackOrSleepIntent' passed (0.001 seconds)
+Test Case 'NativeRatePolicyTests.testRateAndBooleanAreStrictAndPreferencesRoundTrip' started at 2026-11-15 12:31:32.315
+Test Case 'NativeRatePolicyTests.testRateAndBooleanAreStrictAndPreferencesRoundTrip' passed (0.002 seconds)
+Test Case 'NativeRatePolicyTests.testStaleOrConflictingRevisionCannotReplaceCurrentPreferences' started at 2026-11-15 12:31:32.317
+Test Case 'NativeRatePolicyTests.testStaleOrConflictingRevisionCannotReplaceCurrentPreferences' passed (0.001 seconds)
+Test Suite 'NativeRatePolicyTests' passed at 2026-11-15 12:31:32.318
+	 Executed 5 tests, with 0 failures (0 unexpected) in 0.006 (0.006) seconds
+Test Suite 'PortableProfileFileTests' started at 2026-11-15 12:31:32.318
+Test Case 'PortableProfileFileTests.testCanonicalProfileFileRemainsExactlyTheReviewedUTF8Data' started at 2026-11-15 12:31:32.318
+Test Case 'PortableProfileFileTests.testCanonicalProfileFileRemainsExactlyTheReviewedUTF8Data' passed (0.003 seconds)
+Test Case 'PortableProfileFileTests.testFileBridgeCannotSelectPathsOrUnboundOperationsAndCountsUTF8Bytes' started at 2026-11-15 12:31:32.321
+Test Case 'PortableProfileFileTests.testFileBridgeCannotSelectPathsOrUnboundOperationsAndCountsUTF8Bytes' passed (0.104 seconds)
+Test Case 'PortableProfileFileTests.testFileBridgeRejectsForeignFormatBooleanVersionAndUnreviewedRootFields' started at 2026-11-15 12:31:32.425
+Test Case 'PortableProfileFileTests.testFileBridgeRejectsForeignFormatBooleanVersionAndUnreviewedRootFields' passed (0.004 seconds)
+Test Suite 'PortableProfileFileTests' passed at 2026-11-15 12:31:32.429
+	 Executed 3 tests, with 0 failures (0 unexpected) in 0.11 (0.11) seconds
+Test Suite 'debug.xctest' passed at 2026-11-15 12:31:32.429
+	 Executed 83 tests, with 0 failures (0 unexpected) in 29.145 (29.145) seconds
+Test Suite 'All tests' passed at 2026-11-15 12:31:32.429
+	 Executed 83 tests, with 0 failures (0 unexpected) in 29.145 (29.145) seconds
+◇ Test run started.
+↳ Testing Library Version: 6.2.1 (c9d57c83568b06d)
+↳ Target Platform: x86_64-unknown-linux-gnu
+✔ Test run with 0 tests in 0 suites passed after 0.001 seconds.
+{
+  "appleSDKBuild" : "pending",
+  "backgroundAudio" : true,
+  "deviceRuntime" : "pending",
+  "iconHeight" : 1024,
+  "iconWidth" : 1024,
+  "nativeSources" : [
+    "AccountLogin.swift",
+    "App.swift",
+    "AudioEffectsPolicy.swift",
+    "DSP\/DSPCore.c",
+    "DSP\/NativeAudioTap.c",
+    "DSP\/PCMStream.c",
+    "DSP\/PitchCore.c",
+    "MediaPolicy.swift",
+    "NativeAudioEffects.swift",
+    "NativeCatalog.swift",
+    "NativePlayer.swift",
+    "NativeProfileShare.swift",
+    "NativeRatePolicy.swift"
+  ],
+  "projectObjects" : 44,
+  "sharedScheme" : true,
+  "status" : "passed"
+}

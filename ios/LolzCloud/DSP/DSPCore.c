@@ -1,4 +1,5 @@
 #include "include/LCDSPCore.h"
+#include "include/LCPitchCore.h"
 #include <stdatomic.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,17 +8,21 @@
 _Static_assert(ATOMIC_INT_LOCK_FREE == 2, "Realtime parameter words must be lock-free");
 _Static_assert(ATOMIC_LLONG_LOCK_FREE == 2, "Realtime counters must be lock-free");
 enum { BANDS=5, COEFFICIENTS=5, COMBS=4, ALLPASSES=2, LOUDNESS_BLOCKS=1500, ENERGY_WINDOWS=256 };
-typedef struct { int enabled,normalization; float gains[BANDS],preamp,reverb,echo; uint32_t revision; } Settings;
+typedef struct { int enabled,normalization; float gains[BANDS],preamp,reverb,echo,pitch; uint32_t revision; } Settings;
 /* Epoch tags make seek/disable resets O(1), without clearing delay memory on
    the audio thread. All storage is allocated in prepare, freed in unprepare. */
 typedef struct { float *samples; uint64_t *tags,epoch; uint32_t length,position; double damping; } Delay;
 struct LCDSPCore {
-    atomic_uint references, sequence, enabled, gains[BANDS], preamp, reverb, echo, normalization, revision;
+    atomic_uint references, sequence, enabled, gains[BANDS], preamp, reverb, echo, normalization, pitch, revision;
     atomic_uint prepared, unavailable, rate, channels, bandMask, appliedRevision;
     atomic_uint inputRMS, outputRMS, headroom;
     atomic_uint normMeasured,normFrames,loudness,normGain,normTarget,peak,reduction,windowFrames;
     atomic_uint windowInput[ENERGY_WINDOWS],windowOutput[ENERGY_WINDOWS],windowCount[ENERGY_WINDOWS],windowCrossings[ENERGY_WINDOWS];
     atomic_ullong frames;
+    atomic_ullong pitchFrames;
+    atomic_uint pitchReady,pitchLatency;
+    LCPitchCore *pitchCore;
+    uint32_t fixedPitchLatency,outputTimelineStarted;
     /* Only prepare/process/unprepare touch render state; Apple serializes it. */
     Settings current;
     double sampleRate, coefficients[BANDS][COEFFICIENTS], target[BANDS][COEFFICIENTS];
@@ -62,6 +67,7 @@ static int read_settings(LCDSPCore *s,Settings *out){
         for(unsigned b=0;b<BANDS;b++)next.gains[b]=number(atomic_load(&s->gains[b]));
         next.preamp=number(atomic_load(&s->preamp));next.reverb=number(atomic_load(&s->reverb));next.echo=number(atomic_load(&s->echo));
         next.normalization=(int)atomic_load(&s->normalization);next.revision=atomic_load(&s->revision);
+        next.pitch=number(atomic_load(&s->pitch));
         unsigned after=atomic_load(&s->sequence);
         if(before==after&&!(after&1)){*out=next;return 1;}
     }
@@ -91,9 +97,11 @@ LCDSPCore *LCDSPCreate(void){
     LCDSPCore *s=calloc(1,sizeof *s);if(!s)return NULL;
     atomic_init(&s->references,1);atomic_init(&s->sequence,0);atomic_init(&s->enabled,0);
     for(unsigned b=0;b<BANDS;b++)atomic_init(&s->gains[b],bits(0));
-    atomic_init(&s->preamp,bits(0));atomic_init(&s->reverb,bits(0));atomic_init(&s->echo,bits(0));atomic_init(&s->normalization,0);atomic_init(&s->revision,1);
+    atomic_init(&s->preamp,bits(0));atomic_init(&s->reverb,bits(0));atomic_init(&s->echo,bits(0));atomic_init(&s->normalization,0);atomic_init(&s->pitch,bits(1));atomic_init(&s->revision,1);
     atomic_init(&s->prepared,0);atomic_init(&s->unavailable,0);atomic_init(&s->rate,0);atomic_init(&s->channels,0);
     atomic_init(&s->bandMask,0);atomic_init(&s->appliedRevision,0);atomic_init(&s->frames,0);
+    atomic_init(&s->pitchFrames,0);atomic_init(&s->pitchReady,0);atomic_init(&s->pitchLatency,0);
+    s->pitchCore=LCPitchCreate();if(!s->pitchCore){free(s);return NULL;}
     atomic_init(&s->inputRMS,bits(0));atomic_init(&s->outputRMS,bits(0));atomic_init(&s->headroom,bits(0));
     atomic_init(&s->normMeasured,0);atomic_init(&s->normFrames,0);atomic_init(&s->loudness,bits(-120));atomic_init(&s->normGain,bits(0));atomic_init(&s->normTarget,bits(0));
     atomic_init(&s->peak,bits(-120));atomic_init(&s->reduction,bits(0));atomic_init(&s->windowFrames,0);
@@ -103,18 +111,22 @@ LCDSPCore *LCDSPCreate(void){
     return s;
 }
 void LCDSPRetain(LCDSPCore *s){if(s)atomic_fetch_add_explicit(&s->references,1,memory_order_relaxed);}
-void LCDSPRelease(LCDSPCore *s){if(s&&atomic_fetch_sub_explicit(&s->references,1,memory_order_acq_rel)==1){delays_free(s);free(s);}}
+void LCDSPRelease(LCDSPCore *s){if(s&&atomic_fetch_sub_explicit(&s->references,1,memory_order_acq_rel)==1){delays_free(s);LCPitchDestroy(s->pitchCore);free(s);}}
 int LCDSPConfigure(LCDSPCore *s,int enabled,const float *gains,size_t count,float preamp,uint32_t revision){
     return LCDSPConfigureAdvanced(s,enabled,gains,count,preamp,0,0,0,revision);
 }
 int LCDSPConfigureAdvanced(LCDSPCore *s,int enabled,const float *gains,size_t count,float preamp,float reverb,float echo,int normalization,uint32_t revision){
+    return LCDSPConfigurePitch(s,enabled,gains,count,preamp,reverb,echo,normalization,1,revision);
+}
+int LCDSPConfigurePitch(LCDSPCore *s,int enabled,const float *gains,size_t count,float preamp,float reverb,float echo,int normalization,float pitch,uint32_t revision){
     if(!s||!gains||count!=BANDS||!revision||(enabled!=0&&enabled!=1)||!isfinite(preamp)||preamp < -12||preamp>0||
-       !isfinite(reverb)||reverb<0||reverb>0.8f||!isfinite(echo)||echo<0||echo>0.8f||(normalization!=0&&normalization!=1))return 0;
+       !isfinite(reverb)||reverb<0||reverb>0.8f||!isfinite(echo)||echo<0||echo>0.8f||(normalization!=0&&normalization!=1)||!isfinite(pitch)||pitch<.5f||pitch>2)return 0;
     for(unsigned b=0;b<BANDS;b++)if(!isfinite(gains[b])||gains[b]<-12||gains[b]>12)return 0;
     atomic_fetch_add(&s->sequence,1);
     atomic_store(&s->enabled,(unsigned)enabled);
     for(unsigned b=0;b<BANDS;b++)atomic_store(&s->gains[b],bits(gains[b]));
     atomic_store(&s->preamp,bits(preamp));atomic_store(&s->reverb,bits(reverb));atomic_store(&s->echo,bits(echo));atomic_store(&s->normalization,(unsigned)normalization);atomic_store(&s->revision,revision);
+    atomic_store(&s->pitch,bits(pitch));
     atomic_fetch_add(&s->sequence,1);return 1;
 }
 static void coefficients(unsigned band,double hz,double rate,double gain,double out[COEFFICIENTS]){
@@ -202,6 +214,8 @@ static void apply_settings(LCDSPCore *s,Settings next,int immediate){
     atomic_store(&s->bandMask,mask);atomic_store(&s->unavailable,missing?3:0);
     atomic_store(&s->headroom,bits((float)-boost));
     s->current=next;
+    LCPitchConfigure(s->pitchCore,next.pitch,immediate);
+    atomic_store(&s->pitchReady,0);
     reset_energy(s);
     if(immediate){memcpy(s->coefficients,s->target,sizeof s->target);s->gain=s->targetGain;s->wet=s->targetWet;s->reverbAmount=s->targetReverb;s->echoAmount=s->targetEcho;s->rampRemaining=0;}
     else{
@@ -216,6 +230,8 @@ int LCDSPPrepare(LCDSPCore *s,double sampleRate,uint32_t channels,uint32_t maxim
     if(!s)return 0;
     if(!isfinite(sampleRate)||sampleRate<8000||sampleRate>384000||channels<1||channels>2||!maximumFrames||maximumFrames>65536){LCDSPUnavailable(s,1);return 0;}
     atomic_store(&s->prepared,0);delays_free(s);
+    if(!LCPitchPrepare(s->pitchCore,sampleRate,channels)){LCDSPUnavailable(s,2);return 0;}
+    atomic_store(&s->pitchLatency,LCPitchLatency(s->pitchCore));s->fixedPitchLatency=0;s->outputTimelineStarted=1;
     s->sampleRate=sampleRate;s->renderChannels=channels;s->maximumFrames=maximumFrames;memset(s->history,0,sizeof s->history);
     static const double combTime[COMBS]={.0297,.0371,.0411,.0437},allpassTime[ALLPASSES]={.005,.0017};
     for(uint32_t ch=0;ch<channels;ch++){
@@ -233,14 +249,16 @@ int LCDSPPrepare(LCDSPCore *s,double sampleRate,uint32_t channels,uint32_t maxim
     s->normalizationBlockFrames=(uint32_t)llround(sampleRate*.4);
     s->meterWindowFrames=(uint32_t)llround(sampleRate*.01);atomic_store(&s->windowFrames,s->meterWindowFrames);
     Settings cfg=s->current;read_settings(s,&cfg);apply_settings(s,cfg,1);
-    atomic_store(&s->rate,(uint32_t)llround(sampleRate));atomic_store(&s->channels,channels);atomic_store(&s->appliedRevision,0);atomic_store(&s->prepared,1);
+    atomic_store(&s->rate,(uint32_t)llround(sampleRate));atomic_store(&s->channels,channels);atomic_store(&s->appliedRevision,0);atomic_store(&s->frames,0);atomic_store(&s->pitchFrames,0);atomic_store(&s->prepared,1);
     return 1;
 allocation_failed:
     delays_free(s);LCDSPUnavailable(s,2);return 0;
 }
-void LCDSPUnprepare(LCDSPCore *s){if(s){atomic_store(&s->prepared,0);s->rampRemaining=0;memset(s->history,0,sizeof s->history);delays_free(s);}}
+void LCDSPUnprepare(LCDSPCore *s){if(s){atomic_store(&s->prepared,0);s->rampRemaining=0;memset(s->history,0,sizeof s->history);delays_free(s);LCPitchUnprepare(s->pitchCore);atomic_store(&s->pitchReady,0);}}
 void LCDSPUnavailable(LCDSPCore *s,uint32_t reason){if(s){atomic_store(&s->prepared,0);atomic_store(&s->unavailable,reason?reason:1);}}
-void LCDSPReset(LCDSPCore *s){if(s){memset(s->history,0,sizeof s->history);echo_reset(s);reverb_reset(s);normalization_reset(s);s->limiterGain=1;reset_energy(s);}}
+void LCDSPReset(LCDSPCore *s){if(s){memset(s->history,0,sizeof s->history);echo_reset(s);reverb_reset(s);normalization_reset(s);LCPitchReset(s->pitchCore);atomic_store(&s->pitchReady,0);atomic_store(&s->pitchFrames,0);atomic_store(&s->appliedRevision,0);s->outputTimelineStarted=!s->fixedPitchLatency;s->limiterGain=1;reset_energy(s);}}
+uint32_t LCDSPUsePitchLookahead(LCDSPCore *s){if(!s||!atomic_load(&s->prepared))return 0;s->fixedPitchLatency=1;s->outputTimelineStarted=0;return LCPitchLatency(s->pitchCore);}
+void LCDSPBeginOutputTimeline(LCDSPCore *s){if(s){s->outputTimelineStarted=1;reset_energy(s);normalization_reset(s);atomic_store(&s->frames,0);atomic_store(&s->pitchFrames,0);atomic_store(&s->appliedRevision,0);}}
 void LCDSPProcess(LCDSPCore *s,float *left,float *right,uint32_t frames,uint32_t stride){
     if(!s||!left||!frames||!stride||stride>2||frames>s->maximumFrames||!atomic_load(&s->prepared)||(s->renderChannels==2&&!right))return;
     Settings cfg;if(read_settings(s,&cfg)&&cfg.revision!=s->current.revision)apply_settings(s,cfg,0);
@@ -253,23 +271,29 @@ void LCDSPProcess(LCDSPCore *s,float *left,float *right,uint32_t frames,uint32_t
             if(!--s->rampRemaining){memcpy(s->coefficients,s->target,sizeof s->target);s->gain=s->targetGain;s->wet=s->targetWet;s->reverbAmount=s->targetReverb;s->echoAmount=s->targetEcho;if(s->wet==0)normalization_reset(s);}
             s->reverbDry=cos(s->reverbAmount*1.57079632679489661923);s->reverbWet=sin(s->reverbAmount*1.57079632679489661923)*.7;
         }
-        double input[2]={finite_sample(left[(size_t)f*stride]),s->renderChannels==2?finite_sample(right[(size_t)f*stride]):0},processed[2]={input[0],input[1]};
+        double raw[2]={finite_sample(left[(size_t)f*stride]),s->renderChannels==2?finite_sample(right[(size_t)f*stride]):0},input[2]={raw[0],raw[1]},pitched[2]={raw[0],raw[1]};
+        int pitching=s->current.pitch!=1||!LCPitchReady(s->pitchCore);
+        if(s->fixedPitchLatency||pitching)LCPitchFrame(s->pitchCore,raw,input,pitched);
+        double processed[2]={pitched[0],pitched[1]};
         if(s->wet>0.000001){
-            double normalization=normalize_frame(s,input),peak=0;
+            double normalization=normalize_frame(s,pitched);
             for(uint32_t ch=0;ch<s->renderChannels;ch++){
-                double filtered=input[ch]*normalization;
+                double filtered=pitched[ch]*normalization;
                 for(unsigned b=0;b<BANDS;b++)filtered=filter(filtered,s->coefficients[b],s->history[ch][b]);
                 double base=finite_sample(filtered*s->gain),value=base;
                 if(s->reverbAmount>0.000001)value=base*s->reverbDry+reverberate(s,ch,base)*s->reverbWet;
                 if(s->echoAmount>0.000001){Delay *d=&s->echoDelay[ch];double delayed=delay_read(d);delay_write(d,base+delayed*s->echoAmount*.55);value+=delayed*s->echoAmount*.6;}
-                processed[ch]=finite_sample(value);peak=fmax(peak,fabs(processed[ch]));
+                processed[ch]=finite_sample(pitched[ch]+(value-pitched[ch])*s->wet);
             }
+        }
+        if(s->wet>0.000001||pitching){
+            double peak=0;for(uint32_t ch=0;ch<s->renderChannels;ch++)peak=fmax(peak,fabs(processed[ch]));
             /* Stereo-linked zero-lookahead limiter: instantaneous finite
                attack, 160 ms release, -3 dBFS ceiling. Not a true-peak claim. */
             double desired=peak>.7079457843841379?.7079457843841379/peak:1;
             s->limiterGain=desired<s->limiterGain?desired:desired+(s->limiterGain-desired)*s->limiterRelease;
             s->minimumLimiterGain=fmin(s->minimumLimiterGain,s->limiterGain);
-            for(uint32_t ch=0;ch<s->renderChannels;ch++)processed[ch]=fmax(-.98,fmin(.98,finite_sample(input[ch]+(processed[ch]*s->limiterGain-input[ch])*s->wet)));
+            for(uint32_t ch=0;ch<s->renderChannels;ch++)processed[ch]=fmax(-.98,fmin(.98,finite_sample(processed[ch]*s->limiterGain)));
         }
         uint64_t window=s->meterFrames/s->meterWindowFrames;
         if(window<ENERGY_WINDOWS){
@@ -280,11 +304,12 @@ void LCDSPProcess(LCDSPCore *s,float *left,float *right,uint32_t frames,uint32_t
             float *p=(ch?right:left)+(size_t)f*stride;double output=processed[ch];
             *p=(float)output;
             s->maximumPeak=fmax(s->maximumPeak,fabs(output));
-            if(!s->rampRemaining){inSquares+=input[ch]*input[ch];outSquares+=output*output;measuredSamples++;}
+            if(!s->rampRemaining&&LCPitchReady(s->pitchCore)){inSquares+=input[ch]*input[ch];outSquares+=output*output;measuredSamples++;}
             if(window<ENERGY_WINDOWS){s->windowInputEnergy[window]+=input[ch]*input[ch];s->windowOutputEnergy[window]+=output*output;s->windowSampleCount[window]++;}
         }
         s->meterFrames++;
     }
+    if(!s->outputTimelineStarted)return; // Priming renders no user timeline and cannot acknowledge settings.
     uint32_t lastWindow=(uint32_t)fmin(ENERGY_WINDOWS,(s->meterFrames+s->meterWindowFrames-1)/s->meterWindowFrames);
     for(uint32_t i=firstWindow;i<lastWindow;i++){
         atomic_store(&s->windowInput[i],bits((float)fmin(3.402823466e38,s->windowInputEnergy[i])));atomic_store(&s->windowOutput[i],bits((float)fmin(3.402823466e38,s->windowOutputEnergy[i])));atomic_store(&s->windowCount[i],s->windowSampleCount[i]);atomic_store(&s->windowCrossings[i],s->windowPositiveCrossings[i]);
@@ -298,7 +323,9 @@ void LCDSPProcess(LCDSPCore *s,float *left,float *right,uint32_t frames,uint32_t
         atomic_store(&s->outputRMS,bits((float)fmin(3.402823466e38,sqrt(s->outputEnergy/s->energySamples))));
     }
     atomic_fetch_add(&s->frames,frames);
-    if(!s->rampRemaining)atomic_store(&s->appliedRevision,s->current.revision);
+    atomic_store(&s->pitchReady,LCPitchReady(s->pitchCore));
+    if(s->current.pitch!=1&&LCPitchReady(s->pitchCore))atomic_fetch_add(&s->pitchFrames,frames);
+    if(!s->rampRemaining&&LCPitchReady(s->pitchCore))atomic_store(&s->appliedRevision,s->current.revision);
 }
 LCDSPMetrics LCDSPReadMetrics(const LCDSPCore *s){
     LCDSPMetrics m={0};if(!s)return m;
@@ -306,7 +333,8 @@ LCDSPMetrics LCDSPReadMetrics(const LCDSPCore *s){
     m.prepared=atomic_load(&s->prepared);m.unavailableReason=atomic_load(&s->unavailable);m.sampleRate=atomic_load(&s->rate);m.channels=atomic_load(&s->channels);m.activeBandMask=atomic_load(&s->bandMask);
     m.inputRMS=number(atomic_load(&s->inputRMS));m.outputRMS=number(atomic_load(&s->outputRMS));m.headroomDb=number(atomic_load(&s->headroom));
     m.normalizationMeasured=atomic_load(&s->normMeasured);m.normalizationFrames=atomic_load(&s->normFrames);m.energyWindowFrames=atomic_load(&s->windowFrames);
-    m.loudnessDb=number(atomic_load(&s->loudness));m.normalizationGainDb=number(atomic_load(&s->normGain));m.normalizationTargetDb=number(atomic_load(&s->normTarget));m.peakDb=number(atomic_load(&s->peak));m.limiterReductionDb=number(atomic_load(&s->reduction));return m;
+    m.loudnessDb=number(atomic_load(&s->loudness));m.normalizationGainDb=number(atomic_load(&s->normGain));m.normalizationTargetDb=number(atomic_load(&s->normTarget));m.peakDb=number(atomic_load(&s->peak));m.limiterReductionDb=number(atomic_load(&s->reduction));
+    m.pitchLatencyFrames=atomic_load(&s->pitchLatency);m.pitchReady=atomic_load(&s->pitchReady);m.pitchProcessedFrames=atomic_load(&s->pitchFrames);m.pitchRatio=number(atomic_load(&s->pitch));return m;
 }
 LCDSPEnergyWindow LCDSPReadEnergyWindow(const LCDSPCore *s,uint32_t index){
     LCDSPEnergyWindow value={0};if(!s||index>=ENERGY_WINDOWS)return value;

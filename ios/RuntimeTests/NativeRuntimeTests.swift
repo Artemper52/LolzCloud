@@ -327,6 +327,130 @@ import UIKit
         }
     }
 
+    private func independentPitch(_ player: NativePlayer,_ pitch: Double,revision: Int,client: String,request: Int = 1) {
+        XCTAssertTrue(player.configureEffects(["enabled":false,"gains":[12,0,0,0,0],"preampDb":-6,
+            "reverb":0.4,"echo":0.3,"normalization":true,"pitch":pitch],revision:revision,client:client,request:request))
+    }
+
+    func testActualIndependentPitchMeasuresDownstreamPCMAtDifferentTempos() async throws {
+        let importer=subject(),local=try await importOne(importer,wave("Independent 910Hz",seconds:6,hz:910,sampleRate:48000))
+        let network=try XCTUnwrap(SavedTrack(["id":"123456787","title":"Independent cached MP3","artist":"Runtime fixture","duration":1.1,
+            "audioUrl":"https://lolzcloud.com/music/audio/123456787/aaaaaaaaaaaaaaaaaaaaaaaa.mp3"]))
+        let fixture=try XCTUnwrap(Bundle(for:NativeRuntimeTests.self).url(forResource:"tone",withExtension:"mp3"))
+        try Data(contentsOf:fixture).write(to:offline.appendingPathComponent(try XCTUnwrap(LocalAudioFiles.filename(network))))
+        try JSONEncoder().encode([local,network]).write(to:offline.appendingPathComponent("index.json"),options:.atomic)
+        let player=subject(),av=try avPlayer(player),client=UUID().uuidString.lowercased()
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
+        XCTAssertEqual(player.capabilities["effectsSchema"] as? Int,2,"Released SW7 must retain schema2 discovery")
+        XCTAssertEqual(player.capabilities["maxEffectsSchema"] as? Int,3)
+        var revision=0,observations=[[String:Any]]()
+        func trace(_ phase: String,attach: Bool = false) {
+            let metric=player.audioEffects.measurement
+            let payload: [String:Any] = ["scope":"Actual production AVPlayer post-effects tap, including its own spectral tempo stage and C independent pitch. Seeded MP3 is not an HTTPS download proof.","phase":phase,"observations":observations,
+                "state":player.state,"error":player.error,"processedFrames":metric?.processedFrames ?? 0,"pitchProcessedFrames":metric?.pitchProcessedFrames ?? 0,
+                "latencyFrames":metric?.pitchLatencyFrames ?? 0,"actualRate":av.rate,"time":av.currentTime().seconds.isFinite ? av.currentTime().seconds:0]
+            guard let data=try? JSONSerialization.data(withJSONObject:payload,options:[.sortedKeys]),let text=String(data:data,encoding:.utf8) else { return }
+            print("INDEPENDENT_PITCH_PROBE_JSON="+text)
+            if attach { let item=XCTAttachment(data:data,uniformTypeIdentifier:"public.json");item.name="actual-independent-pitch-probe";item.lifetime = .keepAlways;add(item) }
+        }
+        for track in [local,network] {
+            let source=track.isLocal ? "localWAV":"seededGenuineMP3"
+            var baselineHz=0.0,baselineRMS=0.0
+            for (tempo,pitch) in [(1.0,1.0),(0.75,0.5),(0.75,1.25),(0.75,2.0),(1.5,0.5),(1.5,1.25),(1.5,2.0)] {
+                revision+=1
+                XCTAssertTrue(player.configureRate(["value":tempo,"preservesPitch":true,"revision":revision],client:client,request:1))
+                independentPitch(player,pitch,revision:revision,client:client)
+                player.play(track)
+                let deadline=ProcessInfo.processInfo.systemUptime+12
+                while (player.audioEffects.energyWindow(55)?.frames ?? 0)==0 || player.audioEffects.status["appliedRevision"] as? Int != revision {
+                    if player.state == "error" || ProcessInfo.processInfo.systemUptime >= deadline { trace("failed-"+source,attach:true);XCTFail("Actual independent pitch PCM did not arrive");return }
+                    try await settle(0.025)
+                }
+                let metric=try XCTUnwrap(player.audioEffects.measurement),windows=(20..<50).compactMap{player.audioEffects.energyWindow($0)}
+                let frames=windows.reduce(0.0){$0+Double($1.frames)}/Double(max(1,metric.channels)),crossings=windows.reduce(0.0){$0+Double($1.positiveCrossings)}
+                let hz=crossings*Double(metric.sampleRate)/max(1,frames),rms=sqrt(windows.reduce(0.0){$0+Double($1.outputEnergy)}/max(1,frames*Double(metric.channels)))
+                if pitch==1 { baselineHz=hz;baselineRMS=rms }
+                let expected=baselineHz*pitch
+                observations.append(["source":source,"tempo":tempo,"pitch":pitch,"expectedHz":expected,"measuredHz":hz,"rms":rms,"baselineRMS":baselineRMS,"frames":frames,"sampleRate":metric.sampleRate,"actualRate":av.rate,"position":av.currentTime().seconds])
+                trace("measured-"+source)
+                XCTAssertEqual(hz,expected,accuracy:max(8,expected*0.04),"Actual PCM, not a slider/item property, must establish independent tone")
+                XCTAssertGreaterThan(rms,baselineRMS*0.68);XCTAssertLessThan(rms,baselineRMS*1.48)
+                XCTAssertFalse(player.audioEffects.settings.enabled,"Tone must not enable the user's saved EQ")
+                XCTAssertEqual(metric.normalizationFrames,0)
+                XCTAssertEqual((player.audioEffects.status["capabilities"] as? [String:Bool])?["pitch"],true)
+                if pitch != 1 { XCTAssertGreaterThan(metric.pitchProcessedFrames,0) }
+                XCTAssertEqual(av.currentItem?.audioTimePitchAlgorithm,.spectral)
+                XCTAssertEqual(av.currentItem?.duration.seconds ?? 0,track.duration,accuracy:0.2)
+                if track.isLocal && pitch==1.25 {
+                    let start=av.currentTime().seconds,wall=ProcessInfo.processInfo.systemUptime
+                    try await settle(0.16)
+                    let elapsed=ProcessInfo.processInfo.systemUptime-wall,advance=av.currentTime().seconds-start
+                    XCTAssertEqual(advance,elapsed*tempo,accuracy:0.09,"Pitch must leave the actual AVPlayer media clock at its selected tempo")
+                }
+                player.pause()
+            }
+        }
+        trace("matrix-passed",attach:true)
+    }
+
+    func testActualIndependentPitchPauseSeekDuplicateQueueAndLegacyACK() async throws {
+        let player=subject(),track=try await importOne(player,wave("Pitch lifecycle",seconds:4,hz:910,sampleRate:48000))
+        let av=try avPlayer(player),client=UUID().uuidString.lowercased()
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
+        XCTAssertTrue(player.configureEffects(["enabled":false,"gains":[0,0,0,0,0],"preampDb":0],revision:1,client:client,request:1))
+        XCTAssertEqual((player.audioEffects.status["config"] as? [String:Any])?.count,3)
+        XCTAssertTrue(player.configureEffects(["enabled":false,"gains":[0,0,0,0,0],"preampDb":0,"reverb":0,"echo":0,"normalization":false],revision:2,client:client,request:1))
+        XCTAssertEqual((player.audioEffects.status["config"] as? [String:Any])?.count,6)
+        XCTAssertEqual((player.audioEffects.status["capabilities"] as? [String:Bool])?["pitch"],false)
+        player.configureQueue([track,track],index:0,repeatMode:"off",shuffle:false)
+        let generation=try XCTUnwrap(Mirror(reflecting:player).children.first{$0.label=="intent"}?.value as? PlaybackIntent).generation
+        independentPitch(player,1.5,revision:3,client:client)
+        XCTAssertEqual(try XCTUnwrap(Mirror(reflecting:player).children.first{$0.label=="intent"}?.value as? PlaybackIntent).generation,generation)
+        XCTAssertEqual(av.rate,0)
+        player.play(track,queueIndex:0)
+        let pendingGeneration=try XCTUnwrap(Mirror(reflecting:player).children.first{$0.label=="intent"}?.value as? PlaybackIntent).generation
+        independentPitch(player,1.25,revision:4,client:client)
+        XCTAssertEqual(try XCTUnwrap(Mirror(reflecting:player).children.first{$0.label=="intent"}?.value as? PlaybackIntent).generation,pendingGeneration)
+        try await waitFor("real independent pitch plays") { (player.audioEffects.measurement?.pitchProcessedFrames ?? 0)>1024 && av.currentTime().seconds>0.15 }
+        let item=av.currentItem
+        player.pause();let position=av.currentTime().seconds
+        independentPitch(player,0.5,revision:5,client:client)
+        try await settle(0.2)
+        XCTAssertEqual(av.rate,0);XCTAssertEqual(av.currentTime().seconds,position,accuracy:0.08);XCTAssertTrue(av.currentItem===item)
+        XCTAssertNotEqual(player.audioEffects.status["appliedRevision"] as? Int,5)
+        XCTAssertFalse(player.configureEffects(["enabled":false,"gains":[0,0,0,0,0],"preampDb":0,"reverb":0,"echo":0,"normalization":false,"pitch":2],revision:99,client:client,request:500))
+        let restored=subject();XCTAssertEqual(restored.audioEffects.settings.pitch,0.5);XCTAssertFalse(restored.audioEffects.settings.enabled);XCTAssertEqual(try avPlayer(restored).rate,0)
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:2,handshake:false))
+        independentPitch(player,0.5,revision:5,client:client,request:2)
+        XCTAssertEqual(av.rate,0)
+        player.resume()
+        try await waitFor("same tagged settings apply on explicit resume") { player.audioEffects.status["appliedRevision"] as? Int == 5 && av.rate>0 }
+        player.seek(2)
+        try await waitFor("seek retains pitch and exact item") { av.currentTime().seconds>1.95 && av.currentTime().seconds<2.7 }
+        XCTAssertEqual(player.audioEffects.settings.pitch,0.5)
+        player.seek(3.95)
+        try await waitFor("real EOF keeps duplicate occurrence and pitch") { self.records.last{$0["event"] as? String == "selection"}?["index"] as? Int == 1 && av.currentItem !== item && av.rate>0 }
+        XCTAssertEqual(player.audioEffects.settings.pitch,0.5);XCTAssertFalse(player.audioEffects.settings.enabled)
+        XCTAssertEqual((player.audioEffects.status["config"] as? [String:Any])?.count,7)
+    }
+
+    func testActualTapLatencyCompensationKeepsFirstAndLastPCMAndEOFDuration() async throws {
+        let player=subject(),client=UUID().uuidString.lowercased(),rate=48_000
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
+        XCTAssertTrue(player.configureRate(["value":1,"preservesPitch":false,"revision":1],client:client,request:1))
+        let source=try wave("Aligned first and last",seconds:2,sampleRate:rate,signal:{ frame in frame<48 ? 0.25:frame>=2*rate-48 ? -0.25:0 })
+        let track=try await importOne(player,source),av=try avPlayer(player)
+        independentPitch(player,1,revision:1,client:client)
+        player.configureQueue([track],index:0,repeatMode:"off",shuffle:false);player.play(track,queueIndex:0)
+        try await waitFor("actual AVPlayer finishes the compensated stream",timeout:6) { player.state=="ended" }
+        let metric=try XCTUnwrap(player.audioEffects.measurement)
+        try attachEnergyTrace(player,name:"actual-tap-compensated-first-last")
+        XCTAssertGreaterThan(energy(player,0..<3),0.01)
+        XCTAssertGreaterThan(energy(player,197..<202),0.01,"The lookahead must be flushed before reporting EOF")
+        XCTAssertEqual(Double(metric.processedFrames)/Double(metric.sampleRate),2,accuracy:0.015)
+        XCTAssertEqual(av.currentTime().seconds,2,accuracy:0.08);XCTAssertEqual(av.rate,0)
+    }
+
     func testDeletedLocalCannotFallbackToNetworkOrPlayCallerURL() async throws {
         let player = subject(), source = try wave("Deleted")
         let track = try await importOne(player, source)

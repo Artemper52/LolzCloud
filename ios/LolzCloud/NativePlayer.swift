@@ -80,7 +80,7 @@ import Combine
         return clientIntent.accept(client:client,request:request,handshake:handshake)
     }
     func ownsClientIntent(client: String, request: Int) -> Bool { clientIntent.clientID == client && clientIntent.requestID == request }
-    var capabilities: [String:Any] { clientIntent.fields.merging(["catalogReferences":1,"profileExport":1,"effectsSchema":2,"preservesPitch":1]) { _,new in new } }
+    var capabilities: [String:Any] { clientIntent.fields.merging(["catalogReferences":1,"profileExport":1,"effectsSchema":2,"maxEffectsSchema":3,"independentPitch":1,"preservesPitch":1]) { _,new in new } }
     @discardableResult func configureEffects(_ config: [String:Any], revision: Int, client: String, request: Int) -> Bool {
         // Settings acknowledge the current transport owner; they cannot advance
         // its request ID, change playback generation, cancel prepare or resume.

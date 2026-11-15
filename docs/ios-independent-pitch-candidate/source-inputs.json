@@ -1,0 +1,163 @@
+{
+  "version": "0.1.5",
+  "build": 6,
+  "inputs": [
+    {
+      "file": "ios/KernelTests/pitch-probe.c",
+      "bytes": 4530,
+      "sha256": "661f1cee89fd5bbd0904a6ced649a33d731cdc0201d27444d424218ff97a77f7"
+    },
+    {
+      "file": "ios/LolzCloud/AccountLogin.swift",
+      "bytes": 10983,
+      "sha256": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734"
+    },
+    {
+      "file": "ios/LolzCloud/App.swift",
+      "bytes": 16399,
+      "sha256": "3b5c81223f5a8cc905f825c805ae1b716a9b6dd168ba0a28a834d89cf51bcf71"
+    },
+    {
+      "file": "ios/LolzCloud/AudioEffectsPolicy.swift",
+      "bytes": 3166,
+      "sha256": "6896cb5c5f14f552cf874ce2abb051a9223c8107818eaee1f706ac1415a05f80"
+    },
+    {
+      "file": "ios/LolzCloud/DSP/DSPCore.c",
+      "bytes": 26474,
+      "sha256": "f8c4d8ccdf7651a5ef795207abbd69435a417885f3e08279f246afbc32fc443e"
+    },
+    {
+      "file": "ios/LolzCloud/DSP/NativeAudioEffectsBridge.h",
+      "bytes": 59,
+      "sha256": "b2a95cc7ee4c027b32d49a7f97a25dab0e5734e5381ae24cb0a48ccf30795317"
+    },
+    {
+      "file": "ios/LolzCloud/DSP/NativeAudioTap.c",
+      "bytes": 7243,
+      "sha256": "357042c12d2a2e7c4e1b7d3703be8b5b090b6cf5734105cac29f01112dfb2e43"
+    },
+    {
+      "file": "ios/LolzCloud/DSP/NativeAudioTap.h",
+      "bytes": 242,
+      "sha256": "e1e6fc7beed917df0d1e6a3e8e0af48736772e9c4288a0c9bb08f550a879ca5b"
+    },
+    {
+      "file": "ios/LolzCloud/DSP/PCMStream.c",
+      "bytes": 3299,
+      "sha256": "eea97bb7ecb2391b0e2c76243783f705162cd3bd0fb6ee1abae500d2351f85cc"
+    },
+    {
+      "file": "ios/LolzCloud/DSP/PitchCore.c",
+      "bytes": 9104,
+      "sha256": "577adbdad248f57bf66b53146eabf21b6b90acddae5ad6c7acef19bf1b7b3e0b"
+    },
+    {
+      "file": "ios/LolzCloud/DSP/include/LCDSPCore.h",
+      "bytes": 2810,
+      "sha256": "3e58e30abd74bda5831788b0a43ec0f7ee9cfbea3f0fdc206bcbac6603c68f86"
+    },
+    {
+      "file": "ios/LolzCloud/DSP/include/LCPCMStream.h",
+      "bytes": 769,
+      "sha256": "a277ed54f1422c59801669cbbee18e50b5d9fa2d80f8735d74977bb4f494765c"
+    },
+    {
+      "file": "ios/LolzCloud/DSP/include/LCPitchCore.h",
+      "bytes": 963,
+      "sha256": "909204e813ca5adcfa4a2a5989d74a161fa00c04137517ae1aa09a08feeb45a6"
+    },
+    {
+      "file": "ios/LolzCloud/MediaPolicy.swift",
+      "bytes": 30449,
+      "sha256": "e1497aa0f6564aff26211dcb634072dfd6b3ab5ab2ea215927355e6e7abc4c5e"
+    },
+    {
+      "file": "ios/LolzCloud/NativeAudioEffects.swift",
+      "bytes": 7896,
+      "sha256": "acf5527e749b4ed5a512ea63c2e96245b46c928d4cdfd8f3f619894999bcbc82"
+    },
+    {
+      "file": "ios/LolzCloud/NativeCatalog.swift",
+      "bytes": 5303,
+      "sha256": "757ee942d3f9d6e9854f8b2ffed1bdb3ebcd8da0d25e45ac22be8c8795937c0f"
+    },
+    {
+      "file": "ios/LolzCloud/NativePlayer.swift",
+      "bytes": 37957,
+      "sha256": "ae5beed1ed3373f041072f69a25e921e590f627214879fe58dda2e193853adc0"
+    },
+    {
+      "file": "ios/LolzCloud/NativeProfileShare.swift",
+      "bytes": 2903,
+      "sha256": "2818dccc99e4c9e61c8603ca979ccf77b62389797a0fdaf5bc75734665eb23c5"
+    },
+    {
+      "file": "ios/LolzCloud/NativeRatePolicy.swift",
+      "bytes": 2948,
+      "sha256": "fc6feb5626219cdec2f0a3e6b4f2233ae7c19e15f183ef57f84a7c5abb18da39"
+    },
+    {
+      "file": "ios/Package.swift",
+      "bytes": 896,
+      "sha256": "8cae4be078f48a5c66293c42531ca613ae8d2d0b2dd01324d96ce1a5d3e7141b"
+    },
+    {
+      "file": "ios/RuntimeTests/NativeRuntimeTests.swift",
+      "bytes": 67956,
+      "sha256": "6732ebd23ad8d091271b657bcaa3231c9d95547e9c518fcbccabaa805f08e246"
+    },
+    {
+      "file": "ios/Tests/AdvancedAudioEffectsTests.swift",
+      "bytes": 11074,
+      "sha256": "0e99d1eb1f560792f840bbb7275a8ccf5bf6f0756a9d91cc07e84efcfb5295d0"
+    },
+    {
+      "file": "ios/Tests/AudioEffectsTests.swift",
+      "bytes": 9269,
+      "sha256": "ba52ce833fff36f9298f0389a945ad10a09748fee2ac2b8ef30b3b9d83832c0b"
+    },
+    {
+      "file": "ios/Tests/IndependentPitchTests.swift",
+      "bytes": 12193,
+      "sha256": "e07ba28f8de7627fb4fbad016d40eaa4910376cbd81bfdb4ffb14875e6f457ac"
+    },
+    {
+      "file": "ios/Tests/MediaPolicyTests.swift",
+      "bytes": 26542,
+      "sha256": "fc6ea87bafb7987286b934f721437874d314e5d3f1e4678f90cf53beb32f4913"
+    },
+    {
+      "file": "ios/Tests/NativeCatalogTests.swift",
+      "bytes": 6028,
+      "sha256": "94a90789e7387938dc9b1b031848e06460d875685f92c91bc00c5e525fc600e0"
+    },
+    {
+      "file": "ios/Tests/NativeRatePolicyTests.swift",
+      "bytes": 4216,
+      "sha256": "3305d55b34791621426f1fc7008ee59b2f638b47bc8065d0cf120eb3f34ee3e2"
+    },
+    {
+      "file": "ios/Tests/PortableProfileFileTests.swift",
+      "bytes": 2154,
+      "sha256": "6217c5e690cd983c3fe90985d8213435aee1070dcd8aa135b5d3dd9390dbac1f"
+    },
+    {
+      "file": "ios/tools/CheckProject.swift",
+      "bytes": 3879,
+      "sha256": "5ffba84ba5f9a3a71758f53ed9cfd2ef849c1166af0c955b3c76b07f66077a13"
+    },
+    {
+      "file": "ios/tools/project.cjs",
+      "bytes": 6196,
+      "sha256": "9af6891b0842bab1a89451b88e7ae99fe31f1ca5681bea1b9505546ac6525193"
+    },
+    {
+      "file": "ios/tools/runtime-project.cjs",
+      "bytes": 8981,
+      "sha256": "2ee1862b9e87c7ecad72ee30cb0c634be645251ddf771ce9e3dceea8c3517fa6"
+    }
+  ],
+  "inputDigest": "4444bae6eea7b466dab3ece3d2621050e5f4259dc82831fd8844d33e8012911d",
+  "infoPlistSha256": "2d444897427aadcad285c8aaa178bb69c15ac75c30e6386c08b0fb11a450ebd5"
+}
