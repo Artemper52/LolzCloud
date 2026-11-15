@@ -167,9 +167,11 @@
   el('eq-enabled').onchange = () => action('dsp', { settings: { enabled: el('eq-enabled').checked } });
   el('eq-save').onclick = () => action('dsp', { settings: { saveAs: el('eq-name').value } });
   async function saveSound(settings) {
-    await action('dsp', { settings: { ...settings, enabled: true } }); soundDraft = null; render();
+    const transportOnly = Object.keys(settings).every(key => ['rate', 'pitch', 'preservesPitch', 'transportEnabled'].includes(key));
+    await action('dsp', { settings: { ...settings, ...(transportOnly ? { transportEnabled: true } : { enabled: true }) } }); soundDraft = null; render();
   }
   const soundCaption = {
+    pitch: value => (value / 100).toFixed(2).replace('.', ',') + '×',
     preamp: value=>String(value).replace('-','−')+' дБ',
     speed: value => value < 95 ? 'Замедленно' : value > 105 ? 'Ускоренно' : 'Оригинальный',
     bass: value => value <= 0 ? 'Естественный' : value < 4 ? 'Мягкий' : value < 8 ? 'Плотный' : 'Мощный',
@@ -177,16 +179,17 @@
     echo: value => !value ? 'Без эффекта' : value < 25 ? 'Мягкое' : value < 50 ? 'Заметное' : 'Глубокое',
   };
   function controlPatch(name, value) {
-    if (name === 'speed') return { rate: value / 100 };
+    if (name === 'speed') return { rate: value / 100, transportEnabled: true };
+    if (name === 'pitch') return { pitch: value / 100, preservesPitch: true, transportEnabled: true };
     if(name==='preamp')return{preampDb:value};
     if (name === 'bass') { const gains = [...(soundDraft || feature.dsp).gains]; gains[0] = value; gains[1] = Math.round(value * .55); return { gains }; }
     return { [name]: value / 100 };
   }
-  for (const name of ['speed', 'preamp', 'bass', 'reverb', 'echo']) {
+  for (const name of ['speed', 'pitch', 'preamp', 'bass', 'reverb', 'echo']) {
     el(name).oninput = () => {
       if (!feature) return;
       const value = Number(el(name).value); el(name + '-caption').textContent = soundCaption[name](value);
-      soundDraft = { ...(soundDraft || feature.dsp), ...controlPatch(name, value), preset: 'Свой', enabled: true };
+      soundDraft = { ...(soundDraft || feature.dsp), ...controlPatch(name, value), preset: 'Свой', ...(['speed', 'pitch'].includes(name) ? {} : { enabled: true }) };
       void applyDsp(soundDraft);
     };
     el(name).onchange = () => saveSound(controlPatch(name, Number(el(name).value)));
@@ -274,7 +277,7 @@
     }]]));
   }
   async function applyDsp(config) {
-    if (feature?.room?.hosting || feature?.source === 'room') config = { ...config, rate: 1 };
+    if (feature?.room?.hosting || feature?.room?.audioLocked || feature?.source === 'room') config = { ...config, rate: 1, pitch: 1, preservesPitch: true };
     const serialized = JSON.stringify(config);
     if (serialized === dspApplied) return;
     try { await activeView().executeJavaScript(`window.__lolzcloudSetAudioFX && window.__lolzcloudSetAudioFX(${serialized})`); dspApplied = serialized; }
@@ -414,17 +417,23 @@
     el('eq-enabled').checked = feature.dsp.enabled;
     el('sound-presets').querySelectorAll('button').forEach(button => { const selected = button.dataset.preset === feature.dsp.preset; button.classList.toggle('is-selected', selected); button.setAttribute('aria-pressed', String(selected)); });
     const sound = soundDraft || feature.dsp;
-    for (const [name, value] of [['speed', sound.rate * 100], ['preamp',sound.preampDb??0],['bass', Math.max(0, sound.gains[0])], ['reverb', sound.reverb * 100], ['echo', sound.echo * 100]]) {
+    for (const [name, value] of [['speed', sound.rate * 100], ['pitch', (sound.pitch ?? 1) * 100], ['preamp',sound.preampDb??0],['bass', Math.max(0, sound.gains[0])], ['reverb', sound.reverb * 100], ['echo', sound.echo * 100]]) {
       if (document.activeElement !== el(name)) el(name).value = value;
       el(name + '-caption').textContent = soundCaption[name](value);
     }
-    const sharedSpeed = feature.room.hosting || feature.source === 'room';
+    const sharedSpeed = feature.room.hosting || feature.room.audioLocked || feature.source === 'room';
     el('speed').disabled = sharedSpeed;
     el('speed').title = sharedSpeed ? 'В общей комнате используется скорость 1×' : 'Темп музыки';
     if (sharedSpeed) { el('speed').value = 100; el('speed-caption').textContent = 'В комнате · 1×'; }
     el('preserve-pitch').checked = sound.preservesPitch;
+    el('pitch').disabled = sharedSpeed;
+    el('pitch').title = sharedSpeed ? 'В общей комнате используется исходная высота тона' : 'Высота тона без изменения скорости';
+    el('pitch-mode').textContent = sharedSpeed ? 'В комнате звучит исходный тон.' : sound.preservesPitch ? 'Высота тона меняется отдельно от темпа.' : 'Тон следует за темпом. Изменение ползунка включит отдельную высоту.';
     feature.dsp.gains.forEach((gain, index) => { const input = document.getElementById('lc-band-' + index); if (document.activeElement !== input) { input.value = gain; input.nextElementSibling.textContent = gain + ' дБ'; } });
-    el('audio-state').textContent = !feature.dsp.enabled ? 'Оригинальное звучание · эффекты выключены' : feature.audio.unavailable ? 'Темп меняется. Для этого потока пространственные эффекты недоступны.' : feature.audio.attached ? 'Твоё звучание активно · эффекты применяются сразу' : feature.audio.mediaCount ? 'Темп настроен · пространственные эффекты включатся с музыкой' : 'Настройки готовы. Если трек уже играл, нажми паузу и продолжи.';
+    const localAudio = !!window.LolzCloudLocal?.current;
+    const tone = localAudio ? window.LolzCloudLocal.pitchState() : feature.audio.pitch;
+    const independentTone = !sharedSpeed && (sound.enabled || sound.transportEnabled) && sound.preservesPitch && Math.abs((sound.pitch ?? 1) - 1) > .0001;
+    el('audio-state').textContent = independentTone ? tone?.unavailable || !localAudio && feature.audio.unavailable ? 'Для этого потока изменение тона недоступно. Исходный тон сохранён.' : tone?.applied ? 'Высота тона применяется отдельно от темпа.' : 'Настройка тона готова. Обработка подтвердится после начала музыки.' : !feature.dsp.enabled ? sound.transportEnabled && sound.rate !== 1 ? 'Темп настроен · эквалайзер и пространство выключены' : 'Оригинальный тон · эквалайзер и пространство выключены' : feature.audio.unavailable ? 'Темп меняется. Для этого потока пространственные эффекты недоступны.' : feature.audio.attached ? 'Твоё звучание активно · эффекты применяются сразу' : feature.audio.mediaCount ? 'Темп настроен · пространственные эффекты включатся с музыкой' : 'Настройки готовы. Если трек уже играл, нажми паузу и продолжи.';
     if (feature.protection) {
       const settings = feature.protection;
       for (const key of ['limiter', 'ducking', 'scope', 'ceilingDb', 'duckDb', 'thresholdDb']) {
@@ -444,7 +453,7 @@
     if (studio.open && tab === 'lyrics') {
       el('lyric-title').textContent = track.title || 'Включи любимый трек'; el('lyric-artist').textContent = track.artist || 'SoundCloud';
       window.lolzArtwork(el('lyric-cover'), track.cover);
-      if (feature.lyrics?.key === lyricKey(track)) setLyrics(feature.lyrics);
+      if (feature.lyrics?.key === lyricKey(track)) { setLyrics(feature.lyrics); if (!feature.lyrics.loading && (feature.lyrics.lines?.length || feature.lyrics.plain?.trim() || feature.lyrics.instrumental)) lyricTrack = lyricKey(track); }
       if (lyricTrack !== lyricKey(track)) void loadLyrics();
       lyricView.setPlayback(track, snapshot.fresh);
     }
@@ -461,7 +470,8 @@
     lyrics = data; lyricView.setData(data);
     const searching = data.attempts?.find(attempt => attempt.status === 'searching');
     const caption = data.lines?.some(line => line.words?.length) ? 'Пословно · ' + data.source : data.lines?.length ? 'По строкам · ' + data.source : data.versionMismatch ? 'Длительность версии отличается · текст без синхронизации' : data.plain ? 'Текст без тайм-кодов · ' + data.source : data.instrumental ? 'Инструментальная композиция' : data.attempts?.length ? 'Текст не найден · проверь название в источниках' : 'Слова твоей музыки';
-    el('lyric-status').textContent = data.loading ? (data.found ? caption + ' · ищем тайминги…' : 'Ищем слова' + (searching ? ' · ' + searching.name : '…')) : caption;
+    const adapted = data.adapted && Number.isFinite(data.tempo?.rate) ? ' · Под версию ' + data.tempo.rate.toFixed(2).replace('.', ',') + '× (по длительности)' : '';
+    el('lyric-status').textContent = (data.loading ? (data.found ? caption + ' · ищем тайминги…' : 'Ищем слова' + (searching ? ' · ' + searching.name : '…')) : caption) + adapted;
     el('lyric-follow').disabled = !data.lines?.length || feature?.preferences?.autoFollow === false;
   }
   function renderSources() {

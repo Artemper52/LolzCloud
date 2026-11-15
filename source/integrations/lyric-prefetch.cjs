@@ -8,7 +8,7 @@ class LyricPrefetcher {
     if (this.stopped) return;
     if (snapshot.private || !snapshot.fresh) { this.library.warm([]); return; }
     const current = snapshot.playback;
-    if (current?.title && current.duration > 0) void this.library.load(current);
+    if (current?.title) void this.library.load(current);
     if (waveQueue) { this.library.warm(waveQueue.slice(0, 2)); return; }
     const urls = this.urls.filter(url => url !== current?.url).slice(0, 2);
     this.library.warm(urls.map(url => this.metadata.get(url)).filter(Boolean));

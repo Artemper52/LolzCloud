@@ -2,7 +2,8 @@
 const { parseLrc, readTtml, parseYrc, parseRichsync, parseSpicy, tidyLines } = require('./lyric-formats.cjs');
 const { sameRecording, quality, wordCoverage, bestLyrics } = require('./lyric-match.cjs');
 const { LyricSettings, PROVIDERS } = require('./lyric-settings.cjs');
-const { lyricIdentity, lyricCandidates, artistNames } = require('./lyric-identity.cjs');
+const { lyricIdentity, lyricCandidates, artistNames, normalName } = require('./lyric-identity.cjs');
+const Tempo = require('../app/lib/js/lyric-tempo.js');
 const makeUrl = (base, values) => base + '?' + new URLSearchParams(Object.entries(values).filter(([, value]) => value !== undefined && value !== null).map(([key, value]) => [key, String(value)]));
 const metadata = (title, artist, duration) => ({ title, artist, duration: Number(duration) || 0 });
 const catalogueMatch = (rows, track, convert) => (Array.isArray(rows) ? rows : []).map(row => ({ row, track: convert(row) })).filter(value => sameRecording(value.track, track)).sort((a, b) => Math.abs(a.track.duration - track.duration) - Math.abs(b.track.duration - track.duration))[0];
@@ -16,7 +17,45 @@ class ProviderError extends Error {
 }
 class LyricsEngine {
   constructor({ settings = new LyricSettings(), fetcher = (...args) => fetch(...args), adapters = null, now = Date.now, shared = null } = {}) {
-    this.settings = settings; this.fetcher = fetcher; this.adapters = adapters; this.now = now; this.shared = shared; this.cooldowns = new Map(); this.spotifyToken = null; this.albumCache = new Map();
+    this.settings = settings; this.fetcher = fetcher; this.adapters = adapters; this.now = now; this.shared = shared; this.cooldowns = new Map(); this.spotifyToken = null; this.albumCache = new Map(); this.tempoRows = new Map(); this.tempoPending = new Map();
+  }
+  async canonicalTempoRows(track,{signal,force=false}={}) {
+    if(signal?.aborted)throw signal.reason;
+    const key=[track.title,track.artist].map(normalName).join('\n');
+    const cached=this.tempoRows.get(key);if(!force&&cached&&cached.until>this.now())return cached.rows;
+    const blocked=this.cooldowns.get('lrclib');if(blocked?.until>this.now())throw new ProviderError(blocked.code,blocked.until);
+    let task=this.tempoPending.get(key);
+    if(!task||task.controller.signal.aborted){
+      if(this.tempoPending.size>=4)throw new ProviderError('unavailable');
+      const controller=new AbortController();task={controller,users:0,done:false};
+      task.promise=this.request(makeUrl('https://lrclib.net/api/search',{track_name:track.title,artist_name:track.artist}),{signal:AbortSignal.any([controller.signal,AbortSignal.timeout(4500)])}).then(data=>{
+        if(controller.signal.aborted)throw controller.signal.reason;
+        if(!Array.isArray(data)||data.length>100)throw new ProviderError('invalid');
+        const rows=[];let size=0;
+        for(const row of data.slice(0,50)){if(!row||typeof row.trackName!=='string'||typeof row.artistName!=='string')continue;const clean={id:row.id,trackName:row.trackName.slice(0,300),artistName:row.artistName.slice(0,300),duration:row.duration,instrumental:row.instrumental===true,syncedLyrics:typeof row.syncedLyrics==='string'?row.syncedLyrics.slice(0,120000):'',plainLyrics:typeof row.plainLyrics==='string'?row.plainLyrics.slice(0,60000):''};size+=Buffer.byteLength(JSON.stringify(clean));if(size>512000)break;rows.push(clean);}
+        this.tempoRows.delete(key);this.tempoRows.set(key,{rows,until:this.now()+(rows.length?3600000:60000)});while(this.tempoRows.size>24)this.tempoRows.delete(this.tempoRows.keys().next().value);return rows;
+      }).catch(error=>{if(error.retryAt>this.now())this.cooldowns.set('lrclib',{until:error.retryAt,code:error.code});throw error;}).finally(()=>{task.done=true;if(this.tempoPending.get(key)===task)this.tempoPending.delete(key);});
+      this.tempoPending.set(key,task);
+    }
+    task.users++;
+    return new Promise((resolve,reject)=>{let done=false;const finish=(error,rows)=>{if(done)return;done=true;signal?.removeEventListener('abort',abort);task.users--;if(!task.users&&!task.done)task.controller.abort();error?reject(error):resolve(rows);};const abort=()=>finish(signal.reason||new DOMException('Cancelled','AbortError'));if(signal?.aborted){abort();return;}signal?.addEventListener('abort',abort,{once:true});task.promise.then(rows=>finish(null,rows),error=>finish(error));});
+  }
+  async tempoVersion(track,options={}) {
+    const variant=Tempo.detectVariant(track.variantTitle||track.title);
+    if(!variant.marked||this.settings.disabled.includes('lrclib'))return null;
+    const cleaned=Tempo.detectVariant(track.title).title,candidates=lyricCandidates({...track,title:cleaned}),deadline=this.now()+9000,budget=options.signal?AbortSignal.any([options.signal,AbortSignal.timeout(9000)]):AbortSignal.timeout(9000);
+    const ordered=candidates.length>1?[...candidates.slice(1),candidates[0]]:candidates;let written=null;
+    for(const candidate of ordered){
+      if(options.signal?.aborted)throw options.signal.reason;if(this.now()>=deadline||budget.aborted)break;
+      try{
+        const rows=await this.canonicalTempoRows(candidate,{...options,signal:budget});
+        const result=Tempo.selectRecord(rows,{...candidate,variantTitle:track.variantTitle||track.title},{parseLines:parseLrc,sameIdentity:(a,b)=>sameRecording({...a,duration:0},{...b,duration:0})});
+        if(!result)continue;
+        const value={...result,precision:result.lines.length?wordCoverage(result)?'word':'line':'plain',identity:{...result.identity,changed:true},attempts:[{id:'lrclib',name:'LRCLIB',status:result.lines.length?'line':'plain'}]};
+        if(value.lines.length||value.instrumental)return value;if(!written&&value.found)written=value;
+      }catch(error){if(options.signal?.aborted)throw options.signal.reason;if(error.code==='limited')break;}
+    }
+    return written;
   }
   async request(url, { signal, headers = {}, method = 'GET', body, text = false, redirectHosts = [] } = {}) {
     let response;
@@ -196,6 +235,8 @@ class LyricsEngine {
     return result?.status === 200 && result.content ? { ...lyricsFrom(Buffer.from(result.content, 'base64').toString('utf8')), recordId: pick.row.id } : null;
   }
   async search(track, options = {}) {
+    const adapted=await this.tempoVersion(track,options);
+    if(adapted){options.onProgress?.(adapted);return adapted;}
     let best = null;
     for (const candidate of lyricCandidates(track)) {
       const result = await this.searchIdentity(candidate, { ...options, onProgress: value => options.onProgress?.({ ...value, identity: { ...value.identity, changed: value.identity?.title !== track.title || value.identity?.artist !== track.artist } }) });

@@ -32,6 +32,29 @@
       transaction.onabort = transaction.onerror = () => reject(new Error(transaction.error?.name === 'QuotaExceededError' ? 'Недостаточно места. Удали ненужные загрузки.' : 'Не удалось сохранить данные. Проверь свободное место.'));
     });
   }
+  async function saveLyrics(id, value) {
+    const row = { ...value, id }, size = item => new TextEncoder().encode(JSON.stringify(item)).length;
+    if (size(row) > 1024 * 1024) throw new Error('Текст слишком большой для кеша.');
+    const db = await open();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction('lyrics', 'readwrite'), store = transaction.objectStore('lyrics'), entries = [];
+      store.put(row); const request = store.openCursor(); let total = 0;
+      request.onsuccess = () => {
+        try {
+          const cursor = request.result;
+          if (cursor) { const bytes = size(cursor.value); entries.push({ key: cursor.primaryKey, bytes, at: Number(cursor.value.cachedAt) || 0 }); total += bytes; cursor.continue(); return; }
+          entries.sort((a, b) => a.at - b.at); let remaining = entries.length;
+          for (const entry of entries) {
+            if (remaining <= 500 && total <= 8 * 1024 * 1024) break;
+            if (entry.key === id) continue;
+            store.delete(entry.key); total -= entry.bytes; remaining--;
+          }
+        } catch { transaction.abort(); }
+      };
+      transaction.oncomplete = resolve;
+      transaction.onabort = transaction.onerror = () => reject(new Error('Не удалось сохранить кеш текста.'));
+    });
+  }
   async function list() { return (await read('tracks')).map(({ blob, ...row }) => row); }
   async function save(track, blob) {
     if (!(blob instanceof Blob) || blob.size <= 128 || blob.size > MAX_FILE || !/^audio\/mpeg(?:;|$)/i.test(blob.type)) throw new Error('Получен неполный MP3 или файл больше 20 МБ.');
@@ -59,6 +82,6 @@
     });
   }
   window.LolzCloudOffline = { list, get: id => read('tracks', id), remove: id => write('tracks', 'delete', id), save, saveLocal,
-    lyrics: id => read('lyrics', id), saveLyrics: (id, value) => write('lyrics', 'put', { id, ...value }),
+    lyrics: id => read('lyrics', id), saveLyrics,
     userLyrics: id => read('userLyrics', id), saveUserLyrics: (id, value) => write('userLyrics', 'put', { id, ...value }), removeUserLyrics: id => write('userLyrics', 'delete', id), MAX_FILE, MAX_TOTAL };
 })();

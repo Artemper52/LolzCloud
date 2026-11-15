@@ -42,7 +42,7 @@
   applyWebPitch();
   effectsController = window.LolzCloudEffects.createController({ audio, native, sendNative,
     intent: () => ({ clientId: nativeClientId, requestId: nativeRequestId }),
-    wantedPlayback: () => phase === 'playing' || phase === 'loading', onState: renderEffects,
+    preservesPitch: () => preservesPitch, wantedPlayback: () => phase === 'playing' || phase === 'loading', onState: renderEffects,
     onInterrupted: () => { if (!native && loaded && !audio.paused && ['playing', 'loading'].includes(phase)) { phase = 'blocked'; playerError = 'Звук прерван. Нажми Play, чтобы продолжить.'; audio.pause(); renderPlayback(); persist(); } },
   });
   const portableController = window.LolzCloudProfile.create({ read: portableState, apply: applyPortable, lookup: lookupCatalog, onState: renderPortable });
@@ -95,7 +95,7 @@
     try { localStorage.setItem('LolzCloud-app-v1', JSON.stringify({ ...savedState(), liked: [...targetLiked], bookmarks: Object.fromEntries(targetMoments), collection: [...replacement.values()].slice(-500), rate: nextRate, preservesPitch: nextPitch })); if (settings) localStorage.setItem('LolzCloud-effects-v1', JSON.stringify(settings)); }
     catch (error) { try { if (oldApp === null) localStorage.removeItem('LolzCloud-app-v1'); else localStorage.setItem('LolzCloud-app-v1', oldApp); if (oldEffects === null) localStorage.removeItem('LolzCloud-effects-v1'); else localStorage.setItem('LolzCloud-effects-v1', oldEffects); } catch {} throw Error('Не хватает места для переноса. Текущие данные сохранены; освободи место и повтори.'); }
     liked = targetLiked; bookmarks.clear(); for (const [id, rows] of targetMoments) bookmarks.set(id, rows); collection = replacement;
-    if (settings) void effectsController.configure(settings).catch(noticeError); if (nextPitch !== preservesPitch) setPreservesPitch(nextPitch); if (nextRate !== rate) setRate(nextRate);
+    const pitchChanged = nextPitch !== preservesPitch; if (pitchChanged) setPreservesPitch(nextPitch, { syncEffects: false }); if (settings) void effectsController.configure(settings).catch(noticeError); else if (pitchChanged) void effectsController.transport().catch(noticeError); if (nextRate !== rate) setRate(nextRate);
     renderLike(); renderBookmarks(); renderLibrary(); renderComfort(); renderWave();
   }
   async function lookupCatalog(row, signal) {
@@ -164,13 +164,13 @@
     const cancel = () => controller.abort();
     if (signal?.aborted) controller.abort(); else signal?.addEventListener('abort', cancel, { once: true });
     try {
-      const response = await fetch(url, { ...options, credentials: 'same-origin', cache: 'no-store', redirect: 'error', signal: controller.signal, headers: { Accept: 'application/json', ...options.headers } });
+      const response = await fetch(url, { ...options, credentials: options.credentials ?? 'same-origin', cache: 'no-store', redirect: 'error', signal: controller.signal, headers: { Accept: 'application/json', ...options.headers } });
       if (!response.headers.get('content-type')?.toLowerCase().startsWith('application/json') || +(response.headers.get('content-length') || 0) > limit) throw new Error('Сервис вернул неверный ответ. Попробуй ещё раз.');
       const reader = response.body.getReader(), parts = []; let bytes = 0;
       for (;;) { const part = await reader.read(); if (part.done) break; bytes += part.value.byteLength; if (bytes > limit) { await reader.cancel(); throw new Error('Ответ сервиса слишком большой.'); } parts.push(part.value); }
       const text = await new Blob(parts).text();
       let body; try { body = JSON.parse(text); } catch { throw new Error('Не удалось прочитать ответ сервиса.'); }
-      if (!response.ok && response.status !== 202) { const error = new Error(typeof body.error === 'string' ? body.error.slice(0, 300) : 'Сервис временно недоступен (HTTP ' + response.status + ').'); error.status = response.status; throw error; }
+      if (!response.ok && response.status !== 202) { const error = new Error(typeof body.error === 'string' ? body.error.slice(0, 300) : 'Сервис временно недоступен (HTTP ' + response.status + ').'); error.status = response.status; const retry = response.headers.get('retry-after'); if (response.status === 429 && retry) { const delay = /^\d+(?:\.\d+)?$/.test(retry) ? Number(retry) * 1000 : Date.parse(retry) - Date.now(); if (Number.isFinite(delay) && delay > 0) error.retryAfterMs = delay; } throw error; }
       return { response, body };
     } catch (error) {
       if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
@@ -355,7 +355,7 @@
   function renderEffects(value = effectsController.snapshot()) {
     const cap = value.capabilities, config = value.config;
     $('effects-enabled').checked = config.enabled; $('effects-enabled').disabled = !cap.eq;
-    $('effects-retry').hidden = native || value.state !== 'unsupported' || !cap.eq || !config.enabled;
+    $('effects-retry').hidden = native || value.state !== 'unsupported' || (!cap.eq && !cap.pitch) || !config.enabled && (!preservesPitch || config.pitch === 1);
     const db = n => (n > 0 ? '+' : '') + n + ' дБ';
     for (let i = 0; i < 5; i++) { const input = $('effects-gain-' + i); if (document.activeElement !== input) input.value = config.gains[i]; input.disabled = !cap.eq; input.setAttribute('aria-valuetext', db(config.gains[i])); $('effects-gain-' + i + '-value').textContent = db(config.gains[i]); }
     for (const [key, id, scale] of [['preampDb', 'preamp', 1], ['reverb', 'reverb', 100], ['echo', 'echo', 100]]) { const input = $('effects-' + id), amount = Math.round(config[key] * scale); if (document.activeElement !== input) input.value = amount; input.disabled = !cap[id]; $('effects-' + id + '-value').textContent = scale === 1 ? db(amount) : amount + '%'; }
@@ -363,11 +363,12 @@
     for (const section of document.querySelectorAll('[data-effects-cap]')) section.hidden = native && !cap[section.dataset.effectsCap];
     const presets = $('effects-preset'), options = Object.entries(window.LolzCloudEffectsPolicy.PRESETS).filter(([key]) => !native || !(['lofi', 'reverb'].includes(key) && !cap.reverb || key === 'echo' && !cap.echo)), signature = options.map(([key]) => key).join(',');
     if (presets.dataset.options !== signature) { presets.replaceChildren(...options.map(([key, row]) => { const option = document.createElement('option'); option.value = key; option.textContent = row.label; return option; })); const custom = document.createElement('option'); custom.value = 'custom'; custom.textContent = 'Свои настройки'; custom.disabled = true; presets.append(custom); presets.dataset.options = signature; }
-    presets.value = window.LolzCloudEffectsPolicy.selectedPreset(config, native && value.effectsSchema !== 2); presets.disabled = !cap.eq;
+    presets.value = window.LolzCloudEffectsPolicy.selectedPreset(config, native && value.effectsSchema < 2); presets.disabled = !cap.eq;
     let text = value.error || ({ bypassed: 'Обработка выключена. Исходный звук.', pending: 'Настройки применятся при воспроизведении.', applied: 'Обработка применяется к этому треку.', interrupted: 'Звук прерван. Нажми Play, чтобы продолжить.', unsupported: 'Обработка звука здесь недоступна.' })[value.state] || '';
     if (roomAudible) text += ' Настройки относятся к твоему плееру; звук комнаты остаётся общим.';
-    if (native && value.effectsSchema !== 2 && (config.echo || config.reverb || config.normalization)) text += ' Дополнительные эффекты сохранены для поддерживающего клиента.';
+    if (native && value.effectsSchema < 2 && (config.echo || config.reverb || config.normalization)) text += ' Дополнительные эффекты сохранены для поддерживающего клиента.';
     if ($('effects-status').textContent !== text) $('effects-status').textContent = text;
+    if (effectsController) renderComfort();
     const meter = value.normalization; $('effects-normalization-status').textContent = !config.normalization ? 'Для музыки в твоём плеере. Защита от пиков включается вместе с обработкой.' : meter?.measured ? 'Коррекция: ' + db(Math.round(meter.gainDb * 10) / 10) + '. Измерение продолжается во время музыки.' : 'Оцениваем громкость. Первые несколько секунд играют без коррекции.';
   }
   function configureEffects(patch) { portableController.editedSound(patch); portableFile = null; void effectsController.configure(patch).catch(noticeError); }
@@ -454,47 +455,32 @@
       probe.preload = 'metadata'; probe.onloadedmetadata = () => finish(!Number.isFinite(probe.duration) || probe.duration <= 0 || expected > 20 && probe.duration < expected * 0.8 ? new Error('Сервис вернул только отрывок. Загрузка не сохранена.') : null); probe.onerror = () => finish(new Error('Аудиофайл повреждён. Попробуй другую запись.')); probe.src = url;
     });
   }
-  async function lyricsFor(track, signal) {
-    const imported = await DB.userLyrics(track.id).catch(() => null);
-    if (imported?.imported === true && (typeof imported.plain === 'string' && imported.plain.trim() || typeof imported.synced === 'string' && imported.synced.trim())) return imported;
-    const metadata = lyricsMetadata.get(track.id) || track, identity = C.lyricsIdentity(metadata.title) + '|' + C.lyricsIdentity(metadata.artist) + '|' + track.duration;
-    if (!C.lyricsIdentity(metadata.title) || !C.lyricsIdentity(metadata.artist)) throw new Error('Уточни название и исполнителя или импортируй свой TXT / LRC.');
-    const cached = await DB.lyrics(track.id).catch(() => null); if (cached?.policy === 2 && cached.identity === identity && (cached.plain || cached.synced || cached.instrumental)) return cached;
-    const params = new URLSearchParams({ track_name: metadata.title, artist_name: metadata.artist, duration: String(Math.round(track.duration)) });
-    let result, notFound = false;
-    try {
-      const { body } = await json('https://lrclib.net/api/get?' + params, { signal, timeout: 15000, limit: 256 * 1024, credentials: 'omit' });
-      notFound = body?.name === 'TrackNotFound' || body?.code === 'TRACK_NOT_FOUND';
-      if (!notFound) result = C.lyricsCandidate(body, metadata.title, metadata.artist, track.duration);
-    } catch (error) { if (error.status !== 404) throw error; notFound = true; }
-    if (notFound) {
-      const search = new URLSearchParams({ track_name: metadata.title, artist_name: metadata.artist });
-      const { body } = await json('https://lrclib.net/api/search?' + search, { signal, timeout: 15000, limit: 1024 * 1024, credentials: 'omit' });
-      if (!Array.isArray(body) || body.length > 100) throw new Error('Сервис текстов вернул неверный список записей.');
-      const candidates = body.map(row => C.lyricsCandidate(row, metadata.title, metadata.artist, track.duration)).filter(Boolean);
-      result = candidates.find(row => row.synced) || candidates[0];
-    }
-    if (!result) throw new Error('Текст этой записи пока не найден. Уточни название и исполнителя.');
-    if (signal.aborted) throw new DOMException('Cancelled', 'AbortError');
-    const value = { ...result, policy: 2, identity }; void DB.saveLyrics(track.id, value).catch(() => {}); return value;
-  }
+  const lyricService = window.LolzCloudLyrics.create({ db: DB, fetchJSON: json });
+  function lyricsFor(track, signal, refresh = false) { return lyricService.forTrack(track, { signal, metadata: lyricsMetadata.get(track.id), refresh }); }
   async function loadLyrics(force = false) {
     if (!current) return;
     if (!force && lyricsTrack === current.id && $('lyrics-text').childNodes.length) return;
     const track = current, token = ++lyricsVersion; lyricsController?.abort(); lyricsController = new AbortController();
-    lyricsTrack = track.id; syncedLyrics = []; activeLyric = -1; $('lyrics-text').replaceChildren(); $('lyrics-retry').hidden = true; $('lyrics-edit').hidden = true; $('lyrics-metadata-form').hidden = true; $('lyrics-import-remove').hidden = true; $('lyrics-import-status').textContent = ''; document.querySelector('#panel-lyrics .attribution').hidden = false; $('lyrics-status').textContent = 'Ищем текст этой записи…';
+    const metadata = lyricsMetadata.get(track.id) || track, renderedIdentity = track.id + '|' + C.lyricsIdentity(metadata.title) + '|' + C.lyricsIdentity(metadata.artist), keepReady = $('lyrics-text').dataset.identity === renderedIdentity && $('lyrics-text').childNodes.length;
+    lyricsTrack = track.id; if (!keepReady) { syncedLyrics = []; activeLyric = -1; $('lyrics-text').replaceChildren(); } $('lyrics-retry').hidden = true; $('lyrics-edit').hidden = true; $('lyrics-metadata-form').hidden = true; $('lyrics-import-remove').hidden = true; $('lyrics-import-status').textContent = ''; document.querySelector('#panel-lyrics .attribution').hidden = false; $('lyrics-status').textContent = 'Ищем текст этой записи…';
     try {
-      const value = await lyricsFor(track, lyricsController.signal); if (token !== lyricsVersion || current?.id !== track.id) return;
+      const value = await lyricsFor(track, lyricsController.signal, force); if (token !== lyricsVersion || current?.id !== track.id) return;
       $('lyrics-import-remove').hidden = !value.imported; document.querySelector('#panel-lyrics .attribution').hidden = !!value.imported;
-      syncedLyrics = C.parseLyrics(value.synced);
-      if (syncedLyrics.length) { $('lyrics-text').append(...syncedLyrics.map(line => { const item = button(line.text || '♪', () => seek(line.time), 'lyric-line'); item.setAttribute('aria-label', line.text + ', ' + C.formatTime(line.time)); return item; })); $('lyrics-status').textContent = (value.imported ? 'Твой LRC · ' : '') + 'Нажми на строку, чтобы перейти к ней.'; renderTime(); }
-      else { $('lyrics-text').textContent = value.instrumental ? 'Инструментальная запись' : value.plain; $('lyrics-status').textContent = value.imported ? 'Твой текст · без синхронизации' : value.instrumental ? '' : value.durationMatched ? 'Текст без синхронизации' : 'Текст без синхронизации · длительность отличается'; }
-    } catch (error) { if (token !== lyricsVersion || error.name === 'AbortError') return; $('lyrics-status').textContent = error.status === 404 ? 'Текст этой записи пока не найден.' : error.message; $('lyrics-retry').hidden = false; $('lyrics-edit').hidden = false; }
+      $('lyrics-text').replaceChildren(); $('lyrics-text').dataset.identity = renderedIdentity;
+      syncedLyrics = Array.isArray(value.lines) ? value.lines : C.parseLyrics(value.synced);
+      if (value.adapted && value.sourceDuration > 0 && current.duration > 0 && Math.abs(value.sourceDuration - current.duration) > 2.5) syncedLyrics = [];
+      $('lyrics-edit').hidden = !!value.imported; $('lyrics-retry').hidden = !!value.imported || !value.versionMismatch;
+      if (syncedLyrics.length) { $('lyrics-text').append(...syncedLyrics.map(line => { const item = button(line.text || '♪', () => seek(line.time), 'lyric-line'); item.setAttribute('aria-label', line.text + ', ' + C.formatTime(line.time)); return item; })); $('lyrics-status').textContent = (value.imported ? 'Твой LRC · ' : value.adapted ? 'Под версию · ' + Number(value.tempo.rate.toFixed(2)) + '× (по длительности) · ' : '') + 'Нажми на строку, чтобы перейти к ней.'; renderTime(); }
+      else { $('lyrics-text').textContent = value.instrumental ? 'Инструментальная запись' : value.plain || (value.lines || C.parseLyrics(value.synced)).map(line => line.text).join('\n'); $('lyrics-status').textContent = value.imported ? 'Твой текст · без синхронизации' : value.instrumental ? '' : value.durationMatched ? 'Текст без синхронизации' : 'Текст без синхронизации · длительность отличается'; }
+    } catch (error) { if (token !== lyricsVersion || current?.id !== track.id || error.name === 'AbortError') return; $('lyrics-status').textContent = keepReady ? 'Сохранённый текст. Не удалось обновить — можно повторить.' : error.status === 404 ? 'Текст этой записи пока не найден.' : error.message; $('lyrics-retry').hidden = false; $('lyrics-edit').hidden = false; }
   }
   function playerTab(tab) { const lyrics = tab === 'lyrics'; for (const name of ['queue', 'lyrics']) { $('tab-' + name).setAttribute('aria-selected', String(name === tab)); $('tab-' + name).tabIndex = name === tab ? 0 : -1; $('panel-' + name).hidden = name !== tab; } if (lyrics) void loadLyrics(); if (matchMedia('(max-width:759px)').matches) $('player-tabs').scrollIntoView({ block: 'start' }); }
   function renderComfort() {
     $('player-rate').value = rate; $('player-rate-value').textContent = Number(rate.toFixed(2)) + '×';
     $('player-preserves-pitch').checked = preservesPitch;
+    const tone = effectsController.snapshot(), amount = Math.round(12 * Math.log2(tone.config.pitch) * 10) / 10;
+    if (document.activeElement !== $('player-tone')) $('player-tone').value = amount; $('player-tone-value').textContent = (amount > 0 ? '+' : '') + amount + ' полутона';
+    $('player-tone-status').textContent = native && tone.effectsSchema < 3 ? 'Этот iOS-клиент не поддерживает отдельную высоту. Значение сохранится для переноса.' : !preservesPitch ? 'Сейчас высота следует за скоростью. Отдельная настройка сохранена.' : ['unsupported','error'].includes(tone.state) ? 'Обработка высоты сейчас недоступна. Значение сохранено.' : tone.config.pitch !== 1 && tone.state !== 'applied' ? 'Отдельная высота применится при воспроизведении.' : 'Высота меняется отдельно от скорости.';
     $('player-pitch-status').textContent = native && !nativePitchSupported ? 'Этот iOS-клиент не поддерживает переключение высоты. Значение сохранится для переноса.' : !native && !webPitchApplied ? 'Браузер не поддерживает переключение высоты. Значение сохранится для переноса.' : native && ['error', 'unsupported'].includes(nativeRateState) ? 'Сейчас настройка высоты недоступна. Значение сохранено для переноса.' : native && nativeRateState !== 'applied' ? 'Настройка применится при воспроизведении.' : preservesPitch ? 'При изменении скорости высота голоса сохраняется.' : 'Скорость и высота голоса меняются вместе.';
     for (const control of $('rate-presets').children) control.setAttribute('aria-pressed', String(Math.abs(+control.dataset.rate - rate) < 0.001));
     $('sleep-status').textContent = sleepDeadline > 0 && !native ? 'Веб-таймер проверяется при воспроизведении и возврате. В фоне iOS может приостановить его.' : '';
@@ -508,11 +494,18 @@
     renderComfort(); updateMediaSession(); persist();
   }
   function applyWebPitch() { if (native) return; webPitchApplied = false; for (const name of webPitchProperties) try { audio[name] = preservesPitch; if (audio[name] === preservesPitch) webPitchApplied = true; } catch { /* Store the desired portable flag even when a browser refuses it. */ } }
-  function setPreservesPitch(value, { edited = false } = {}) {
+  function setPreservesPitch(value, { edited = false, syncEffects = true } = {}) {
     if (typeof value !== 'boolean') return; preservesPitch = value;
     if (edited) { portableController.editedSound({ preservesPitch }); portableFile = null; }
     if (native) { nativeRateRevision++; if (nativePitchSupported) syncNativeRate(); } else applyWebPitch();
+    if (syncEffects) void effectsController.transport().catch(noticeError);
     renderComfort(); persist();
+  }
+  function setTone(value) {
+    const semitones = Number(value); if (!Number.isFinite(semitones) || semitones < -12 || semitones > 12) return;
+    const pitch = 2 ** (semitones / 12); portableController.editedSound({ pitch, preservesPitch: true, transportEnabled: true }); portableFile = null;
+    if (!preservesPitch) setPreservesPitch(true, { syncEffects: false });
+    void effectsController.configure({ pitch }).then(renderComfort).catch(noticeError); renderComfort();
   }
   function syncNativeRate() {
     if (!native || !nativePitchSupported) return;
@@ -711,6 +704,7 @@
   $('effects-reset').onclick = () => configureEffects(window.LolzCloudEffectsPolicy.preset('original'));
   $('effects-retry').onclick = () => configureEffects({});
   $('player-rate').oninput = () => setRate($('player-rate').value, { edited: true }); $('rate-presets').onclick = event => { const control = event.target.closest('[data-rate]'); if (control) setRate(control.dataset.rate, { edited: true }); };
+  $('player-tone').oninput = () => setTone($('player-tone').value); $('player-tone-reset').onclick = () => setTone(0);
   $('player-preserves-pitch').onchange = () => setPreservesPitch($('player-preserves-pitch').checked, { edited: true });
   $('sleep-select').onchange = () => setSleep(+$('sleep-select').value); $('bookmark-add').onclick = addBookmark;
   $('queue-clear').onclick = () => { leaveWave(); queue = current ? [current] : []; index = current ? 0 : -1; history = []; persist(); renderQueue(); notice('В очереди остался текущий трек'); };
