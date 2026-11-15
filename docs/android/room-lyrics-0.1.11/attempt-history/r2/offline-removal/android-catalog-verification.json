@@ -1,0 +1,21 @@
+{
+  "phase": "offline-removal",
+  "status": "failed",
+  "error": "java.lang.AssertionError: Numeric and permalink aliases retain both exact queue occurrences as nonplayable references",
+  "playbackError": "",
+  "checks": [
+    "Only the isolated Android emulator may run library/network mutations",
+    "Production native playback service binds",
+    "Native owned-file guard: files=/data/user/0/com.lolzcloud.mobile/files canonical=/data/data/com.lolzcloud.mobile/files raw=/data/user/0/com.lolzcloud.mobile/files/offline/bcc7a0b4-356b-472f-b258-1f7497ccc835.audio canonicalFile=/data/data/com.lolzcloud.mobile/files/offline/bcc7a0b4-356b-472f-b258-1f7497ccc835.audio uri=file:///data/user/0/com.lolzcloud.mobile/files/offline/bcc7a0b4-356b-472f-b258-1f7497ccc835.audio authority=null",
+    "A real native decoder plays the exact private file that will be removed",
+    "Deleting the active owned download actually frees its complete private file bytes",
+    "Active deletion fences the old decoder and keeps the paused source position without preparing or autoplay"
+  ],
+  "screenshots": [],
+  "realPublicHttps": false,
+  "nativeMediaPlayer": true,
+  "fakeMediaSdk": false,
+  "personalAccountsUsed": false,
+  "version": "0.1.11",
+  "apkSha256": "f08023f382de33dcb6e4b24929b4948cd8d731cfffcdf2e87a26a593a6495df5"
+}

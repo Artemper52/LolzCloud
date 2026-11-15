@@ -1,0 +1,17 @@
+{
+  "status": "failed",
+  "error": "java.io.IOException: Загрузка уже изменилась. Открой меню заново",
+  "playbackError": "",
+  "checks": [
+    "Only the isolated Android emulator may run library/network mutations",
+    "Production native playback service binds",
+    "A real native decoder plays the exact private file that will be removed"
+  ],
+  "screenshots": [],
+  "realPublicHttps": true,
+  "nativeMediaPlayer": true,
+  "fakeMediaSdk": false,
+  "personalAccountsUsed": false,
+  "version": "0.1.11",
+  "apkSha256": "f378ae3ccacd85d7374ce5201e505f25b2c2ff6a25c97119ebab185f3eed245d"
+}

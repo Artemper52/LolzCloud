@@ -1,0 +1,28 @@
+{
+  "status": "passed",
+  "createdAt": "2026-11-15T16:56:32.439Z",
+  "checks": [
+    {
+      "suite": "LyricsMetadataTest",
+      "count": 53
+    },
+    {
+      "suite": "LrcParserTest",
+      "count": 30
+    },
+    {
+      "suite": "com.lolzcloud.mobile.LyricsProviderTest",
+      "count": 55
+    },
+    {
+      "suite": "OfflineFilesTest",
+      "count": 13
+    },
+    {
+      "suite": "com.lolzcloud.mobile.RoomTransportPolicyTest",
+      "count": 40
+    }
+  ],
+  "total": 191,
+  "scope": "Real host Java LRC words/timing/provider-cache policies and real private-fixture file-byte deletion. Android rendering, actual SharedPreferences/MediaPlayer/SAF require later instrumentation."
+}

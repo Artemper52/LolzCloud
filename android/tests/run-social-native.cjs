@@ -19,7 +19,10 @@ if (run(['shell','getprop','ro.kernel.qemu']).trim() !== '1') throw new Error('O
 const before = run(['shell','dumpsys','package','com.lolzcloud.mobile']);
 const permissionGranted = /android\.permission\.POST_NOTIFICATIONS: granted=true/.test(before);
 const version = JSON.parse(fs.readFileSync(path.join(project,'version.json'),'utf8'));
-const apk = path.join(project,'output','LolzCloud-Android-'+version.versionName+'.apk');
+const apk = path.join(process.env.LOLZCLOUD_ANDROID_OUTPUT||path.join(project,'output'),'LolzCloud-Android-'+version.versionName+'.apk');
+const expectedSha=crypto.createHash('sha256').update(fs.readFileSync(apk)).digest('hex');
+const installed=run(['shell','pm','path','com.lolzcloud.mobile']).trim().replace(/^package:/,'');
+if(!/^\/data\/app\/[A-Za-z0-9_~+=./-]+\/base\.apk$/.test(installed)||run(['shell','sha256sum',installed]).trim().split(/\s+/)[0]!==expectedSha)throw Error('Installed target differs from the supplied production artifact.');
 try {
   run(['shell','pm','grant','com.lolzcloud.mobile','android.permission.POST_NOTIFICATIONS']);
   console.log(run(['install','-r',path.join(project,'build','instrumentation','LolzCloud-core-tests.apk')]).trim());
@@ -33,7 +36,8 @@ try {
   report.androidVersion=run(['shell','getprop','ro.build.version.release']).trim();
   report.deviceModel=run(['shell','getprop','ro.product.model']).trim();
   report.apk=path.basename(apk);
-  report.apkSha256=crypto.createHash('sha256').update(fs.readFileSync(apk)).digest('hex');
+  if(run(['shell','sha256sum',installed]).trim().split(/\s+/)[0]!==expectedSha)throw Error('Production APK changed during social fixtures.');
+  report.apkSha256=expectedSha;report.productionShaUnchanged=true;
   report.scope=rolesOnly?'Declared own-origin role profiles rendered with the actual bundled social.js/css in Android WebView; real touch open/Cancel, GET-only fixtures, no personal login or role grant.':uploadOnly?'Actual system DocumentsUI → read-only PNG test provider → production ValueCallback → FileReader/Canvas; isolated own-origin form, no personal login or server upload.':'Real private offline storage/MediaPlayer and real Android NotificationManager; social events are isolated fixtures, not a personal-account login.';
   fs.mkdirSync(reportDirectory,{recursive:true});
   fs.writeFileSync(path.join(reportDirectory,rolesOnly?'android-social-roles-verification.json':uploadOnly?'android-social-upload-verification.json':withoutPicker?'android-social-core-verification.json':backOnly?'android-social-back-verification.json':'android-social-native-verification.json'),JSON.stringify(report,null,2)+'\n');

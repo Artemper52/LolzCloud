@@ -1,0 +1,24 @@
+{
+  "phase": "pending-seek",
+  "status": "failed",
+  "error": "java.lang.AssertionError: A seek issued before preparation survives on the final source: processing=true position=27",
+  "playbackError": "",
+  "checks": [
+    "Only the isolated Android emulator may run library/network mutations",
+    "Production native playback service binds",
+    "The final source prepares after rapid Next/seek with processing=false",
+    "The intended real decoder is used: PCM=false expected=false",
+    "A seek issued before preparation survives on the final source: processing=false position=7000",
+    "A paused source applies its pre-prepare seek with processing=false",
+    "Pre-prepare seeking never starts the paused source: processing=false",
+    "The final source prepares after rapid Next/seek with processing=true",
+    "The intended real decoder is used: PCM=true expected=true"
+  ],
+  "screenshots": [],
+  "realPublicHttps": false,
+  "nativeMediaPlayer": true,
+  "fakeMediaSdk": false,
+  "personalAccountsUsed": false,
+  "version": "0.1.11",
+  "apkSha256": "b872acf7d65368e0cc3a8478ee4fd877eca8b24650c1639e17704917e39f5db2"
+}

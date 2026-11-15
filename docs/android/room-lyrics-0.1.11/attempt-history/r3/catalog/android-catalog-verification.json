@@ -1,0 +1,29 @@
+{
+  "status": "failed",
+  "error": "java.io.IOException: Нет связи с каталогом. Проверь интернет и повтори поиск",
+  "playbackError": "",
+  "checks": [
+    "Only the isolated Android emulator may run library/network mutations",
+    "Production native playback service binds",
+    "Real Android JSON parser maps stable SoundCloud identity, source and milliseconds",
+    "Android parser rejects malformed audioUrl before playback",
+    "Android parser rejects malformed audioUrl before playback",
+    "Android parser rejects malformed cover before playback",
+    "Android parser rejects malformed url before playback",
+    "Android parser enforces the 20-minute catalog bound",
+    "Legacy track JSON migrates without losing new catalog attribution",
+    "Preparation accepts only the requested canonical audio URL",
+    "A preparing response cannot be played as a ready MP3",
+    "Malformed or substituted preparation response never reaches native playback",
+    "Malformed or substituted preparation response never reaches native playback",
+    "Malformed or substituted preparation response never reaches native playback",
+    "Unsupported stream error is preserved without blaming a local file"
+  ],
+  "screenshots": [],
+  "realPublicHttps": true,
+  "nativeMediaPlayer": true,
+  "fakeMediaSdk": false,
+  "personalAccountsUsed": false,
+  "version": "0.1.11",
+  "apkSha256": "b872acf7d65368e0cc3a8478ee4fd877eca8b24650c1639e17704917e39f5db2"
+}

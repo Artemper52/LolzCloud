@@ -1,0 +1,17 @@
+{
+  "phase": "offline-removal",
+  "status": "failed",
+  "error": "java.lang.AssertionError: Native owned-file guard: files=/data/user/0/com.lolzcloud.mobile/files canonical=/data/data/com.lolzcloud.mobile/files raw=/data/user/0/com.lolzcloud.mobile/files/offline/dc999714-71c8-41a5-8d4b-6f75b50ab02a.audio canonicalFile=/data/data/com.lolzcloud.mobile/files/offline/dc999714-71c8-41a5-8d4b-6f75b50ab02a.audio uri=file:///data/user/0/com.lolzcloud.mobile/files/offline/dc999714-71c8-41a5-8d4b-6f75b50ab02a.audio authority=null",
+  "playbackError": "",
+  "checks": [
+    "Only the isolated Android emulator may run library/network mutations",
+    "Production native playback service binds"
+  ],
+  "screenshots": [],
+  "realPublicHttps": false,
+  "nativeMediaPlayer": true,
+  "fakeMediaSdk": false,
+  "personalAccountsUsed": false,
+  "version": "0.1.11",
+  "apkSha256": "f378ae3ccacd85d7374ce5201e505f25b2c2ff6a25c97119ebab185f3eed245d"
+}

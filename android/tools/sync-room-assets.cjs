@@ -11,6 +11,7 @@ const files = [
   ['server/public/room-sync.js', 'room-sync.js'],
   ['server/public/room-players.js', 'room-players.js'],
   ['server/public/media-source.js', 'media-source.js'],
+  ['server/public/app/room-transport.js', 'room-transport.js'],
   ['server/public/site.js', 'site.js'],
   ['server/public/social.html', 'social.html'],
   ['server/public/social.js', 'social.js'],

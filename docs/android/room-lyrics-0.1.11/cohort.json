@@ -1,0 +1,189 @@
+{
+  "status": "passed",
+  "startedAt": "2026-11-15T17:07:37.384Z",
+  "version": "0.1.11",
+  "versionCode": 12,
+  "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+  "sourceDigest": "c8652cae0af6550cfa5f1d652537040abd98a8545a4a39f7de403408d62e85ca",
+  "suites": [
+    {
+      "name": "pending-seek",
+      "status": "passed",
+      "checks": 23,
+      "reusedSameShaRun": true,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\pending-seek\\android-catalog-verification.json"
+    },
+    {
+      "name": "lyrics",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\lyrics",
+      "startedAt": "2026-11-15T16:59:58.084Z",
+      "finishedAt": "2026-11-15T17:00:08.420Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 51,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\lyrics\\android-lyrics-verification.json",
+      "reusedSameShaRun": true
+    },
+    {
+      "name": "offline-removal",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\offline-removal",
+      "startedAt": "2026-11-15T17:00:08.598Z",
+      "finishedAt": "2026-11-15T17:00:12.695Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 24,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\offline-removal\\android-catalog-verification.json",
+      "reusedSameShaRun": true
+    },
+    {
+      "name": "room-transport",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\room-transport",
+      "startedAt": "2026-11-15T17:00:12.908Z",
+      "finishedAt": "2026-11-15T17:00:30.078Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 44,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\room-transport\\android-room-transport-verification.json",
+      "reusedSameShaRun": true
+    },
+    {
+      "name": "catalog",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\catalog",
+      "startedAt": "2026-11-15T17:00:30.245Z",
+      "finishedAt": "2026-11-15T17:01:00.171Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 56,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\catalog\\android-catalog-verification.json",
+      "reusedSameShaRun": true
+    },
+    {
+      "name": "portable-retry1",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\portable-retry1",
+      "startedAt": "2026-11-15T17:07:37.822Z",
+      "finishedAt": "2026-11-15T17:08:07.410Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 36,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\portable-retry1\\android-portable-profile-verification.json"
+    },
+    {
+      "name": "cloud",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\cloud",
+      "startedAt": "2026-11-15T17:08:07.600Z",
+      "finishedAt": "2026-11-15T17:08:17.625Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 24,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\cloud\\android-cloud-profile-verification.json"
+    },
+    {
+      "name": "wave",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\wave",
+      "startedAt": "2026-11-15T17:08:17.826Z",
+      "finishedAt": "2026-11-15T17:08:47.524Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 33,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\wave\\android-wave-verification.json"
+    },
+    {
+      "name": "bookmark",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\bookmark",
+      "startedAt": "2026-11-15T17:08:47.848Z",
+      "finishedAt": "2026-11-15T17:08:55.418Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 4,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\bookmark\\android-wave-verification.json"
+    },
+    {
+      "name": "pitch",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\pitch",
+      "startedAt": "2026-11-15T17:08:55.660Z",
+      "finishedAt": "2026-11-15T17:09:29.390Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 44,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\pitch\\android-pitch-verification.json"
+    },
+    {
+      "name": "pcm",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\pcm",
+      "startedAt": "2026-11-15T17:09:29.587Z",
+      "finishedAt": "2026-11-15T17:10:04.697Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 30,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\pcm\\android-pcm-effects-verification.json"
+    },
+    {
+      "name": "room",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\room",
+      "startedAt": "2026-11-15T17:10:04.897Z",
+      "finishedAt": "2026-11-15T17:10:11.584Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 13,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\room\\android-room-media-verification.json"
+    },
+    {
+      "name": "audio-audit",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\audio-audit",
+      "startedAt": "2026-11-15T17:10:11.902Z",
+      "finishedAt": "2026-11-15T17:10:16.470Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 20,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\audio-audit\\android-catalog-verification.json"
+    },
+    {
+      "name": "comfort",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\comfort",
+      "startedAt": "2026-11-15T17:10:16.756Z",
+      "finishedAt": "2026-11-15T17:10:40.919Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 25,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\comfort\\android-audio-comfort-verification.json"
+    },
+    {
+      "name": "social",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\social",
+      "startedAt": "2026-11-15T17:10:41.122Z",
+      "finishedAt": "2026-11-15T17:10:52.682Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "checks": 50,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\social\\android-social-core-verification.json"
+    }
+  ],
+  "failedAttempts": [
+    {
+      "name": "portable",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\portable",
+      "startedAt": "2026-11-15T17:01:00.350Z",
+      "finishedAt": "2026-11-15T17:01:19.741Z",
+      "status": "failed",
+      "exitCode": 1,
+      "error": "C:\\Users\\27nov\\LolzCloud\\android\\tests\\run-portable-profile.cjs:20\r\nif(report.status!=='passed'||!report.preferencesRestored||!report.productionShaUnchanged)throw Error(report.error||report.cleanupError||'Portable profile runtime failed');\r\n                                                                                         ^\r\n\r\nError: java.lang.AssertionError: Profile document absent: LolzCloud profile QA|Files from LolzCloud profile QA / Declared portable JSON fixtures|Grid view|Show roots|LolzCloud profile QA|More options|Desktop profile.json|2:01 AM, 4.00 kB, JSON document|Preview the file Desktop profile.json|export-221ce43b-a4bf-4c86-9e46-de46d3ab556d.json|3:55 AM, 2.70 kB, JSON document|Preview the file export-221ce43b-a4bf-4c86-9e46-de46d3ab556d.json|export-41f9d50c-695a-461d-bc71-929d9e5f7069.json|2:14 AM, 2.70 kB, JSON document|Preview the file export-41f9d50c-695a-461d-bc71-929d9e5f7069.json|export-61e2c6af-4853-4274-9ccf-b0464c5030d2.json|2:09 AM, 2.70 kB, JSON document|Preview the file export-61e2c6af-4853-4274-9ccf-b0464c5030d2.json|export-68bb30f6-62e8-407a-8334-6d3947c2cefb.json|7:45 PM, 2.77 kB, JSON document|Preview the file export-68bb30f6-62e8-407a-8334-6d3947c2cefb.json|export-7ad3c3cf-b915-4bb0-93f0-2f91ec12b5d2.json|4:11 AM, 2.70 kB, JSON document|Preview the file export-7ad3c3cf-b915-4bb0-93f0-2f91ec12b5d2.json|export-7c04c721-e01a-4318-a5b3-f32842cdb1ce.json|8:01 PM, 2.77 kB, JSON document|Preview the file export-7c04c721-e01a-4318-a5b3-f32842cdb1ce.json|export-8bacd59d-849d-40d0-b8d8-f2afc10297a9.json|2:01 AM, 2.70 kB, JSON document|Preview the file export-8bacd59d-849d-40d0-b8d8-f2afc10297a9.json|export-96e00953-3f1f-4c3c-b22d-041c43a6d95e.json|5:10 AM, 2.70 kB, JSON document|Preview the file export-96e00953-3f1f-4c3c-b22d-041c43a6d95e.json|export-a8b11fe5-e7a1-4d85-a526-700228d86790.json|1:24 PM, 2.70 kB, JSON document|Preview the file export-a8b11fe5-e7a1-4d85-a526-700228d86790.json|export-cea8a311-6134-4c3d-a95e-53b02cfad2a0.json|4:09 AM, 2.70 kB, JSON document|Preview the file export-cea8a311-6134-4c3d-a95e-53b02cfad2a0.json|export-ed5be104-3986-48bc-9bf3-10c6c4e4e026.json|4:21 PM, 2.77 kB, JSON document|Preview the file export-ed5be104-3986-48bc-9bf3-10c6c4e4e026.json|\r\n    at Object.<anonymous> (C:\\Users\\27nov\\LolzCloud\\android\\tests\\run-portable-profile.cjs:20:96)\r\n    at Module._compile (node:internal/modules/cjs/loader:1761:14)\r\n    at Object..js (node:internal/modules/cjs/loader:1893:10)\r\n    at Module.load (node:internal/modules/cjs/loader:1481:32)\r\n    at Module._load (node:internal/modules/cjs/loader:1300:12)\r\n    at TracingChannel.traceSync (node:diagnostics_channel:328:14)\r\n    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)\r\n    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)\r\n    at node:internal/main/run_main_module:33:47\r\n\r\nNode.js v24.13.0\r\n",
+      "checks": 22,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r4\\portable\\android-portable-profile-verification.json"
+    }
+  ],
+  "finishedAt": "2026-11-15T17:10:52.879Z"
+}

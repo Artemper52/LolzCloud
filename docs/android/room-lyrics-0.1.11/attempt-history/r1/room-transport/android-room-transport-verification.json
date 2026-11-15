@@ -1,0 +1,108 @@
+{
+  "status": "failed",
+  "error": "java.lang.AssertionError: Host system seek reaches the real room audio clock in source seconds",
+  "dom": "\"{\\\"media\\\":{\\\"kind\\\":\\\"state\\\",\\\"ready\\\":true,\\\"paused\\\":false,\\\"time\\\":4.185343,\\\"track\\\":2},\\\"transport\\\":{\\\"version\\\":1,\\\"roomId\\\":\\\"0123456789abcdef0123456789abcdef\\\",\\\"documentId\\\":\\\"dda4bcd9-11ee-42b0-99c3-f870dfb134b9\\\",\\\"epoch\\\":1,\\\"revision\\\":150,\\\"active\\\":true,\\\"playback\\\":{\\\"url\\\":\\\"https://soundcloud.com/fixture/track2\\\",\\\"title\\\":\\\"Room fixture2\\\",\\\"artist\\\":\\\"Declared cross-origin WAV\\\",\\\"cover\\\":\\\"\\\",\\\"duration\\\":45,\\\"position\\\":4.185343,\\\"playing\\\":true},\\\"capabilities\\\":{\\\"play\\\":true,\\\"pause\\\":true,\\\"next\\\":true,\\\"previous\\\":true,\\\"seek\\\":true}},\\\"next\\\":1}\"",
+  "version": "0.1.11",
+  "versionCode": 12,
+  "apkSha256": "f378ae3ccacd85d7374ce5201e505f25b2c2ff6a25c97119ebab185f3eed245d",
+  "checks": [
+    {
+      "name": "Only the owned task emulator can run this fixture",
+      "passed": true
+    },
+    {
+      "name": "Native playback service binds before room entry",
+      "passed": true
+    },
+    {
+      "name": "The real solo MediaPlayer clock advances before handoff",
+      "passed": true
+    },
+    {
+      "name": "The trusted main frame and genuine cross-origin audio document load",
+      "passed": true
+    },
+    {
+      "name": "Pending room navigation cancels native playback without a replacement source",
+      "passed": true
+    },
+    {
+      "name": "System Play before explicit Join cannot play the room or resurrect the old solo queue",
+      "passed": true
+    },
+    {
+      "name": "An explicit solo choice can release an initial inactive room before its first Join",
+      "passed": true
+    },
+    {
+      "name": "Genuine Join starts actual decoded cross-origin audio",
+      "passed": true
+    },
+    {
+      "name": "The real Android MediaSession publishes room track metadata and playing state",
+      "passed": true
+    },
+    {
+      "name": "The first explicit room Join can reclaim epoch1 after an inactive-to-solo release",
+      "passed": true
+    },
+    {
+      "name": "Room playback fences the previous native decoder while preserving its queue",
+      "passed": true
+    },
+    {
+      "name": "MediaController Pause controls actual room audio",
+      "passed": true
+    },
+    {
+      "name": "Native lockscreen state follows the room pause",
+      "passed": true
+    },
+    {
+      "name": "Pausing a listener preserves room ownership for hardware Resume",
+      "passed": true
+    },
+    {
+      "name": "The actual child audio clock stays paused",
+      "passed": true
+    },
+    {
+      "name": "MediaController Play resumes the same room source",
+      "passed": true
+    },
+    {
+      "name": "Pause/Resume keeps the exact room document identity",
+      "passed": true
+    },
+    {
+      "name": "A listener does not advertise host Next",
+      "passed": true
+    },
+    {
+      "name": "Even a forced system Next cannot act on a listener or fall back to solo Next",
+      "passed": true
+    },
+    {
+      "name": "A forged provider-frame postMessage cannot supply native metadata or owner state",
+      "passed": true
+    },
+    {
+      "name": "A valid host lease enables native Next",
+      "passed": true
+    },
+    {
+      "name": "Host MediaController Next advances actual room audio exactly once",
+      "passed": true
+    },
+    {
+      "name": "Room Next consumes no entry from the preserved native queue",
+      "passed": true
+    },
+    {
+      "name": "Original native preferences/library are restored exactly after room fixtures",
+      "passed": true
+    }
+  ],
+  "screenshots": [],
+  "scope": "Actual production Android room bridge/MediaSession/notification service, MediaPlayer and PCM renderer handoff, shared bundled room-transport.js, real cross-origin HTMLAudio clocks and MotionEvent Join. Declared room/provider fixtures; no personal OAuth, public room membership, SoundCloud/YouTube SDK or physical speaker fidelity claim."
+}

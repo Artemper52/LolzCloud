@@ -1,0 +1,147 @@
+{
+  "status": "failed",
+  "startedAt": "2026-11-15T16:39:30.865Z",
+  "version": "0.1.11",
+  "versionCode": 12,
+  "apkSha256": "b872acf7d65368e0cc3a8478ee4fd877eca8b24650c1639e17704917e39f5db2",
+  "sourceDigest": "d633ba55cc5c08be61c958bfb95acf0b6f4e4407d08c59630d8015a025f3e963",
+  "suites": [
+    {
+      "name": "lyrics",
+      "status": "passed",
+      "checks": 51,
+      "reusedSameShaRun": true,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\lyrics\\android-lyrics-verification.json"
+    },
+    {
+      "name": "offline-removal",
+      "status": "passed",
+      "checks": 24,
+      "reusedSameShaRun": true,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\offline-removal\\android-catalog-verification.json"
+    },
+    {
+      "name": "room-transport",
+      "status": "passed",
+      "checks": 44,
+      "reusedSameShaRun": true,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\room-transport\\android-room-transport-verification.json"
+    },
+    {
+      "name": "pitch",
+      "status": "passed",
+      "startedAt": "2026-11-15T16:39:31.059Z",
+      "finishedAt": "2026-11-15T16:39:57.746Z",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\pitch",
+      "exitCode": 0,
+      "error": "",
+      "checks": 44,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\pitch\\android-pitch-verification.json"
+    },
+    {
+      "name": "wave",
+      "status": "passed",
+      "startedAt": "2026-11-15T16:39:57.908Z",
+      "finishedAt": "2026-11-15T16:40:20.427Z",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\wave",
+      "exitCode": 0,
+      "error": "",
+      "checks": 33,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\wave\\android-wave-verification.json"
+    },
+    {
+      "name": "bookmark",
+      "status": "passed",
+      "startedAt": "2026-11-15T16:40:20.597Z",
+      "finishedAt": "2026-11-15T16:40:24.771Z",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\bookmark",
+      "exitCode": 0,
+      "error": "",
+      "checks": 4,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\bookmark\\android-wave-verification.json"
+    },
+    {
+      "name": "pcm",
+      "status": "passed",
+      "startedAt": "2026-11-15T16:40:24.931Z",
+      "finishedAt": "2026-11-15T16:40:56.724Z",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\pcm",
+      "exitCode": 0,
+      "error": "",
+      "checks": 30,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\pcm\\android-pcm-effects-verification.json"
+    },
+    {
+      "name": "catalog",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\catalog-retry1",
+      "startedAt": "2026-11-15T16:44:55.881Z",
+      "finishedAt": "2026-11-15T16:45:26.238Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\catalog-retry1\\android-catalog-verification.json",
+      "checks": 58
+    },
+    {
+      "name": "portable",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\portable",
+      "startedAt": "2026-11-15T16:45:26.475Z",
+      "finishedAt": "2026-11-15T16:45:49.316Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\portable\\android-portable-profile-verification.json",
+      "checks": 36
+    },
+    {
+      "name": "cloud",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\cloud",
+      "startedAt": "2026-11-15T16:45:49.487Z",
+      "finishedAt": "2026-11-15T16:45:58.464Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\cloud\\android-cloud-profile-verification.json",
+      "checks": 24
+    },
+    {
+      "name": "room",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\room",
+      "startedAt": "2026-11-15T16:45:58.638Z",
+      "finishedAt": "2026-11-15T16:46:04.148Z",
+      "status": "passed",
+      "exitCode": 0,
+      "error": "",
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\room\\android-room-media-verification.json",
+      "checks": 13
+    },
+    {
+      "name": "audio-audit",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\audio-audit",
+      "startedAt": "2026-11-15T16:46:04.630Z",
+      "finishedAt": "2026-11-15T16:46:08.079Z",
+      "status": "failed",
+      "exitCode": 1,
+      "error": "Error: java.lang.AssertionError: Late decoder callbacks preserve the final selected track and seek\n    at main (C:\\Users\\27nov\\LolzCloud\\android\\tests\\run-catalog.cjs:28:41)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n",
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\audio-audit\\android-catalog-verification.json",
+      "checks": 8
+    }
+  ],
+  "continuedAt": "2026-11-15T16:44:55.779Z",
+  "failedAttempts": [
+    {
+      "name": "catalog",
+      "status": "failed",
+      "startedAt": "2026-11-15T16:40:56.890Z",
+      "finishedAt": "2026-11-15T16:40:59.370Z",
+      "output": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\catalog",
+      "exitCode": 1,
+      "error": "Error: java.io.IOException: Нет связи с каталогом. Проверь интернет и повтори поиск\n    at main (C:\\Users\\27nov\\LolzCloud\\android\\tests\\run-catalog.cjs:28:41)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n",
+      "checks": 15,
+      "report": "D:\\LolzCloud-Android-Toolchain\\android-room-lyrics\\candidate-0.1.11-r3\\catalog\\android-catalog-verification.json"
+    }
+  ],
+  "setupObservation": "The PCM network-restoration test returned before Android default WiFi finished validation; first catalogue attempt failed connection. WiFi/data restored1/1, validated network and successful emulator DNS/ICMP verified before one fresh catalogue attempt.",
+  "error": "Error: audio-audit failed",
+  "finishedAt": "2026-11-15T16:46:08.081Z"
+}

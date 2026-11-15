@@ -1,0 +1,71 @@
+{
+  "status": "passed",
+  "generatedAt": "2026-11-15T17:08:47.469Z",
+  "apk": "LolzCloud-Android-0.1.11.apk",
+  "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+  "assetCount": 12,
+  "canonicalRawZipPaths": true,
+  "sourceBytesMatch": true,
+  "assets": [
+    {
+      "path": "assets/room-client/logo.svg",
+      "bytes": 396,
+      "sha256": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512"
+    },
+    {
+      "path": "assets/room-client/media-source.js",
+      "bytes": 1517,
+      "sha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c"
+    },
+    {
+      "path": "assets/room-client/room-players.js",
+      "bytes": 3441,
+      "sha256": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9"
+    },
+    {
+      "path": "assets/room-client/room-sync.js",
+      "bytes": 3584,
+      "sha256": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab"
+    },
+    {
+      "path": "assets/room-client/room-transport.js",
+      "bytes": 6341,
+      "sha256": "bb4d1ac5cc88ae77c9eca78637922942d8a4df8dd42bcd25cfda0fdc72da9b46"
+    },
+    {
+      "path": "assets/room-client/room.css",
+      "bytes": 41933,
+      "sha256": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340"
+    },
+    {
+      "path": "assets/room-client/room.html",
+      "bytes": 11054,
+      "sha256": "aa2e1421e267107360ba890321d5455f2eaf9f1f567d542e366d8dd1c88a8ff4"
+    },
+    {
+      "path": "assets/room-client/room.js",
+      "bytes": 52113,
+      "sha256": "a1825c77e73d61e83633fb54a8556928f0225b866fc3acb82ac3cef37b505937"
+    },
+    {
+      "path": "assets/room-client/site.js",
+      "bytes": 7569,
+      "sha256": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616"
+    },
+    {
+      "path": "assets/room-client/social.css",
+      "bytes": 12818,
+      "sha256": "d16d9131ad980d13e441a7ae866d2b08e7c4b58e0a387ec892a1de1aa80ffa86"
+    },
+    {
+      "path": "assets/room-client/social.html",
+      "bytes": 1011,
+      "sha256": "d905f78fe734677728c9e3d3b9e426f8d7fd984c4fdc66a7ea5318834aefd3fe"
+    },
+    {
+      "path": "assets/room-client/social.js",
+      "bytes": 38894,
+      "sha256": "c3e8b8c0c185afd7fa7f13c5692bfe8339c8e2aeeb139fb70485a1d0c50da601"
+    }
+  ]
+}

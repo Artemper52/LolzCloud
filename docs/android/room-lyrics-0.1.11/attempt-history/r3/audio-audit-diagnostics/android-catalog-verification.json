@@ -1,0 +1,25 @@
+{
+  "phase": "audio-audit",
+  "injectedFocusCallbacks": true,
+  "generatedSilentAudioFixture": true,
+  "status": "failed",
+  "error": "java.lang.AssertionError: Late decoder callbacks preserve the final selected track and seek; index=2 position=76 pending=76 elapsed=278 speed=1.2",
+  "playbackError": "",
+  "checks": [
+    "Only the isolated Android emulator may run library/network mutations",
+    "Production native playback service binds",
+    "Real native MediaPlayer plays the generated local audit fixture",
+    "Audit fixture reaches an actual nonzero decoder position",
+    "Enqueue into an emptied playing queue starts at zero, not the removed track position",
+    "The newly enqueued local track plays",
+    "The actual new decoder starts near zero",
+    "Rapid Next/seek resolves only the final native source"
+  ],
+  "screenshots": [],
+  "realPublicHttps": false,
+  "nativeMediaPlayer": true,
+  "fakeMediaSdk": false,
+  "personalAccountsUsed": false,
+  "version": "0.1.11",
+  "apkSha256": "b872acf7d65368e0cc3a8478ee4fd877eca8b24650c1639e17704917e39f5db2"
+}

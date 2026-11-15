@@ -1,0 +1,43 @@
+{
+  "status": "passed",
+  "checks": [
+    "Actual Android scrypt/AES-GCM decrypts the public Node vector 0",
+    "Actual Android scrypt/AES-GCM decrypts the public Node vector 1",
+    "Actual Android scrypt/AES-GCM decrypts the public Node vector 2",
+    "Cloud read verifies the native session before reading its encrypted revision",
+    "A foreign profile response is rejected even when the cookie has returned to the original owner (ABA)",
+    "An ownerless legacy response cannot be restored as the captured account",
+    "A mismatched PUT receipt is not reported as a confirmed save and is never retried",
+    "A cookie swap during fresh owner verification prevents PUT entirely",
+    "A changed owner with the same session handle cannot overwrite the previous account",
+    "A cancelled operation cannot begin a cloud write",
+    "Revision409 leaves the encrypted copy intact and is not retried",
+    "An incomplete cloud reply cannot be mistaken for an empty copy",
+    "Rejected session never reaches the cloud profile route",
+    "The final restore owner guard fails before a single preference commit or backup mutation",
+    "Native dialog displays the verified fixture owner and cloud revision",
+    "Opening upload confirmation sends no PUT and clears the password widget",
+    "Cancel overwrite confirmation preserves the existing cloud copy",
+    "Explicit native replacement sends exactly one authenticated encrypted revision write",
+    "Native UI upload contains the real common profile and preserves unsupported fields inside encryption",
+    "Wrong password cannot open a restore preview or mutate local data",
+    "Successful decrypt reaches a preview payload without auto-applying local or unsupported settings",
+    "Native409 is visible, preserves cloud data and requires a new read before another write",
+    "Cancellation immediately after confirm fences the actual crypto worker before any PUT",
+    "Native cloud flow opens no browser or WebView"
+  ],
+  "screenshots": [
+    "cloud-read.png",
+    "cloud-confirm.png"
+  ],
+  "runId": "7919835e-c219-47ba-8540-049be541b7cb",
+  "version": "0.1.11",
+  "versionCode": 12,
+  "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+  "preferencesRestored": true,
+  "personalAccountsUsed": false,
+  "transport": "isolated injected native transport; no real cloud mutation",
+  "scope": "Actual Android scrypt/AES-GCM providers and native dialog widgets, encrypted revision requests, strict owner/cookie/ABA/409/cancel guards. Explicit fixture account only. Personal OAuth, live authenticated server roundtrip and physical devices are not tested.",
+  "productionShaUnchanged": true,
+  "checkedAt": "2026-11-15T17:08:17.360Z"
+}

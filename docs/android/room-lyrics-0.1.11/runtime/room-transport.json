@@ -1,0 +1,188 @@
+{
+  "status": "passed",
+  "version": "0.1.11",
+  "versionCode": 12,
+  "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+  "checks": [
+    {
+      "name": "Only the owned task emulator can run this fixture",
+      "passed": true
+    },
+    {
+      "name": "Native playback service binds before room entry",
+      "passed": true
+    },
+    {
+      "name": "The real solo MediaPlayer clock advances before handoff",
+      "passed": true
+    },
+    {
+      "name": "The trusted main frame and genuine cross-origin audio document load",
+      "passed": true
+    },
+    {
+      "name": "Pending room navigation cancels native playback without a replacement source",
+      "passed": true
+    },
+    {
+      "name": "System Play before explicit Join cannot play the room or resurrect the old solo queue",
+      "passed": true
+    },
+    {
+      "name": "An explicit solo choice can release an initial inactive room before its first Join",
+      "passed": true
+    },
+    {
+      "name": "Genuine Join starts actual decoded cross-origin audio",
+      "passed": true
+    },
+    {
+      "name": "The real Android MediaSession publishes room track metadata and playing state",
+      "passed": true
+    },
+    {
+      "name": "The first explicit room Join can reclaim epoch1 after an inactive-to-solo release",
+      "passed": true
+    },
+    {
+      "name": "Room playback fences the previous native decoder while preserving its queue",
+      "passed": true
+    },
+    {
+      "name": "MediaController Pause controls actual room audio",
+      "passed": true
+    },
+    {
+      "name": "Native lockscreen state follows the room pause",
+      "passed": true
+    },
+    {
+      "name": "Pausing a listener preserves room ownership for hardware Resume",
+      "passed": true
+    },
+    {
+      "name": "The actual child audio clock stays paused",
+      "passed": true
+    },
+    {
+      "name": "MediaController Play resumes the same room source",
+      "passed": true
+    },
+    {
+      "name": "Pause/Resume keeps the exact room document identity",
+      "passed": true
+    },
+    {
+      "name": "A listener does not advertise host Next",
+      "passed": true
+    },
+    {
+      "name": "Even a forced system Next cannot act on a listener or fall back to solo Next",
+      "passed": true
+    },
+    {
+      "name": "A forged provider-frame postMessage cannot supply native metadata or owner state",
+      "passed": true
+    },
+    {
+      "name": "A valid host lease enables native Next",
+      "passed": true
+    },
+    {
+      "name": "Host MediaController Next advances actual room audio exactly once",
+      "passed": true
+    },
+    {
+      "name": "Room Next consumes no entry from the preserved native queue",
+      "passed": true
+    },
+    {
+      "name": "System seek is delivered through the real bridge as5source seconds",
+      "passed": true
+    },
+    {
+      "name": "Host system seek reaches the real room audio clock in source seconds",
+      "passed": true
+    },
+    {
+      "name": "Room Previous restarts this room recording rather than selecting an old solo track",
+      "passed": true
+    },
+    {
+      "name": "System room Pause still reaches the WebView while the Activity is in the background",
+      "passed": true
+    },
+    {
+      "name": "System room Resume works through the foreground playback service in the background",
+      "passed": true
+    },
+    {
+      "name": "The existing room Activity returns to the foreground without rebuilding its document",
+      "passed": true
+    },
+    {
+      "name": "A real queued room Next waits behind a declared asynchronous provider delay",
+      "passed": true
+    },
+    {
+      "name": "An explicit native Play receives direct room release without waiting for the slow Next",
+      "passed": true
+    },
+    {
+      "name": "Native solo starts only after the actual room audio is paused and its lease is released",
+      "passed": true
+    },
+    {
+      "name": "Late Next completion and an old active snapshot cannot steal a newer solo owner",
+      "passed": true
+    },
+    {
+      "name": "window.__transport.snapshot().epoch===2&&!window.__media.paused",
+      "passed": true
+    },
+    {
+      "name": "A new explicit room Join reacquires a higher epoch and pauses solo again",
+      "passed": true
+    },
+    {
+      "name": "Leaving the room navigates to the declared own-origin social page",
+      "passed": true
+    },
+    {
+      "name": "A closed room's system commands cannot silently resume the prior solo queue",
+      "passed": true
+    },
+    {
+      "name": "A later explicit native Play can resume solo after room exit",
+      "passed": true
+    },
+    {
+      "name": "The actual PCM AudioTrack path is rendering before a second room handoff",
+      "passed": true
+    },
+    {
+      "name": "The second trusted room document loads without reusing its old lease",
+      "passed": true
+    },
+    {
+      "name": "Room entry closes the actual native PCM renderer as well as MediaPlayer",
+      "passed": true
+    },
+    {
+      "name": "Room media can start after the PCM renderer relinquishes playback",
+      "passed": true
+    },
+    {
+      "name": "All room/system/native handoffs stay inside the app without browser fallback",
+      "passed": true
+    },
+    {
+      "name": "Original native preferences/library are restored exactly after room fixtures",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/room-transport-review/room-transport-host.png"
+  ],
+  "scope": "Actual production Android room bridge/MediaSession/notification service, MediaPlayer and PCM renderer handoff, shared bundled room-transport.js, real cross-origin HTMLAudio clocks and MotionEvent Join. Declared room/provider fixtures; no personal OAuth, public room membership, SoundCloud/YouTube SDK or physical speaker fidelity claim."
+}

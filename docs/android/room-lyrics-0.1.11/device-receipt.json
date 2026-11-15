@@ -1,0 +1,34 @@
+{
+  "status": "passed",
+  "apkSha256": "3b0772c602c36d8dbba33deab7af51f5c986d7a63781a7fd2775266dc6487076",
+  "avd": "LolzCloud",
+  "emulator": "emulator-5554",
+  "androidApi": "35",
+  "wifi": "1",
+  "mobileData": "1",
+  "ownedProcesses": [
+    {
+      "ProcessId": 33560,
+      "ParentProcessId": 31020,
+      "Name": "emulator.exe",
+      "ExecutablePath": "D:\\LolzCloud-Android-Toolchain\\sdk\\emulator\\emulator.exe",
+      "CommandLine": "\"D:\\LolzCloud-Android-Toolchain\\sdk\\emulator\\emulator.exe\" -avd LolzCloud -port 5554 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader -memory 1024 -camera-back none -camera-front none"
+    },
+    {
+      "ProcessId": 36260,
+      "ParentProcessId": 33560,
+      "Name": "qemu-system-x86_64-headless.exe",
+      "ExecutablePath": "D:\\LolzCloud-Android-Toolchain\\sdk\\emulator\\qemu\\windows-x86_64\\qemu-system-x86_64-headless.exe",
+      "CommandLine": "D:\\LolzCloud-Android-Toolchain\\sdk\\emulator\\qemu\\windows-x86_64\\qemu-system-x86_64-headless.exe -avd LolzCloud -port 5554 -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader -memory 1024 -camera-back none -camera-front none"
+    }
+  ],
+  "mediaProjection": "MEDIA PROJECTION MANAGER (dumpsys media_projection)\r\nMedia Projection: \r\nnull",
+  "activeTargetServices": "ACTIVITY MANAGER SERVICES (dumpsys activity services)\r\n  (nothing)",
+  "networkValidated": true,
+  "observedAt": "2026-11-15T17:11:54.9102952Z",
+  "stoppedOwnedAvd": true,
+  "adbDevicesEmpty": true,
+  "shutdownMethod": "adb -s emulator-5554 emu kill, after exact AVD/PID/parent/path/command-line checks; ADB transient offline row cleared on observation.",
+  "shutdownCompletedAt": "2026-11-15T17:12:38.2938331Z",
+  "preferences": "Each fixture restores its captured preferences in finally; every reporting fixture with preferencesRestored reports true. No personal profile or account was used."
+}
