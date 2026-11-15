@@ -1,0 +1,17 @@
+{
+  "status": "stopped",
+  "parentRelationshipVerifiedBeforeKill": true,
+  "commandIssuedAfterVerification": true,
+  "beforeStop": "before-stop-r3.json",
+  "qemuPid": 28820,
+  "launcherPid": 18792,
+  "command": "adb -s emulator-5554 emu kill",
+  "qemuExited": true,
+  "avd": "LolzCloud",
+  "receiptObserverRecovered": "PowerShell single-object JSON normalized after process exit; no repeated kill/restart",
+  "adbAfter": "List of devices attached",
+  "serial": "emulator-5554",
+  "launcherExited": true,
+  "stoppedAt": "2026-11-15T13:27:06.8532923Z",
+  "processPathsVerifiedBeforeKill": true
+}

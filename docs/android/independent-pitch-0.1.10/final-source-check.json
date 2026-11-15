@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T13:25:26.732Z",
+  "inputsUnchanged": 63,
+  "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+  "sourceDigest": "6338119feb0a54eae8a837eae71de47c3dc08d9e23f4a750db9df3bdbbd1ae8e",
+  "published019Unchanged": true,
+  "published019Sha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693"
+}

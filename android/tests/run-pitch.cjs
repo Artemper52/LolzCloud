@@ -1,0 +1,20 @@
+'use strict';
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),assert=require('node:assert/strict'),{spawnSync}=require('node:child_process');
+const argv=process.argv.slice(2),arg=(name,fallback='')=>{const i=argv.indexOf(name);return i<0?fallback:argv[i+1]||'';};
+const version=arg('--expected-version'),code=arg('--expected-code'),sha=arg('--expected-sha').toLowerCase(),serial=arg('--serial','emulator-5554'),avd=arg('--expected-avd','LolzCloud');
+if(!/^\d+\.\d+\.\d+$/.test(version)||!/^\d+$/.test(code)||!/^[a-f0-9]{64}$/.test(sha)||!/^emulator-\d+$/.test(serial))throw Error('Explicit candidate version/code/SHA and owned AVD are required');
+const root=path.resolve(__dirname,'../..'),output=arg('--output','D:/LolzCloud-Android-Toolchain/android-pitch/runtime'),sdk=process.env.LOLZCLOUD_ANDROID_SDK||'D:/LolzCloud-Android-Toolchain/sdk',adb=path.join(sdk,'platform-tools',process.platform==='win32'?'adb.exe':'adb');fs.mkdirSync(output,{recursive:true});
+function run(args,timeout=30000){const value=spawnSync(adb,['-s',serial,...args],{encoding:'utf8',windowsHide:true,timeout,maxBuffer:8*1024*1024});if(value.error||value.status!==0)throw value.error||Error(value.stdout+value.stderr);return value.stdout;}
+if(run(['shell','getprop','ro.kernel.qemu']).trim()!=='1'||run(['shell','getprop','sys.boot_completed']).trim()!=='1'||run(['emu','avd','name']).split(/\r?\n/)[0].trim()!==avd)throw Error('Only booted owned AVD is allowed');
+const installed=run(['shell','pm','path','com.lolzcloud.mobile']).trim().replace(/^package:/,'');if(!/^\/data\/app\/[A-Za-z0-9_~+=./-]+\/base\.apk$/.test(installed)||run(['shell','sha256sum',installed]).split(/\s+/)[0]!==sha)throw Error('Installed candidate SHA/path mismatch');
+run(['install','-r',arg('--test-apk',path.join(root,'android/build/instrumentation/LolzCloud-core-tests.apk'))],60000);run(['shell','am','force-stop','com.lolzcloud.mobile']);
+const runId=crypto.randomUUID(),stdout=run(['shell','am','instrument','-w','-e','runId',runId,'-e','phase',arg('--phase','full'),'com.lolzcloud.mobile.test/com.lolzcloud.mobile.test.PitchInstrumentation'],300000);fs.writeFileSync(path.join(output,'instrumentation-stdout.txt'),stdout);
+const remote='/sdcard/Android/data/com.lolzcloud.mobile/files/pitch-review/',report=JSON.parse(run(['exec-out','cat',remote+'android-pitch-test.json']));
+if(report.runId!==runId||report.version!==version||report.versionCode!==Number(code)||report.apkSha256!==sha)throw Error('Stale/incorrect pitch report');
+report.productionShaUnchanged=run(['shell','sha256sum',installed]).split(/\s+/)[0]===sha;report.checkedAt=new Date().toISOString();report.emulator=serial;report.avd=avd;
+for(const name of report.screenshots||[])if(/^[a-z0-9-]+\.png$/.test(name))run(['pull',remote+name,path.join(output,name)]);
+fs.writeFileSync(path.join(output,'android-pitch-verification.json'),JSON.stringify(report,null,2)+'\n');
+if(report.status!=='passed'||!report.preferencesRestored||!report.productionShaUnchanged)throw Error(report.error||report.cleanupError||'Actual pitch checks failed');
+if(report.captures.length<8||!report.captures.some(row=>row.pcm&&row.expectedHz===750&&row.rms>.002)||!report.captures.some(row=>!row.pcm&&row.expectedHz===1300&&row.rms>.002))throw Error('Actual post-AudioTrack PCM and legacy output-frequency evidence missing');
+const portable=JSON.parse(run(['exec-out','cat',remote+'pitch-roundtrip.json'])),{normalizeProfile}=require(path.join(root,'source/integrations/portable-profile.cjs')),normalized=JSON.parse(JSON.stringify(normalizeProfile(portable)));assert.deepEqual(normalized.music.dsp,portable.music.dsp);assert.deepEqual(normalized.music.customEffects,portable.music.customEffects);fs.writeFileSync(path.join(output,'pitch-roundtrip.json'),JSON.stringify(portable,null,2)+'\n');
+report.nodeJavaSoundRoundtrip=true;fs.writeFileSync(path.join(output,'android-pitch-verification.json'),JSON.stringify(report,null,2)+'\n');console.log('PASS '+report.checks.length+' actual portable/lifecycle/system-output pitch checks; '+output);

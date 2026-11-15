@@ -1,0 +1,69 @@
+{
+  "status": "failed",
+  "error": "java.lang.AssertionError: Same recording reuses completed timings across measured duration jitter below2.5s",
+  "checks": [
+    {
+      "name": "Production MediaPlayer service binds for lyrics integration",
+      "passed": true
+    },
+    {
+      "name": "Real local audio advances before opening lyrics",
+      "passed": true
+    },
+    {
+      "name": "Declared provider is requested by the production lyrics page",
+      "passed": true
+    },
+    {
+      "name": "Native lyrics page displays loading while the request is in flight",
+      "passed": true
+    },
+    {
+      "name": "Opening/loading lyrics never pauses or restarts native music",
+      "passed": true
+    },
+    {
+      "name": "Matched source text becomes actual native lyric views",
+      "passed": true
+    },
+    {
+      "name": "Production UI retains source timestamps rather than estimating line times",
+      "passed": true
+    },
+    {
+      "name": "Touching a timed native line seeks the real MediaPlayer",
+      "passed": true
+    },
+    {
+      "name": "Playback position highlights the current genuine timed line",
+      "passed": true
+    },
+    {
+      "name": "Lyrics interaction preserves the current native queue and track",
+      "passed": true
+    },
+    {
+      "name": "Successful automatic lyrics persist separately and can load without another network request",
+      "passed": true
+    },
+    {
+      "name": "Completed same-recording lyrics survive transient unknown duration and uploader metadata without a new fetch",
+      "passed": true
+    },
+    {
+      "name": "Same recording reuses completed timings across measured duration jitter below2.5s",
+      "passed": false
+    }
+  ],
+  "screenshots": [
+    "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/lyrics-review/lyrics-found.png"
+  ],
+  "scope": "Declared bounded LRCLIB transport fixtures; real native UI, source LRC line highlighting/seeking, MediaPlayer, private cache/import priority/cancel. No substituted media SDK, real-user account or room navigation.",
+  "version": "0.1.10",
+  "versionCode": 11,
+  "apkSha256": "a9f09e7571ede4a5be70afa324c13fa513cfcf64dbd8bc3e16d17600999537a1",
+  "androidApi": 35,
+  "personalAccountsUsed": false,
+  "generatedAt": "2026-11-15T12:51:43.394Z",
+  "emulator": "emulator-5554"
+}

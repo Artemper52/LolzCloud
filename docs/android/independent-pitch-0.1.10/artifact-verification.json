@@ -1,0 +1,125 @@
+{
+  "status": "passed",
+  "version": "0.1.10",
+  "versionCode": 11,
+  "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+  "bytes": 2623004,
+  "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+  "sourceDigest": "6338119feb0a54eae8a837eae71de47c3dc08d9e23f4a750db9df3bdbbd1ae8e",
+  "sourceFiles": 63,
+  "javaFiles": 44,
+  "compiledWithGeneratedR": 45,
+  "dexSha256": "1bc01b863526cac576cd91f218ba8536db7826cbd2f26f1bd2cb6d4edf55521f",
+  "dexBytes": 534532,
+  "dexMatchesPackaged": true,
+  "canonicalRawZipNames": true,
+  "zipEntries": [
+    {
+      "path": "AndroidManifest.xml",
+      "size": 5956,
+      "sha256": "52922a848b85cd63a1b06e34a4906d082dc4c7e6cac5724f5ca7d2479c5ecec7"
+    },
+    {
+      "path": "res/drawable/ic_launcher.xml",
+      "size": 1080,
+      "sha256": "17b7a767e13ed00ef8dd46ccd606ae72decd1777fc8aa20e2eebc81262c1f0f8"
+    },
+    {
+      "path": "res/drawable-nodpi-v4/forest_art.png",
+      "size": 2326396,
+      "sha256": "955f5fd5eb463cab47e045e8a52e205a8f8c2416fe2ded5c143c4d90c1124f71"
+    },
+    {
+      "path": "resources.arsc",
+      "size": 1608,
+      "sha256": "99d7cef1d29b27b657c4a447eeafa10ec47654125acbf4f30b6cb2f14e7d90ec"
+    },
+    {
+      "path": "classes.dex",
+      "size": 534532,
+      "sha256": "1bc01b863526cac576cd91f218ba8536db7826cbd2f26f1bd2cb6d4edf55521f"
+    },
+    {
+      "path": "assets/licenses/wg-scrypt-Apache-2.0.txt",
+      "size": 10174,
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "path": "assets/licenses/wg-scrypt-provenance.json",
+      "size": 1130,
+      "sha256": "a5f7cef3ca08957aea60417f6c3eabef96bd924f5dda9ecc16f57e5948ab3af0"
+    },
+    {
+      "path": "assets/room-client/logo.svg",
+      "size": 396,
+      "sha256": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512"
+    },
+    {
+      "path": "assets/room-client/media-source.js",
+      "size": 1517,
+      "sha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c"
+    },
+    {
+      "path": "assets/room-client/room-players.js",
+      "size": 3441,
+      "sha256": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9"
+    },
+    {
+      "path": "assets/room-client/room-sync.js",
+      "size": 3584,
+      "sha256": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab"
+    },
+    {
+      "path": "assets/room-client/room.css",
+      "size": 41933,
+      "sha256": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340"
+    },
+    {
+      "path": "assets/room-client/room.html",
+      "size": 10998,
+      "sha256": "a195898b4526c70d68f8b2627d61ba98902daefb7472ad3cf990cc2cc9807af1"
+    },
+    {
+      "path": "assets/room-client/room.js",
+      "size": 48674,
+      "sha256": "1bbaf4f4580e43c00a731efbc9dd1dc6c3cf57a1a570c50a30a3852d23fb4e08"
+    },
+    {
+      "path": "assets/room-client/site.js",
+      "size": 7569,
+      "sha256": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616"
+    },
+    {
+      "path": "assets/room-client/social.css",
+      "size": 12818,
+      "sha256": "d16d9131ad980d13e441a7ae866d2b08e7c4b58e0a387ec892a1de1aa80ffa86"
+    },
+    {
+      "path": "assets/room-client/social.html",
+      "size": 1011,
+      "sha256": "d905f78fe734677728c9e3d3b9e426f8d7fd984c4fdc66a7ea5318834aefd3fe"
+    },
+    {
+      "path": "assets/room-client/social.js",
+      "size": 38894,
+      "sha256": "c3e8b8c0c185afd7fa7f13c5692bfe8339c8e2aeeb139fb70485a1d0c50da601"
+    },
+    {
+      "path": "META-INF/LOLZCLOU.SF",
+      "size": 1957,
+      "sha256": "2408bba3cb14a0820bd271d7560b150bb000154482f1263e25e579d3dbf8c851"
+    },
+    {
+      "path": "META-INF/LOLZCLOU.RSA",
+      "size": 1635,
+      "sha256": "cda65a5b23fb1c4d14cf774fb9dbe1bbb59871f2e1385558031604680e400733"
+    },
+    {
+      "path": "META-INF/MANIFEST.MF",
+      "size": 1830,
+      "sha256": "13945864cf79f8c40bfc73235d31b0da62098405bd39769bc04548cfc5d1f2f7"
+    }
+  ],
+  "privateApk": "D:\\LolzCloud-Android-Toolchain\\android-pitch\\candidate-0.1.10-r3\\LolzCloud-Android-0.1.10.apk",
+  "buildLog": "D:\\LolzCloud-Android-Toolchain\\android-pitch\\build-r3.txt"
+}

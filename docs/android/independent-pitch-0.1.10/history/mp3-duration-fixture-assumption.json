@@ -1,0 +1,139 @@
+{
+  "status": "failed",
+  "error": "java.lang.AssertionError: Marked reupload uses canonical search and duration-retimed real native lines",
+  "checks": [
+    {
+      "name": "Production MediaPlayer service binds for lyrics integration",
+      "passed": true
+    },
+    {
+      "name": "Real local audio advances before opening lyrics",
+      "passed": true
+    },
+    {
+      "name": "Lyrics fixture explicitly uses the genuine legacy MediaPlayer with neutral audio preferences",
+      "passed": true
+    },
+    {
+      "name": "Declared provider is requested by the production lyrics page",
+      "passed": true
+    },
+    {
+      "name": "Native lyrics page displays loading while the request is in flight",
+      "passed": true
+    },
+    {
+      "name": "Opening/loading lyrics never pauses or restarts native music",
+      "passed": true
+    },
+    {
+      "name": "Matched source text becomes actual native lyric views",
+      "passed": true
+    },
+    {
+      "name": "Production UI retains source timestamps rather than estimating line times",
+      "passed": true
+    },
+    {
+      "name": "Touching a timed native line seeks the real MediaPlayer",
+      "passed": true
+    },
+    {
+      "name": "Playback position highlights the current genuine timed line",
+      "passed": true
+    },
+    {
+      "name": "Lyrics interaction preserves the current native queue and track",
+      "passed": true
+    },
+    {
+      "name": "Successful automatic lyrics persist separately and can load without another network request",
+      "passed": true
+    },
+    {
+      "name": "Completed same-recording lyrics survive transient unknown duration and uploader metadata without a new fetch",
+      "passed": true
+    },
+    {
+      "name": "Same recording reuses completed timings across measured duration jitter below2.5s",
+      "passed": true
+    },
+    {
+      "name": "Canonical source URL reuses a completed match after alias-to-numeric-ID migration",
+      "passed": true
+    },
+    {
+      "name": "Cancelling another lookup never deletes a completed positive recording cache",
+      "passed": true
+    },
+    {
+      "name": "Network/provider failures expose an actual Retry state instead of a false not-found result",
+      "passed": true
+    },
+    {
+      "name": "A lyric network error leaves audio playing",
+      "passed": true
+    },
+    {
+      "name": "A failed refresh leaves known-good same-recording lyrics visible beside Retry",
+      "passed": true
+    },
+    {
+      "name": "A later successful provider miss does not overwrite completed same-recording text",
+      "passed": true
+    },
+    {
+      "name": "A refresh miss keeps existing good text without inventing a network error",
+      "passed": true
+    },
+    {
+      "name": "A different known recording duration cannot reuse earlier synchronized or written cache entries",
+      "passed": true
+    },
+    {
+      "name": "Explicit identity reset permits a fresh different-duration written match",
+      "passed": true
+    },
+    {
+      "name": "Different-version written text has no seek action or synthetic synchronization",
+      "passed": true
+    },
+    {
+      "name": "Metadata correction opens an actual native dialog",
+      "passed": true
+    },
+    {
+      "name": "Explicit corrected metadata drives a new successful native lookup",
+      "passed": true
+    },
+    {
+      "name": "Manual lookup identity survives repository recreation for that recording",
+      "passed": true
+    },
+    {
+      "name": "Lyrics metadata correction never changes the playing track's real metadata",
+      "passed": true
+    },
+    {
+      "name": "Marked reupload uses canonical search and duration-retimed real native lines",
+      "passed": false
+    },
+    {
+      "name": "Original native library/settings preferences are restored after lyrics fixtures",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/lyrics-review/lyrics-found.png",
+    "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/lyrics-review/lyrics-error.png",
+    "/storage/emulated/0/Android/data/com.lolzcloud.mobile/files/lyrics-review/lyrics-plain.png"
+  ],
+  "scope": "Declared bounded LRCLIB transport fixtures; real native UI, source LRC line highlighting/seeking, MediaPlayer, private cache/import priority/cancel. No substituted media SDK, real-user account or room navigation.",
+  "version": "0.1.10",
+  "versionCode": 11,
+  "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+  "androidApi": 35,
+  "personalAccountsUsed": false,
+  "generatedAt": "2026-11-15T13:10:54.560Z",
+  "emulator": "emulator-5554"
+}

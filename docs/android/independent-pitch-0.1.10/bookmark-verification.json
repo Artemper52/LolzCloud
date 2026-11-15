@@ -1,0 +1,24 @@
+{
+  "status": "passed",
+  "checks": [
+    "A new Wave recording stays ephemeral before an explicit save action",
+    "Saving a Wave moment also retains its metadata for the visible list and common portable export",
+    "Explicit Wave bookmark save preserves the exact current occurrence, queue and pause",
+    "The actual native moments page shows the saved Wave track while exported JSON excludes its private file URI"
+  ],
+  "live": {},
+  "screenshots": [
+    "wave-bookmark.png"
+  ],
+  "preferencesRestored": true,
+  "runId": "d2b655d0-0aea-4963-bc84-fcd5763a45b6",
+  "version": "0.1.10",
+  "versionCode": 11,
+  "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+  "scope": "Declared provider fixture -> actual PCM -> genuine native PopupMenu -> moment list and portable JSON. No live Wave API or personal account in this focused phase.",
+  "productionShaUnchanged": true,
+  "checkedAt": "2026-11-15T13:16:57.839Z",
+  "emulator": "emulator-5554",
+  "avd": "LolzCloud",
+  "phase": "bookmark"
+}

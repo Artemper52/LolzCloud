@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.lolzcloud.mobile.test">
     <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="36" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <application android:label="LolzCloud test fixtures" android:debuggable="true">
         <activity android:name="com.lolzcloud.mobile.test.AudioFocusFixtureActivity" android:exported="true" />
+        <activity android:name="com.lolzcloud.mobile.test.AudioCaptureFixtureActivity" android:exported="true" />
+        <service android:name="com.lolzcloud.mobile.test.AudioCaptureFixtureService" android:exported="false" android:foregroundServiceType="mediaProjection" />
         <provider android:name="com.lolzcloud.mobile.test.FixtureDocumentsProvider" android:authorities="com.lolzcloud.mobile.test.documents" android:exported="true" android:grantUriPermissions="true" android:permission="android.permission.MANAGE_DOCUMENTS">
             <intent-filter><action android:name="android.content.action.DOCUMENTS_PROVIDER" /></intent-filter>
         </provider>
@@ -26,4 +31,5 @@
     <instrumentation android:name="com.lolzcloud.mobile.test.CloudProfileInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
     <instrumentation android:name="com.lolzcloud.mobile.test.PcmEffectsInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
     <instrumentation android:name="com.lolzcloud.mobile.test.WaveInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
+    <instrumentation android:name="com.lolzcloud.mobile.test.PitchInstrumentation" android:targetPackage="com.lolzcloud.mobile" android:functionalTest="true" android:handleProfiling="false" />
 </manifest>

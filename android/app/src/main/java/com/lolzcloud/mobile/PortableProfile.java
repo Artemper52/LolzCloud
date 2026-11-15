@@ -108,7 +108,8 @@ public final class PortableProfile {
         if (gains.length() != 5) throw new IOException("В эквалайзере должно быть пять полос");
         JSONArray next = new JSONArray(); for (int i = 0; i < 5; i++) { Object raw = gains.get(i); if (!(raw instanceof Number) || !Double.isFinite(((Number) raw).doubleValue()) || ((Number) raw).doubleValue() < -12 || ((Number) raw).doubleValue() > 12) throw new IOException("Полосы должны быть от −12 до +12 дБ"); next.put(raw); }
         return new JSONObject().put("enabled", bool(row, "enabled", false)).put("preset", row.has("preset") ? text(row, "preset", 32) : "Original")
-                .put("gains", next).put("rate", number(row, "rate", 1, .5, 2)).put("preservesPitch", bool(row, "preservesPitch", false))
+                .put("gains", next).put("rate", number(row, "rate", 1, .5, 2)).put("pitch", number(row,"pitch",1,.5,2))
+                .put("preservesPitch", bool(row, "preservesPitch", false)).put("transportEnabled",bool(row,"transportEnabled",false))
                 .put("reverb", number(row, "reverb", 0, 0, .8)).put("echo", number(row, "echo", 0, 0, .8)).put("preampDb", number(row, "preampDb", 0, -12, 0));
     }
 

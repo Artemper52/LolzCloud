@@ -65,6 +65,7 @@ public final class MainActivity extends Activity {
     private LyricsRepository lyricsRepository;
     private Future<?> lyricsTask;
     private LyricsProvider.Result automaticLyrics;
+    private long lyricsIdentityRevision;
     private String lyricsRequestKey="",lyricsTrackId="",lyricsError="";
     private boolean lyricsLoading;
     private int lyricsGeneration;
@@ -389,7 +390,7 @@ public final class MainActivity extends Activity {
                 TextView error=text(lyricsError,14,muted,false);error.setTag("lyrics_error");error.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);content.addView(error);gap(14);
             }else if(automaticLyrics!=null&&automaticLyrics.instrumental)empty("lyrics","Без слов","LRCLIB отметил эту запись как инструментальную. Если это не так, уточни данные или добавь свой текст.");
             else if(lyricLines.isEmpty())empty("lyrics",LyricsMetadata.candidates(identity.title,identity.artist,duration).isEmpty()?"Уточни данные песни":"Текст пока не найден","Проверь название и исполнителя: имя загрузившего трек может отличаться от автора. Можно повторить поиск или добавить свой TXT/LRC.");
-            if(automaticLyrics!=null&&automaticLyrics.found())paragraph("LRCLIB · "+(automaticLyrics.timed?"строки с таймкодами":automaticLyrics.versionMismatch?"другая длительность · без таймкодов":"без таймкодов"));
+            if(automaticLyrics!=null&&automaticLyrics.found())paragraph(automaticLyrics.adapted?String.format(Locale.ROOT,"LRCLIB · Под версию · %.2f× (по длительности)",automaticLyrics.adaptationRate):"LRCLIB · "+(automaticLyrics.timed?"строки с таймкодами":automaticLyrics.versionMismatch?"другая длительность · без таймкодов":"без таймкодов"));
         }
         for(LrcParser.Line line:lyricLines){TextView v=text(line.text,23,line.time<0?ink:muted,true);v.setLineSpacing(dp(4),1);v.setPadding(0,dp(12),0,dp(12));if(line.time>=0){v.setContentDescription("Перейти к "+format(line.time)+": "+line.text);v.setOnClickListener(w->{Track active=current();if(player!=null&&active!=null&&active.id.equals(t.id))player.seekTo(line.time);});}lyricViews.add(v);content.addView(v);}
         gap(18);
@@ -400,14 +401,14 @@ public final class MainActivity extends Activity {
     private void cancelLyrics(){lyricsGeneration++;if(lyricsTask!=null)lyricsTask.cancel(true);lyricsTask=null;if(lyricsRepository!=null)lyricsRepository.cancel();lyricsLoading=false;lyricsRequestKey="";}
     private void requestLyrics(Track track,boolean force){
         cancelLyrics();LyricsMetadata.Query identity=lyricsRepository.identity(track.id,track.title,track.artist,lyricDuration(track));
-        lyricsRequestKey=lyricsRepository.key(track.id,identity);lyricsTrackId=track.id;lyricsDuration=identity.duration;automaticLyrics=null;lyricsError="";
-        if(LyricsMetadata.candidates(identity.title,identity.artist,identity.duration).isEmpty())return;
+        boolean retain=track.id.equals(lyricsTrackId)&&lyricsIdentityRevision==identity.identityRevision&&LyricsRepository.compatible(automaticLyrics,identity.duration);
+        lyricsRequestKey=lyricsRepository.key(track.id,identity);lyricsTrackId=track.id;lyricsDuration=identity.duration;lyricsIdentityRevision=identity.identityRevision;if(!retain)automaticLyrics=null;lyricsError="";
         final int ticket=lyricsGeneration;final String key=lyricsRequestKey;lyricsLoading=true;
         lyricsTask=lyricsIo.submit(()->{
             LyricsProvider.Result result=null;String error="";
-            try{result=lyricsRepository.load(track.id,identity,force);}catch(Exception failure){error=failure.getMessage()==null?"Не удалось загрузить текст. Повтори поиск.":failure.getMessage();}
+            try{result=lyricsRepository.load(track.id,track.sourceUrl,identity,force);}catch(Exception failure){error=failure.getMessage()==null?"Не удалось загрузить текст. Повтори поиск.":failure.getMessage();}
             final LyricsProvider.Result loaded=result;final String message=error;
-            handler.post(()->{Track now=current();if(!alive||ticket!=lyricsGeneration||!key.equals(lyricsRequestKey)||!page.equals("lyrics")||now==null||!now.id.equals(track.id))return;lyricsLoading=false;lyricsTask=null;automaticLyrics=loaded;lyricsError=message;render();});
+            handler.post(()->{Track now=current();if(!alive||ticket!=lyricsGeneration||!key.equals(lyricsRequestKey)||!page.equals("lyrics")||now==null||!now.id.equals(track.id))return;lyricsLoading=false;lyricsTask=null;if(loaded!=null)automaticLyrics=loaded;lyricsError=message;render();});
         });
     }
     private void lyricsIdentityDialog(Track track){
@@ -421,8 +422,14 @@ public final class MainActivity extends Activity {
         if(player==null){paragraph("Плеер подключается…");return;}
         soundCapabilities=player.effectsCapabilitiesKey();
         LinearLayout presets=row();presets.addView(chip("Обычная скорость",false,()->tempoPreset(1f,1f)));presets.addView(chip("Slowed",false,()->tempoPreset(.85f,.9f)));presets.addView(chip("Speed up",false,()->tempoPreset(1.2f,1.1f)));content.addView(horizontal(presets));
-        section("Скорость");slider(String.format(Locale.ROOT,"%.2f×",player.speed()),150,Math.round((player.speed()-.5f)*100),value->player.setSpeed(.5f+value/100f),value->String.format(Locale.ROOT,"%.2f×",.5f+value/100f));
-        section("Тон");slider(String.format(Locale.ROOT,"%.2f×",player.pitch()),150,Math.round((player.pitch()-.5f)*100),value->player.setPitch(.5f+value/100f),value->String.format(Locale.ROOT,"%.2f×",.5f+value/100f));
+        final TextView transportNote=text("",12,muted,false);
+        final Runnable describeTransport=()->transportNote.setText(!player.nativeTransportActive()?"Скорость и тон сохранены, но выключены. Правка включает только скорость и тон, не эквалайзер.":player.preservesPitch()?String.format(Locale.ROOT,"Независимый тон · %.2f× при скорости %.2f×",player.pitch(),player.speed()):String.format(Locale.ROOT,"Тон следует скорости: %.2f×. Независимый тон %.2f× сохранён.",player.pitch(),player.independentPitch()));
+        section("Скорость");SeekBar rateSlider=slider(String.format(Locale.ROOT,"%.2f×",player.requestedSpeed()),150,Math.round((player.requestedSpeed()-.5f)*100),value->{player.setSpeed(.5f+value/100f);describeTransport.run();},value->String.format(Locale.ROOT,"%.2f×",.5f+value/100f));rateSlider.setTag("native_playback_rate");
+        section("Тон");
+        LinearLayout toneRow=row();toneRow.setGravity(Gravity.CENTER_VERTICAL);TextView toneTitle=text("Сохранять выбранный тон",15,ink,true);toneRow.addView(toneTitle,new LinearLayout.LayoutParams(0,-2,1));
+        final Switch preserve=new Switch(this);preserve.setTag("native_preserves_pitch");preserve.setContentDescription("Сохранять выбранный тон при изменении скорости");preserve.setChecked(player.preservesPitch());preserve.setThumbTintList(ColorStateList.valueOf(accent));preserve.setMinimumHeight(dp(48));toneRow.addView(preserve);content.addView(toneRow);
+        final boolean[] updatingMode={false};preserve.setOnCheckedChangeListener((view,value)->{if(!updatingMode[0]){player.setPreservesPitch(value);describeTransport.run();}});
+        SeekBar toneSlider=slider(String.format(Locale.ROOT,"Выбранный тон · %.2f×",player.independentPitch()),150,Math.round((player.independentPitch()-.5f)*100),value->{player.setPitch(.5f+value/100f);updatingMode[0]=true;preserve.setChecked(player.preservesPitch());updatingMode[0]=false;describeTransport.run();},value->String.format(Locale.ROOT,"Выбранный тон · %.2f×",.5f+value/100f));toneSlider.setTag("native_independent_pitch");describeTransport.run();content.addView(transportNote);
         section("Переносимый эквалайзер");
         if(player.portableProfilePending()){paragraph("Сохранённый звук из профиля пока не применяется. Текущие настройки продолжают действовать, в том числе на следующих треках.");content.addView(button("Применить звук из профиля",false,()->{player.activatePortableSound();render();}));}
         switchRow("Эквалайзер и эффекты","Обработка звука на телефоне",player.portableSoundActive()&&player.portableSoundEnabled(),enabled->{player.setPortableEnabled(enabled);render();});

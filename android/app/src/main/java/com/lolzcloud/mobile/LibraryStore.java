@@ -551,6 +551,58 @@ public final class LibraryStore {
     public long savedPosition() { return prefs.getLong("queue_position", 0); }
     public SharedPreferences preferences() { return prefs; }
 
+    /** Reading a backup/export must never mutate preferences, including on an aborted cloud import. */
+    public PitchPolicy.State pitchState(){synchronized(LOCK){
+        JSONObject raw=null;try{if(prefs.contains("portable_dsp"))raw=new JSONObject(prefs.getString("portable_dsp","{}"));}catch(JSONException|RuntimeException invalid){}
+        boolean effects=raw!=null&&raw.optBoolean("enabled",false);
+        if(pitchVersion()>=PitchPolicy.SCHEMA)return new PitchPolicy.State(
+                pitchNumber(PitchPolicy.RATE_KEY,1),pitchNumber(PitchPolicy.PITCH_KEY,1),pitchBoolean(PitchPolicy.PRESERVES_KEY),effects,pitchBoolean(PitchPolicy.ENABLED_KEY));
+        if(raw!=null&&(raw.has("pitch")||raw.has("transportEnabled")))try{return pitchFromSound(PortableProfile.sound(raw));}catch(IOException|JSONException invalid){}
+        if(prefs.contains("speed")||prefs.contains("pitch")||raw!=null)return PitchPolicy.migrateLocal(pitchNumber("speed",1),pitchNumber("pitch",1),effects);
+        return PitchPolicy.fresh();
+    }}
+    private int pitchVersion(){try{return prefs.getInt(PitchPolicy.SCHEMA_KEY,0);}catch(ClassCastException invalid){return 0;}}
+    private boolean pitchBoolean(String key){try{return prefs.getBoolean(key,false);}catch(ClassCastException invalid){return false;}}
+    private double pitchNumber(String key,double fallback){try{return PitchPolicy.storedRatio(prefs.getFloat(key,(float)fallback));}catch(ClassCastException invalid){return fallback;}}
+    private static PitchPolicy.State pitchFromSound(JSONObject sound)throws JSONException{
+        return new PitchPolicy.State(sound.getDouble("rate"),sound.optDouble("pitch",1),sound.getBoolean("preservesPitch"),sound.getBoolean("enabled"),sound.optBoolean("transportEnabled",false));
+    }
+    private static void pitchFields(SharedPreferences.Editor edit,PitchPolicy.State state){
+        edit.putInt(PitchPolicy.SCHEMA_KEY,PitchPolicy.SCHEMA).putFloat(PitchPolicy.RATE_KEY,(float)state.rate).putFloat(PitchPolicy.PITCH_KEY,(float)state.pitch)
+                .putBoolean(PitchPolicy.PRESERVES_KEY,state.preservesPitch).putBoolean(PitchPolicy.ENABLED_KEY,state.transportEnabled)
+                .putFloat("speed",(float)state.outputRate()).putFloat("pitch",(float)state.outputPitch());
+    }
+    static PitchPolicy.State stageSoundTransport(SharedPreferences.Editor edit,JSONObject sound)throws JSONException{
+        PitchPolicy.State state=pitchFromSound(sound);pitchFields(edit,state);return state;
+    }
+    public PitchPolicy.State resetNativeTransport(){synchronized(LOCK){PitchPolicy.State state=PitchPolicy.fresh();SharedPreferences.Editor edit=prefs.edit();pitchFields(edit,state);edit.apply();return state;}}
+    private static JSONObject pitchFields(JSONObject sound,PitchPolicy.State state)throws JSONException{
+        return sound.put("rate",state.rate).put("pitch",state.pitch).put("preservesPitch",state.preservesPitch).put("transportEnabled",state.transportEnabled);
+    }
+    public PitchPolicy.State migratePitchState()throws IOException{synchronized(LOCK){
+        PitchPolicy.State state=pitchState();if(pitchVersion()>=PitchPolicy.SCHEMA)return state;
+        try{SharedPreferences.Editor edit=prefs.edit();pitchFields(edit,state);
+            if(prefs.contains("portable_dsp"))edit.putString("portable_dsp",pitchFields(PortableProfile.sound(new JSONObject(prefs.getString("portable_dsp","{}"))),state).toString());
+            if(prefs.contains("portable_export_dsp")&&!prefs.getBoolean("portable_dsp_pending",false))edit.putString("portable_export_dsp",pitchFields(PortableProfile.sound(new JSONObject(prefs.getString("portable_export_dsp","{}"))),state).toString());
+            edit.apply();return state;
+        }catch(JSONException invalid){throw new IOException("Не удалось восстановить сохранённый тон",invalid);}
+    }}
+    public PitchPolicy.State editNativeRate(double value,JSONObject fallback)throws IOException{return editNativeTransport("rate",value,fallback);}
+    public PitchPolicy.State editNativePitch(double value,JSONObject fallback)throws IOException{return editNativeTransport("pitch",value,fallback);}
+    public PitchPolicy.State editNativePreservesPitch(boolean value,JSONObject fallback)throws IOException{return editNativeTransport("preservesPitch",value?1:0,fallback);}
+    private PitchPolicy.State editNativeTransport(String key,double value,JSONObject fallback)throws IOException{synchronized(LOCK){
+        try{PitchPolicy.State before=pitchState(),after=key.equals("rate")?before.withRate(value):key.equals("pitch")?before.withPitch(value):before.preserving(value==1);
+            JSONObject applied=prefs.contains("portable_dsp")?PortableProfile.sound(new JSONObject(prefs.getString("portable_dsp","{}"))):PortableProfile.sound(fallback==null?new JSONObject():fallback);
+            pitchFields(applied,after);
+            JSONObject exported=prefs.contains("portable_export_dsp")?PortableProfile.sound(new JSONObject(prefs.getString("portable_export_dsp","{}"))):new JSONObject(applied.toString());
+            exported.put(key,applied.get(key)).put("transportEnabled",true);if(key.equals("pitch"))exported.put("preservesPitch",true);
+            SharedPreferences.Editor edit=prefs.edit();pitchFields(edit,after);if(prefs.contains("portable_dsp"))edit.putString("portable_dsp",applied.toString());edit.putString("portable_export_dsp",exported.toString()).apply();return after;
+        }catch(JSONException|IllegalArgumentException invalid){throw new IOException("Не удалось сохранить скорость и тон",invalid);}
+    }}
+
+    /** FX master may change the shared transport gate; it does not replace remembered pitch. */
+    public PitchPolicy.State refreshPitchGate()throws IOException{synchronized(LOCK){PitchPolicy.State state=pitchState();SharedPreferences.Editor edit=prefs.edit();pitchFields(edit,state);edit.apply();return state;}}
+
     public static boolean isDirectHttps(Uri uri) {
         if (uri == null || !"https".equalsIgnoreCase(uri.getScheme()) || uri.getHost() == null
                 || uri.getUserInfo() != null) return false;
@@ -614,7 +666,10 @@ public final class LibraryStore {
                 JSONObject profile = portableSnapshot(), sound = profile.getJSONObject("music").getJSONObject("dsp");
                 if (prefs.contains("portable_export_dsp")) sound = PortableProfile.sound(new JSONObject(prefs.getString("portable_export_dsp", "{}")));
                 else if (prefs.contains("portable_dsp")) sound = PortableProfile.sound(new JSONObject(prefs.getString("portable_dsp", "{}")));
-                else sound.put("rate", prefs.getFloat("speed", 1f));
+                else pitchFields(sound,pitchState());
+                // A pure export may run before the Service's local migration has committed.
+                // Preserve actual old native tone, without adopting an unchecked imported snapshot.
+                if(pitchVersion()<PitchPolicy.SCHEMA&&!prefs.getBoolean("portable_dsp_pending",false))pitchFields(sound,pitchState());
                 return exportProjection(profile, readTracks("tracks"), new HashSet<>(prefs.getStringSet("liked", new HashSet<String>())), null,
                         new JSONObject(prefs.getString("portable_aliases", "{}")), sound);
             } catch (JSONException | IllegalArgumentException invalid) { throw new IOException("Не удалось подготовить общий профиль", invalid); }
@@ -711,7 +766,7 @@ public final class LibraryStore {
                         .putString("portable_export_dsp", profile.getJSONObject("music").getJSONObject("dsp").toString()).putBoolean("portable_dsp_pending", !applySound)
                         .putString("tracks", trackJson(tracks).toString()).putStringSet("liked", liked);
                 for (java.util.Map.Entry<String, List<Long>> entry : moments.entrySet()) { JSONArray data = new JSONArray(); for (long time : entry.getValue()) data.put(time); edit.putString("bookmarks_" + entry.getKey(), data.toString()); }
-                if (applySound) { JSONObject sound = profile.getJSONObject("music").getJSONObject("dsp"); float rate = (float) sound.getDouble("rate"); edit.putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).putFloat("speed", rate).putFloat("pitch", sound.getBoolean("preservesPitch") ? 1f : rate).putInt("bass", 0).putBoolean("reverb", false).putInt("loudness", 0).putBoolean("eq_enabled", sound.getBoolean("enabled")); }
+                if (applySound) { JSONObject sound = profile.getJSONObject("music").getJSONObject("dsp");stageSoundTransport(edit,sound);edit.putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).putInt("bass", 0).putBoolean("reverb", false).putInt("loudness", 0).putBoolean("eq_enabled", sound.getBoolean("enabled")); }
                 if (guard != null) guard.verify();
                 if (!edit.commit()) throw new IOException("Не удалось сохранить профиль. Проверь свободное место");
                 return imported.size();
@@ -819,17 +874,17 @@ public final class LibraryStore {
                 JSONObject snapshot = portableSnapshot(), sound = snapshot.getJSONObject("music").getJSONObject("dsp");
                 if (prefs.contains("portable_export_dsp")) sound = PortableProfile.sound(new JSONObject(prefs.getString("portable_export_dsp", "{}")));
                 else if (prefs.contains("portable_dsp")) sound = PortableProfile.sound(new JSONObject(prefs.getString("portable_dsp", "{}")));
-                else sound.put("rate", prefs.getFloat("speed", 1f));
-                if (applySound) sound.put("rate", Math.max(.5, Math.min(2, incomingSpeed)));
+                else pitchFields(sound,pitchState());
+                PitchPolicy.State beforeTransport=pitchState();
+                PitchPolicy.State legacyTransport=new PitchPolicy.State(Math.max(.5,Math.min(2,incomingSpeed)),beforeTransport.outputPitch(),true,beforeTransport.effectsEnabled,true);
+                if (applySound) pitchFields(sound,legacyTransport);
                 exportProjection(snapshot, tracks, liked, null, new JSONObject(prefs.getString("portable_aliases", "{}")), sound);
                 String backup = exportProfile();
                 SharedPreferences.Editor edit = prefs.edit().putString("profile_backup", backup)
                         .putLong("profile_backup_at", System.currentTimeMillis())
                         .putString("tracks", savedTracks.toString()).putStringSet("liked", liked);
-                if (applySound) edit.putFloat("speed", (float) Math.max(.5, Math.min(2.0, incomingSpeed)))
-                        .putInt("bass", Math.max(0, Math.min(1000, profile.optInt("bass", 0))))
-                        .putInt("repeat", Math.max(0, Math.min(2, profile.optInt("repeat", 0))));
-                if (applySound && prefs.contains("portable_dsp")) edit.putString("portable_dsp", PortableProfile.sound(new JSONObject(prefs.getString("portable_dsp", "{}"))).put("rate", Math.max(.5, Math.min(2, incomingSpeed))).toString());
+                if (applySound){pitchFields(edit,legacyTransport);edit.putInt("bass", Math.max(0, Math.min(1000, profile.optInt("bass", 0)))).putInt("repeat", Math.max(0, Math.min(2, profile.optInt("repeat", 0))));}
+                if (applySound && prefs.contains("portable_dsp")) edit.putString("portable_dsp", pitchFields(PortableProfile.sound(new JSONObject(prefs.getString("portable_dsp", "{}"))),legacyTransport).toString());
                 if (applySound) edit.putString("portable_export_dsp", sound.toString());
                 if (guard != null) guard.verify();
                 boolean success = edit.commit();

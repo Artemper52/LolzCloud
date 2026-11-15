@@ -137,6 +137,7 @@ public final class PlaybackService extends Service {
     private int repeat;
     private float speed = 1f;
     private float pitch = 1f;
+    private PitchPolicy.State transport=PitchPolicy.fresh();
     private float volume = 1f;
     private long pendingSeek;
     private long lastSave;
@@ -153,8 +154,7 @@ public final class PlaybackService extends Service {
         SharedPreferences prefs = store.preferences();
         repeat = prefs.getInt("repeat", 0);
         shuffle = prefs.getBoolean("shuffle", false);
-        speed = prefs.getFloat("speed", 1f);
-        pitch = prefs.getFloat("pitch", 1f);
+        try{adoptTransport(store.migratePitchState());}catch(IOException invalid){adoptTransport(store.pitchState());error=invalid.getMessage();}
         normalization = prefs.getBoolean("pcm_normalization", false);
         syncImportedNormalization();
         long savedSleep = prefs.getLong(SLEEP_DEADLINE, 0);
@@ -257,6 +257,10 @@ public final class PlaybackService extends Service {
     public boolean shuffle() { return shuffle && (wave==null||!wave.active()); }
     public float speed() { return speed; }
     public float pitch() { return pitch; }
+    public float requestedSpeed(){return(float)transport.rate;}
+    public float independentPitch(){return(float)transport.pitch;}
+    public boolean preservesPitch(){return transport.preservesPitch;}
+    public boolean nativeTransportActive(){return transport.active();}
     public float volume() { return volume; }
     public long sleepRemainingMillis() { return sleepAt == 0 ? 0 : Math.max(0, sleepAt - SystemClock.elapsedRealtime()); }
 
@@ -469,21 +473,22 @@ public final class PlaybackService extends Service {
 
     public void setSpeed(float value) {
         if (Float.isNaN(value) || Float.isInfinite(value)) return;
-        speed = Math.max(.5f, Math.min(2f, value));
-        store.preferences().edit().putFloat("speed", speed).apply();
-        updatePortableTransport("rate");
-        applySpeed();
+        try{adoptTransport(store.editNativeRate(Math.max(.5f,Math.min(2f,value)),portableSound()));applySpeed();}
+        catch(IOException invalid){error=invalid.getMessage();}
         changed(false);
     }
 
     public void setPitch(float value) {
         if (Float.isNaN(value) || Float.isInfinite(value)) return;
-        pitch = Math.max(.5f, Math.min(2f, value));
-        store.preferences().edit().putFloat("pitch", pitch).apply();
-        updatePortableTransport("preservesPitch");
-        applySpeed();
+        try{adoptTransport(store.editNativePitch(Math.max(.5f,Math.min(2f,value)),portableSound()));applySpeed();}
+        catch(IOException invalid){error=invalid.getMessage();}
         changed(false);
     }
+    public void setPreservesPitch(boolean enabled){
+        try{adoptTransport(store.editNativePreservesPitch(enabled,portableSound()));applySpeed();}catch(IOException invalid){error=invalid.getMessage();}changed(false);
+    }
+    private void adoptTransport(PitchPolicy.State value){transport=value;speed=(float)value.outputRate();pitch=(float)value.outputPitch();}
+    private void reapplyTransportGate(){try{adoptTransport(store.refreshPitchGate());applySpeed();}catch(IOException invalid){error=invalid.getMessage();}}
 
     public void setVolume(float value) {
         if (Float.isNaN(value) || Float.isInfinite(value)) return;
@@ -552,7 +557,7 @@ public final class PlaybackService extends Service {
             if (store.preferences().getBoolean("portable_dsp_apply", false)) {
                 JSONObject sound = portableSound(); sound.put("gains", hardwareCurve()).put("enabled", true).put("preset", "Custom");
                 store.preferences().edit().putString("portable_dsp", sound.toString()).apply();
-                exportPortableKeys(sound, "gains", "enabled", "preset");
+                exportPortableKeys(sound, "gains", "enabled", "preset");reapplyTransportGate();
             }
             return true;
         } catch (RuntimeException | JSONException ignored) { return false; }
@@ -594,7 +599,7 @@ public final class PlaybackService extends Service {
         SharedPreferences.Editor edit = prefs.edit().putFloat("speed", 1f).putFloat("pitch", 1f)
                 .putInt("bass", 0).putBoolean("reverb", false).putInt("loudness", 0).putBoolean("eq_enabled", false);
         for (String key : AudioEffectsPolicy.storedEqBands(prefs.getAll().keySet())) edit.remove(key);
-        edit.apply(); speed = 1f; pitch = 1f; applySpeed();
+        edit.apply();adoptTransport(store.resetNativeTransport());applySpeed();
         try { String neutral = PortableProfile.sound(new JSONObject()).toString(); store.preferences().edit().putString("portable_dsp", neutral).putString("portable_export_dsp", neutral).putBoolean("portable_dsp_apply", true).putBoolean("portable_dsp_pending", false).apply(); }
         catch (IOException | JSONException impossible) { throw new IllegalStateException(impossible); }
         applyPortableGain();
@@ -635,7 +640,7 @@ public final class PlaybackService extends Service {
         try {
             SharedPreferences prefs = store.preferences();
             if (prefs.contains("portable_dsp")) return PortableProfile.sound(new JSONObject(prefs.getString("portable_dsp", "{}")));
-            JSONObject sound = PortableProfile.sound(new JSONObject()).put("rate", speed).put("preservesPitch", Math.abs(pitch - 1f) < .001f);
+            JSONObject sound = PortableProfile.sound(new JSONObject()).put("rate",transport.rate).put("pitch",transport.pitch).put("preservesPitch",transport.preservesPitch).put("transportEnabled",transport.transportEnabled);
             if (eqAvailable()) sound.put("gains", hardwareCurve()).put("enabled", equalizer.getEnabled());
             return sound;
         } catch (IOException | JSONException | RuntimeException invalid) {
@@ -650,11 +655,6 @@ public final class PlaybackService extends Service {
         for (int band = 0; band < count; band++) { frequencies[band] = eqCenterHz(band); levels[band] = eqBandLevel(band) / 100d; }
         for (double frequency : PortableAudioCurve.FREQUENCIES) result.put(count == 0 ? 0 : Math.max(-12, Math.min(12, PortableAudioCurve.at(frequencies, levels, frequency))));
         return result;
-    }
-
-    private void updatePortableTransport(String key) {
-        try { JSONObject sound = portableSound().put("rate", speed).put("preservesPitch", Math.abs(pitch - 1f) < .001f); if (store.preferences().contains("portable_dsp")) store.preferences().edit().putString("portable_dsp", sound.toString()).apply(); exportPortableKeys(sound, key); }
-        catch (JSONException impossible) { throw new IllegalStateException(impossible); }
     }
 
     private void exportPortableKeys(JSONObject sound, String... keys) {
@@ -674,18 +674,17 @@ public final class PlaybackService extends Service {
 
     public void activatePortableSound() {
         JSONObject sound = portableSound();
-        if (portableProfilePending()) try { sound = PortableProfile.sound(new JSONObject(store.preferences().getString("portable_profile", "{}")).getJSONObject("music").getJSONObject("dsp")); } catch (IOException | JSONException invalid) { error = "Не удалось прочитать сохранённый звук профиля"; changed(false); return; }
-        float rate = (float) sound.optDouble("rate", 1);
-        store.preferences().edit().putString("portable_dsp", sound.toString()).putString("portable_export_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).putBoolean("portable_dsp_pending", false)
-                .putFloat("speed", rate).putFloat("pitch", sound.optBoolean("preservesPitch", false) ? 1f : rate)
-                .putInt("bass", 0).putBoolean("reverb", false).putInt("loudness", 0).apply();
+        if (portableProfilePending()) try { sound = store.preferences().contains("portable_export_dsp")?PortableProfile.sound(new JSONObject(store.preferences().getString("portable_export_dsp","{}"))):PortableProfile.sound(new JSONObject(store.preferences().getString("portable_profile", "{}")).getJSONObject("music").getJSONObject("dsp")); } catch (IOException | JSONException invalid) { error = "Не удалось прочитать сохранённый звук профиля"; changed(false); return; }
+        try{SharedPreferences.Editor edit=store.preferences().edit().putString("portable_dsp", sound.toString()).putString("portable_export_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).putBoolean("portable_dsp_pending", false)
+                .putInt("bass", 0).putBoolean("reverb", false).putInt("loudness", 0);LibraryStore.stageSoundTransport(edit,sound);edit.apply();}
+        catch(JSONException invalid){error="Не удалось применить скорость и тон профиля";changed(false);return;}
         syncImportedNormalization(true);
         reloadSettings();
     }
-    public void setPortableEnabled(boolean enabled) { try { JSONObject sound = portableSound().put("enabled", enabled); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"enabled");updatePcmConfiguration(); changed(true); } catch (JSONException impossible) { throw new IllegalStateException(impossible); } }
+    public void setPortableEnabled(boolean enabled) { try { JSONObject sound = portableSound().put("enabled", enabled); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"enabled");reapplyTransportGate();updatePcmConfiguration(); changed(true); } catch (JSONException impossible) { throw new IllegalStateException(impossible); } }
     public void setPortableBand(int band, double gain) {
         if (band < 0 || band >= 5 || !Double.isFinite(gain) || gain < -12 || gain > 12) return;
-        try { JSONObject sound = portableSound(); JSONArray gains = sound.getJSONArray("gains"); gains.put(band, gain); sound.put("enabled", true).put("preset", "Custom"); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"gains","enabled","preset");updatePcmConfiguration(); changed(false); }
+        try { JSONObject sound = portableSound(); JSONArray gains = sound.getJSONArray("gains"); gains.put(band, gain); sound.put("enabled", true).put("preset", "Custom"); store.preferences().edit().putString("portable_dsp", sound.toString()).putBoolean("portable_dsp_apply", true).apply(); exportPortableKeys(sound,"gains","enabled","preset");reapplyTransportGate();updatePcmConfiguration(); changed(false); }
         catch (JSONException impossible) { throw new IllegalStateException(impossible); }
     }
     public void setPortablePreamp(double db) {
@@ -704,8 +703,7 @@ public final class PlaybackService extends Service {
         SharedPreferences prefs = store.preferences();
         repeat = Math.max(0, Math.min(2, prefs.getInt("repeat", 0)));
         shuffle = prefs.getBoolean("shuffle", false);
-        speed = Math.max(.5f, Math.min(2f, prefs.getFloat("speed", 1f)));
-        pitch = Math.max(.5f, Math.min(2f, prefs.getFloat("pitch", 1f)));
+        adoptTransport(store.pitchState());
         syncImportedNormalization();
         applySpeed();
         setBass(prefs.getInt("bass", 0));
@@ -726,7 +724,7 @@ public final class PlaybackService extends Service {
     public double portableReverb(){return portableSound().optDouble("reverb",0);}
     public void setPortableEffect(String effect,double value){
         if(!(effect.equals("echo")||effect.equals("reverb"))||!Double.isFinite(value)||value<0||value>.8)return;
-        try{JSONObject sound=portableSound().put(effect,value).put("enabled",true);store.preferences().edit().putString("portable_dsp",sound.toString()).putBoolean("portable_dsp_apply",true).apply();exportPortableKeys(sound,effect,"enabled");updatePcmConfiguration();changed(false);}catch(JSONException impossible){throw new IllegalStateException(impossible);}
+        try{JSONObject sound=portableSound().put(effect,value).put("enabled",true);store.preferences().edit().putString("portable_dsp",sound.toString()).putBoolean("portable_dsp_apply",true).apply();exportPortableKeys(sound,effect,"enabled");reapplyTransportGate();updatePcmConfiguration();changed(false);}catch(JSONException impossible){throw new IllegalStateException(impossible);}
     }
     public void setNormalization(boolean enabled){
         try{SharedPreferences prefs=store.preferences();JSONObject snapshot=prefs.contains("portable_profile")?PortableProfile.parse(prefs.getString("portable_profile","")):PortableProfile.normalize(new JSONObject().put("format","lolzcloud-profile").put("version",1));snapshot.getJSONObject("tools").put("normalization",enabled);String json=PortableProfile.normalize(snapshot).toString();prefs.edit().putBoolean("pcm_normalization",enabled).putString("portable_profile",json).putString("pcm_normalization_snapshot",profileFingerprint(json)).putBoolean("pcm_normalization_pending",false).apply();normalization=enabled;updatePcmConfiguration();changed(false);}catch(IOException|JSONException invalid){error="Не удалось сохранить нормализацию: "+invalid.getMessage();changed(true);}

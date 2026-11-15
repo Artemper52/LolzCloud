@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-11-15T13:26:26.839Z",
+  "serial": "emulator-5554",
+  "avd": "LolzCloud",
+  "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+  "wifi": "1",
+  "data": "1",
+  "activeWakeLocks": 0,
+  "services": "ACTIVITY MANAGER SERVICES (dumpsys activity services)\r\n  (nothing)\r\n",
+  "projection": "MEDIA PROJECTION MANAGER (dumpsys media_projection)\r\nMedia Projection: \r\nnull\r\n",
+  "launcher": {
+    "ProcessId": 18792,
+    "ParentProcessId": 1244,
+    "Name": "emulator.exe",
+    "ExecutablePath": "D:\\LolzCloud-Android-Toolchain\\sdk\\emulator\\emulator.exe",
+    "CommandLine": "\"D:\\LolzCloud-Android-Toolchain\\sdk\\emulator\\emulator.exe\" -avd LolzCloud -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader -memory 1536 -camera-back none -camera-front none"
+  },
+  "qemu": {
+    "ProcessId": 28820,
+    "ParentProcessId": 18792,
+    "Name": "qemu-system-x86_64-headless.exe",
+    "ExecutablePath": "D:\\LolzCloud-Android-Toolchain\\sdk\\emulator\\qemu\\windows-x86_64\\qemu-system-x86_64-headless.exe",
+    "CommandLine": "D:\\LolzCloud-Android-Toolchain\\sdk\\emulator\\qemu\\windows-x86_64\\qemu-system-x86_64-headless.exe -avd LolzCloud -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader -memory 1536 -camera-back none -camera-front none"
+  },
+  "processPathsVerified": true,
+  "parentRelationshipVerified": true
+}

@@ -3,6 +3,7 @@ package com.lolzcloud.mobile;
 import android.content.Context;
 import android.content.SharedPreferences;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,41 +26,66 @@ public final class LyricsRepository {
     LyricsRepository(LyricsProvider provider,SharedPreferences matches,File directory){this.provider=provider;this.matches=matches;this.directory=directory;}
     public LyricsMetadata.Query identity(String id,String title,String artist,long duration){
         String value=matches.getString(hash(id),"");
-        try{JSONObject row=new JSONObject(value);LyricsMetadata.Query corrected=new LyricsMetadata.Query(row.getString("title"),row.getString("artist"),duration);if(corrected.usable())return corrected;}catch(Exception ignored){}
+        try{JSONObject row=new JSONObject(value);long revision=row.optLong("revision",0);if(!row.has("title"))return new LyricsMetadata.Query(title,artist,duration).revision(revision);LyricsMetadata.Query corrected=new LyricsMetadata.Query(row.getString("title"),row.getString("artist"),duration,title).revision(revision);if(corrected.usable())return corrected;}catch(Exception ignored){}
         return new LyricsMetadata.Query(title,artist,duration);
     }
     public void setIdentity(String id,String title,String artist){
         LyricsMetadata.Query query=new LyricsMetadata.Query(title,artist,0);if(!query.usable())throw new IllegalArgumentException("Укажи название песни и исполнителя");
-        try{matches.edit().putString(hash(id),new JSONObject().put("title",query.title).put("artist",query.artist).toString()).apply();}catch(Exception error){throw new IllegalArgumentException("Не удалось сохранить название",error);}
+        try{matches.edit().putString(hash(id),new JSONObject().put("title",query.title).put("artist",query.artist).put("revision",nextRevision(id)).toString()).apply();}catch(Exception error){throw new IllegalArgumentException("Не удалось сохранить название",error);}
     }
-    public void resetIdentity(String id){matches.edit().remove(hash(id)).apply();}
+    private long nextRevision(String id){long previous=0;try{previous=new JSONObject(matches.getString(hash(id),"{}")).optLong("revision",0);}catch(Exception ignored){}return Math.max(System.currentTimeMillis(),previous+1);}
+    public void resetIdentity(String id){try{matches.edit().putString(hash(id),new JSONObject().put("revision",nextRevision(id)).toString()).apply();}catch(Exception ignored){}}
     public String key(String id,LyricsMetadata.Query query){return hash(id+"\n"+query.key());}
     public void cancel(){provider.cancel();}
     public long retryAt(){return provider.retryAt();}
-    public LyricsProvider.Result load(String id,LyricsMetadata.Query query,boolean force)throws IOException{
-        File file=new File(directory,key(id,query)+".json");
-        if(!force){LyricsProvider.Result cached=read(file,query);if(cached!=null)return cached;}
-        LyricsProvider.Result result=provider.lookup(LyricsMetadata.candidates(query.title,query.artist,query.duration));
-        if(Thread.currentThread().isInterrupted())throw new java.io.InterruptedIOException("Поиск отменён");
-        // Only successful lyrics/instrumental records persist; a miss or network error can be retried.
-        if(result.found()||result.instrumental)write(file,result);
-        return result;
+    public synchronized LyricsProvider.Result load(String id,LyricsMetadata.Query query,boolean force)throws IOException{
+        return load(id,"",query,force);
     }
-    private LyricsProvider.Result read(File file,LyricsMetadata.Query query){
-        if(!file.isFile()||file.length()>512000||file.lastModified()<System.currentTimeMillis()-7L*86400000)return null;
-        try(FileInputStream input=new FileInputStream(file);java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream()){
-            byte[] buffer=new byte[8192];int count;while((count=input.read(buffer))!=-1){if(bytes.size()+count>512000)return null;bytes.write(buffer,0,count);}
-            JSONObject row=new JSONObject(new String(bytes.toByteArray(),StandardCharsets.UTF_8));
+    public synchronized LyricsProvider.Result load(String id,String sourceUrl,LyricsMetadata.Query query,boolean force)throws IOException{
+        if(Thread.currentThread().isInterrupted())throw new java.io.InterruptedIOException("Поиск отменён");
+        File file=new File(directory,key(id,query)+".json");
+        String source=sourceUrl!=null&&sourceUrl.matches("https://soundcloud\\.com/[A-Za-z0-9_-]+/[A-Za-z0-9_-]+")?sourceUrl:id;
+        File recording=new File(directory,hash("recording-tempo-v1\n"+source+"\n"+query.identityRevision)+".json");
+        LyricsProvider.Result known=read(file,query,false);if(known==null)known=read(recording,query,true);
+        if(!force&&known!=null)return known;
+        LyricsProvider.Result result=provider.lookup(LyricsMetadata.candidates(query.title,query.artist,query.duration,query.rawTitle),new LyricsProvider.Cache(){
+            public JSONArray read(LyricsMetadata.Query value){try{JSONObject row=readJson(new File(directory,hash("canonical-tempo-v1\n"+value.canonicalKey())+".json"),LyricsProvider.JSON_LIMIT);return row==null?null:row.getJSONArray("rows");}catch(Exception invalid){return null;}}
+            public void write(LyricsMetadata.Query value,JSONArray rows){try{JSONObject safe=new JSONObject().put("rows",rows);if(safe.toString().getBytes(StandardCharsets.UTF_8).length<=LyricsProvider.JSON_LIMIT)writeJson(new File(directory,hash("canonical-tempo-v1\n"+value.canonicalKey())+".json"),safe);}catch(Exception ignored){}}
+        },force);
+        if(Thread.currentThread().isInterrupted())throw new java.io.InterruptedIOException("Поиск отменён");
+        if(known!=null&&known.timed&&!result.timed)return known;
+        // Only successful lyrics/instrumental records persist; a miss or network error can be retried.
+        if(result.found()||result.instrumental){write(file,result);write(recording,result);}
+        // A valid refresh miss must not erase a completed match for this exact recording.
+        return !result.found()&&!result.instrumental&&known!=null?known:result;
+    }
+    public static boolean compatible(LyricsProvider.Result result,long duration){return result!=null&&(result.found()||result.instrumental)&&(duration<=0||result.duration<=0||Math.abs(result.duration-duration)<=2500);}
+    private LyricsProvider.Result read(File file,LyricsMetadata.Query query,boolean stableRecording){
+        try{
+            JSONObject row=readJson(file,512000);if(row==null)return null;
             String text=row.getString("text");if(text.length()>LyricsProvider.TEXT_LIMIT)return null;
             boolean timed=row.getBoolean("timed");long duration=row.getLong("duration");
-            if(timed&&!LyricsMetadata.durationMatches(query.duration,duration))return null;
-            return new LyricsProvider.Result(text,row.getString("title"),row.getString("artist"),timed,row.getBoolean("instrumental"),row.getBoolean("mismatch"),row.getLong("id"),duration);
+            if(timed&&!(stableRecording?(query.duration<=0||duration>0&&Math.abs(query.duration-duration)<=2500):LyricsMetadata.durationMatches(query.duration,duration)))return null;
+            boolean adapted=row.optBoolean("adapted",false);double rate=row.optDouble("rate",1);long reference=row.optLong("referenceDuration",duration);
+            if(adapted&&(!timed||!Double.isFinite(rate)||rate<.5||rate>2||duration<20000||reference<20000||Math.abs(rate-(double)reference/duration)>.000001||!stableRecording&&(!query.variant.permits(query.duration,reference)||!LyricsMetadata.sameTitle(row.getString("title"),query.variant.title)||!LyricsMetadata.sameArtists(row.getString("artist"),query.artist))))return null;
+            if(stableRecording&&query.duration>0&&duration>0&&Math.abs(query.duration-duration)>2500)return null;
+            String evidence=row.optString("referenceEvidence",adapted?"duration-match":"");if(!evidence.isEmpty()&&!evidence.equals("duration-match")&&!evidence.equals("catalog-consensus"))return null;
+            return new LyricsProvider.Result(text,row.getString("title"),row.getString("artist"),timed,row.getBoolean("instrumental"),row.getBoolean("mismatch"),row.getLong("id"),duration,adapted,rate,reference,evidence);
         }catch(Exception error){return null;}
+    }
+    private JSONObject readJson(File file,int limit){
+        if(!file.isFile()||file.length()>limit||file.lastModified()<System.currentTimeMillis()-7L*86400000)return null;
+        try(FileInputStream input=new FileInputStream(file);java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream()){byte[] buffer=new byte[8192];int count;while((count=input.read(buffer))!=-1){if(bytes.size()+count>limit)return null;bytes.write(buffer,0,count);}return new JSONObject(new String(bytes.toByteArray(),StandardCharsets.UTF_8));}catch(Exception invalid){return null;}
     }
     private void write(File file,LyricsProvider.Result result){
         try{
+            JSONObject row=new JSONObject().put("text",result.text).put("title",result.title).put("artist",result.artist).put("timed",result.timed).put("instrumental",result.instrumental).put("mismatch",result.versionMismatch).put("id",result.recordId).put("duration",result.duration).put("adapted",result.adapted).put("rate",result.adaptationRate).put("referenceDuration",result.referenceDuration).put("referenceEvidence",result.referenceEvidence);
+            writeJson(file,row);
+        }catch(Exception ignored){/* Cache failure never hides a valid online result. */}
+    }
+    private void writeJson(File file,JSONObject row){
+        try{
             if(!directory.isDirectory()&&!directory.mkdirs())return;
-            JSONObject row=new JSONObject().put("text",result.text).put("title",result.title).put("artist",result.artist).put("timed",result.timed).put("instrumental",result.instrumental).put("mismatch",result.versionMismatch).put("id",result.recordId).put("duration",result.duration);
             File temporary=new File(directory,file.getName()+".tmp");
             try(FileOutputStream output=new FileOutputStream(temporary)){output.write(row.toString().getBytes(StandardCharsets.UTF_8));}
             if(!temporary.renameTo(file)){temporary.delete();return;}
