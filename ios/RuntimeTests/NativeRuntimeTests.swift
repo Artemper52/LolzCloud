@@ -264,27 +264,58 @@ import UIKit
         XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
         XCTAssertTrue(player.configureEffects(["enabled":false,"gains":[0,0,0,0,0],"preampDb":0],revision:1,client:client,request:1))
         var observations=[[String:Any]](),revision=0
+        func trace(_ attempt: [String:Any], attach: Bool = false) {
+            let payload: [String:Any] = ["scope":"Real production AVPlayer tap; frequency, not merely item properties, must demonstrate rate processing.",
+                "observations":observations,"attempt":attempt]
+            guard let data=try? JSONSerialization.data(withJSONObject:payload,options:[.sortedKeys]), let text=String(data:data,encoding:.utf8) else { return }
+            print("RATE_PITCH_PROBE_JSON="+text)
+            if attach {
+                let attachment=XCTAttachment(data:data,uniformTypeIdentifier:"public.json")
+                attachment.name="actual-avplayer-rate-pitch-probe";attachment.lifetime = .keepAlways;add(attachment)
+            }
+        }
+        func snapshot(_ source: String,_ rate: Double,_ preserve: Bool) -> [String:Any] {
+            let metric=player.audioEffects.measurement,seconds=av.currentTime().seconds
+            return ["source":source,"rate":rate,"preservesPitch":preserve,"state":player.state,"error":player.error,
+                "itemStatus":av.currentItem?.status.rawValue ?? -1,"itemError":av.currentItem?.error?.localizedDescription ?? "",
+                "time":seconds.isFinite ? seconds:0,"actualRate":av.rate,"timeControlStatus":av.timeControlStatus.rawValue,
+                "processedFrames":metric?.processedFrames ?? 0,"prepared":metric?.prepared ?? 0,
+                "unavailableReason":metric?.unavailableReason ?? 0,"frame55":player.audioEffects.energyWindow(55)?.frames ?? 0]
+        }
         for track in [local,network] {
             for (rate,preserve) in [(1.0,true),(1.5,false),(1.5,true),(0.75,false),(0.75,true)] {
                 revision+=1
                 XCTAssertTrue(player.configureRate(["value":rate,"preservesPitch":preserve,"revision":revision],client:client,request:1))
                 player.play(track)
-                try await waitFor("real PCM reaches the rate probe",timeout:12) {
-                    av.currentItem?.status == .readyToPlay && (player.audioEffects.energyWindow(55)?.frames ?? 0)>0
+                let source=track.isLocal ? "localWAV":"seededGenuineMP3"
+                trace(snapshot(source,rate,preserve))
+                let deadline=ProcessInfo.processInfo.systemUptime+12
+                while av.currentItem?.status != .readyToPlay || (player.audioEffects.energyWindow(55)?.frames ?? 0)==0 {
+                    if player.state == "error" || ProcessInfo.processInfo.systemUptime >= deadline {
+                        // Record before XCTFail: continueAfterFailure=false may
+                        // abort this test before a Swift catch/defer can run.
+                        trace(snapshot(source,rate,preserve),attach:true)
+                        XCTFail("PCM probe did not become ready for \(source), rate \(rate), preservesPitch \(preserve): \(player.error)")
+                        return
+                    }
+                    try await Task.sleep(nanoseconds:25_000_000)
                 }
                 let metric=try XCTUnwrap(player.audioEffects.measurement)
                 let rows=(20..<50).compactMap{player.audioEffects.energyWindow($0)}
                 let frames=rows.reduce(0.0){$0+Double($1.frames)}/Double(max(1,metric.channels))
                 let crossings=rows.reduce(0.0){$0+Double($1.positiveCrossings)}
                 let hz=crossings*Double(metric.sampleRate)/max(1,frames)
-                observations.append(["source":track.isLocal ? "localWAV":"seededGenuineMP3","rate":rate,"preservesPitch":preserve,
+                observations.append(["source":source,"rate":rate,"preservesPitch":preserve,
                     "tapHz":hz,"sampleRate":metric.sampleRate,"frames":frames,"crossings":crossings,
                     "algorithm":av.currentItem?.audioTimePitchAlgorithm.rawValue ?? ""])
-                player.stop()
+                trace(snapshot(source,rate,preserve))
+                // Each play creates a fresh real item/tap. Keep one audio
+                // session for the matrix instead of doing ten synchronous OS
+                // deactivate/reactivate cycles as a meter precondition.
+                player.pause()
             }
         }
-        let attachment=XCTAttachment(data:try JSONSerialization.data(withJSONObject:["scope":"PCM at the real production AVPlayer tap; downstream position must be demonstrated, not assumed.","observations":observations],options:[.prettyPrinted,.sortedKeys]),uniformTypeIdentifier:"public.json")
-        attachment.name="actual-avplayer-rate-pitch-probe";attachment.lifetime = .keepAlways;add(attachment)
+        trace(["phase":"matrix-collected"],attach:true)
         for source in ["localWAV","seededGenuineMP3"] {
             let rows=observations.filter{$0["source"] as? String == source},baseline=try XCTUnwrap(rows.first?["tapHz"] as? Double)
             XCTAssertGreaterThan(baseline,100)
