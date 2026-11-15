@@ -2,7 +2,7 @@
   'use strict';
   const { request, avatar } = window.LolzCloudSite, { RoomClock, DriftCorrection, RoomAdvanceGate } = window.LolzCloudRoomSync, el = id => document.getElementById(id), id = location.pathname.match(/\/room\/([a-f0-9]{32})/)?.[1];
   const desktop = window.LolzCloudDesktopRoom, media = window.LolzCloudMedia;
-  let desktopState = null, playerKind = '', nativeRevision=0;
+  let desktopState = null, playerKind = '', nativeRevision=0, roomTransport, localPaused = true, audioIntent = 0;
   const nativeHost = () => desktopState?.hosting && state?.controller?.connection === desktopState.connection;
   const connection = crypto.randomUUID(), clock = new RoomClock(), correction = new DriftCorrection(), advanceGate = new RoomAdvanceGate();
   let state = null, widget = null, widgetScript = null, playerTimeout, loaded = '', ready = false, started = false, stopped = false, lease = '', sequence = 0, publishing = null, pendingPublish = null, lastApplied = 0, lastHeartbeat = 0, busyJoin = false, eventStream = null, lastStateAt = 0, queueSignature = '', peopleSignature = '', chatSignature = '', historySignature = '', reactionSignature = '', generation = 0, settingsFilled = false;
@@ -15,10 +15,18 @@
   let chatSending = false, chatUnread = 0, chatInitialized = false;
   const chatRows = new Map();
   const pendingToggles=new Set();
-  const appAudioPlaying=()=>{if(window.parent!==window)window.parent.postMessage({type:'lolzcloud:room-audio',playing:true},location.origin);};
+  const appAudioPlaying=()=>{roomTransport?.acquire();if(window.parent!==window)window.parent.postMessage({type:'lolzcloud:room-audio',playing:true},location.origin);};
+  function pauseHere() { audioIntent++;started=false;localPaused=true;lastApplied=performance.now();widget?.pause();updateControls();updateBadge(); }
   window.addEventListener('message',event=>{
-    if(window.parent===window||event.source!==window.parent||event.origin!==location.origin||event.data?.type!=='lolzcloud:app-audio'||event.data.action!=='pause')return;
-    started=false;lastApplied=performance.now();widget?.pause();updateControls();updateBadge();
+    if(window.parent===window||event.source!==window.parent||event.origin!==location.origin)return;
+    if(event.data?.type==='lolzcloud:app-audio'&&event.data.action==='pause'){pauseHere();roomTransport?.release();return;}
+    if(event.data?.type==='lolzcloud:room-command'){
+      const current=roomTransport?.snapshot(),input=event.data;
+      if(current?.active&&window.LolzCloudRoomTransportPolicy.owner(input)===window.LolzCloudRoomTransportPolicy.owner(current)&&current.capabilities[input.command])event.source.postMessage({type:'lolzcloud:room-command-result',state:'accepted',id:input.id,roomId:id,documentId:current.documentId,epoch:current.epoch},event.origin);
+      void roomTransport?.command(input).then(result=>{
+        event.source.postMessage({type:'lolzcloud:room-command-result',id:input.id,roomId:id,documentId:input.documentId,epoch:input.epoch,...result},event.origin);
+      });
+    }
   });
   const message = error => { const text = error instanceof Error ? error.message : String(error || ''); el('status').textContent = text; if (el('room-sheet-status')) el('room-sheet-status').textContent = text; };
   const node = (tag, value, className) => { const result = document.createElement(tag); result.textContent = value; if (className) result.className = className; return result; };
@@ -98,7 +106,7 @@
       image.onerror = () => { image.hidden = true; };
       image.src = artwork;
     });
-    updateBadge(); sync(true);
+    updateBadge(); sync(true); roomTransport?.update();
   }
   function nativeUpdate() {
     if (!started || !isController() || !activeLease() || advanceGate.pending || selectingTrack || performance.now() - lastApplied < 800 || !ready) return;
@@ -157,7 +165,7 @@
     if (url === loaded && kind === playerKind && !retry) return;
     // SDK pause/destroy can synchronously emit state changes. Invalidate the
     // outgoing recording before teardown so it cannot publish into the new one.
-    const token = ++generation;
+    const token = ++generation; localPaused = true;
     clearTimeout(autoplayTimer); autoplayTimer = null;
     ready = false; lastApplied = performance.now();
     if (widget && (kind !== playerKind || kind === 'youtube')) { const old=el('player'), parent=old?.parentElement;widget.pause();widget.destroy?.();widget=null;const replacement=document.createElement('iframe');replacement.id='player';replacement.title='Плеер комнаты';replacement.allow='autoplay; encrypted-media; fullscreen';if(old?.isConnected)old.replaceWith(replacement);else parent?.append(replacement); }
@@ -179,7 +187,7 @@
       if (kind === 'youtube') {
         widget?.destroy?.();
         playerTimeout = setTimeout(()=>playerFailed(token),18000);
-        const next = await window.LolzCloudRoomPlayers.youtube(frame,track,{ready:()=>widgetReady(token),changed:playing=>{if(token!==generation)return;if(playing){autoplayBlocked=false;if(started)appAudioPlaying();updateControls();}nativeUpdate();},ended:()=>sourceEnded(token),error:()=>playerFailed(token),blocked:()=>{if(token!==generation)return;autoplayBlocked=true;health.status='autoplay';updateBadge();updateControls();message('Нажми «Разрешить звук здесь» или Play в плеере YouTube.');}});
+        const next = await window.LolzCloudRoomPlayers.youtube(frame,track,{ready:()=>widgetReady(token),changed:playing=>{if(token!==generation)return;localPaused=!playing;if(playing){autoplayBlocked=false;if(started)appAudioPlaying();updateControls();}roomTransport?.update();nativeUpdate();},ended:()=>sourceEnded(token),error:()=>playerFailed(token),blocked:()=>{if(token!==generation)return;autoplayBlocked=true;health.status='autoplay';updateBadge();updateControls();message('Нажми «Разрешить звук здесь» или Play в плеере YouTube.');}});
         if(token!==generation){next.destroy?.();return;} widget=next;
         if(token!==generation)widget.destroy?.(); return;
       }
@@ -192,8 +200,9 @@
         frame.src = 'https://w.soundcloud.com/player/?url=' + encodeURIComponent(url) + '&auto_play=false&show_comments=false&show_reposts=false';
         widget = Widget(frame);
         widget.bind(Widget.Events.READY, () => widgetReady(token));
-        widget.bind(Widget.Events.PLAY,()=>{autoplayBlocked=false;if(started)appAudioPlaying();updateControls();nativeUpdate();});
-        for (const name of ['PAUSE', 'SEEK']) widget.bind(Widget.Events[name], nativeUpdate);
+        widget.bind(Widget.Events.PLAY,()=>{localPaused=false;autoplayBlocked=false;if(started)appAudioPlaying();updateControls();roomTransport?.update();nativeUpdate();});
+        widget.bind(Widget.Events.PAUSE,()=>{localPaused=true;roomTransport?.update();nativeUpdate();});
+        widget.bind(Widget.Events.SEEK,nativeUpdate);
         widget.bind(Widget.Events.FINISH, () => sourceEnded(generation));
         widget.bind(Widget.Events.ERROR, () => playerFailed(generation));
       }
@@ -296,7 +305,7 @@
     el('host-seek').max = value.playback.duration || 1; if (document.activeElement !== el('host-seek')) el('host-seek').value = clock.position(value); el('room-settings').hidden = !value.host;
     if (!settingsFilled && value.host) { settingsFilled = true; el('settings-name').value = value.settings.name; el('settings-description').value = value.settings.description; el('settings-public').checked = value.settings.public; el('settings-chat').checked = value.settings.chat; el('settings-auto').checked = value.settings.autoNext; el('settings-capacity').value = value.settings.capacity; }
     for(const [key,id]of [['public','settings-public'],['chat','settings-chat'],['autoNext','settings-auto']])if(!pendingToggles.has(key))el(id).checked=value.settings[key]===true;
-    void load(value.playback); renderQueue(); renderSearchActions(); renderPeople(); renderConversation(); updateBadge(); sync();
+    void load(value.playback); renderQueue(); renderSearchActions(); renderPeople(); renderConversation(); updateBadge(); sync(); roomTransport?.update();
   }
   function updateControls() {
     const controller = isController();
@@ -309,7 +318,7 @@
     el('queue-url').disabled = el('queue-form').querySelector('button').disabled = stopped || !state;
     document.querySelectorAll('[data-reaction]').forEach(button => { button.disabled = stopped || !state; });
   }
-  async function control(data) { if(desktop && ['claim','release'].includes(data.type)){if(data.type==='claim'&&!nativeHost())widget?.pause();desktopState=await desktop[data.type]();await poll();return {room:state};} const result = await call('control', data); if (result.lease) { lease = result.lease; sequence = 0; started = true; appAudioPlaying(); } render(result.room); return result; }
+  async function control(data) { const intent=audioIntent;if(desktop && ['claim','release'].includes(data.type)){if(data.type==='claim'&&!nativeHost())widget?.pause();desktopState=await desktop[data.type]();await poll();return {room:state};} const result = await call('control', data); if (result.lease) { lease = result.lease; sequence = 0; if(intent===audioIntent){started = true; appAudioPlaying();} } render(result.room); return result; }
   function publish(patch) {
     if (nativeHost()) { const revision=++nativeRevision;
       if(typeof patch.playing==='boolean'){state.playback={...state.playback,playing:patch.playing};updateControls();}
@@ -343,7 +352,7 @@
     if (selectingTrack || stopped) return false;
     if (!state?.canControl) throw new Error('Слушатель может предложить песню в общую очередь.');
     if (!media.mediaUrl(track?.url)) throw new Error('Нужна ссылка SoundCloud или YouTube Music.');
-    selectingTrack = true; selectionCommitted = false; autoplayBlocked = false; lastApplied = performance.now();
+    const intent=audioIntent;selectingTrack = true; selectionCommitted = false; autoplayBlocked = false; lastApplied = performance.now();
     // Stop local audio without playing the outgoing recording to unlock media.
     widget?.pause(); updateControls(); renderQueue(); renderSearchActions();
     try {
@@ -351,7 +360,7 @@
       if (publishing) await publishing;
       if (!isController()) await control({ type: 'claim', connection, force: state.host === true, name: /Android|iPhone|iPad/i.test(navigator.userAgent) ? 'Телефон' : 'Браузер' });
       if (!isController() || !activeLease()) throw new Error('Не удалось взять пульт. Обнови состояние и повтори выбор.');
-      started = true; appAudioPlaying();
+      if(intent===audioIntent){started = true; appAudioPlaying();}
       let result;
       if (queueId && nativeHost()) {
         if (typeof desktop.playQueued !== 'function') throw new Error('Обнови приложение, чтобы включать конкретный трек очереди.');
@@ -413,7 +422,7 @@
   }
   function close(reason) {
     stopped = true; ready = false; generation++; started = false; lease = ''; pendingPublish = null;
-    clearTimeout(playerTimeout); widget?.pause(); eventStream?.close();
+    clearTimeout(playerTimeout); widget?.pause(); eventStream?.close(); localPaused=true;roomTransport?.release();
     el('host-controls').hidden = el('claim-host').hidden = el('release-host').hidden = true;
     el('chat-input').disabled = el('chat-form').querySelector('button').disabled = true;
     updateControls(); updateBadge(); message(reason);
@@ -539,10 +548,10 @@
     finally{pendingToggles.delete(key);input.disabled=false;if(state)input.checked=state.settings[key]===true;}
   };
   window.addEventListener('online', () => { void calibrate(); void poll(); }); document.addEventListener('visibilitychange', () => { if (!document.hidden) { void calibrate(); void poll(); sync(true); } });
-  window.addEventListener('pagehide', () => { eventStream?.close(); const csrf = window.LolzCloudSession?.csrf; if (csrf) { if (lease) void fetch('/api/rooms/' + id + '/control', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf }, body: JSON.stringify({ type: 'release', connection, lease }), keepalive: true }); void fetch('/api/rooms/' + id + '/leave', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf }, body: JSON.stringify({ connection }), keepalive: true }); } });
+  window.addEventListener('pagehide', () => { pauseHere();roomTransport?.release();eventStream?.close(); const csrf = window.LolzCloudSession?.csrf; if (csrf) { if (lease) void fetch('/api/rooms/' + id + '/control', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf }, body: JSON.stringify({ type: 'release', connection, lease }), keepalive: true }); void fetch('/api/rooms/' + id + '/leave', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrf }, body: JSON.stringify({ connection }), keepalive: true }); } });
   setInterval(() => {
     if (stopped) return;
-    updateBadge(); sync();
+    updateBadge(); sync(); if(roomTransport?.snapshot().active)roomTransport.update();
     if(isController()&&!nativeHost()&&!selectingTrack&&!started&&ready&&state.playback.playing&&atEnd(target(),0)&&!advanceGate.pending)void finishTrack().catch(message);
     if (isController() && !nativeHost() && (!selectingTrack || selectionCommitted) && performance.now() - lastHeartbeat > 4000) {
       lastHeartbeat = performance.now();
@@ -565,6 +574,32 @@
     if(started){appAudioPlaying();widget.play();}else {lastApplied=performance.now();widget.pause();}updateControls();sync(started);return true;
   }};
   if(desktop)setInterval(()=>{if(stopped||nativeHost()||!state?.playback.url)return;samplePlayer((position,paused)=>{if(!nativeHost())desktop.listen({...state.playback,position:position/1000,playing:started&&!paused,rate:1});});},400);
+  roomTransport=window.LolzCloudRoomTransportPolicy.create({
+    roomId:id,documentId:crypto.randomUUID().toLowerCase(),
+    read(){
+      const controllable=!stopped&&isController()&&activeLease()&&!selectingTrack;
+      return {playback:{url:state?.playback.url||'',title:state?.playback.title||'',artist:state?.playback.artist||'',cover:el('track-art').getAttribute('src')||'',duration:state?.playback.duration||0,position:state?Math.max(0,clock.position(state)):0,playing:!!(started&&ready&&!stopped&&!localPaused&&!autoplayBlocked&&state?.playback.playing&&activeLease())},capabilities:{play:!!(ready&&!stopped&&state?.playback.url),pause:!stopped,next:controllable,previous:controllable,seek:controllable}};
+    },
+    async perform(command,value){
+      if(command==='release'){pauseHere();return true;}
+      if(command==='pause'){audioIntent++;localPaused=true;widget?.pause();if(isController()&&activeLease())return publish({playing:false});pauseHere();return true;}
+      if(command==='play'){
+        if(!ready||stopped)return false;started=true;autoplayBlocked=false;appAudioPlaying();
+        if(isController()&&activeLease()&&!state.playback.playing)return publish({playing:true});
+        if(state.playback.playing)playHere();updateControls();sync(true);return true;
+      }
+      if(!isController()||!activeLease())return false;
+      if(command==='next')return nextTrack();
+      if(command==='previous')return seekRoom(0);
+      if(command==='seek')return seekRoom(value);
+      return false;
+    },
+    notify(transport){
+      if(window.parent!==window)window.parent.postMessage({type:'lolzcloud:room-transport',transport},location.origin);
+      window.dispatchEvent(new CustomEvent('lolzcloud:room-transport',{detail:transport}));
+    }
+  });
+  window.LolzCloudRoomTransport={identity:roomTransport.identity,snapshot:roomTransport.snapshot,command:roomTransport.command,release(expected){if(window.LolzCloudRoomTransportPolicy.owner(expected)!==window.LolzCloudRoomTransportPolicy.owner(roomTransport.snapshot()))return false;pauseHere();return roomTransport.release(expected);}};
   updateControls();
   setInterval(poll, 8000); setInterval(() => { if (!stopped) void calibrate(); }, 30000);
   window.LolzCloudSessionReady.then(session => { if (!session) return; void calibrate(); void poll(); });

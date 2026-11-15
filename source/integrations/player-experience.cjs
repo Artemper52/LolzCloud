@@ -1,5 +1,6 @@
 'use strict';
 const fs = require('node:fs'), path = require('node:path');
+const { createHash } = require('node:crypto');
 const { PlayerTools, trackUrl, localUrl, text } = require('./player-tools.cjs');
 const { LocalLibrary } = require('./local-library.cjs');
 const { ReleaseRadar } = require('./release-radar.cjs');
@@ -11,11 +12,76 @@ const { writeJson } = require('./durable-json.cjs');
 function createPlayerExperience({ app, service, music, wave, lyrics, room, discovery, downloads, media, play, getWindow, notify, dialog, clipboard }) {
   const directory = app.getPath('userData'), tools = new PlayerTools(path.join(directory, 'player-tools.json')), library = new LocalLibrary(path.join(directory, 'local-library.json'), downloads.directory), radar = new ReleaseRadar(path.join(directory, 'release-radar.json'), discovery), send = (channel, value) => getWindow()?.webContents.send(channel, value);
   let local = null, pendingSeek = null, versions = { source: null, candidates: [], loading: false, error: '' }, lookupRevision = 0, remote = null, remoteBusy = false, remotePollAt = 0, profileBusy = false, cloudRevision = null, lastError = '', roomNextBusy = false, roomAdvanceKey = '';
+  let cloudSession = null, cloudGeneration = 0, cloudRead = null, cloudOperation = null;
+  const clearCloudRead = () => { cloudRead = null; cloudRevision = null; };
+  function syncCloudSession() {
+    const state = room.getState(), ownerId = state.authenticated && Number.isSafeInteger(state.user?.id) && state.user.id > 0 ? state.user.id : null;
+    const token = ownerId && typeof room.token === 'string' && /^[\w-]{43}$/.test(room.token) ? room.token : '';
+    if (cloudSession?.ownerId !== ownerId || cloudSession?.token !== token) {
+      cloudOperation?.controller.abort(); clearCloudRead();
+      cloudSession = Object.freeze({ ownerId, token, generation: ++cloudGeneration });
+    }
+    return cloudSession;
+  }
+  function assertCloudCurrent(operation) {
+    const identity = syncCloudSession();
+    if (identity !== operation.identity || !identity.ownerId || !identity.token || operation.controller.signal.aborted)
+      throw new Error('Аккаунт или сессия изменились. Открой облачную копию заново.');
+  }
+  function cloudResponse(operation, result) {
+    assertCloudCurrent(operation);
+    if (!result || result.ownerId !== operation.identity.ownerId || !Number.isSafeInteger(result.revision) || result.revision < 0) {
+      clearCloudRead(); throw new Error('Не удалось подтвердить владельца и версию облачной копии. Открой её заново.');
+    }
+    return result;
+  }
+  async function cloudRequest(operation, options) {
+    assertCloudCurrent(operation);
+    try { return cloudResponse(operation, await room.request('/api/profile', { ...options, signal: operation.controller.signal })); }
+    catch (error) { assertCloudCurrent(operation); if (error.status === 409) clearCloudRead(); throw error; }
+  }
+  function cloudProof(operation, value, envelope = value.envelope) {
+    const valid = value.revision === 0 ? envelope === null : envelope && typeof envelope === 'object';
+    if (!valid) { clearCloudRead(); throw new Error('Облачная копия имеет неверный формат. Открой её заново.'); }
+    return Object.freeze({ identity: operation.identity, revision: value.revision,
+      digest: createHash('sha256').update(JSON.stringify(envelope)).digest('hex') });
+  }
+  const sameCloudProof = (a, b) => !!a && a.identity === b.identity && a.revision === b.revision && a.digest === b.digest;
+  async function transferCloud(action) {
+    syncCloudSession(); if (profileBusy) throw new Error('Перенос профиля уже выполняется.');
+    const operation = { identity: cloudSession, controller: new AbortController() };
+    assertCloudCurrent(operation); profileBusy = true; cloudOperation = operation;
+    try {
+      const server = await cloudRequest(operation), proof = cloudProof(operation, server);
+      if (action.type === 'profile-push') {
+        if (server.revision > 0 && !sameCloudProof(cloudRead, proof)) {
+          clearCloudRead(); throw new Error('В облаке уже есть копия или она изменилась. Сначала открой актуальную копию этого аккаунта.');
+        }
+        const envelope = await encryptProfile(portable(), action.passphrase);
+        assertCloudCurrent(operation);
+        const result = await cloudRequest(operation, { method: 'PUT', body: { revision: proof.revision, envelope } });
+        if (result.revision !== proof.revision + 1) { clearCloudRead(); throw new Error('Сервер не подтвердил сохранённую версию. Открой облачную копию заново.'); }
+        cloudRead = cloudProof(operation, result, envelope); cloudRevision = result.revision;
+      } else {
+        if (!server.envelope) throw new Error('Облачной копии пока нет.');
+        const value = await decryptProfile(server.envelope, action.passphrase);
+        assertCloudCurrent(operation);
+        const choice = await dialog.showMessageBox(getWindow(), { type: 'question', message: 'Восстановить облачную копию профиля?', buttons: ['Восстановить', 'Отмена'], defaultId: 1, cancelId: 1 });
+        assertCloudCurrent(operation);
+        if (choice.response === 0) {
+          const verified = cloudProof(operation, await cloudRequest(operation));
+          if (!sameCloudProof(proof, verified)) { clearCloudRead(); throw new Error('Облачная копия изменилась во время подтверждения. Открой её заново.'); }
+          // No await between the final session/revision check and local commit.
+          restore(value); cloudRead = verified; cloudRevision = verified.revision;
+        }
+      }
+    } finally { if (cloudOperation === operation) { cloudOperation = null; profileBusy = false; } }
+  }
   wave.isDuplicate = (track, cache, now) => tools.duplicate(track, cache, now);
   let localStartedAt = 0, localOrigin = '', localGeneration = 0;
   const current = () => local ? { ...local } : service.displayPlayback();
   const snapshot = (base = service.getState()) => local ? { ...base, local: true, private: true, fresh: true, transitioning: false, playback: { ...local }, displayPlayback: { ...local } } : base;
-  const state = () => ({ ...tools.state(), library: library.state(), radar: radar.state(), versions: structuredClone(versions), remote: remote ? { url: remote.url, qr: remote.qr, name: remote.name, error: remote.error || '' } : null, cloudRevision, profileBusy, error: lastError });
+  const state = () => { syncCloudSession(); return { ...tools.state(), library: library.state(), radar: radar.state(), versions: structuredClone(versions), remote: remote ? { url: remote.url, qr: remote.qr, name: remote.name, error: remote.error || '' } : null, cloudRevision, profileBusy, error: lastError }; };
   function localPlay(id, queue, position = 0) {
     const row = library.play(id, queue); wave.stop(); localStartedAt = Date.now(); localOrigin = service.playback.url; const token = ++localGeneration;
     send('lolzcloud:pause-soundcloud'); local = { ...row, source: undefined, path: undefined, token, playing: false, position, rate: 1, repeat: library.repeat, liked: false, ended: false };
@@ -105,8 +171,7 @@ function createPlayerExperience({ app, service, music, wave, lyrics, room, disco
       case 'profile-export': { const selected = await dialog.showSaveDialog(getWindow(), { title: 'Сохранить переносимый профиль', defaultPath: path.join(app.getPath('downloads'), 'LolzCloud-profile.json'), filters: [{ name: 'Профиль LolzCloud', extensions: ['json'] }] }); if (!selected.canceled && selected.filePath) writeJson(selected.filePath, portable()); break; }
       case 'profile-import': { const selected = await dialog.showOpenDialog(getWindow(), { title: 'Восстановить настройки и вкусы', filters: [{ name: 'Профиль LolzCloud', extensions: ['json'] }], properties: ['openFile'] }); if (selected.canceled || !selected.filePaths[0]) break; const filename = selected.filePaths[0]; if (fs.statSync(filename).size > MAX_BYTES) throw new Error('Профиль слишком большой.'); const value = normalizeProfile(JSON.parse(fs.readFileSync(filename, 'utf8'))); const choice = await dialog.showMessageBox(getWindow(), { type: 'question', message: 'Заменить настройки, подборки и вкусы волны?', detail: 'Текущие данные будут сохранены в резервную копию. Входы в сервисы сохранятся.', buttons: ['Восстановить', 'Отмена'], defaultId: 1, cancelId: 1 }); if (choice.response === 0) return restore(value); break; }
       case 'profile-push': case 'profile-pull': {
-        if (profileBusy) throw new Error('Перенос профиля уже выполняется.'); profileBusy = true;
-        try { const server = await room.request('/api/profile'); if (action.type === 'profile-push') { if (cloudRevision === null && server.revision > 0) throw new Error('На сервере уже есть копия. Сначала загрузи её, чтобы не затереть изменения другого устройства.'); const result = await room.request('/api/profile', { method: 'PUT', body: { revision: cloudRevision ?? 0, envelope: await encryptProfile(portable(), action.passphrase) } }); cloudRevision = result.revision; } else { if (!server.envelope) throw new Error('Облачной копии пока нет.'); const value = await decryptProfile(server.envelope, action.passphrase); const choice = await dialog.showMessageBox(getWindow(), { type: 'question', message: 'Восстановить облачную копию профиля?', buttons: ['Восстановить', 'Отмена'], defaultId: 1, cancelId: 1 }); if (choice.response === 0) { restore(value); cloudRevision = server.revision; } } } finally { profileBusy = false; } break;
+        await transferCloud(action); break;
       }
       case 'remote-start': { if (remote) break; const value = await room.request('/api/remotes', { method: 'POST', body: { name: 'LolzCloud · ' + (process.platform === 'win32' ? 'Windows' : 'Linux') } }); if (!/^[a-f0-9]{32}$/.test(value.id) || value.url !== room.origin + '/remote/' + value.id) throw new Error('Сервер вернул неверную ссылку пульта.'); remote = { ...value, ack: 0, qr: await require('qrcode').toDataURL(value.url, { width: 220, margin: 2, errorCorrectionLevel: 'M' }) }; break; }
       case 'remote-copy': if (!remote) throw new Error('Сначала включи пульт.'); clipboard.writeText(remote.url); break;
@@ -126,6 +191,7 @@ function createPlayerExperience({ app, service, music, wave, lyrics, room, disco
   }
   let lastNormalizationUrl = '', previous = null;
   function observe() {
+    syncCloudSession();
     library.scan(); const source = snapshot(), track = source.playback;
     if (track.url !== lastNormalizationUrl) { lastNormalizationUrl = track.url; sendNormalization(); }
     if (pendingSeek) { if (Date.now() > pendingSeek.until) { pendingSeek = null; lastError = 'Не удалось открыть трек закладки. Можно повторить.'; } else if (source.fresh && track.url === pendingSeek.url && track.duration > 0) { const value = pendingSeek; pendingSeek = null; void media('seek', Math.min(track.duration, value.position)); } }
@@ -135,6 +201,6 @@ function createPlayerExperience({ app, service, music, wave, lyrics, room, disco
     previous = { ...track };
     if (remote && !remoteBusy && Date.now() >= remotePollAt) { const target = remote; remoteBusy = true; remotePollAt = Date.now() + 1800; void (async () => { try { const result = await room.request('/api/remotes/' + target.id + '/state', { method: 'PUT', body: { fresh: source.fresh === true, private: source.private === true, playback: source.private ? null : source.playback, volume: music.data.player.volume ?? 1, ack: target.ack } }); if (remote !== target) return; for (const command of result.commands || []) { if (command.id <= target.ack) continue; if (Number.isSafeInteger(command.id) && command.id === target.ack + 1) { if (command.command === 'volume') music.configurePlayer({ volume: command.value }); await media(command.command, command.value); target.ack = command.id; } } target.error = ''; } catch (error) { target.error = error.message; } finally { remoteBusy = false; notify(); } })(); }
   }
-  return { state, snapshot, current, act, observe, localMedia, localState, stopLocal, acceptSoundCloud(value) { if (local && value?.playing && (value.url !== localOrigin || Date.now() - localStartedAt > 1500)) stopLocal(); }, tools, async shutdown() { if (remote) { const target = remote; remote = null; await room.request('/api/remotes/' + target.id, { method: 'DELETE' }).catch(() => {}); } } };
+  return { state, snapshot, current, act, observe, localMedia, localState, stopLocal, acceptSoundCloud(value) { if (local && value?.playing && (value.url !== localOrigin || Date.now() - localStartedAt > 1500)) stopLocal(); }, tools, async shutdown() { cloudOperation?.controller.abort(); clearCloudRead(); if (remote) { const target = remote; remote = null; await room.request('/api/remotes/' + target.id, { method: 'DELETE' }).catch(() => {}); } } };
 }
 module.exports = { createPlayerExperience };

@@ -16,8 +16,9 @@
     const mime = C.audioFileType(file.name, new Uint8Array(await file.slice(0, 32).arrayBuffer()));
     if (!mime) throw new Error('Выбери настоящий MP3, WAV, M4A или FLAC.');
     const blob = file.slice(0, file.size, mime), duration = await probe(blob);
-    const title = String(file.name).replace(/\.(mp3|wav|m4a|flac)$/i, '').trim().slice(0, 300) || 'Локальная запись';
-    const track = C.localTrack({ id: 'local:' + crypto.randomUUID(), local: true, source: 'local', audioUrl: '', title, artist: '', duration });
+    const metadata = await window.LolzCloudAudioMetadata.read(file);
+    const title = metadata.title || String(file.name).replace(/\.(mp3|wav|m4a|flac)$/i, '').trim().slice(0, 300) || 'Локальная запись';
+    const track = C.localTrack({ id: 'local:' + crypto.randomUUID(), local: true, source: 'local', audioUrl: '', title, artist: metadata.artist || '', duration });
     if (!track) throw new Error('Не удалось прочитать запись.');
     await DB.saveLocal(track, blob, file.name); return track;
   }

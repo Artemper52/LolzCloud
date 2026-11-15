@@ -8,6 +8,7 @@ test('packaged room frontend routes only its own presentation, preserving API/au
   assert.equal(roomAsset(origin + '/room/' + id + '/'), 'room.html');
   assert.equal(roomAsset(origin + '/cloud/room-sync.js?v=2'), 'room-sync.js');
   assert.equal(roomAsset(origin + '/cloud/room.js'), 'room.js');
+  assert.equal(roomAsset(origin + '/app/room-transport.js'), 'room-transport.js');
   assert.equal(roomAsset(origin + '/assets/logo.svg'), 'logo.svg');
   assert.equal(roomAsset(origin + '/social?tab=friends'), 'social.html');
   assert.equal(roomAsset(origin + '/rooms'), 'rooms.html');

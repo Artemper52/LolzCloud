@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const C = window.LolzCloudAppCore, DB = window.LolzCloudOffline, $ = id => document.getElementById(id), origin = location.origin;
+  const C = window.LolzCloudAppCore, DB = window.LolzCloudOffline, RT = window.LolzCloudRoomTransportPolicy, $ = id => document.getElementById(id), origin = location.origin;
   const native = !!window.webkit?.messageHandlers?.lolzcloud;
   // A native snapshot may have been queued before a newer UI choice. Document
   // identity also prevents a previous page from winning after a WebView reload.
@@ -23,10 +23,13 @@
   let view = 'search', phase = 'paused', elapsed = current && Number.isFinite(saved.position) ? Math.min(current.duration, Math.max(0, saved.position)) : 0, duration = current?.duration || 0, loaded = false, activeBlobURL = '', playerError = '';
   let searchVersion = 0, searchController, results = [], searchedQuery = '', nextOffset = '', searching = false;
   let playVersion = 0, preparationController, history = [], offline = new Map(), downloads = new Set(), libraryFilter = 'all', libraryVisible = 300, bookmarkVisible = 100, bookmarkVisibleID = '', actionTrack;
-  let lyricsVersion = 0, lyricsController, lyricsTrack = '', syncedLyrics = [], activeLyric = -1, roomLyricsVersion = 0;
+  let lyricsVersion = 0, lyricsController, lyricsTrack = '', syncedLyrics = [], roomLyricsVersion = 0, lyricView, roomLyricView, roomLyricsController, roomLyricsKey = '', roomLyricsValue = null, roomLyricsSeekable = false;
   const lyricsMetadata = new Map();
   try { for (const [id, value] of Object.entries(JSON.parse(localStorage.getItem('LolzCloud-lyrics-metadata-v1') || '{}')).slice(0, 500)) if (C.trackID(id) && value && typeof value.title === 'string' && value.title.length <= 300 && typeof value.artist === 'string' && value.artist.length <= 300 && C.lyricsIdentity(value.title) && C.lyricsIdentity(value.artist)) lyricsMetadata.set(id, { title: value.title, artist: value.artist }); } catch { /* Bad metadata never blocks music. */ }
   let account = null, accountPending, accountVersion = 0, frameRoomURL = '', roomAudible = false, noticeTimer, persistTimer, installPrompt, lastSavedTime = 0;
+  let activeRoom = null, roomDocument = '', roomRevision = 0, nativeRoomSupported = false, mediaMetadataKey = '', systemSoloAllowed = true;
+  const roomCommands = new Map();
+  let roomLyricClock = null;
   let loginVersion = 0, loginController, loginCommitting = false;
   let nativeQueueSignature = '', nativeQueueOwned = false, nativeCatalogReferences = false, nativeProfileExport = false, nativeQueuePositions = [], nativePitchSupported = false, nativeRateRevision = 1, nativeRateKey = '', nativeRateState = 'pending';
   const catalogAliases = new Map();
@@ -150,7 +153,7 @@
     if (!portableFile) { try { const value = await portableController.exportProfile(); portableJSON = JSON.stringify(value); portableFile = new File([portableJSON], 'LolzCloud-profile-' + new Date().toISOString().slice(0, 10) + '.json', { type: 'application/json' }); if (portableFile.size > window.LolzCloudProfilePolicy.MAX_BYTES) { portableFile = null; throw Error('Профиль больше 750 КБ. Уменьши список для переноса.'); } renderPortable(); } catch (error) { portableError(error); } return; }
     try { if (native && nativeProfileExport) { portableOperation = crypto.randomUUID().toLowerCase(); sendNative('exportProfile', { filename: portableFile.name, json: portableJSON, operationId: portableOperation }); } else if (navigator.canShare?.({ files: [portableFile] })) await navigator.share({ files: [portableFile], title: 'Профиль LolzCloud' }); else if (native) throw Error('Для сохранения файла обнови iOS-клиент или открой LolzCloud в Safari.'); else { const url = URL.createObjectURL(portableFile), link = node('a'); link.href = url; link.download = portableFile.name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 30000); } } catch (error) { portableError(error); }
   }
-  function learnNativeCapabilities(value) { if (!native || !currentNativeIntent(value)) return; effectsController.capabilities(value); if (value.profileExport === 1) nativeProfileExport = true; if (value.preservesPitch === 1 && !nativePitchSupported) { nativePitchSupported = true; queueMicrotask(() => { syncNativeRate(); renderComfort(); }); } if (value.catalogReferences === 1 && !nativeCatalogReferences) { nativeCatalogReferences = true; nativeQueueSignature = ''; queueMicrotask(syncNativeQueue); } }
+  function learnNativeCapabilities(value) { if (!native || !currentNativeIntent(value)) return; effectsController.capabilities(value); if (value.roomTransport === 1 && !nativeRoomSupported) { nativeRoomSupported = true; if (activeRoom) queueMicrotask(() => { if (activeRoom) sendNative('roomOwner', activeRoom); }); } if (value.profileExport === 1) nativeProfileExport = true; if (value.preservesPitch === 1 && !nativePitchSupported) { nativePitchSupported = true; queueMicrotask(() => { syncNativeRate(); renderComfort(); }); } if (value.catalogReferences === 1 && !nativeCatalogReferences) { nativeCatalogReferences = true; nativeQueueSignature = ''; queueMicrotask(syncNativeQueue); } }
   function savedState() { return { queue, index, shuffle, repeat, liked: [...liked], collection: [...collection.values()].slice(-500), position: elapsed, rate, preservesPitch, sleepDeadline, bookmarks: Object.fromEntries(bookmarks) }; }
   function persist() {
     clearTimeout(persistTimer);
@@ -253,7 +256,7 @@
   }
   async function refreshOffline() {
     if (native) { sendNative('downloads'); return; }
-    try { const rows = await DB.list(); offline = new Map(rows.map(row => { const item = C.savedTrack(row, origin); return item ? [item.id, { ...item, bytes: row.bytes, savedAt: Number.isFinite(row.savedAt) ? row.savedAt : 0 }] : null; }).filter(Boolean)); renderLibrary(); renderDownload(); }
+    try { const rows = await DB.list(); offline = new Map(rows.map(row => { const item = C.savedTrack(row, origin); return item ? [item.id, { ...item, bytes: row.bytes, savedAt: Number.isFinite(row.savedAt) ? row.savedAt : 0 }] : null; }).filter(Boolean)); renderLibrary(); renderDownload(); renderPlayback(); }
     catch (error) { $('storage-status').textContent = error.message; }
   }
   function toggleLike(track) {
@@ -283,7 +286,53 @@
     const start = Math.max(0, Math.min(selected - 100, source.length - 200));
     queue = source.slice(start, start + 200); history = []; playAt(selected - start);
   }
-  function pauseRoom() { roomAudible = false; $('rooms-frame').contentWindow?.postMessage({ type: 'lolzcloud:app-audio', action: 'pause' }, origin); }
+  function clearRoomOwner(expected = activeRoom) {
+    if (!expected || RT.owner(expected) !== RT.owner(activeRoom)) return;
+    activeRoom = null; roomAudible = false;
+    for (const [id, command] of roomCommands) { clearTimeout(command.timer); roomCommands.delete(id); }
+    if (native && nativeRoomSupported) sendNative('roomOwner', { ...expected, active: false, revision: expected.revision + (expected.active ? 1 : 0), playback: { ...expected.playback, playing: false } });
+    mediaMetadataKey = ''; updateMediaSession();
+  }
+  function pauseRoom() {
+    const expected = activeRoom, frame = $('rooms-frame');
+    try { if (expected) frame.contentWindow?.LolzCloudRoomTransport?.release(expected); } catch { /* Navigation can replace the document during a handoff. */ }
+    clearRoomOwner(expected); roomAudible = false;
+    frame.contentWindow?.postMessage({ type: 'lolzcloud:app-audio', action: 'pause' }, origin);
+  }
+  function roomCommand(command, value, nativeValue) {
+    const transport = activeRoom, frame = $('rooms-frame');
+    if (!transport) return false;
+    const id = nativeValue?.id || crypto.randomUUID().toLowerCase();
+    const finish = (ok, error = '') => { if (nativeValue && native && nativeRoomSupported) sendNative('roomCommandResult', { ...transport, id, ok, error: error.slice(0, 300) }); else if (!ok && error) notice(error); };
+    if (!transport.capabilities[command] || roomCommands.size >= 8) { finish(false, 'Эта команда сейчас недоступна в комнате.'); return true; }
+    const timer = setTimeout(() => { const pending = roomCommands.get(id); if (!pending) return; roomCommands.delete(id); pending.finish(false, 'Комната не ответила. Открой её и повтори команду.'); }, 2500);
+    roomCommands.set(id, { transport, finish, timer });
+    frame.contentWindow?.postMessage({ type: 'lolzcloud:room-command', roomId: transport.roomId, documentId: transport.documentId, epoch: transport.epoch, id, command, ...(Number.isFinite(value) ? { value } : {}) }, origin);
+    return true;
+  }
+  function systemCommand(command, value) {
+    if (roomCommand(command, value) || !systemSoloAllowed) return;
+    if (command === 'play') resume(); else if (command === 'pause') pause();
+    else if (command === 'next') next(); else if (command === 'previous') previous(); else if (command === 'seek') seek(value);
+  }
+  function receiveRoomTransport(input) {
+    const transport = RT.snapshot(input), frame = $('rooms-frame');
+    if (!transport) return;
+    let identity, live;
+    try { const api = frame.contentWindow?.LolzCloudRoomTransport; identity = api?.identity; live = RT.snapshot(api?.snapshot()); if (!C.roomURL(frame.contentWindow.location.href, origin)) return; } catch { return; }
+    if (identity?.documentId !== transport.documentId || identity.roomId !== transport.roomId) return;
+    if (!live || RT.owner(live) !== RT.owner(transport) || transport.revision < live.revision || transport.active && !live.active) return;
+    if (roomDocument === transport.documentId && transport.revision <= roomRevision) return;
+    if (roomDocument !== transport.documentId) { clearRoomOwner(); roomDocument = transport.documentId; roomRevision = 0; }
+    roomRevision = transport.revision;
+    updateRoomLyrics(transport);
+    if (!transport.active) { if (RT.owner(transport) === RT.owner(activeRoom)) clearRoomOwner(transport); return; }
+    if (activeRoom && activeRoom.documentId === transport.documentId && transport.epoch < activeRoom.epoch) return;
+    if (RT.owner(activeRoom) !== RT.owner(transport)) { systemSoloAllowed = false; pause(); clearRoomOwner(); }
+    activeRoom = transport; roomAudible = true;
+    if (native && nativeRoomSupported) sendNative('roomOwner', transport);
+    updateMediaSession();
+  }
   // The same audio element survives every route and track change. The first
   // gesture calls load/play immediately; WebKit may still require a second
   // explicit Play after cold preparation, which remains a visible state.
@@ -297,11 +346,11 @@
   function stopSource() { audio.pause(); audio.removeAttribute('src'); audio.load(); if (activeBlobURL) URL.revokeObjectURL(activeBlobURL); activeBlobURL = ''; loaded = false; }
   async function playAt(position, { automatic = false, seek = 0, remember = true } = {}) {
     let track = queue[position]; if (!track) return;
-    beginNativeIntent();
+    pauseRoom(); systemSoloAllowed = true; beginNativeIntent();
     const previousIndex = index; preparationController?.abort(); preparationController = new AbortController(); const signal = preparationController.signal, token = ++playVersion;
     if (remember && previousIndex >= 0 && previousIndex !== position) history.push(previousIndex);
     if (history.length > 200) history.shift();
-    index = position; current = track; phase = 'loading'; playerError = ''; elapsed = seek; duration = track.duration; loaded = false; pauseRoom();
+    index = position; current = track; phase = 'loading'; playerError = ''; elapsed = seek; duration = track.duration; loaded = false;
     wave.begin(track, seek);
     effectsController.track(track.id);
     if (native) sendNative('stop'); else { stopSource(); effectsController.prime(); if (!automatic) primeAudio(); }
@@ -344,7 +393,7 @@
   }
   function resume() {
     if (!current) { if (queue.length) void playAt(0); return; }
-    pauseRoom();
+    pauseRoom(); systemSoloAllowed = true;
     if (!loaded || phase === 'error' || phase === 'ended') { void playAt(index, { seek: phase === 'ended' ? 0 : elapsed, remember: false }); return; }
     beginNativeIntent();
     playerError = ''; phase = 'loading'; renderPlayback();
@@ -404,17 +453,18 @@
   function renderTime() {
     $('player-time').textContent = C.formatTime(elapsed); $('player-duration').textContent = C.formatTime(duration);
     $('player-seek').max = duration || 1; if (document.activeElement !== $('player-seek')) $('player-seek').value = Math.min(elapsed, duration || 1);
-    if (syncedLyrics.length) {
-      let found = -1; for (let i = 0; i < syncedLyrics.length && syncedLyrics[i].time <= elapsed + 0.1; i++) found = i;
-      if (found !== activeLyric) { $('lyrics-text').querySelector('[data-active=true]')?.removeAttribute('data-active'); const line = $('lyrics-text').children[found]; if (line) line.dataset.active = 'true'; activeLyric = found; }
-    }
+    lyricView?.update(elapsed);
   }
   function updateMediaSession() {
-    if (native || !('mediaSession' in navigator) || !current) return;
+    if (native || !('mediaSession' in navigator) || !current && !activeRoom) return;
     try {
-      if (navigator.mediaSession.metadata?.title !== current.title) navigator.mediaSession.metadata = new MediaMetadata({ title: current.title, artist: current.artist, album: 'LolzCloud', artwork: [{ src: current.cover || origin + '/app/icon-512.png', sizes: '512x512', type: current.cover ? 'image/jpeg' : 'image/png' }] });
-      navigator.mediaSession.playbackState = phase === 'playing' ? 'playing' : 'paused';
-      if (duration > 0 && Number.isFinite(elapsed)) navigator.mediaSession.setPositionState?.({ duration, playbackRate: rate, position: Math.min(duration, Math.max(0, elapsed)) });
+      if (!activeRoom && !systemSoloAllowed) { navigator.mediaSession.metadata = null; navigator.mediaSession.playbackState = 'none'; navigator.mediaSession.setPositionState?.(); mediaMetadataKey = ''; return; }
+      const row = activeRoom?.playback || current, key = JSON.stringify([activeRoom ? RT.owner(activeRoom) : current.id, row.url, row.title, row.artist, row.cover]);
+      if (mediaMetadataKey !== key) { navigator.mediaSession.metadata = new MediaMetadata({ title: row.title, artist: row.artist, album: activeRoom ? 'Комната · LolzCloud' : 'LolzCloud', artwork: [{ src: row.cover || origin + '/app/icon-512.png', sizes: '512x512', type: row.cover ? 'image/jpeg' : 'image/png' }] }); mediaMetadataKey = key; }
+      navigator.mediaSession.playbackState = (activeRoom ? row.playing : phase === 'playing') ? 'playing' : 'paused';
+      const length = activeRoom ? row.duration : duration, position = activeRoom ? row.position : elapsed;
+      if (length > 0 && Number.isFinite(position)) navigator.mediaSession.setPositionState?.({ duration: length, playbackRate: activeRoom ? 1 : rate, position: Math.min(length, Math.max(0, position)) });
+      else navigator.mediaSession.setPositionState?.();
     } catch { /* MediaSession availability varies by browser. */ }
   }
   function openActions(track) { actionTrack = track; renderActions(); $('track-dialog').showModal(); }
@@ -456,22 +506,25 @@
     });
   }
   const lyricService = window.LolzCloudLyrics.create({ db: DB, fetchJSON: json });
+  lyricView = window.LolzCloudLyricView.create($('lyrics-text'), { seek });
+  roomLyricView = window.LolzCloudLyricView.create($('room-lyrics-text'), { seek: position => { roomCommand('seek', position); } });
   function lyricsFor(track, signal, refresh = false) { return lyricService.forTrack(track, { signal, metadata: lyricsMetadata.get(track.id), refresh }); }
   async function loadLyrics(force = false) {
     if (!current) return;
     if (!force && lyricsTrack === current.id && $('lyrics-text').childNodes.length) return;
     const track = current, token = ++lyricsVersion; lyricsController?.abort(); lyricsController = new AbortController();
     const metadata = lyricsMetadata.get(track.id) || track, renderedIdentity = track.id + '|' + C.lyricsIdentity(metadata.title) + '|' + C.lyricsIdentity(metadata.artist), keepReady = $('lyrics-text').dataset.identity === renderedIdentity && $('lyrics-text').childNodes.length;
-    lyricsTrack = track.id; if (!keepReady) { syncedLyrics = []; activeLyric = -1; $('lyrics-text').replaceChildren(); } $('lyrics-retry').hidden = true; $('lyrics-edit').hidden = true; $('lyrics-metadata-form').hidden = true; $('lyrics-import-remove').hidden = true; $('lyrics-import-status').textContent = ''; document.querySelector('#panel-lyrics .attribution').hidden = false; $('lyrics-status').textContent = 'Ищем текст этой записи…';
+    lyricsTrack = track.id; if (!keepReady) { syncedLyrics = []; lyricView.clear(); } $('lyrics-retry').hidden = true; $('lyrics-edit').hidden = true; $('lyrics-metadata-form').hidden = true; $('lyrics-import-remove').hidden = true; $('lyrics-import-status').textContent = ''; document.querySelector('#panel-lyrics .attribution').hidden = false; $('lyrics-status').textContent = 'Ищем текст этой записи…';
     try {
       const value = await lyricsFor(track, lyricsController.signal, force); if (token !== lyricsVersion || current?.id !== track.id) return;
       $('lyrics-import-remove').hidden = !value.imported; document.querySelector('#panel-lyrics .attribution').hidden = !!value.imported;
-      $('lyrics-text').replaceChildren(); $('lyrics-text').dataset.identity = renderedIdentity;
+      $('lyrics-text').dataset.identity = renderedIdentity;
       syncedLyrics = Array.isArray(value.lines) ? value.lines : C.parseLyrics(value.synced);
       if (value.adapted && value.sourceDuration > 0 && current.duration > 0 && Math.abs(value.sourceDuration - current.duration) > 2.5) syncedLyrics = [];
       $('lyrics-edit').hidden = !!value.imported; $('lyrics-retry').hidden = !!value.imported || !value.versionMismatch;
-      if (syncedLyrics.length) { $('lyrics-text').append(...syncedLyrics.map(line => { const item = button(line.text || '♪', () => seek(line.time), 'lyric-line'); item.setAttribute('aria-label', line.text + ', ' + C.formatTime(line.time)); return item; })); $('lyrics-status').textContent = (value.imported ? 'Твой LRC · ' : value.adapted ? 'Под версию · ' + Number(value.tempo.rate.toFixed(2)) + '× (по длительности) · ' : '') + 'Нажми на строку, чтобы перейти к ней.'; renderTime(); }
-      else { $('lyrics-text').textContent = value.instrumental ? 'Инструментальная запись' : value.plain || (value.lines || C.parseLyrics(value.synced)).map(line => line.text).join('\n'); $('lyrics-status').textContent = value.imported ? 'Твой текст · без синхронизации' : value.instrumental ? '' : value.durationMatched ? 'Текст без синхронизации' : 'Текст без синхронизации · длительность отличается'; }
+      lyricView.render(syncedLyrics, { plain: value.plain || (value.lines || C.parseLyrics(value.synced)).map(line => line.text).join('\n'), instrumental: value.instrumental });
+      if (syncedLyrics.length) { $('lyrics-status').textContent = (value.imported ? 'Твой LRC · ' : value.adapted ? 'Под версию · ' + Number(value.tempo.rate.toFixed(2)) + '× (по длительности) · ' : '') + 'Нажми на строку, чтобы перейти к ней.'; renderTime(); }
+      else { $('lyrics-status').textContent = value.imported ? 'Твой текст · без синхронизации' : value.instrumental ? '' : value.durationMatched ? 'Текст без синхронизации' : 'Текст без синхронизации · длительность отличается'; }
     } catch (error) { if (token !== lyricsVersion || current?.id !== track.id || error.name === 'AbortError') return; $('lyrics-status').textContent = keepReady ? 'Сохранённый текст. Не удалось обновить — можно повторить.' : error.status === 404 ? 'Текст этой записи пока не найден.' : error.message; $('lyrics-retry').hidden = false; $('lyrics-edit').hidden = false; }
   }
   function playerTab(tab) { const lyrics = tab === 'lyrics'; for (const name of ['queue', 'lyrics']) { $('tab-' + name).setAttribute('aria-selected', String(name === tab)); $('tab-' + name).tabIndex = name === tab ? 0 : -1; $('panel-' + name).hidden = name !== tab; } if (lyrics) void loadLyrics(); if (matchMedia('(max-width:759px)').matches) $('player-tabs').scrollIntoView({ block: 'start' }); }
@@ -543,16 +596,41 @@
     const position = Math.round(elapsed * 10) / 10; if (rows.some(row => Math.abs(row.position - position) < 1)) return notice('Этот момент уже сохранён');
     rows.push({ position, createdAt: Date.now() }); rows.sort((a, b) => a.position - b.position); bookmarks.set(id, rows); collection.set(current.id, current); renderBookmarks(); renderLibrary(); persist(); notice('Момент ' + C.formatTime(position) + ' сохранён');
   }
-  async function roomLyrics() {
-    const doc = $('rooms-frame').contentDocument, title = doc?.getElementById('track-title')?.textContent?.trim(), artist = doc?.getElementById('track-artist')?.textContent?.trim();
-    if (!title || !artist) return notice('В комнате пока нет сведений о текущей записи.');
-    const token = ++roomLyricsVersion; $('room-lyrics-title').textContent = title; $('room-lyrics-text').textContent = ''; $('room-lyrics-status').textContent = 'Ищем текст…'; $('room-lyrics-dialog').showModal();
+  function roomLyricsSnapshot() {
+    try { return RT.snapshot($('rooms-frame').contentWindow?.LolzCloudRoomTransport?.snapshot()); } catch { return null; }
+  }
+  function roomLyricIdentity(transport) { const row = transport.playback; return [transport.documentId, row.url, C.lyricsIdentity(row.title), C.lyricsIdentity(row.artist), row.duration].join('|'); }
+  function renderRoomLyrics(transport) {
+    if (!roomLyricsValue) return;
+    const value = roomLyricsValue, lines = Array.isArray(value.lines) ? value.lines : C.parseLyrics(value.synced);
+    roomLyricsSeekable = transport.capabilities.seek;
+    roomLyricView.render(lines, { plain: value.plain || lines.map(line => line.text).join('\n'), instrumental: value.instrumental, seekable: roomLyricsSeekable });
+    roomLyricView.update(transport.playback.position);
+    $('room-lyrics-status').textContent = (value.adapted ? 'Под версию · ' + Number(value.tempo.rate.toFixed(2)) + '× (по длительности). ' : '') + (lines.length ? roomLyricsSeekable ? 'Нажми строку, чтобы перейти к ней в комнате.' : 'Текст следует за музыкой. Перемотка доступна ведущему.' : value.instrumental ? '' : 'Текст без синхронизации.');
+  }
+  function updateRoomLyrics(transport) {
+    if (!$('room-lyrics-dialog').open) return;
+    if (!transport.playback.url || !transport.playback.title || !transport.playback.artist) { ++roomLyricsVersion; roomLyricsController?.abort(); roomLyricsKey = ''; roomLyricsValue = null; roomLyricClock = null; roomLyricView.clear(); $('room-lyrics-status').textContent = 'Ждём сведения о следующей записи. Комната продолжает работать.'; return; }
+    const key = roomLyricIdentity(transport);
+    if (roomLyricsKey !== key) { void roomLyrics(transport); return; }
+    roomLyricClock = { position: transport.playback.position, playing: transport.playback.playing, duration: transport.playback.duration, at: performance.now() };
+    if (roomLyricsValue && roomLyricsSeekable !== transport.capabilities.seek) renderRoomLyrics(transport);
+    roomLyricView.update(transport.playback.position);
+  }
+  async function roomLyrics(input) {
+    const transport = input || roomLyricsSnapshot(), row = transport?.playback;
+    if (!row?.url || !row.title || !row.artist) return notice('В комнате пока нет сведений о текущей записи.');
+    const key = roomLyricIdentity(transport), token = ++roomLyricsVersion, target = { ...row, id: C.sourceURL(row.url) ? 'ref:' + C.sourceURL(row.url) : 'room:' + row.url };
+    roomLyricsController?.abort(); roomLyricsController = new AbortController(); roomLyricsKey = key;
+    const keepReady = $('room-lyrics-text').dataset.source === row.url && $('room-lyrics-text').childNodes.length;
+    if (!keepReady) { roomLyricsValue = null; roomLyricView.clear(); }
+    $('room-lyrics-title').textContent = row.title; $('room-lyrics-status').textContent = 'Ищем текст…'; if (!$('room-lyrics-dialog').open) $('room-lyrics-dialog').showModal();
+    updateRoomLyrics(transport);
     try {
-      const params = new URLSearchParams({ track_name: title, artist_name: artist }); const { body } = await json('https://lrclib.net/api/get?' + params, { timeout: 15000, limit: 256 * 1024 });
-      if (token !== roomLyricsVersion) return;
-      $('room-lyrics-text').textContent = body.instrumental ? 'Инструментальная запись' : typeof body.plainLyrics === 'string' ? body.plainLyrics.slice(0, 200000) : '';
-      $('room-lyrics-status').textContent = $('room-lyrics-text').textContent ? 'Для записи: ' + artist : 'Текст этой записи пока не найден.';
-    } catch { if (token === roomLyricsVersion) $('room-lyrics-status').textContent = 'Текст не найден или нет связи с LRCLIB. Комната продолжает играть.'; }
+      const value = await lyricsFor(target, roomLyricsController.signal);
+      if (token !== roomLyricsVersion || roomLyricIdentity(roomLyricsSnapshot() || transport) !== key) return;
+      roomLyricsValue = value; $('room-lyrics-text').dataset.source = row.url; renderRoomLyrics(roomLyricsSnapshot() || transport);
+    } catch (error) { if (token !== roomLyricsVersion || error.name === 'AbortError') return; $('room-lyrics-status').textContent = keepReady ? 'Сохранённый текст. Не удалось обновить — можно открыть его ещё раз.' : error.message || 'Текст пока не найден. Комната продолжает играть.'; }
   }
   function showView(name, focus = false) {
     if (!['search', 'wave', 'library', 'rooms', 'profile'].includes(name)) return;
@@ -629,7 +707,7 @@
     let doc, win; try { doc = frame.contentDocument; win = frame.contentWindow; if (!doc || win.location.origin !== origin) return; } catch { return; }
     const path = win.location.pathname;
     if (path === '/login' || path.startsWith('/auth/')) { login(); return; }
-    if (frame.id === 'rooms-frame') { frameRoomURL = C.roomURL(win.location.href, origin); $('rooms-directory').hidden = $('room-lyrics').hidden = !frameRoomURL; }
+    if (frame.id === 'rooms-frame') { frameRoomURL = C.roomURL(win.location.href, origin); $('rooms-directory').hidden = $('room-lyrics').hidden = !frameRoomURL; const transport = win.LolzCloudRoomTransport?.snapshot(); if (!transport || activeRoom && transport.documentId !== activeRoom.documentId) clearRoomOwner(); if (transport) receiveRoomTransport(transport); }
     doc.addEventListener('click', event => {
       const anchor = event.target.closest('a[href]'); if (!anchor || event.defaultPrevented) return;
       let url; try { url = new URL(anchor.href, origin); } catch { return; }
@@ -642,8 +720,24 @@
     doc.addEventListener('lolzcloud:social-room-open', event => { if (C.roomURL(event.detail?.url, origin)) { event.preventDefault(); openRoom(event.detail.url); } });
   }
   window.addEventListener('message', event => {
-    if (event.origin !== origin || event.source !== $('rooms-frame').contentWindow || event.data?.type !== 'lolzcloud:room-audio' || event.data.playing !== true) return;
-    roomAudible = true; pause();
+    if (event.origin !== origin || event.source !== $('rooms-frame').contentWindow) return;
+    if (event.data?.type === 'lolzcloud:room-transport') { receiveRoomTransport(event.data.transport); return; }
+    if (event.data?.type === 'lolzcloud:room-command-result') {
+      const pending = roomCommands.get(event.data.id);
+      if (!pending || RT.owner(pending.transport) !== RT.owner(event.data) || RT.owner(pending.transport) !== RT.owner(activeRoom)) return;
+      if (event.data.state === 'accepted') {
+        if (!pending.accepted) {
+          pending.accepted = true; clearTimeout(pending.timer);
+          pending.timer = setTimeout(() => { if (roomCommands.get(event.data.id) !== pending) return; roomCommands.delete(event.data.id); pending.finish(false, 'Источник не завершил подготовку. Открой комнату и проверь выбранную запись.'); }, 60000);
+          if (native && nativeRoomSupported) sendNative('roomCommandResult', { ...pending.transport, id: event.data.id, ok: true, pending: true, error: '' });
+        }
+        return;
+      }
+      clearTimeout(pending.timer); roomCommands.delete(event.data.id); pending.finish(event.data.ok === true, event.data.ok === true ? '' : 'Команда недоступна: проверь связь и право управления комнатой.');
+      if (event.data.transport) receiveRoomTransport(event.data.transport); return;
+    }
+    // Compatibility with an older room document until its next navigation.
+    if (event.data?.type === 'lolzcloud:room-audio' && event.data.playing === true && !$('rooms-frame').contentWindow?.LolzCloudRoomTransport) { roomAudible = true; pause(); }
   });
   $('search-form').onsubmit = event => { event.preventDefault(); $('search-query').blur(); void search(); };
   $('search-query').oninput = () => { if (searching) { ++searchVersion; searchController?.abort(); searching = false; $('search-submit').disabled = false; $('search-status').textContent = 'Нажми «Найти», чтобы выполнить новый поиск.'; } $('search-more').hidden = $('search-query').value.trim() !== searchedQuery || !nextOffset; };
@@ -733,7 +827,7 @@
   };
   $('track-like').onclick = () => { toggleLike(actionTrack); $('track-dialog').close(); }; $('track-queue').onclick = () => { enqueue(actionTrack); $('track-dialog').close(); }; $('track-download').onclick = () => { void download(actionTrack); $('track-dialog').close(); };
   for (const control of document.querySelectorAll('[data-close]')) control.onclick = () => $(control.dataset.close).close();
-  $('room-lyrics-dialog').addEventListener('close', () => { ++roomLyricsVersion; });
+  $('room-lyrics-dialog').addEventListener('close', () => { ++roomLyricsVersion; roomLyricsController?.abort(); roomLyricsKey = ''; roomLyricClock = null; });
   $('install-open').onclick = () => $('install-dialog').showModal();
   $('login-cancel').onclick = cancelLogin; $('login-retry').onclick = () => { void login(); };
   $('login-dialog').addEventListener('cancel', event => { event.preventDefault(); cancelLogin(); });
@@ -767,6 +861,7 @@
   window.addEventListener('lolzcloud:effects', event => { if (native) { learnNativeCapabilities(event.detail); effectsController.receiveNative(event.detail); } });
   window.addEventListener('lolzcloud:playback', event => {
     if (!native) return; const value = event.detail; learnNativeCapabilities(value); receiveNativeRate(value); if (!current) return;
+    if (activeRoom || !systemSoloAllowed) { if (!nativeRoomSupported && value?.state === 'playing') sendNative('pause'); return; }
     if (!currentNativeIntent(value) || typeof value.id === 'string' && value.id !== current.id || !['loading', 'playing', 'paused', 'ended', 'error'].includes(value.state)) return;
     if (!loaded && value.id !== current.id) return; loaded = true;
     if (!nativePitchSupported && Number.isFinite(value.rate) && value.rate >= 0.5 && value.rate <= 2) rate = value.rate;
@@ -777,6 +872,7 @@
   });
   window.addEventListener('lolzcloud:selection', event => {
     if (!native) return; const value = event.detail, position = nativeCatalogReferences ? value?.index : nativeQueuePositions[value?.index];
+    if (activeRoom || !systemSoloAllowed) { if (!nativeRoomSupported) sendNative('pause'); return; }
     if (!currentNativeIntent(value) || !Number.isInteger(position) || position < 0 || position >= queue.length) return;
     const received = C.savedTrack(value.track, origin); let expected = queue[position];
     if (C.referenceTrack(expected) && C.track(received, origin) && value.previousId === expected.id && (/^[1-9][0-9]{0,15}$/.test(expected.id) ? received.id === expected.id : received.url === expected.url)) { if (!adoptCatalog(expected, received, { selected: false })) return; queue[position] = received; expected = received; }
@@ -789,7 +885,13 @@
     renderPlayer(); renderQueue(); persist();
     if (changed && $('tab-lyrics').getAttribute('aria-selected') === 'true') void loadLyrics();
   });
-  window.addEventListener('lolzcloud:command', event => { if (!native) return; if (event.detail?.action === 'next') next(); else if (event.detail?.action === 'previous') previous(); });
+  window.addEventListener('lolzcloud:command', event => { if (!native) return; if (['next', 'previous'].includes(event.detail?.action)) systemCommand(event.detail.action); });
+  window.addEventListener('lolzcloud:room-command', event => {
+    const value = event.detail;
+    if (!native || !nativeRoomSupported || !currentNativeIntent(value) || RT.owner(value) !== RT.owner(activeRoom)) return;
+    roomCommand(value.command, value.value, value);
+  });
+  window.addEventListener('lolzcloud:room-command-result', event => { const value = event.detail; if (native && currentNativeIntent(value) && RT.owner(value) === RT.owner(activeRoom) && ['expired', 'error'].includes(value.state)) notice(value.error || 'Открой комнату и повтори команду.'); });
   window.addEventListener('lolzcloud:download', event => {
     if (!native || !event.detail) return; const value = event.detail;
     if (Array.isArray(value.tracks)) { offline = new Map(value.tracks.slice(0, 500).map(row => { const item = C.savedTrack({ ...row, artist: row.artist || '' }, origin); return item ? [item.id, item] : null; }).filter(Boolean)); }
@@ -802,14 +904,15 @@
     }
     if (value.state === 'loading' && typeof value.id === 'string') downloads.add(value.id);
     if (value.state === 'ready' || value.state === 'error') { downloads.delete(value.id); if (value.state === 'error') notice(value.error || 'Не удалось сохранить трек.'); else if (!value.import) notice('Сохранено на устройстве'); }
-    renderLibrary(); renderDownload(); renderSearch();
+    renderLibrary(); renderDownload(); renderSearch(); renderPlayback();
   });
   window.addEventListener('lolzcloud:account', event => { if (!native) return; if (event.detail?.state === 'ready') { updateAccount(null); $('rooms-frame').removeAttribute('src'); $('social-frame').removeAttribute('src'); void loadAccount(true); } else if (event.detail?.state === 'error') notice(event.detail.error || 'Не удалось войти. Попробуй ещё раз.'); });
-  if ('mediaSession' in navigator && !native) for (const [action, handler] of Object.entries({ play: resume, pause, nexttrack: () => next(), previoustrack: previous, seekto: detail => seek(detail.seekTime), seekbackward: detail => seek(elapsed - (detail.seekOffset || 10)), seekforward: detail => seek(elapsed + (detail.seekOffset || 10)) })) { try { navigator.mediaSession.setActionHandler(action, handler); } catch { /* Optional platform command. */ } }
+  if ('mediaSession' in navigator && !native) for (const [action, handler] of Object.entries({ play: () => systemCommand('play'), pause: () => systemCommand('pause'), nexttrack: () => systemCommand('next'), previoustrack: () => systemCommand('previous'), seekto: detail => systemCommand('seek', detail.seekTime), seekbackward: detail => systemCommand('seek', Math.max(0, (activeRoom?.playback.position ?? elapsed) - (detail.seekOffset || 10))), seekforward: detail => systemCommand('seek', Math.min(activeRoom?.playback.duration || duration || 86400, (activeRoom?.playback.position ?? elapsed) + (detail.seekOffset || 10))) })) { try { navigator.mediaSession.setActionHandler(action, handler); } catch { /* Optional platform command. */ } }
   function connectivity() { $('connection').hidden = navigator.onLine; }
   window.addEventListener('online', () => { connectivity(); if (['rooms', 'profile'].includes(view)) void loadAccount(true); }); window.addEventListener('offline', connectivity);
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); else { checkSleep(); connectivity(); if (['rooms', 'profile'].includes(view)) void loadAccount(); } });
   window.addEventListener('pagehide', () => { wave.flush(); clearTimeout(persistTimer); try { localStorage.setItem('LolzCloud-app-v1', JSON.stringify(savedState())); } catch {} });
+  setInterval(() => { if (!$('room-lyrics-dialog').open || !roomLyricClock) return; const clock = roomLyricClock; roomLyricView.update(Math.min(clock.duration || 86400, clock.position + (clock.playing ? Math.min(2, (performance.now() - clock.at) / 1000) : 0))); }, 100);
   renderPlayer(); renderQueue(); renderLibrary(); renderComfort(); renderBookmarks(); renderEffects(); renderPortable(); renderWave(); scheduleSleep(); checkSleep(); connectivity(); renderGate('rooms-gate', 'rooms'); renderGate('profile-gate', 'profile'); void refreshOffline(); if (native) { if (nativePitchSupported) syncNativeRate(); else sendNative('rate', { value: rate }); sendNative('capabilities'); }
   if (native) $('install-open').hidden = true;
   if (native) { $('audio-import-control').hidden = true; $('native-audio-import').hidden = false; }

@@ -92,16 +92,48 @@
   }
   function parseLyrics(text) {
     if (typeof text !== 'string' || text.length > 512 * 1024) return [];
-    const rows = [];
+    const offsetTag = text.match(/\[offset:\s*([^\]]*)\]/i), rawOffset = offsetTag?.[1]?.trim() || '0';
+    if (!/^[+-]?\d{1,9}$/.test(rawOffset) || Math.abs(Number(rawOffset)) > 86400000) return [];
+    const offset = Number(rawOffset) / 1000, rows = [];
+    const stampTime = stamp => Number(stamp[1]) * 60 + Number(stamp[2]) + Number('0.' + (stamp[3] || '0'));
+    let totalWords = 0;
     for (const line of text.split(/\r?\n/)) {
-      const stamps = [...line.matchAll(/\[(\d{1,3}):(\d{2})(?:[.:](\d{1,3}))?\]/g)];
-      const words = line.replace(/\[[^\]]*\]/g, '').trim();
-      for (const stamp of stamps) {
-        const time = +stamp[1] * 60 + +stamp[2] + +(stamp[3] || '0') / 10 ** (stamp[3]?.length || 1);
-        if (+stamp[2] < 60 && time <= 86400) rows.push({ time, text: words });
+      const stamps = [...line.matchAll(/\[(\d{1,3}):(\d{2})(?:[.:](\d{1,3}))?\]/g)].filter(stamp => Number(stamp[2]) < 60);
+      if (!stamps.length) continue;
+      const body = line.replace(/\[[^\]]*\]/g, '').trim(), markers = [...body.matchAll(/<(\d{1,3}):(\d{2})(?:[.:](\d{1,3}))?>/g)];
+      const plain = body.replace(/<\d{1,3}:\d{2}(?:[.:]\d{1,3})?>/g, '').trim().slice(0, 4000);
+      const base = stampTime(stamps[0]), sourceWords = [];
+      let validWords = markers.length > 0 && markers.length <= 513 && body.slice(0, markers[0]?.index || 0).trim() === '';
+      for (let i = 0; validWords && i < markers.length; i++) {
+        const marker = markers[i], next = markers[i + 1], time = stampTime(marker), end = next ? stampTime(next) : undefined;
+        if (Number(marker[2]) >= 60 || time < base - .05 || time > 86400 || next && (Number(next[2]) >= 60 || end < time || end > 86400)) { validWords = false; break; }
+        let words = body.slice(marker.index + marker[0].length, next?.index ?? body.length);
+        if (i === 0) words = words.trimStart(); if (!next) words = words.trimEnd();
+        if (words) sourceWords.push({ time, text: words, ...(end !== undefined ? { end } : {}) });
       }
+      if (sourceWords.length) { sourceWords[0].text = sourceWords[0].text.trimStart(); sourceWords.at(-1).text = sourceWords.at(-1).text.trimEnd(); }
+      while (sourceWords.length && !sourceWords[0].text) sourceWords.shift();
+      while (sourceWords.length && !sourceWords.at(-1).text) sourceWords.pop();
+      validWords &&= sourceWords.length > 0 && sourceWords.length <= 512 && sourceWords.map(word => word.text).join('') === plain;
+      const terminal = markers.at(-1), terminalEnd = validWords && body.slice(terminal.index + terminal[0].length).trim() === '' ? stampTime(terminal) : undefined;
+      for (const stamp of stamps) {
+        if (rows.length >= 4000) break;
+        const rawTime = stampTime(stamp), time = Math.max(0, rawTime + offset); if (time > 86400) continue;
+        const row = { time, text: plain };
+        if (validWords && totalWords + sourceWords.length <= 16000) {
+          const shift = rawTime - base + offset;
+          const words = sourceWords.map(word => ({ time: Math.max(0, word.time + shift), text: word.text,
+            ...(word.end !== undefined ? { end: Math.max(0, word.end + shift) } : {}) }));
+          if (words.every(word => word.time <= 86400 && (word.end === undefined || word.end <= 86400))) {
+            row.words = Object.freeze(words.map(Object.freeze)); totalWords += words.length;
+            if (terminalEnd !== undefined) row.end = Math.max(0, terminalEnd + shift);
+          }
+        }
+        rows.push(Object.freeze(row));
+      }
+      if (rows.length >= 4000) break;
     }
-    return rows.sort((a, b) => a.time - b.time).slice(0, 4000);
+    return Object.freeze(rows.sort((a, b) => a.time - b.time));
   }
   function formatTime(seconds) { const total = Math.max(0, Math.floor(Number(seconds) || 0)); return Math.floor(total / 60) + ':' + String(total % 60).padStart(2, '0'); }
   function lyricsIdentity(value) {

@@ -7,6 +7,7 @@ const DIRECTORY = path.join(__dirname, '../app/lib/room-client');
 const FILES = Object.freeze({
   '/cloud/room.css': 'room.css', '/cloud/site.js': 'site.js', '/cloud/room-sync.js': 'room-sync.js',
   '/cloud/media-source.js': 'media-source.js', '/cloud/room-players.js': 'room-players.js',
+  '/app/room-transport.js': 'room-transport.js',
   '/cloud/room.js': 'room.js', '/cloud/social.js': 'social.js', '/cloud/social.css': 'social.css', '/assets/logo.svg': 'logo.svg',
 });
 const CSP = "default-src 'none'; script-src 'self' https://w.soundcloud.com https://www.youtube.com https://s.ytimg.com; style-src 'self'; img-src 'self' https: data:; connect-src 'self'; frame-src https://w.soundcloud.com https://www.youtube.com https://www.youtube-nocookie.com; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'";
