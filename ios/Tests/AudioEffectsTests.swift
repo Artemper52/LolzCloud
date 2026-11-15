@@ -29,6 +29,17 @@ final class AudioEffectsTests: XCTestCase {
         XCTAssertEqual(data,original);let m=LCDSPReadMetrics(core)
         XCTAssertEqual(m.processedFrames,5);XCTAssertEqual(m.appliedRevision,2)
     }
+    func testPCMCrossingMeterMeasuresToneAndResetsWithTheStream() throws {
+        let core=try XCTUnwrap(LCDSPCreate());defer{LCDSPRelease(core)}
+        _=config(core,enabled:false);_=LCDSPPrepare(core,44100,1,65536)
+        _=process(core,hz:910,seconds:1.2)
+        let rows=(20..<110).map{LCDSPReadEnergyWindow(core,UInt32($0))}
+        let frames=rows.reduce(0.0){$0+Double($1.frames)},crossings=rows.reduce(0.0){$0+Double($1.positiveCrossings)}
+        XCTAssertEqual(crossings*44100/frames,910,accuracy:2)
+        LCDSPReset(core)
+        XCTAssertEqual(LCDSPReadEnergyWindow(core,50).positiveCrossings,0)
+        XCTAssertEqual(LCDSPReadEnergyWindow(core,50).frames,0)
+    }
     func testPeakingBandChangesFrequencyBalanceWithHeadroom() throws {
         let core=try XCTUnwrap(LCDSPCreate());defer{LCDSPRelease(core)}
         XCTAssertEqual(config(core,gains:[0,0,12,0,0]),1);XCTAssertEqual(LCDSPPrepare(core,44100,1,65536),1)

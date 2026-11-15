@@ -18,7 +18,10 @@ typedef struct {
 } LCDSPMetrics;
 /* First 2.56 seconds of 10 ms input/output energy after a discontinuity or
    settings change. Atomic diagnostic reads never copy PCM or enter rendering. */
-typedef struct { uint32_t frames; float inputEnergy, outputEnergy; } LCDSPEnergyWindow;
+/* Positive crossings use a +/-0.001 hysteresis on the first output channel.
+   This diagnoses the PCM at this tap; it is not an assertion that the tap is
+   downstream of AVPlayer's global time-pitch stage. */
+typedef struct { uint32_t frames, positiveCrossings; float inputEnergy, outputEnergy; } LCDSPEnergyWindow;
 LCDSPCore *LCDSPCreate(void);
 void LCDSPRetain(LCDSPCore *core);
 void LCDSPRelease(LCDSPCore *core);

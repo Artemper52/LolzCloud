@@ -76,6 +76,10 @@ import UniformTypeIdentifiers
             }
             return
         }
+        if action == "rate" {
+            player.configureRate(object,client:client,request:request)
+            return
+        }
         if action == "capabilities" || action == "exportProfile" {
             guard let client, let request, player.ownsClientIntent(client:client,request:request) else { return }
             if action == "capabilities" { event("capabilities",player.capabilities); return }
@@ -111,7 +115,6 @@ import UniformTypeIdentifiers
         case "stop": player.stop()
         case "seek": player.seek(MediaPolicy.time(object["position"]))
         case "volume": if let value = object["value"] as? Double { player.volume(value) }
-        case "rate": if let value = MediaPolicy.number(object["value"]) { player.rate(value) }
         case "sleep": if let value = MediaPolicy.number(object["minutes"]), [0,15,30,45,60].contains(value) { player.sleep(minutes:Int(value)) }
         case "download": if let row = object["track"] as? [String:Any], let track = SavedTrack(row) { player.download(track) }
         case "importAudio": openAudioImporter()

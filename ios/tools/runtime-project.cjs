@@ -1,12 +1,12 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
-// A separate disposable project: the published project and four production
-// Swift files are inputs only and are never rewritten by runtime verification.
+// A separate disposable project: application sources are inputs only and are
+// never rewritten by runtime verification.
 function generate(output){
  const root=path.resolve(__dirname,'..'),folder=path.resolve(output),project=path.join(folder,'LolzCloudRuntime.xcodeproj');
  const id=name=>crypto.createHash('sha256').update('LolzCloud-runtime:'+name).digest('hex').slice(0,24).toUpperCase();
  const q=value=>JSON.stringify(value),objects=[],add=(name,type,body)=>objects.push(`${id(name)} = { isa = ${type}; ${body} };`);
- const appFiles=['App.swift','MediaPolicy.swift','NativePlayer.swift','AccountLogin.swift','AudioEffectsPolicy.swift','NativeAudioEffects.swift','NativeCatalog.swift','NativeProfileShare.swift','DSP/DSPCore.c','DSP/NativeAudioTap.c'];
+ const appFiles=['App.swift','MediaPolicy.swift','NativePlayer.swift','AccountLogin.swift','AudioEffectsPolicy.swift','NativeAudioEffects.swift','NativeCatalog.swift','NativeProfileShare.swift','NativeRatePolicy.swift','DSP/DSPCore.c','DSP/NativeAudioTap.c'];
  for(const file of appFiles){add(file,'PBXFileReference',`lastKnownFileType = ${file.endsWith('.c')?'sourcecode.c.c':'sourcecode.swift'}; path = ${q(path.join(root,'LolzCloud',file))}; sourceTree = "<absolute>";`);add('build:'+file,'PBXBuildFile',`fileRef = ${id(file)};`);}
  add('test-file','PBXFileReference',`lastKnownFileType = sourcecode.swift; path = ${q(path.join(root,'RuntimeTests','NativeRuntimeTests.swift'))}; sourceTree = "<absolute>";`);
  add('test-build','PBXBuildFile',`fileRef = ${id('test-file')};`);

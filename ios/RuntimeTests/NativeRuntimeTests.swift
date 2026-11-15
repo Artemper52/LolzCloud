@@ -18,6 +18,7 @@ import UIKit
     private var scratch: URL!
     private var records: [[String: Any]] = []
     private var savedEffectsPreference: Data?
+    private var savedRatePreference: Data?
     private var offline: URL {
         FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent("Offline", isDirectory: true)
@@ -29,6 +30,8 @@ import UIKit
         try FileManager.default.createDirectory(at: scratch, withIntermediateDirectories: true)
         records = []
         savedEffectsPreference = UserDefaults.standard.data(forKey: "native_audio_effects_v1")
+        savedRatePreference = UserDefaults.standard.data(forKey:"native_rate_settings_v1")
+        UserDefaults.standard.removeObject(forKey:"native_rate_settings_v1")
     }
 
     override func tearDown() async throws {
@@ -40,6 +43,8 @@ import UIKit
         subjects = []
         if let savedEffectsPreference { UserDefaults.standard.set(savedEffectsPreference,forKey:"native_audio_effects_v1") }
         else { UserDefaults.standard.removeObject(forKey:"native_audio_effects_v1") }
+        if let savedRatePreference { UserDefaults.standard.set(savedRatePreference,forKey:"native_rate_settings_v1") }
+        else { UserDefaults.standard.removeObject(forKey:"native_rate_settings_v1") }
         if let scratch { try? FileManager.default.removeItem(at: scratch) }
     }
 
@@ -197,6 +202,98 @@ import UIKit
         player.play(locals[0], queueIndex: 3)
         try await waitFor("explicit duplicate selection plays") { av.currentTime().seconds > 0.1 && av.rate > 0 }
         XCTAssertEqual(records.last { $0["event"] as? String == "selection" }?["index"] as? Int, 3)
+    }
+
+    func testActualPitchPreferenceIsPausedPersistentAndSurvivesSeekAndDuplicateNext() async throws {
+        let player=subject(),track=try await importOne(player,wave("Pitch settings",seconds:6,sampleRate:48000))
+        let av=try avPlayer(player),client=UUID().uuidString.lowercased()
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
+        player.configureQueue([track,track],index:0,repeatMode:"off",shuffle:false)
+        XCTAssertTrue(player.configureRate(["value":1.5,"preservesPitch":false,"revision":1],client:client,request:1))
+        XCTAssertEqual(av.rate,0)
+        player.play(track,queueIndex:0)
+        try await waitFor("varispeed item really plays") { av.rate>1.4 && av.currentTime().seconds>0.2 }
+        let item=try XCTUnwrap(av.currentItem)
+        XCTAssertEqual(item.audioTimePitchAlgorithm,.varispeed)
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:2,handshake:false));player.pause()
+        let position=av.currentTime().seconds
+        XCTAssertTrue(player.configureRate(["value":0.75,"preservesPitch":true,"revision":2],client:client,request:2))
+        try await settle(0.2)
+        XCTAssertEqual(av.rate,0);XCTAssertEqual(av.currentTime().seconds,position,accuracy:0.08)
+        XCTAssertTrue(av.currentItem===item);XCTAssertEqual(item.audioTimePitchAlgorithm,.spectral)
+        XCTAssertFalse(player.configureRate(["value":2,"preservesPitch":false,"revision":1],client:client,request:2))
+        XCTAssertFalse(player.configureRate(["value":2,"preservesPitch":false,"revision":3],client:client,request:500))
+        XCTAssertFalse(player.configureRate(["value":2],client:client,request:2),"A late legacy command must not undo negotiated settings")
+        XCTAssertEqual(av.defaultRate,0.75)
+        let restored=subject(),restoredAV=try avPlayer(restored)
+        XCTAssertEqual(restoredAV.defaultRate,0.75);XCTAssertEqual(restoredAV.rate,0)
+        let stored=try XCTUnwrap(UserDefaults.standard.data(forKey:"native_rate_settings_v1"))
+        XCTAssertTrue(try JSONDecoder().decode(NativeRatePreferences.self,from:stored).preservesPitch)
+        player.resume()
+        try await waitFor("spectral resume keeps the selected slow rate") { av.rate>0.7 && av.rate<0.8 && av.currentTime().seconds>position+0.1 }
+        player.seek(2)
+        try await waitFor("actual seek preserves pitch mode") { av.currentTime().seconds>1.95 && av.currentTime().seconds<2.7 }
+        XCTAssertEqual(av.currentItem?.audioTimePitchAlgorithm,.spectral)
+        player.seek(5.95)
+        try await waitFor("actual EOF advances to the exact duplicate occurrence") {
+            self.records.last{$0["event"] as? String == "selection"}?["index"] as? Int == 1 && av.currentItem !== item && av.rate>0
+        }
+        XCTAssertEqual(av.currentItem?.audioTimePitchAlgorithm,.spectral);XCTAssertEqual(av.defaultRate,0.75)
+        XCTAssertEqual(records.last{$0["event"] as? String == "playback"}?["preservesPitch"] as? Bool,true)
+        player.pause()
+        XCTAssertEqual(records.last{$0["event"] as? String == "playback"}?["rateAppliedRevision"] as? Int,0)
+        player.play(track,queueIndex:1)
+        let pendingItem=av.currentItem
+        let before=try XCTUnwrap(Mirror(reflecting:player).children.first{$0.label == "intent"}?.value as? PlaybackIntent).generation
+        XCTAssertTrue(player.configureRate(["value":1.25,"preservesPitch":false,"revision":3],client:client,request:2))
+        let after=try XCTUnwrap(Mirror(reflecting:player).children.first{$0.label == "intent"}?.value as? PlaybackIntent).generation
+        XCTAssertEqual(before,after);XCTAssertTrue(av.currentItem === pendingItem)
+        try await waitFor("settings during pending item preparation do not cancel or rearm playback") { av.rate>1.2 && av.currentTime().seconds>0.2 }
+        XCTAssertEqual(av.currentItem?.audioTimePitchAlgorithm,.varispeed)
+        XCTAssertEqual(records.last{$0["event"] as? String == "selection"}?["index"] as? Int,1)
+    }
+
+    func testActualAVPlayerRateAlgorithmsMustBeProvenByMeasuredPCM() async throws {
+        let importer=subject(),local=try await importOne(importer,wave("Pitch 910 Hz",seconds:4,hz:910,sampleRate:48000))
+        let network=try XCTUnwrap(SavedTrack(["id":"123456788","title":"Seeded rate MP3","artist":"Runtime test","duration":1.1,
+            "audioUrl":"https://lolzcloud.com/music/audio/123456788/aaaaaaaaaaaaaaaaaaaaaaaa.mp3"]))
+        let fixture=try XCTUnwrap(Bundle(for:NativeRuntimeTests.self).url(forResource:"tone",withExtension:"mp3"))
+        try Data(contentsOf:fixture).write(to:offline.appendingPathComponent(try XCTUnwrap(LocalAudioFiles.filename(network))))
+        try JSONEncoder().encode([local,network]).write(to:offline.appendingPathComponent("index.json"),options:.atomic)
+        let player=subject(),av=try avPlayer(player),client=UUID().uuidString.lowercased()
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
+        XCTAssertTrue(player.configureEffects(["enabled":false,"gains":[0,0,0,0,0],"preampDb":0],revision:1,client:client,request:1))
+        var observations=[[String:Any]](),revision=0
+        for track in [local,network] {
+            for (rate,preserve) in [(1.0,true),(1.5,false),(1.5,true),(0.75,false),(0.75,true)] {
+                revision+=1
+                XCTAssertTrue(player.configureRate(["value":rate,"preservesPitch":preserve,"revision":revision],client:client,request:1))
+                player.play(track)
+                try await waitFor("real PCM reaches the rate probe",timeout:12) {
+                    av.currentItem?.status == .readyToPlay && (player.audioEffects.energyWindow(55)?.frames ?? 0)>0
+                }
+                let metric=try XCTUnwrap(player.audioEffects.measurement)
+                let rows=(20..<50).compactMap{player.audioEffects.energyWindow($0)}
+                let frames=rows.reduce(0.0){$0+Double($1.frames)}/Double(max(1,metric.channels))
+                let crossings=rows.reduce(0.0){$0+Double($1.positiveCrossings)}
+                let hz=crossings*Double(metric.sampleRate)/max(1,frames)
+                observations.append(["source":track.isLocal ? "localWAV":"seededGenuineMP3","rate":rate,"preservesPitch":preserve,
+                    "tapHz":hz,"sampleRate":metric.sampleRate,"frames":frames,"crossings":crossings,
+                    "algorithm":av.currentItem?.audioTimePitchAlgorithm.rawValue ?? ""])
+                player.stop()
+            }
+        }
+        let attachment=XCTAttachment(data:try JSONSerialization.data(withJSONObject:["scope":"PCM at the real production AVPlayer tap; downstream position must be demonstrated, not assumed.","observations":observations],options:[.prettyPrinted,.sortedKeys]),uniformTypeIdentifier:"public.json")
+        attachment.name="actual-avplayer-rate-pitch-probe";attachment.lifetime = .keepAlways;add(attachment)
+        for source in ["localWAV","seededGenuineMP3"] {
+            let rows=observations.filter{$0["source"] as? String == source},baseline=try XCTUnwrap(rows.first?["tapHz"] as? Double)
+            XCTAssertGreaterThan(baseline,100)
+            for row in rows.dropFirst() {
+                let rate=try XCTUnwrap(row["rate"] as? Double),preserve=try XCTUnwrap(row["preservesPitch"] as? Bool),hz=try XCTUnwrap(row["tapHz"] as? Double)
+                let expected=baseline*(preserve ? 1:rate)
+                XCTAssertEqual(hz,expected,accuracy:max(10,expected*0.04),"If this fails with unchanged pitch in varispeed, the tap is upstream; these PCM measurements cannot prove final AVPlayer pitch.")
+            }
+        }
     }
 
     func testDeletedLocalCannotFallbackToNetworkOrPlayCallerURL() async throws {
@@ -531,6 +628,13 @@ import UIKit
         XCTAssertEqual(shell.player.audioEffects.revision,1,"A future FX request must not take over the transport binding")
         try await post(["action":"pause","clientId":b,"requestId":2],in:web)
         XCTAssertEqual(av.rate,0)
+        try await post(["action":"rate","clientId":b,"requestId":2,"value":1.25,"preservesPitch":false,"revision":1],in:web)
+        try await waitFor("actual trusted WK rate message selects varispeed without resuming") { av.defaultRate == 1.25 && av.currentItem?.audioTimePitchAlgorithm == .varispeed }
+        XCTAssertEqual(av.rate,0)
+        try await post(["action":"rate","clientId":b,"requestId":500,"value":2,"preservesPitch":true,"revision":2],in:web)
+        try await settle(0.1)
+        XCTAssertEqual(av.defaultRate,1.25,"A settings side-channel must not acquire a future transport request")
+        XCTAssertEqual(av.currentItem?.audioTimePitchAlgorithm,.varispeed)
         let probe = RuntimeFrameProbe()
         web.configuration.userContentController.add(probe, name: "runtime_probe")
         web.configuration.userContentController.addUserScript(WKUserScript(
@@ -552,7 +656,7 @@ import UIKit
             }
         }
         try await settle(0.2)
-        XCTAssertEqual(av.defaultRate, 1, "A real iframe must not control the native player")
+        XCTAssertEqual(av.defaultRate, 1.25, "A real iframe must not control the native player")
         web.configuration.userContentController.removeScriptMessageHandler(forName: "runtime_probe")
         _ = try await javascript("document.getElementById('runtime-child').remove();true", in: web)
         records.removeAll()
@@ -562,7 +666,7 @@ import UIKit
         try await waitFor("public non-bridge own page finishes", timeout: 30) { web.url?.path == "/install.html" && !web.isLoading }
         try await post(["action":"rate", "clientId":b, "requestId":3, "value":1.75], in: web)
         try await settle(0.2)
-        XCTAssertEqual(av.defaultRate, 1, "A public same-origin page must not acquire the /app bridge")
+        XCTAssertEqual(av.defaultRate, 1.25, "A public same-origin page must not acquire the /app bridge")
         XCTAssertFalse(records.contains { $0["requestId"] as? Int == 3 })
     }
 

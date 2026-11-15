@@ -29,6 +29,8 @@ import Combine
     private var needsPreparation = false
     private var requestedPosition: Double = 0
     private var settings = PlaybackSettings()
+    private var rateBinding = NativeRateBinding()
+    private let rateDefaults: UserDefaults
     private var sleepTask: Task<Void,Never>?
     private var watchdog: Task<Void,Never>?
     private var downloadTasks: [String: Task<Void, Never>] = [:]
@@ -39,9 +41,15 @@ import Combine
     private let directory: URL
     private let index: URL
     private var remoteTargets: [(MPRemoteCommand, Any)] = []
-    init() {
+    init(defaults: UserDefaults = .standard) {
+        rateDefaults = defaults
         directory = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0].appendingPathComponent("Offline", isDirectory: true)
         index = directory.appendingPathComponent("index.json")
+        if let data = defaults.data(forKey:"native_rate_settings_v1"), data.count <= 1024,
+           let saved = try? JSONDecoder().decode(NativeRatePreferences.self,from:data) {
+            _ = settings.setRate(saved.value,preservesPitch:saved.preservesPitch)
+        }
+        player.defaultRate = Float(settings.rate)
         try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
         if let data = try? Data(contentsOf: index), data.count <= 1_000_000,
            let saved = try? JSONDecoder().decode([SavedTrack].self, from: data) {
@@ -72,7 +80,7 @@ import Combine
         return clientIntent.accept(client:client,request:request,handshake:handshake)
     }
     func ownsClientIntent(client: String, request: Int) -> Bool { clientIntent.clientID == client && clientIntent.requestID == request }
-    var capabilities: [String:Any] { clientIntent.fields.merging(["catalogReferences":1,"profileExport":1,"effectsSchema":2]) { _,new in new } }
+    var capabilities: [String:Any] { clientIntent.fields.merging(["catalogReferences":1,"profileExport":1,"effectsSchema":2,"preservesPitch":1]) { _,new in new } }
     @discardableResult func configureEffects(_ config: [String:Any], revision: Int, client: String, request: Int) -> Bool {
         // Settings acknowledge the current transport owner; they cannot advance
         // its request ID, change playback generation, cancel prepare or resume.
@@ -83,6 +91,7 @@ import Combine
     private var effectsStatus: [String:Any] {
         var result = audioEffects.status
         result["catalogReferences"] = 1
+        result["preservesPitch"] = 1
         if var normalization = result["normalization"] as? [String:Any] {
             normalization["key"] = current?.id ?? ""; result["normalization"] = normalization
         }
@@ -164,7 +173,9 @@ import Combine
         if let registered = tracks.first(where: { $0.id == track.id }), let saved = LocalAudioFiles.existing(registered,in:directory) { source = saved }
         else if track.isLocal { fail("Локальный файл не найден. Импортируй его заново."); return }
         else { guard let address = MediaPolicy.audio(track.audioUrl) else { fail("Не удалось восстановить сохранённый трек. Повтори попытку."); return }; source = address }
-        let item = AVPlayerItem(url: source); player.replaceCurrentItem(with: item)
+        let item = AVPlayerItem(url: source)
+        item.audioTimePitchAlgorithm = settings.preservesPitch ? .spectral : .varispeed
+        player.replaceCurrentItem(with: item)
         itemObservation = item.observe(\.status, options: [.initial,.new]) { [weak self] item, _ in
             Task { @MainActor in
                 guard let self, self.generation == ticket, self.player.currentItem === item else { return }
@@ -226,8 +237,31 @@ import Combine
     func volume(_ value: Double) { player.volume = Float(value.isFinite ? min(1,max(0,value)) : 1) }
     func rate(_ value: Double) {
         guard settings.setRate(value) else { return }
-        player.defaultRate = Float(settings.rate)
-        if intent.wantsPlay, player.rate > 0 { player.rate = Float(settings.rate) }
+        rateBinding.clear(); applyRatePreferences()
+    }
+    @discardableResult func configureRate(_ object: [String:Any], client: String?, request: Int?) -> Bool {
+        if let client, let request { guard ownsClientIntent(client:client,request:request) else { return false } }
+        else { guard client == nil, request == nil, clientIntent.clientID == nil else { return false } }
+        if object["preservesPitch"] != nil || object["revision"] != nil {
+            guard let client, let request, let revision = MediaPolicy.requestID(object["revision"]),
+                  let rawValue = object["value"], let flag = object["preservesPitch"],
+                  let next = NativeRatePreferences(["value":rawValue,"preservesPitch":flag]),
+                  rateBinding.accept(next,revision:revision,client:client,request:request) else { return false }
+            _ = settings.setRate(next.value,preservesPitch:next.preservesPitch)
+        } else {
+            guard rateBinding.acceptsLegacy(client:client), let value = MediaPolicy.number(object["value"]), settings.setRate(value) else { return false }
+        }
+        applyRatePreferences(); return true
+    }
+    private func applyRatePreferences() {
+        // Never call play(), seek(), acceptClientIntent() or cancel preparation
+        // here. Changing the algorithm while paused must leave it paused.
+        let wasPlaying = intent.wantsPlay && player.rate > 0
+        let algorithm: AVAudioTimePitchAlgorithm = settings.preservesPitch ? .spectral : .varispeed
+        if player.currentItem?.audioTimePitchAlgorithm != algorithm { player.currentItem?.audioTimePitchAlgorithm = algorithm }
+        if player.defaultRate != Float(settings.rate) { player.defaultRate = Float(settings.rate) }
+        if wasPlaying, player.rate != Float(settings.rate) { player.rate = Float(settings.rate) }
+        if let data = try? JSONEncoder().encode(settings.ratePreferences), rateDefaults.data(forKey:"native_rate_settings_v1") != data { rateDefaults.set(data,forKey:"native_rate_settings_v1") }
         publish()
     }
     func sleep(minutes: Int) {
@@ -256,7 +290,14 @@ import Combine
             if let selectionAlias { detail["previousId"] = selectionAlias }
             transportEvent("selection",detail)
         }
-        if !offlineQueue { transportEvent("playback",["id":current?.id ?? "","state":state,"time":time.isFinite ? max(0,time):requestedPosition,"duration":duration.isFinite && duration > 0 ? duration:(current?.duration ?? 0),"error":error,"queue":queueOwned,"rate":settings.rate,"sleepDeadline":settings.sleepDeadline,"catalogReferences":1]) }
+        if !offlineQueue {
+            let applied = intent.wantsPlay && player.timeControlStatus == .playing &&
+                abs(Double(player.rate)-settings.rate)<0.01 && player.currentItem?.status == .readyToPlay &&
+                player.currentItem?.audioTimePitchAlgorithm == (settings.preservesPitch ? .spectral : .varispeed)
+            var detail: [String:Any] = ["id":current?.id ?? "","state":state,"time":time.isFinite ? max(0,time):requestedPosition,"duration":duration.isFinite && duration > 0 ? duration:(current?.duration ?? 0),"error":error,"queue":queueOwned,"rate":settings.rate,"preservesPitch":settings.preservesPitch,"sleepDeadline":settings.sleepDeadline,"catalogReferences":1]
+            detail.merge(rateBinding.acknowledgement(client:clientIntent.clientID,request:clientIntent.requestID,applied:applied)) { _,new in new }
+            transportEvent("playback",detail)
+        }
         guard let track = current else { return }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = [MPMediaItemPropertyTitle:track.title,MPMediaItemPropertyArtist:track.artist,MPMediaItemPropertyPlaybackDuration:duration.isFinite && duration > 0 ? duration:track.duration,MPNowPlayingInfoPropertyElapsedPlaybackTime:time.isFinite ? max(0,time):0,MPNowPlayingInfoPropertyPlaybackRate:player.rate]
     }

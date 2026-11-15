@@ -16,7 +16,7 @@ struct LCDSPCore {
     atomic_uint prepared, unavailable, rate, channels, bandMask, appliedRevision;
     atomic_uint inputRMS, outputRMS, headroom;
     atomic_uint normMeasured,normFrames,loudness,normGain,normTarget,peak,reduction,windowFrames;
-    atomic_uint windowInput[ENERGY_WINDOWS],windowOutput[ENERGY_WINDOWS],windowCount[ENERGY_WINDOWS];
+    atomic_uint windowInput[ENERGY_WINDOWS],windowOutput[ENERGY_WINDOWS],windowCount[ENERGY_WINDOWS],windowCrossings[ENERGY_WINDOWS];
     atomic_ullong frames;
     /* Only prepare/process/unprepare touch render state; Apple serializes it. */
     Settings current;
@@ -33,7 +33,8 @@ struct LCDSPCore {
     uint64_t normalizationFrames;
     double limiterGain,limiterRelease,maximumPeak,minimumLimiterGain;
     double windowInputEnergy[ENERGY_WINDOWS],windowOutputEnergy[ENERGY_WINDOWS];
-    uint32_t windowSampleCount[ENERGY_WINDOWS],meterWindowFrames;
+    uint32_t windowSampleCount[ENERGY_WINDOWS],windowPositiveCrossings[ENERGY_WINDOWS],meterWindowFrames;
+    int crossingArmed;
     uint64_t meterFrames;
     double inputEnergy, outputEnergy;
     uint64_t energySamples;
@@ -44,12 +45,12 @@ static float number(uint32_t value){float result;memcpy(&result,&value,sizeof re
 static double finite_sample(double value){return isfinite(value)?value:0;}
 static void identity(double c[COEFFICIENTS]){c[0]=1;c[1]=c[2]=c[3]=c[4]=0;}
 static void reset_energy(LCDSPCore *s){
-    s->inputEnergy=s->outputEnergy=0;s->energySamples=0;s->meterFrames=0;s->maximumPeak=0;s->minimumLimiterGain=1;
+    s->inputEnergy=s->outputEnergy=0;s->energySamples=0;s->meterFrames=0;s->maximumPeak=0;s->minimumLimiterGain=1;s->crossingArmed=0;
     atomic_store(&s->inputRMS,bits(0));atomic_store(&s->outputRMS,bits(0));atomic_store(&s->peak,bits(-120));atomic_store(&s->reduction,bits(0));
     /* A fixed small diagnostic array, independent of sample rate/delay length. */
     for(unsigned i=0;i<ENERGY_WINDOWS;i++){
-        s->windowInputEnergy[i]=s->windowOutputEnergy[i]=0;s->windowSampleCount[i]=0;
-        atomic_store(&s->windowInput[i],bits(0));atomic_store(&s->windowOutput[i],bits(0));atomic_store(&s->windowCount[i],0);
+        s->windowInputEnergy[i]=s->windowOutputEnergy[i]=0;s->windowSampleCount[i]=s->windowPositiveCrossings[i]=0;
+        atomic_store(&s->windowInput[i],bits(0));atomic_store(&s->windowOutput[i],bits(0));atomic_store(&s->windowCount[i],0);atomic_store(&s->windowCrossings[i],0);
     }
 }
 static int read_settings(LCDSPCore *s,Settings *out){
@@ -96,7 +97,7 @@ LCDSPCore *LCDSPCreate(void){
     atomic_init(&s->inputRMS,bits(0));atomic_init(&s->outputRMS,bits(0));atomic_init(&s->headroom,bits(0));
     atomic_init(&s->normMeasured,0);atomic_init(&s->normFrames,0);atomic_init(&s->loudness,bits(-120));atomic_init(&s->normGain,bits(0));atomic_init(&s->normTarget,bits(0));
     atomic_init(&s->peak,bits(-120));atomic_init(&s->reduction,bits(0));atomic_init(&s->windowFrames,0);
-    for(unsigned i=0;i<ENERGY_WINDOWS;i++){atomic_init(&s->windowInput[i],bits(0));atomic_init(&s->windowOutput[i],bits(0));atomic_init(&s->windowCount[i],0);}
+    for(unsigned i=0;i<ENERGY_WINDOWS;i++){atomic_init(&s->windowInput[i],bits(0));atomic_init(&s->windowOutput[i],bits(0));atomic_init(&s->windowCount[i],0);atomic_init(&s->windowCrossings[i],0);}
     s->normLinear=s->limiterGain=1;
     s->gain=s->targetGain=1;for(unsigned b=0;b<BANDS;b++)identity(s->coefficients[b]);
     return s;
@@ -271,6 +272,10 @@ void LCDSPProcess(LCDSPCore *s,float *left,float *right,uint32_t frames,uint32_t
             for(uint32_t ch=0;ch<s->renderChannels;ch++)processed[ch]=fmax(-.98,fmin(.98,finite_sample(input[ch]+(processed[ch]*s->limiterGain-input[ch])*s->wet)));
         }
         uint64_t window=s->meterFrames/s->meterWindowFrames;
+        if(window<ENERGY_WINDOWS){
+            if(processed[0]<-.001)s->crossingArmed=1;
+            else if(processed[0]>.001&&s->crossingArmed){s->windowPositiveCrossings[window]++;s->crossingArmed=0;}
+        }
         for(uint32_t ch=0;ch<s->renderChannels;ch++){
             float *p=(ch?right:left)+(size_t)f*stride;double output=processed[ch];
             *p=(float)output;
@@ -282,7 +287,7 @@ void LCDSPProcess(LCDSPCore *s,float *left,float *right,uint32_t frames,uint32_t
     }
     uint32_t lastWindow=(uint32_t)fmin(ENERGY_WINDOWS,(s->meterFrames+s->meterWindowFrames-1)/s->meterWindowFrames);
     for(uint32_t i=firstWindow;i<lastWindow;i++){
-        atomic_store(&s->windowInput[i],bits((float)fmin(3.402823466e38,s->windowInputEnergy[i])));atomic_store(&s->windowOutput[i],bits((float)fmin(3.402823466e38,s->windowOutputEnergy[i])));atomic_store(&s->windowCount[i],s->windowSampleCount[i]);
+        atomic_store(&s->windowInput[i],bits((float)fmin(3.402823466e38,s->windowInputEnergy[i])));atomic_store(&s->windowOutput[i],bits((float)fmin(3.402823466e38,s->windowOutputEnergy[i])));atomic_store(&s->windowCount[i],s->windowSampleCount[i]);atomic_store(&s->windowCrossings[i],s->windowPositiveCrossings[i]);
     }
     atomic_store(&s->normMeasured,s->loudnessCount>=8);atomic_store(&s->normFrames,(uint32_t)fmin(UINT32_MAX,s->normalizationFrames));
     atomic_store(&s->loudness,bits((float)s->loudnessDb));atomic_store(&s->normGain,bits((float)s->normGainDb));atomic_store(&s->normTarget,bits((float)s->normTargetDb));
@@ -305,5 +310,5 @@ LCDSPMetrics LCDSPReadMetrics(const LCDSPCore *s){
 }
 LCDSPEnergyWindow LCDSPReadEnergyWindow(const LCDSPCore *s,uint32_t index){
     LCDSPEnergyWindow value={0};if(!s||index>=ENERGY_WINDOWS)return value;
-    value.frames=atomic_load(&s->windowCount[index]);value.inputEnergy=number(atomic_load(&s->windowInput[index]));value.outputEnergy=number(atomic_load(&s->windowOutput[index]));return value;
+    value.frames=atomic_load(&s->windowCount[index]);value.positiveCrossings=atomic_load(&s->windowCrossings[index]);value.inputEnergy=number(atomic_load(&s->windowInput[index]));value.outputEnergy=number(atomic_load(&s->windowOutput[index]));return value;
 }

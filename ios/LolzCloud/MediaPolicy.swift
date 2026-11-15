@@ -107,11 +107,13 @@ struct NativeClientIntent {
 }
 
 struct PlaybackSettings {
-    private(set) var rate = 1.0
+    private(set) var ratePreferences = NativeRatePreferences()
+    var rate: Double { ratePreferences.value }
+    var preservesPitch: Bool { ratePreferences.preservesPitch }
     private(set) var sleepDeadline = 0.0
-    mutating func setRate(_ value: Double) -> Bool {
-        guard value.isFinite, (0.5...2).contains(value) else { return false }
-        rate = value; return true
+    mutating func setRate(_ value: Double, preservesPitch: Bool? = nil) -> Bool {
+        guard let next = NativeRatePreferences(value:value,preservesPitch:preservesPitch ?? self.preservesPitch) else { return false }
+        ratePreferences = next; return true
     }
     mutating func setSleep(minutes: Int, now: TimeInterval) -> Bool {
         guard [0,15,30,45,60].contains(minutes), now.isFinite else { return false }
