@@ -1,0 +1,8 @@
+{
+  "inputZipSha256": "5fc3a558003494ee1019b70416a691f3c741f80c03b9477b121f7cb4d6370a42",
+  "pathValidation": "strict raw ZIP names, no backslashes/absolute/traversal/duplicate/symlinks",
+  "runtimeFiles": 153,
+  "lockEquivalentExceptRootVersion": true,
+  "dependencyDeclarationsIdentical": true,
+  "sourceVersion": "0.9.19"
+}

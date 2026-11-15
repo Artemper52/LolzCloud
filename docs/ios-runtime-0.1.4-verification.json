@@ -1,0 +1,911 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T01:32:30.602627+00:00",
+  "version": "0.1.4",
+  "build": 5,
+  "sourceCommit": "4605f3c4b540d845191b6de127905779395769df",
+  "workflowURL": "https://github.com/Artemper52/LolzCloud/blob/4605f3c4b540d845191b6de127905779395769df/.github/workflows/verify-ios-pitch.yml",
+  "runURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43661428085",
+  "runId": 43661428085,
+  "scope": "Apple SDK simulator/device compile plus hosted iPhone/iPad runtime on frozen native source. No physical-device, Apple signing, personal-account or external-provider claim.",
+  "sdk": {
+    "status": "passed",
+    "jobId": 132651598262,
+    "xcode": "26.3",
+    "iPhoneOSSDK": "26.2",
+    "simulatorSDK": "26.2",
+    "minimumDeployment": "16.4",
+    "simulatorBuild": "passed",
+    "genericDeviceArchive": "passed",
+    "policyTests": 71,
+    "artifact": {
+      "id": 14140596143,
+      "bytes": 1364210,
+      "sha256": "e0b79bc1068353981ba3047d39d7e507099bd73882da45b1fbe5d6b9633be73e"
+    }
+  },
+  "pureVerification": {
+    "linux": {
+      "passed": 71,
+      "failed": 0,
+      "swift": "6.2.1"
+    },
+    "macOS": {
+      "passed": 71,
+      "failed": 0
+    },
+    "addressSanitizerLinux": {
+      "passed": 71,
+      "failed": 0,
+      "leakSanitizerEnabled": false
+    },
+    "versionNode": {
+      "passed": 2,
+      "failed": 0
+    }
+  },
+  "runtime": {
+    "iphone": {
+      "status": "passed",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0,
+      "jobId": 132652246372,
+      "device": {
+        "uuid": "AC81FD69-6A52-4E4A-94BE-13DC3701F7D4",
+        "family": "iphone",
+        "device": "iPhone 16",
+        "runtime": "iOS 26.2",
+        "version": "26.2"
+      },
+      "platform": {
+        "architecture": "arm64",
+        "deviceId": "AC81FD69-6A52-4E4A-94BE-13DC3701F7D4",
+        "deviceName": "LolzCloud-runtime-1794704979048",
+        "modelName": "iPhone 16",
+        "osBuildNumber": "23C54",
+        "osVersion": "26.2",
+        "platform": "iOS Simulator"
+      },
+      "artifact": {
+        "id": 14140716948,
+        "name": "LolzCloud-iOS-runtime-iphone-43661428085",
+        "bytes": 753717,
+        "digest": "sha256:fd9d922501de0212107fcfe6a7f5b4c8b27558efd8575f92313bb64a1bd9dffa",
+        "url": "https://api.github.com/repos/Artemper52/LolzCloud/actions/artifacts/14140716948"
+      },
+      "rawReportSha256": "f9defddb1a26a28c8a0d3378b659933457417c02d3a366c52fa4e13e45129711",
+      "pitchProbeSha256": "e5c566af8c98981241a9884382c0a9bd3929ea313177e17613a8fd39f96d13ad",
+      "observations": [
+        {
+          "algorithm": "Spectral",
+          "crossings": 273,
+          "frames": 14400,
+          "preservesPitch": true,
+          "rate": 1,
+          "sampleRate": 48000,
+          "source": "localWAV",
+          "tapHz": 910
+        },
+        {
+          "algorithm": "Varispeed",
+          "crossings": 410,
+          "frames": 14400,
+          "preservesPitch": false,
+          "rate": 1.5,
+          "sampleRate": 48000,
+          "source": "localWAV",
+          "tapHz": 1366.6666666666667
+        },
+        {
+          "algorithm": "Spectral",
+          "crossings": 273,
+          "frames": 14400,
+          "preservesPitch": true,
+          "rate": 1.5,
+          "sampleRate": 48000,
+          "source": "localWAV",
+          "tapHz": 910
+        },
+        {
+          "algorithm": "Varispeed",
+          "crossings": 205,
+          "frames": 14400,
+          "preservesPitch": false,
+          "rate": 0.75,
+          "sampleRate": 48000,
+          "source": "localWAV",
+          "tapHz": 683.3333333333334
+        },
+        {
+          "algorithm": "Spectral",
+          "crossings": 273,
+          "frames": 14400,
+          "preservesPitch": true,
+          "rate": 0.75,
+          "sampleRate": 48000,
+          "source": "localWAV",
+          "tapHz": 910
+        },
+        {
+          "algorithm": "Spectral",
+          "crossings": 198,
+          "frames": 13230,
+          "preservesPitch": true,
+          "rate": 1,
+          "sampleRate": 44100,
+          "source": "seededGenuineMP3",
+          "tapHz": 660
+        },
+        {
+          "algorithm": "Varispeed",
+          "crossings": 297,
+          "frames": 13230,
+          "preservesPitch": false,
+          "rate": 1.5,
+          "sampleRate": 44100,
+          "source": "seededGenuineMP3",
+          "tapHz": 990
+        },
+        {
+          "algorithm": "Spectral",
+          "crossings": 198,
+          "frames": 13230,
+          "preservesPitch": true,
+          "rate": 1.5,
+          "sampleRate": 44100,
+          "source": "seededGenuineMP3",
+          "tapHz": 660
+        },
+        {
+          "algorithm": "Varispeed",
+          "crossings": 148,
+          "frames": 13230,
+          "preservesPitch": false,
+          "rate": 0.75,
+          "sampleRate": 44100,
+          "source": "seededGenuineMP3",
+          "tapHz": 493.3333333333333
+        },
+        {
+          "algorithm": "Spectral",
+          "crossings": 196,
+          "frames": 13230,
+          "preservesPitch": true,
+          "rate": 0.75,
+          "sampleRate": 44100,
+          "source": "seededGenuineMP3",
+          "tapHz": 653.3333333333334
+        }
+      ],
+      "actualPlaybackSnapshots": [
+        {
+          "actualRate": 1,
+          "error": "",
+          "frame55": 480,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": true,
+          "processedFrames": 40960,
+          "rate": 1,
+          "source": "localWAV",
+          "state": "playing",
+          "time": 0.509383043,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 1.5,
+          "error": "",
+          "frame55": 480,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": false,
+          "processedFrames": 28672,
+          "rate": 1.5,
+          "source": "localWAV",
+          "state": "playing",
+          "time": 0.531100793,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 1.5,
+          "error": "",
+          "frame55": 480,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": true,
+          "processedFrames": 28672,
+          "rate": 1.5,
+          "source": "localWAV",
+          "state": "playing",
+          "time": 0.462263084,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 0.75,
+          "error": "",
+          "frame55": 480,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": false,
+          "processedFrames": 28672,
+          "rate": 0.75,
+          "source": "localWAV",
+          "state": "playing",
+          "time": 0.25359299,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 0.75,
+          "error": "",
+          "frame55": 480,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": true,
+          "processedFrames": 28672,
+          "rate": 0.75,
+          "source": "localWAV",
+          "state": "playing",
+          "time": 0.183687188,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 1,
+          "error": "",
+          "frame55": 441,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": true,
+          "processedFrames": 26453,
+          "rate": 1,
+          "source": "seededGenuineMP3",
+          "state": "playing",
+          "time": 0.250306004,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 1.5,
+          "error": "",
+          "frame55": 441,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": false,
+          "processedFrames": 26453,
+          "rate": 1.5,
+          "source": "seededGenuineMP3",
+          "state": "playing",
+          "time": 0.541103625,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 1.5,
+          "error": "",
+          "frame55": 441,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": true,
+          "processedFrames": 30232,
+          "rate": 1.5,
+          "source": "seededGenuineMP3",
+          "state": "playing",
+          "time": 0.570245403,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 0.75,
+          "error": "",
+          "frame55": 441,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": false,
+          "processedFrames": 26453,
+          "rate": 0.75,
+          "source": "seededGenuineMP3",
+          "state": "playing",
+          "time": 0.250160448,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 0.75,
+          "error": "",
+          "frame55": 441,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": true,
+          "processedFrames": 26453,
+          "rate": 0.75,
+          "source": "seededGenuineMP3",
+          "state": "playing",
+          "time": 0.182646589,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        }
+      ],
+      "testSummary": {
+        "devicesAndConfigurations": [
+          {
+            "device": {
+              "architecture": "arm64",
+              "deviceId": "AC81FD69-6A52-4E4A-94BE-13DC3701F7D4",
+              "deviceName": "LolzCloud-runtime-1794704979048",
+              "modelName": "iPhone 16",
+              "osBuildNumber": "23C54",
+              "osVersion": "26.2",
+              "platform": "iOS Simulator"
+            },
+            "expectedFailures": 0,
+            "failedTests": 0,
+            "passedTests": 14,
+            "skippedTests": 0,
+            "testPlanConfiguration": {
+              "configurationId": "1",
+              "configurationName": "Test Scheme Action"
+            }
+          }
+        ],
+        "environmentDescription": "LolzCloudRuntime · Built with macOS 15.8.2",
+        "expectedFailures": 0,
+        "failedTests": 0,
+        "finishTime": 1794705405.166,
+        "passedTests": 14,
+        "result": "Passed",
+        "skippedTests": 0,
+        "startTime": 1794705195.901,
+        "statistics": [],
+        "testFailures": [],
+        "title": "Test - LolzCloudRuntime",
+        "topInsights": [],
+        "totalTestCount": 14
+      }
+    },
+    "ipad": {
+      "status": "passed",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0,
+      "jobId": 132652246394,
+      "device": {
+        "uuid": "77345005-F9FE-45A2-A1DE-972149712ACB",
+        "family": "ipad",
+        "device": "iPad Pro 11-inch (M4) (16GB)",
+        "runtime": "iOS 26.2",
+        "version": "26.2"
+      },
+      "platform": {
+        "architecture": "arm64",
+        "deviceId": "77345005-F9FE-45A2-A1DE-972149712ACB",
+        "deviceName": "LolzCloud-runtime-1794705029640",
+        "modelName": "iPad Pro 11-inch (M4) (16GB)",
+        "osBuildNumber": "23C54",
+        "osVersion": "26.2",
+        "platform": "iOS Simulator"
+      },
+      "artifact": {
+        "id": 14140168508,
+        "name": "LolzCloud-iOS-runtime-ipad-43661428085",
+        "bytes": 663798,
+        "digest": "sha256:bf87bff9c5eb316d2edd61e74936a952adb90dad64789946e42df468317e7229",
+        "url": "https://api.github.com/repos/Artemper52/LolzCloud/actions/artifacts/14140168508"
+      },
+      "rawReportSha256": "083bc3f118bac90a04e59eacbcb1c2bffe3abf8383d1c20fd4225c82ec3a11c9",
+      "pitchProbeSha256": "e5c566af8c98981241a9884382c0a9bd3929ea313177e17613a8fd39f96d13ad",
+      "observations": [
+        {
+          "algorithm": "Spectral",
+          "crossings": 273,
+          "frames": 14400,
+          "preservesPitch": true,
+          "rate": 1,
+          "sampleRate": 48000,
+          "source": "localWAV",
+          "tapHz": 910
+        },
+        {
+          "algorithm": "Varispeed",
+          "crossings": 410,
+          "frames": 14400,
+          "preservesPitch": false,
+          "rate": 1.5,
+          "sampleRate": 48000,
+          "source": "localWAV",
+          "tapHz": 1366.6666666666667
+        },
+        {
+          "algorithm": "Spectral",
+          "crossings": 273,
+          "frames": 14400,
+          "preservesPitch": true,
+          "rate": 1.5,
+          "sampleRate": 48000,
+          "source": "localWAV",
+          "tapHz": 910
+        },
+        {
+          "algorithm": "Varispeed",
+          "crossings": 205,
+          "frames": 14400,
+          "preservesPitch": false,
+          "rate": 0.75,
+          "sampleRate": 48000,
+          "source": "localWAV",
+          "tapHz": 683.3333333333334
+        },
+        {
+          "algorithm": "Spectral",
+          "crossings": 273,
+          "frames": 14400,
+          "preservesPitch": true,
+          "rate": 0.75,
+          "sampleRate": 48000,
+          "source": "localWAV",
+          "tapHz": 910
+        },
+        {
+          "algorithm": "Spectral",
+          "crossings": 198,
+          "frames": 13230,
+          "preservesPitch": true,
+          "rate": 1,
+          "sampleRate": 44100,
+          "source": "seededGenuineMP3",
+          "tapHz": 660
+        },
+        {
+          "algorithm": "Varispeed",
+          "crossings": 297,
+          "frames": 13230,
+          "preservesPitch": false,
+          "rate": 1.5,
+          "sampleRate": 44100,
+          "source": "seededGenuineMP3",
+          "tapHz": 990
+        },
+        {
+          "algorithm": "Spectral",
+          "crossings": 198,
+          "frames": 13230,
+          "preservesPitch": true,
+          "rate": 1.5,
+          "sampleRate": 44100,
+          "source": "seededGenuineMP3",
+          "tapHz": 660
+        },
+        {
+          "algorithm": "Varispeed",
+          "crossings": 148,
+          "frames": 13230,
+          "preservesPitch": false,
+          "rate": 0.75,
+          "sampleRate": 44100,
+          "source": "seededGenuineMP3",
+          "tapHz": 493.3333333333333
+        },
+        {
+          "algorithm": "Spectral",
+          "crossings": 196,
+          "frames": 13230,
+          "preservesPitch": true,
+          "rate": 0.75,
+          "sampleRate": 44100,
+          "source": "seededGenuineMP3",
+          "tapHz": 653.3333333333334
+        }
+      ],
+      "actualPlaybackSnapshots": [
+        {
+          "actualRate": 1,
+          "error": "",
+          "frame55": 480,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": true,
+          "processedFrames": 40960,
+          "rate": 1,
+          "source": "localWAV",
+          "state": "playing",
+          "time": 0.525917917,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 1.5,
+          "error": "",
+          "frame55": 480,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": false,
+          "processedFrames": 28672,
+          "rate": 1.5,
+          "source": "localWAV",
+          "state": "playing",
+          "time": 0.533442918,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 1.5,
+          "error": "",
+          "frame55": 480,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": true,
+          "processedFrames": 28672,
+          "rate": 1.5,
+          "source": "localWAV",
+          "state": "playing",
+          "time": 0.407479418,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 0.75,
+          "error": "",
+          "frame55": 480,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": false,
+          "processedFrames": 28672,
+          "rate": 0.75,
+          "source": "localWAV",
+          "state": "playing",
+          "time": 0.267654646,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 0.75,
+          "error": "",
+          "frame55": 480,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": true,
+          "processedFrames": 28672,
+          "rate": 0.75,
+          "source": "localWAV",
+          "state": "playing",
+          "time": 0.18478498,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 1,
+          "error": "",
+          "frame55": 441,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": true,
+          "processedFrames": 26453,
+          "rate": 1,
+          "source": "seededGenuineMP3",
+          "state": "playing",
+          "time": 0.245027296,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 1.5,
+          "error": "",
+          "frame55": 441,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": false,
+          "processedFrames": 26453,
+          "rate": 1.5,
+          "source": "seededGenuineMP3",
+          "state": "playing",
+          "time": 0.527128637,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 1.5,
+          "error": "",
+          "frame55": 441,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": true,
+          "processedFrames": 26453,
+          "rate": 1.5,
+          "source": "seededGenuineMP3",
+          "state": "playing",
+          "time": 0.390925367,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 0.75,
+          "error": "",
+          "frame55": 441,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": false,
+          "processedFrames": 26453,
+          "rate": 0.75,
+          "source": "seededGenuineMP3",
+          "state": "playing",
+          "time": 0.248928249,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        },
+        {
+          "actualRate": 0.75,
+          "error": "",
+          "frame55": 441,
+          "itemError": "",
+          "itemStatus": 1,
+          "prepared": 1,
+          "preservesPitch": true,
+          "processedFrames": 26453,
+          "rate": 0.75,
+          "source": "seededGenuineMP3",
+          "state": "playing",
+          "time": 0.175288113,
+          "timeControlStatus": 2,
+          "unavailableReason": 0
+        }
+      ],
+      "testSummary": {
+        "devicesAndConfigurations": [
+          {
+            "device": {
+              "architecture": "arm64",
+              "deviceId": "77345005-F9FE-45A2-A1DE-972149712ACB",
+              "deviceName": "LolzCloud-runtime-1794705029640",
+              "modelName": "iPad Pro 11-inch (M4) (16GB)",
+              "osBuildNumber": "23C54",
+              "osVersion": "26.2",
+              "platform": "iOS Simulator"
+            },
+            "expectedFailures": 0,
+            "failedTests": 0,
+            "passedTests": 14,
+            "skippedTests": 0,
+            "testPlanConfiguration": {
+              "configurationId": "1",
+              "configurationName": "Test Scheme Action"
+            }
+          }
+        ],
+        "environmentDescription": "LolzCloudRuntime · Built with macOS 15.8.2",
+        "expectedFailures": 0,
+        "failedTests": 0,
+        "finishTime": 1794705479.966,
+        "passedTests": 14,
+        "result": "Passed",
+        "skippedTests": 0,
+        "startTime": 1794705204.65,
+        "statistics": [],
+        "testFailures": [],
+        "title": "Test - LolzCloudRuntime",
+        "topInsights": [],
+        "totalTestCount": 14
+      }
+    }
+  },
+  "compiledProductionHashes": {
+    "App.swift": "3b5c81223f5a8cc905f825c805ae1b716a9b6dd168ba0a28a834d89cf51bcf71",
+    "MediaPolicy.swift": "e1497aa0f6564aff26211dcb634072dfd6b3ab5ab2ea215927355e6e7abc4c5e",
+    "NativePlayer.swift": "7644bf88b2aa8c780819c0f99f481424823af20b0c4ec806aeb0a3d1dad298d9",
+    "AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
+    "AudioEffectsPolicy.swift": "04e0efe18dc15036716243ae263157e57d3ae3fc62446ba5c945ff7d42ed9d5d",
+    "NativeAudioEffects.swift": "cad5c9289a0146485348eef0c651799fb3508ec03772fcc035a0d7f4acaeffc3",
+    "NativeCatalog.swift": "757ee942d3f9d6e9854f8b2ffed1bdb3ebcd8da0d25e45ac22be8c8795937c0f",
+    "NativeProfileShare.swift": "2818dccc99e4c9e61c8603ca979ccf77b62389797a0fdaf5bc75734665eb23c5",
+    "NativeRatePolicy.swift": "fc6feb5626219cdec2f0a3e6b4f2233ae7c19e15f183ef57f84a7c5abb18da39",
+    "DSPCore.c": "cb8ee851c7ce19564e8427b9bdc97e2202dcab8d3fc0d1e0fdd5ebef334d3604",
+    "NativeAudioTap.c": "3d68886e3ed3964c75861886c575ae42422dde573084c7868f2fa94df556d2c7"
+  },
+  "canonicalInputHashes": {
+    "ios/LolzCloud/AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
+    "ios/LolzCloud/App.swift": "3b5c81223f5a8cc905f825c805ae1b716a9b6dd168ba0a28a834d89cf51bcf71",
+    "ios/LolzCloud/AudioEffectsPolicy.swift": "04e0efe18dc15036716243ae263157e57d3ae3fc62446ba5c945ff7d42ed9d5d",
+    "ios/LolzCloud/DSP/DSPCore.c": "cb8ee851c7ce19564e8427b9bdc97e2202dcab8d3fc0d1e0fdd5ebef334d3604",
+    "ios/LolzCloud/DSP/NativeAudioEffectsBridge.h": "b2a95cc7ee4c027b32d49a7f97a25dab0e5734e5381ae24cb0a48ccf30795317",
+    "ios/LolzCloud/DSP/NativeAudioTap.c": "3d68886e3ed3964c75861886c575ae42422dde573084c7868f2fa94df556d2c7",
+    "ios/LolzCloud/DSP/NativeAudioTap.h": "e1e6fc7beed917df0d1e6a3e8e0af48736772e9c4288a0c9bb08f550a879ca5b",
+    "ios/LolzCloud/DSP/include/LCDSPCore.h": "e28955822ae980f3ef36736d109cff8b903f2beed6501c133f5e3e978f49f6e6",
+    "ios/LolzCloud/MediaPolicy.swift": "e1497aa0f6564aff26211dcb634072dfd6b3ab5ab2ea215927355e6e7abc4c5e",
+    "ios/LolzCloud/NativeAudioEffects.swift": "cad5c9289a0146485348eef0c651799fb3508ec03772fcc035a0d7f4acaeffc3",
+    "ios/LolzCloud/NativeCatalog.swift": "757ee942d3f9d6e9854f8b2ffed1bdb3ebcd8da0d25e45ac22be8c8795937c0f",
+    "ios/LolzCloud/NativePlayer.swift": "7644bf88b2aa8c780819c0f99f481424823af20b0c4ec806aeb0a3d1dad298d9",
+    "ios/LolzCloud/NativeProfileShare.swift": "2818dccc99e4c9e61c8603ca979ccf77b62389797a0fdaf5bc75734665eb23c5",
+    "ios/LolzCloud/NativeRatePolicy.swift": "fc6feb5626219cdec2f0a3e6b4f2233ae7c19e15f183ef57f84a7c5abb18da39",
+    "ios/Package.swift": "7bce9f92f78f5d5e4e0cb9c789831d37997a73596d89563c145ad4fc36d7e4aa",
+    "ios/RuntimeTests/NativeRuntimeTests.swift": "2a2ba8d19026cb2aec011eaba204808df88b091d5b04f94c6af918bd41eec9bc",
+    "ios/Tests/AdvancedAudioEffectsTests.swift": "0e99d1eb1f560792f840bbb7275a8ccf5bf6f0756a9d91cc07e84efcfb5295d0",
+    "ios/Tests/AudioEffectsTests.swift": "ba52ce833fff36f9298f0389a945ad10a09748fee2ac2b8ef30b3b9d83832c0b",
+    "ios/Tests/MediaPolicyTests.swift": "fc6ea87bafb7987286b934f721437874d314e5d3f1e4678f90cf53beb32f4913",
+    "ios/Tests/NativeCatalogTests.swift": "94a90789e7387938dc9b1b031848e06460d875685f92c91bc00c5e525fc600e0",
+    "ios/Tests/NativeRatePolicyTests.swift": "3305d55b34791621426f1fc7008ee59b2f638b47bc8065d0cf120eb3f34ee3e2",
+    "ios/Tests/PortableProfileFileTests.swift": "6217c5e690cd983c3fe90985d8213435aee1070dcd8aa135b5d3dd9390dbac1f",
+    "ios/tools/CheckProject.swift": "f4268e454936239bb0adcc028aaf904df45bf2b02c386d591a6d5d4890f6d346",
+    "ios/tools/project.cjs": "07c75508d7744151bc3f56e15c046f477df7f99f71b962c804c4dd15d055a216",
+    "ios/tools/runtime-project.cjs": "b9192763931ec2d8bcf1bc427d0d73fd7aa298a1708faaada13c3a9e1d0af896"
+  },
+  "canonicalInputsVerified": 25,
+  "infoPlistSha256": "30df01be0ec5cc8be2523e652915f960a8d5374aa9092631e7a9ecf2e2469b7f",
+  "binaries": [
+    {
+      "name": "LolzCloud-iOS-0.1.4-simulator.zip",
+      "bytes": 1092068,
+      "sha256": "599659f85b1b0f3f239b6bbfe28e45f7b0fbd9318057fa55b4a7af4e29a2054f",
+      "info": {
+        "CFBundleIdentifier": "com.lolzcloud.ios",
+        "CFBundleShortVersionString": "0.1.4",
+        "CFBundleVersion": "5",
+        "MinimumOSVersion": "16.4",
+        "UIDeviceFamily": [
+          1,
+          2
+        ],
+        "UIBackgroundModes": [
+          "audio"
+        ],
+        "DTXcode": "2630",
+        "DTSDKName": "iphonesimulator26.2"
+      },
+      "slices": [
+        {
+          "architecture": "x86_64",
+          "cpuSubtype": 3,
+          "fileType": 2,
+          "hasCodeSignatureCommand": false,
+          "hasCMSDistributionSignature": false,
+          "codeDirectoryFlags": [],
+          "platform": 7,
+          "minimumOS": "16.4",
+          "sdk": "26.2"
+        },
+        {
+          "architecture": "arm64",
+          "cpuSubtype": 0,
+          "fileType": 2,
+          "hasCodeSignatureCommand": true,
+          "hasCMSDistributionSignature": false,
+          "codeDirectoryFlags": [
+            131074
+          ],
+          "platform": 7,
+          "minimumOS": "16.4",
+          "sdk": "26.2"
+        }
+      ],
+      "embeddedProvisioning": false,
+      "appleDistributionSigned": false,
+      "zipSafePaths": true,
+      "zipCRC": "passed"
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.4-unsigned.ipa",
+      "bytes": 282300,
+      "sha256": "59437333340311d22d87740cbca673765b31916aa6aad14a14e82b26b7a2f9a2",
+      "info": {
+        "CFBundleIdentifier": "com.lolzcloud.ios",
+        "CFBundleShortVersionString": "0.1.4",
+        "CFBundleVersion": "5",
+        "MinimumOSVersion": "16.4",
+        "UIDeviceFamily": [
+          1,
+          2
+        ],
+        "UIBackgroundModes": [
+          "audio"
+        ],
+        "DTXcode": "2630",
+        "DTSDKName": "iphoneos26.2"
+      },
+      "slices": [
+        {
+          "architecture": "arm64",
+          "cpuSubtype": 0,
+          "fileType": 2,
+          "hasCodeSignatureCommand": false,
+          "hasCMSDistributionSignature": false,
+          "codeDirectoryFlags": [],
+          "platform": 2,
+          "minimumOS": "16.4",
+          "sdk": "26.2"
+        }
+      ],
+      "embeddedProvisioning": false,
+      "appleDistributionSigned": false,
+      "zipSafePaths": true,
+      "zipCRC": "passed"
+    }
+  ],
+  "audioProof": {
+    "measurement": "Positive crossings of a single known tone in actual production MTAudioProcessingTap PCM, 0.20–0.50 s tap windows, with real AVPlayer rate/progress snapshots.",
+    "formatsTested": [
+      "Imported PCM WAV, 48000Hz mono",
+      "Genuine MP3 fixture, 44100Hz mono, seeded into private network-track cache"
+    ],
+    "ratesMeasured": [
+      0.75,
+      1,
+      1.5
+    ],
+    "preservesPitchValues": [
+      false,
+      true
+    ],
+    "threshold": "max(10Hz, expectedHz*0.04), unchanged after first attempt",
+    "result": "Varispeed frequency follows rate; spectral remains at original pitch. The observed tap position is demonstrated empirically for these file paths, not inferred from PostEffects naming.",
+    "independentPitch": false,
+    "privateAudioUploaded": false
+  },
+  "behaviorVerified": [
+    "Strict current client/request ownership and independent nondecreasing rate revision",
+    "No autoplay or position/item reset when toggled in pause",
+    "Private rate/preserve preference round-trip",
+    "Seek/resume and exact duplicate queue advance retain the selected algorithm",
+    "Settings during pending item preparation retain generation/current item and really play",
+    "Actual trusted top-level WK rate message accepted; future transport request and provider child frame rejected",
+    "Previous12 AVPlayer/DSP/import/catalog/profile share runtime tests remain passing"
+  ],
+  "history": [
+    {
+      "commit": "863df1c911df1ed75b22ac69ffecc8d54425b9b2",
+      "runId": 43659301680,
+      "ipad": {
+        "passed": 14,
+        "failed": 0
+      },
+      "iphone": {
+        "passed": 13,
+        "failed": 1,
+        "failure": "PCM probe readiness timeout before complete matrix; not a failed frequency assertion"
+      }
+    },
+    {
+      "commit": "4605f3c4b540d845191b6de127905779395769df",
+      "change": "Test-only matrix uses pause between fresh item/tap measurements instead of ten global OS audio-session teardowns, and records per-case/failure metrics before XCTFail. The exact OS cause of the first timeout was not proven. Production source and frequency/deadline thresholds unchanged.",
+      "iphone": {
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0
+      },
+      "ipad": {
+        "passed": 14,
+        "failed": 0,
+        "skipped": 0
+      }
+    }
+  ],
+  "limits": [
+    "No physical iPhone/iPad, headphones, calls, locked-screen or AirPlay test.",
+    "Only WAV and genuine cached MP3 pitch spectra were measured; other imported codecs are not an exhaustive codec qualification.",
+    "Seeded MP3 cache is not an HTTPS MP3 download validation.",
+    "No independent pitch scalar; the checkbox only selects time-pitch behavior as tempo changes.",
+    "No Apple CMS distribution signature or provisioning. Device IPA requires recipient signing; simulator ZIP is for Xcode on Mac.",
+    "External Documents Provider/picker, personal login, user share-sheet Cancel/destination persistence remain unverified. Share cleanup is programmatic.",
+    "Existing published0.1.3 artifacts and historical reports were not overwritten."
+  ]
+}
