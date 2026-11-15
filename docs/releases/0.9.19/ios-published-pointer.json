@@ -1,0 +1,13 @@
+{
+  "status": "updated-after-publication",
+  "version": "0.1.4",
+  "build": 5,
+  "sourceCommit": "4605f3c4b540d845191b6de127905779395769df",
+  "releaseId": 446000930,
+  "pointerSha256": "cf1666e0e22837a2720db53dd73f95d08d5eee3cec5d0b463dacca07a775f159",
+  "historical13Sha256": "6d82e65fbd296be7abe211f446315f332160deb11f5622cc4d98901324768f41",
+  "historical13Preserved": true,
+  "sourceZIPUnchanged": true,
+  "originalIndexUnchanged": true,
+  "recordedAt": "2026-11-15T11:31:56.657Z"
+}

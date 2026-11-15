@@ -1,0 +1,36 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T11:33:34.159Z",
+  "probe": "origin-host SSH executing public HTTPS GET",
+  "version": "0.9.19",
+  "downloads": "/srv/lolzcloud/releases/20261115T113004-platforms-0.9.19-b4ba9174/downloads",
+  "website": "/srv/lolzcloud/releases/20261115T104642-website-0.9.19-70d41537",
+  "inventory": {
+    "bytes": 7019,
+    "sha256": "a8124554b706d23e28417a20b10aa0e7e78264031fd8567656f3acfcd09b3cba",
+    "github": {
+      "url": "https://github.com/Artemper52/LolzCloud",
+      "sourceCommit": "a98eef6f2ef1403cc621c99fa82ae6398c5ed440",
+      "sourceBranch": "codex/recover-music-0.9.19",
+      "releasePublication": "published",
+      "status": "published",
+      "releaseURL": "https://github.com/Artemper52/LolzCloud/releases/tag/v0.9.19",
+      "releaseId": 446000930,
+      "tag": "v0.9.19",
+      "verifiedFiles": 22,
+      "verifiedBytes": 1075622667,
+      "verification": "https://github.com/Artemper52/LolzCloud/actions/runs/43708031379",
+      "checksumReportArtifact": 14159506238
+    }
+  },
+  "immutable22AssetsSameInodes": true,
+  "backend": {
+    "ok": true,
+    "version": "0.9.22",
+    "roomProtocol": 2,
+    "socialProtocol": 1,
+    "oauthConfigured": true,
+    "spicyConfigured": true
+  },
+  "sourceTag": "a98eef6f2ef1403cc621c99fa82ae6398c5ed440"
+}

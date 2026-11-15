@@ -1,0 +1,1008 @@
+{
+  "startedAt": "2026-11-15T11:26:17.493Z",
+  "status": "passed",
+  "mode": "published-full",
+  "sourceCommit": "a98eef6f2ef1403cc621c99fa82ae6398c5ed440",
+  "checks": [
+    {
+      "name": "Plan pin, exact repository/tag/commit and22 artifacts",
+      "passed": true
+    },
+    {
+      "name": "Exact official URLs, unique names, bounded sizes and SHA256",
+      "passed": true,
+      "totalBytes": 1075622667
+    },
+    {
+      "name": "Website19/Android1.9/native1.4/PWA and exact14 planned downloads",
+      "passed": true,
+      "names": [
+        "LolzCloud-0.9.19-win-x64-Setup.exe",
+        "LolzCloud-0.9.19-win-x64.zip",
+        "LolzCloud-0.9.19-win7-legacy-Setup.exe",
+        "LolzCloud-0.9.19-win7-legacy-x64.zip",
+        "LolzCloud-0.9.19-linux-x64.AppImage",
+        "LolzCloud-0.9.19-linux-x64.tar.gz",
+        "LolzCloud-0.9.19-linux-arm64.tar.gz",
+        "LolzCloud-Android-0.1.9.apk",
+        "LolzCloud-0.9.19-source.zip",
+        "LolzCloud-iOS-0.1.4-source.zip",
+        "LolzCloud-iOS-0.1.4-unsigned.ipa",
+        "LolzCloud-iOS-0.1.4-simulator.zip",
+        "LolzCloud-browser-helper-1.2.0-chromium.zip",
+        "LolzCloud-browser-helper-1.2.0-firefox.zip"
+      ]
+    },
+    {
+      "name": "Source proof and sourceZIP match pinned release",
+      "passed": true
+    },
+    {
+      "name": "PWA23/SW7 and native25 exact frozen inventories",
+      "passed": true
+    },
+    {
+      "name": "Released18 modern exact packaged updater loaded",
+      "passed": true,
+      "archive": "D:/LolzCloud-Android-Toolchain/release-0.9.18/modern/LolzCloud-win32-x64/resources/app.asar",
+      "asarSha256": "cddce93ec2701693e414357af34312b360da017fd2ffa4138b2d73bffeac39fa",
+      "moduleSha256": "ea3648c194c55846aa15f093cf21198ed46b7b5fe717fefec5b563241648e9f0",
+      "currentVersion": "0.9.18"
+    },
+    {
+      "name": "Released18 legacy exact packaged updater loaded",
+      "passed": true,
+      "archive": "D:/LolzCloud-Android-Toolchain/release-0.9.18/legacy/LolzCloud-win32-x64/resources/app.asar",
+      "asarSha256": "cddce93ec2701693e414357af34312b360da017fd2ffa4138b2d73bffeac39fa",
+      "moduleSha256": "ea3648c194c55846aa15f093cf21198ed46b7b5fe717fefec5b563241648e9f0",
+      "currentVersion": "0.9.18"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 latest.yml",
+      "passed": true,
+      "bytes": 366,
+      "sha256": "276225683f6d8e64edee821e78bc40531f70b89a3b7a31a94b3f88a2f6cda65c",
+      "sha512": "WstyNnqzxOlTokE6BuLEP5gpMEHD5xGTjLGhll/bwuKc4N+1hww1IV6pZbk+bATiq8WRpzYzKIgfpEq+lqjAcw==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 android-update.json",
+      "passed": true,
+      "bytes": 439,
+      "sha256": "113448605b2bc85fd488c859f2f1b2799e89604a805e7de2b6aad54229b7f255",
+      "sha512": "nbfnQ2HReTUJZeitUK5/SsjRIzkNHDmO5w7DkmkumzuA2fK3uC8m8CNHhyLs7LenFRbzET4FXwjtXks/XJepNQ==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 legacy.yml",
+      "passed": true,
+      "bytes": 373,
+      "sha256": "d78635bec0503dd92147b6e4b064836581cbae46df120222c444980f67e2f468",
+      "sha512": "7tGTm2YhRmPTysLRsbaOZKkncV4JrPSIJYEtTUhr7yIemrV6QlwD9JoD2652BjLaWCh8Y8uf44M9bVNIJeGSGg==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-0.9.19-linux-arm64.tar.gz",
+      "passed": true,
+      "bytes": 159411964,
+      "sha256": "e03a093c2e436f932666fbfa7d417211da2e9e67d6da69df608b5ae4bb7c37f9",
+      "sha512": "74mZnGDXS7xHWaynHKUJC430Sp1YBYUZGF8Rqsmqc3mBVmmJpZOHzyU/xXfOFc6mYlBx5xr1j5r3+sDGsiePqA==",
+      "encoding": "identity",
+      "reusedFrom": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\public-qa\\public-downloads-origin-20261115112246248.json"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-0.9.19-linux-x64.AppImage",
+      "passed": true,
+      "bytes": 147470840,
+      "sha256": "2e4f1e49d234dc310869b719acce1e05b2b2730271aa4f84755ce8f6b4e6bd98",
+      "sha512": "+X2oGdr9KVtek+R0aIoDVYhRhiPY2C+OhgaYL9vzlNEFZx4qeESYQ42JaTWDI7srncA6cnR29sAL+4JULcdIZQ==",
+      "encoding": "identity",
+      "reusedFrom": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\public-qa\\public-downloads-origin-20261115112246248.json"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-0.9.19-linux-x64.tar.gz",
+      "passed": true,
+      "bytes": 160325692,
+      "sha256": "17affd53051995f994e1103a650e47b619e021a7f6569abbba05719e8ca3d541",
+      "sha512": "G56bi6SVKDz98GVEW96eY3AkYkJ0YR8LK3YxBbpN7nVmhwmbxKzV6kFlWKisrhykJYcXqJMgORfg6JjddpagkA==",
+      "encoding": "identity",
+      "reusedFrom": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\public-qa\\public-downloads-origin-20261115112246248.json"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-0.9.19-win-x64-Setup.exe",
+      "passed": true,
+      "bytes": 146396374,
+      "sha256": "eca24d822cfbff7e7891a0c958ca6bff91cff3718766e3b7a5b93fcf8406007f",
+      "sha512": "Yf7MgysIEqC7T4xED2IApG04QGjA2DuhncMD4/6LsPvvSdoJxWIPP37BR4ONT7oTH54X4pUd7KCUtpHTIX8AXw==",
+      "encoding": "identity",
+      "reusedFrom": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\public-qa\\public-downloads-origin-20261115112246248.json"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-0.9.19-win-x64-Setup.exe.blockmap",
+      "passed": true,
+      "bytes": 152714,
+      "sha256": "294da34c65f6e28bbbaa0eaa9f4fc4c4570b2c42a34ff40653f7b6876c671d7f",
+      "sha512": "JhQ93+b5qi7ZuFm3x8b2NFZT9p8cuYUXSdlyqSb6pvXuNJ5yqn4ivXHeVJD+C0SeekkKQdiG6Yltl0/sKbPReg==",
+      "encoding": "identity",
+      "reusedFrom": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\public-qa\\public-downloads-origin-20261115112246248.json"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-0.9.19-source.zip",
+      "passed": true,
+      "bytes": 26944551,
+      "sha256": "d5b9efc1c8862cb633ca02789d51bdd5f708e03deb952404c38b9fac139843ad",
+      "sha512": "vsGahJ5TGMlqpzrKv9NEnwLnbbBf5BQvtClToBZPuwumeV2vUahnvZru6ZuEFRAe/z7bc1jT70xi9iJmvaFHYA==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-0.9.19-win7-legacy-Setup.exe.blockmap",
+      "passed": true,
+      "bytes": 105166,
+      "sha256": "29d2ee97d1e3c17dc83b9c7a5e77b0e8985afbc75e507ce05bea0f97738b0374",
+      "sha512": "DrxkcWLtkiB6r85IoKEq+975Jsh3MwpjasY1CUBRJWov/9BEglFuHcUhsNCodyQPa9NZgYMGpEutSCAK3gkd+g==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-0.9.19-win7-legacy-Setup.exe",
+      "passed": true,
+      "bytes": 99541416,
+      "sha256": "d041beca12f657eddacbfc5efd70e5364b8180292cc96861324c2ad70872e68f",
+      "sha512": "DtAzjJyqxW8DR5crc/OkBOkhg1n8DgGgYwa/NoFpLx4q7CqsP0bc8rLORZgX+PeBU1dwUdnpntLI2rdCFGiMsA==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-0.9.19-win-x64.zip",
+      "passed": true,
+      "bytes": 196682066,
+      "sha256": "2ebe5bab34c295562fc00a17326a9a40d802aff443bb9bd2052e2fc52c54f5ed",
+      "sha512": "i1U54+hGTpG0zY+mNESLIR7/dEVrLk51obaQeJz7UeX9SJfV5Cupy/euaw69/fq30EjXiNZiAr14SIHrvJMSaw==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "passed": true,
+      "bytes": 10190,
+      "sha256": "b656175abd7283ab4ddb43eb46cc3b38ce666af4d9b5378c3a6e1ed98a23b129",
+      "sha512": "/Ph1oiISO32a/eAMugLQmDWYjMPEs31utKaNc6OPyQj6wbj7QvsTLy8Bj15IaPJqPM0NYIPhPbN8952Rqu43XQ==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-0.9.19-win7-legacy-x64.zip",
+      "passed": true,
+      "bytes": 134399138,
+      "sha256": "bb3885ab49f67f6ac6ccfe6e3da5909c340c45cd2554f81bd6d391efadfbc0f9",
+      "sha512": "CBUABo4Hbe8Mkt4RlrnAR0xE5V+n0I7CqxaMxYgwp/LpzoiMcELO5VEnj0ENFbdptIh0jCHWVwXxFvYx2X7u9Q==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-Android-0.1.9.apk",
+      "passed": true,
+      "bytes": 2614813,
+      "sha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693",
+      "sha512": "eRKVE9bm+binHi7MGpZd17DjJGBwEyRV8QUhDqgm2J8tXtf9M66n77/volk6iqtBZM3NbsLhdiT0cZH/Tu6+bw==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "passed": true,
+      "bytes": 10190,
+      "sha256": "bd1b43bb821a5fb2a122f0d5e8e3e3d2b0c3bbb94f887016be79f9e6ed98aebe",
+      "sha512": "DHlCUxYm+5DCM05cq2k3nTXtJqRzJV5Ufz1Ns7cbKOaLa8GDFACHjqh/+rfdgO++zzZ/Ya/Hk+3+ti5SOTVC3Q==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-iOS-0.1.4-simulator.zip",
+      "passed": true,
+      "bytes": 1092068,
+      "sha256": "599659f85b1b0f3f239b6bbfe28e45f7b0fbd9318057fa55b4a7af4e29a2054f",
+      "sha512": "FKAhHtr16+aOYtOHITEbOVDeAYEaCHdNb4Fb4pjptktQUxpupKgLcHO7MjIW+Hv+VuCIZpUh0UZWOr0U49IBRA==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-iOS-0.1.4-source.zip",
+      "passed": true,
+      "bytes": 178816,
+      "sha256": "c0e6fcd98322248c60397bbfb97c8a5cc7d07da985834142614cec49006096b8",
+      "sha512": "6zlVa1l3gBe96uoOQjSj6o3hxCbuFH/QIb1nWSsh8LZIjWtfkEVAR5910kcfXz2kDYe0yR2pUAwwMSfR+DBTjg==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-iOS-0.1.4-unsigned.ipa",
+      "passed": true,
+      "bytes": 282300,
+      "sha256": "59437333340311d22d87740cbca673765b31916aa6aad14a14e82b26b7a2f9a2",
+      "sha512": "RdzLL65+lP1U4cSLoSpYp/o92xzfLzn7uXw3utErUe9Lrcw0qbGXUJ3e3tzSi4T4YIQKKydsORc9A5NruI0fVw==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 update.json",
+      "passed": true,
+      "bytes": 565,
+      "sha256": "764fc3e647aeef8fa6637d2484f5d17ddf586c981f136ba57ada2fd838c22114",
+      "sha512": "gyINnJG38i6VmuGPGP8lUbwY9p5kvCGSO8smzxkYMB1UewZH7ESprCOHruMv309NBwXqkjbJytk6tU9ObI7Zsg==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 update-legacy.json",
+      "passed": true,
+      "bytes": 588,
+      "sha256": "c852adbddabce0f7537782021385e236899c5af7f0ac0a52ebf4b46f25548aa9",
+      "sha512": "D00KT27uNSHQ+RjDPG/G2gxF+Tkw/5IVBO5/Uz5n6uj8s/n6cSrImCJfTXnq8XZ5qs4hSdhSJeHvc1NFRzbRkw==",
+      "encoding": "identity"
+    },
+    {
+      "name": "Actual full public GET size/SHA256 LolzCloud-0.9.19-SHA256SUMS.txt",
+      "passed": true,
+      "bytes": 2038,
+      "sha256": "32e459d167acae09aa4cb51b6707afeb3bd9e76fe739ccfc50cebd36a055a7b0",
+      "sha512": "Ai2M1P1Yol2Or3fTdE65/wjUj1ecuj4/77nNsmG5zWSr8dejxmf+okvB+lf1w9mJhROVi+QLx+w2TS/mFTc29A==",
+      "encoding": "identity"
+    },
+    {
+      "name": "latest YAML SHA512 and JSON match actual Setup/ZIP",
+      "passed": true
+    },
+    {
+      "name": "legacy YAML SHA512 and JSON match actual Setup/ZIP",
+      "passed": true
+    },
+    {
+      "name": "Android1.9/code10 manifest matches actual APK",
+      "passed": true
+    },
+    {
+      "name": "SHA256SUMS covers all21 other exact artifacts",
+      "passed": true
+    },
+    {
+      "name": "Inventory19/Android1.9/native1.4/PWA22/sourcecommit",
+      "passed": true
+    },
+    {
+      "name": "Native inventory matches actual compiled14/14 iPhone+iPad proof",
+      "passed": true
+    },
+    {
+      "name": "Every platform inventory asset matches pinned actual bytes",
+      "passed": true
+    },
+    {
+      "name": "Android r8 source digest and certificate match manifest",
+      "passed": true,
+      "sourceSha256": "cdb5a2f7ff93beba3c58f1b38b5be3232608f2bb05c73d9f557d80039c865a17",
+      "files": 62
+    },
+    {
+      "name": "Actual published APK package/code/version/signature verified without installation",
+      "passed": true
+    },
+    {
+      "name": "Actual public sourceZIP exact commit and all1113 raw Git files",
+      "passed": true,
+      "commit": "a98eef6f2ef1403cc621c99fa82ae6398c5ed440",
+      "files": 1113,
+      "entries": 1234
+    },
+    {
+      "name": "Actual source package/backend/Android version metadata consistent",
+      "passed": true
+    },
+    {
+      "name": "Actual sourceZIP23 exact PWA22 inputs",
+      "passed": true,
+      "files": 23
+    },
+    {
+      "name": "Actual sourceZIP25 exact compiled native inputs",
+      "passed": true,
+      "files": 25,
+      "compiledCommit": "4605f3c4b540d845191b6de127905779395769df"
+    },
+    {
+      "name": "Actual sourceZIP153 exact desktop runtime build inputs",
+      "passed": true,
+      "files": 153
+    },
+    {
+      "name": "Actual sourceZIP Android62 r8 inputs including11 mapped generated room assets",
+      "passed": true,
+      "files": 62,
+      "generatedVirtualCopies": 11,
+      "aggregateSha256": "cdb5a2f7ff93beba3c58f1b38b5be3232608f2bb05c73d9f557d80039c865a17"
+    },
+    {
+      "name": "Actual sourceZIP all13 staged website files raw-byte match",
+      "passed": true
+    },
+    {
+      "name": "Separate native sourceZIP preserves all25 compiled inputs",
+      "passed": true,
+      "compiledCommit": "4605f3c4b540d845191b6de127905779395769df"
+    },
+    {
+      "name": "Published IPA/simulator bytes match Apple SDK14/14 both simulator proofs",
+      "passed": true,
+      "compiledCommit": "4605f3c4b540d845191b6de127905779395769df",
+      "runURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43661428085",
+      "physicalDeviceTested": false,
+      "signedIPA": false
+    },
+    {
+      "name": "Published website exact bytes index.html",
+      "passed": true,
+      "bytes": 12174,
+      "sha256": "3db93f478953dd9de3a8b8c9f77600852f05d180787d88c8ab2e39502fd6ec39"
+    },
+    {
+      "name": "Published website exact bytes app.js",
+      "passed": true,
+      "bytes": 5731,
+      "sha256": "b3eeea84c681bd8825f53e1f2cedc1c384ccf376c879bf9c87889961d323b590"
+    },
+    {
+      "name": "Published website exact bytes site-config.js",
+      "passed": true,
+      "bytes": 1407,
+      "sha256": "d9603b9e9780f99d215dd27fccb1cb40166b361a7e2f53521458f9257ecc3fbc"
+    },
+    {
+      "name": "Published website exact bytes style.css",
+      "passed": true,
+      "bytes": 13750,
+      "sha256": "ee775bd4799ee126ab356a7e1af80da7a5cc12e4843c58591c10463d4ac298a6"
+    },
+    {
+      "name": "Published website exact bytes downloads.css",
+      "passed": true,
+      "bytes": 5475,
+      "sha256": "c06f7b6b1d24f494702b7e917bacd2e343cc8570ae716c40143cebf53a3a9b5c"
+    },
+    {
+      "name": "Published website exact bytes install.html",
+      "passed": true,
+      "bytes": 24457,
+      "sha256": "2ded7164a0211c20333a4cacd6f9725e91805c03c060dce306e44367e9af8c5e"
+    },
+    {
+      "name": "Published website exact bytes install.js",
+      "passed": true,
+      "bytes": 198,
+      "sha256": "cb749cac3621f6076f2181f3f218e315cd6e5f49e96234c47d709cde18219c43"
+    },
+    {
+      "name": "Published website exact bytes assets/logo.svg",
+      "passed": true,
+      "bytes": 396,
+      "sha256": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512"
+    },
+    {
+      "name": "Published website exact bytes assets/lyrics.png",
+      "passed": true,
+      "bytes": 466926,
+      "sha256": "68d7bd25cef2e91230fb61b613e86e43cd8db86575885db039102809e77e0024"
+    },
+    {
+      "name": "Published website exact bytes assets/mini.png",
+      "passed": true,
+      "bytes": 208458,
+      "sha256": "f077fddaae2e91bd45fb1d1eabff964ecdd4a67e137a1c391beaab309a7db1f7"
+    },
+    {
+      "name": "Published website exact bytes assets/record.svg",
+      "passed": true,
+      "bytes": 3353,
+      "sha256": "ba31b0fa22b3f202223aec6400f9b2b665fa5cda321a1ca0afa4756cee1a535b"
+    },
+    {
+      "name": "Published website exact bytes assets/sound.png",
+      "passed": true,
+      "bytes": 277759,
+      "sha256": "149ae16294bc08be918479ee655b763eaa2fff6057b5a119dfb8afa4d12bcf0d"
+    },
+    {
+      "name": "Published website exact bytes assets/wave.png",
+      "passed": true,
+      "bytes": 501215,
+      "sha256": "079fcb00a64ec53828b3f13308d79702d02ed7c4d6346694787e2dbd1b5e55cd"
+    },
+    {
+      "name": "Website root aliases exact19 index",
+      "passed": true
+    },
+    {
+      "name": "Homepage rendered download hrefs point to exact19 planned artifacts",
+      "passed": true,
+      "names": [
+        "LolzCloud-0.9.19-win-x64-Setup.exe",
+        "LolzCloud-0.9.19-win-x64.zip",
+        "LolzCloud-Android-0.1.9.apk",
+        "LolzCloud-0.9.19-linux-x64.AppImage",
+        "LolzCloud-0.9.19-linux-x64.tar.gz",
+        "LolzCloud-0.9.19-linux-arm64.tar.gz",
+        "LolzCloud-0.9.19-win7-legacy-Setup.exe",
+        "LolzCloud-0.9.19-win7-legacy-x64.zip",
+        "LolzCloud-0.9.19-source.zip"
+      ]
+    },
+    {
+      "name": "Published PWA22 exact bytes app.css",
+      "passed": true,
+      "bytes": 21939,
+      "sha256": "1c45f9b2bd1087330d759b6473f693fa6ac20041bfd7b955f0ac21d04cee2753"
+    },
+    {
+      "name": "Published PWA22 exact bytes app.js",
+      "passed": true,
+      "bytes": 107861,
+      "sha256": "56d1b64ac93b11080cdbaff5359cb388aeb5ecaf1569c525acc7fd41bdb7a51e"
+    },
+    {
+      "name": "Published PWA22 exact bytes core.js",
+      "passed": true,
+      "bytes": 9897,
+      "sha256": "20a8d5b82f1c392438cd6655dd0f40f253e6d8ce6aace96e123dba4edca97daf"
+    },
+    {
+      "name": "Published PWA22 exact bytes effects-policy.js",
+      "passed": true,
+      "bytes": 5503,
+      "sha256": "d09718958652e166fef7dcaed791d0353107601b7214814ffb13e20aecb94687"
+    },
+    {
+      "name": "Published PWA22 exact bytes effects.js",
+      "passed": true,
+      "bytes": 14086,
+      "sha256": "ce79663279f017d67e03d376c3664764b1a5c6b1379d239cd746c4097caf9991"
+    },
+    {
+      "name": "Published PWA22 exact bytes icon-192.png",
+      "passed": true,
+      "bytes": 7875,
+      "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4"
+    },
+    {
+      "name": "Published PWA22 exact bytes icon-512.png",
+      "passed": true,
+      "bytes": 9687,
+      "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef"
+    },
+    {
+      "name": "Published PWA22 exact bytes icon.svg",
+      "passed": true,
+      "bytes": 366,
+      "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6"
+    },
+    {
+      "name": "Published PWA22 exact bytes imports.js",
+      "passed": true,
+      "bytes": 2375,
+      "sha256": "9c025444b795b53b730d27723d18006a743c11601f22c86b2f89bea9d384abc2"
+    },
+    {
+      "name": "Published PWA22 exact bytes index.html",
+      "passed": true,
+      "bytes": 26949,
+      "sha256": "1be4fbc39c9a579f78f4002dd53ee394cfbea7ee9118463e719215024d32c391"
+    },
+    {
+      "name": "Published PWA22 exact bytes limiter-worklet.js",
+      "passed": true,
+      "bytes": 2197,
+      "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112"
+    },
+    {
+      "name": "Published PWA22 exact bytes manifest.webmanifest",
+      "passed": true,
+      "bytes": 440,
+      "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7"
+    },
+    {
+      "name": "Published PWA22 exact bytes normalization-worklet.js",
+      "passed": true,
+      "bytes": 3376,
+      "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664"
+    },
+    {
+      "name": "Published PWA22 exact bytes offline.js",
+      "passed": true,
+      "bytes": 4979,
+      "sha256": "8774eb963ff7fe0c85e61668c0355d8c3b0e3467a3e30a7ba032c49771ab3936"
+    },
+    {
+      "name": "Published PWA22 exact bytes profile-cloud.js",
+      "passed": true,
+      "bytes": 9042,
+      "sha256": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64"
+    },
+    {
+      "name": "Published PWA22 exact bytes profile-crypto-worker.js",
+      "passed": true,
+      "bytes": 4898,
+      "sha256": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66"
+    },
+    {
+      "name": "Published PWA22 exact bytes profile-crypto.js",
+      "passed": true,
+      "bytes": 2972,
+      "sha256": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206"
+    },
+    {
+      "name": "Published PWA22 exact bytes profile-policy.js",
+      "passed": true,
+      "bytes": 9513,
+      "sha256": "5e2d9bf5253d7a25dba7419baf4bb8d64670a179474da02577c5a5687e75c56a"
+    },
+    {
+      "name": "Published PWA22 exact bytes profile.js",
+      "passed": true,
+      "bytes": 15387,
+      "sha256": "38af455641f22842cdce51913dba07442c8ceff636cf08315636cd89b08fdeac"
+    },
+    {
+      "name": "Published PWA22 exact bytes sw.js",
+      "passed": true,
+      "bytes": 1854,
+      "sha256": "7595a92b982049ae8cd5a8518d2c6c4086417e42b5c4886ec4775191ec443c72"
+    },
+    {
+      "name": "Published PWA22 exact bytes vendor-scrypt-3.0.1.js",
+      "passed": true,
+      "bytes": 17811,
+      "sha256": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d"
+    },
+    {
+      "name": "Published PWA22 exact bytes wave-history.js",
+      "passed": true,
+      "bytes": 2065,
+      "sha256": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3"
+    },
+    {
+      "name": "Published PWA22 exact bytes wave.js",
+      "passed": true,
+      "bytes": 15089,
+      "sha256": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4"
+    },
+    {
+      "name": "PWA canonical scope/standalone install metadata",
+      "passed": true
+    },
+    {
+      "name": "Atomic SWv7 includes wave/history/profile/crypto/effects cache assets",
+      "passed": true
+    },
+    {
+      "name": "Public backend22 preserves room2/social1",
+      "passed": true
+    },
+    {
+      "name": "Music live protocol1/wave1",
+      "passed": true
+    },
+    {
+      "name": "All14 advertised downloads fully byte-verified",
+      "passed": true
+    },
+    {
+      "name": "GitHub latest is published19 with exact22 asset names",
+      "passed": true
+    },
+    {
+      "name": "Released18 modern detects19 AVAILABLE without installation",
+      "passed": true,
+      "feed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/"
+    },
+    {
+      "name": "Released18 legacy detects19 AVAILABLE without installation",
+      "passed": true,
+      "feed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/"
+    }
+  ],
+  "probe": "origin-host SSH executing public HTTPS GET",
+  "limits": {
+    "files": 22,
+    "perFile": 350000000,
+    "total": 2000000000,
+    "parallel": 3,
+    "artifactTimeoutMs": 300000,
+    "metadataTimeoutMs": 30000
+  },
+  "personalAccountsUsed": false,
+  "installAttempted": false,
+  "publicationAttempted": false,
+  "planSha256": "7dd112da1761c57f3db1abf5659890ae61efb3f5b514eba7e7d16f1bcd492b5e",
+  "resumedFrom": {
+    "file": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\public-qa\\public-downloads-origin-20261115112246248.json",
+    "sha256": "cf56584209101285f9e71a5273f830d9b87d57eeee99e3f628ebf1b9d4365255",
+    "status": "failed",
+    "startedAt": "2026-11-15T11:22:46.248Z"
+  },
+  "inventory": {
+    "version": "0.9.19",
+    "updatedAt": "2026-11-15T11:04:52.186Z",
+    "windows": {
+      "version": "0.9.19",
+      "setup": {
+        "name": "LolzCloud-0.9.19-win-x64-Setup.exe",
+        "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-win-x64-Setup.exe",
+        "size": 146396374,
+        "sha256": "eca24d822cfbff7e7891a0c958ca6bff91cff3718766e3b7a5b93fcf8406007f"
+      },
+      "portable": {
+        "name": "LolzCloud-0.9.19-win-x64.zip",
+        "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-win-x64.zip",
+        "size": 196682066,
+        "sha256": "2ebe5bab34c295562fc00a17326a9a40d802aff443bb9bd2052e2fc52c54f5ed"
+      }
+    },
+    "legacy": {
+      "version": "0.9.19",
+      "setup": {
+        "name": "LolzCloud-0.9.19-win7-legacy-Setup.exe",
+        "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-win7-legacy-Setup.exe",
+        "size": 99541416,
+        "sha256": "d041beca12f657eddacbfc5efd70e5364b8180292cc96861324c2ad70872e68f"
+      },
+      "portable": {
+        "name": "LolzCloud-0.9.19-win7-legacy-x64.zip",
+        "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-win7-legacy-x64.zip",
+        "size": 134399138,
+        "sha256": "bb3885ab49f67f6ac6ccfe6e3da5909c340c45cd2554f81bd6d391efadfbc0f9"
+      },
+      "physicalWindows7Tested": false
+    },
+    "android": {
+      "versionName": "0.1.9",
+      "versionCode": 10,
+      "packageName": "com.lolzcloud.mobile",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.9.apk",
+      "size": 2614813,
+      "sha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693",
+      "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+      "sourceSha256": "cdb5a2f7ff93beba3c58f1b38b5be3232608f2bb05c73d9f557d80039c865a17"
+    },
+    "ios": {
+      "kind": "installed-web-app",
+      "url": "https://lolzcloud.com/app/",
+      "physicalSafariTested": false,
+      "native": {
+        "version": "0.1.4",
+        "build": 5,
+        "status": "unsigned-sdk-build",
+        "source": {
+          "name": "LolzCloud-iOS-0.1.4-source.zip",
+          "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.4-source.zip",
+          "size": 178816,
+          "sha256": "c0e6fcd98322248c60397bbfb97c8a5cc7d07da985834142614cec49006096b8"
+        },
+        "unsignedIPA": {
+          "name": "LolzCloud-iOS-0.1.4-unsigned.ipa",
+          "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.4-unsigned.ipa",
+          "size": 282300,
+          "sha256": "59437333340311d22d87740cbca673765b31916aa6aad14a14e82b26b7a2f9a2"
+        },
+        "simulator": {
+          "name": "LolzCloud-iOS-0.1.4-simulator.zip",
+          "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.4-simulator.zip",
+          "size": 1092068,
+          "sha256": "599659f85b1b0f3f239b6bbfe28e45f7b0fbd9318057fa55b4a7af4e29a2054f"
+        },
+        "appleSDKBuild": true,
+        "deviceTest": false,
+        "signedIPA": false,
+        "compiledCommit": "4605f3c4b540d845191b6de127905779395769df",
+        "verification": "https://github.com/Artemper52/LolzCloud/actions/runs/43661428085",
+        "xcode": "26.3",
+        "sdk": "26.2",
+        "simulatorRuntimeTest": {
+          "status": "passed",
+          "verification": "https://github.com/Artemper52/LolzCloud/actions/runs/43661428085",
+          "iphonePassed": 14,
+          "ipadPassed": 14,
+          "skipped": 0,
+          "physicalDeviceTested": false
+        }
+      },
+      "webRevision": "0.9.22"
+    },
+    "linux": {
+      "version": "0.9.19",
+      "nativeX64Tested": true,
+      "arm64RuntimeTested": false,
+      "x64AppImage": {
+        "name": "LolzCloud-0.9.19-linux-x64.AppImage",
+        "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-linux-x64.AppImage",
+        "size": 147470840,
+        "sha256": "2e4f1e49d234dc310869b719acce1e05b2b2730271aa4f84755ce8f6b4e6bd98"
+      },
+      "x64Archive": {
+        "name": "LolzCloud-0.9.19-linux-x64.tar.gz",
+        "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-linux-x64.tar.gz",
+        "size": 160325692,
+        "sha256": "17affd53051995f994e1103a650e47b619e021a7f6569abbba05719e8ca3d541"
+      },
+      "arm64Archive": {
+        "name": "LolzCloud-0.9.19-linux-arm64.tar.gz",
+        "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-linux-arm64.tar.gz",
+        "size": 159411964,
+        "sha256": "e03a093c2e436f932666fbfa7d417211da2e9e67d6da69df608b5ae4bb7c37f9"
+      }
+    },
+    "source": {
+      "name": "LolzCloud-0.9.19-source.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-source.zip",
+      "size": 26944551,
+      "sha256": "d5b9efc1c8862cb633ca02789d51bdd5f708e03deb952404c38b9fac139843ad"
+    },
+    "github": {
+      "url": "https://github.com/Artemper52/LolzCloud",
+      "sourceCommit": "a98eef6f2ef1403cc621c99fa82ae6398c5ed440",
+      "sourceBranch": "codex/recover-music-0.9.19",
+      "releasePublication": "pending-upload"
+    },
+    "sourceCommit": "a98eef6f2ef1403cc621c99fa82ae6398c5ed440",
+    "checksums": {
+      "name": "LolzCloud-0.9.19-SHA256SUMS.txt",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-SHA256SUMS.txt",
+      "size": 2038,
+      "sha256": "32e459d167acae09aa4cb51b6707afeb3bd9e76fe739ccfc50cebd36a055a7b0"
+    },
+    "updates": [
+      {
+        "name": "latest.yml",
+        "url": "https://lolzcloud.com/downloads/latest.yml",
+        "size": 366,
+        "sha256": "276225683f6d8e64edee821e78bc40531f70b89a3b7a31a94b3f88a2f6cda65c"
+      },
+      {
+        "name": "update.json",
+        "url": "https://lolzcloud.com/downloads/update.json",
+        "size": 565,
+        "sha256": "764fc3e647aeef8fa6637d2484f5d17ddf586c981f136ba57ada2fd838c22114"
+      },
+      {
+        "name": "legacy.yml",
+        "url": "https://lolzcloud.com/downloads/legacy.yml",
+        "size": 373,
+        "sha256": "d78635bec0503dd92147b6e4b064836581cbae46df120222c444980f67e2f468"
+      },
+      {
+        "name": "update-legacy.json",
+        "url": "https://lolzcloud.com/downloads/update-legacy.json",
+        "size": 588,
+        "sha256": "c852adbddabce0f7537782021385e236899c5af7f0ac0a52ebf4b46f25548aa9"
+      },
+      {
+        "name": "android-update.json",
+        "url": "https://lolzcloud.com/downloads/android-update.json",
+        "size": 439,
+        "sha256": "113448605b2bc85fd488c859f2f1b2799e89604a805e7de2b6aad54229b7f255"
+      },
+      {
+        "name": "LolzCloud-0.9.19-win-x64-Setup.exe.blockmap",
+        "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-win-x64-Setup.exe.blockmap",
+        "size": 152714,
+        "sha256": "294da34c65f6e28bbbaa0eaa9f4fc4c4570b2c42a34ff40653f7b6876c671d7f"
+      },
+      {
+        "name": "LolzCloud-0.9.19-win7-legacy-Setup.exe.blockmap",
+        "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-win7-legacy-Setup.exe.blockmap",
+        "size": 105166,
+        "sha256": "29d2ee97d1e3c17dc83b9c7a5e77b0e8985afbc75e507ce05bea0f97738b0374"
+      }
+    ]
+  },
+  "githubLatest": {
+    "id": 446000930,
+    "tag": "v0.9.19",
+    "url": "https://github.com/Artemper52/LolzCloud/releases/tag/v0.9.19",
+    "assets": 22
+  },
+  "actualArtifacts": 22,
+  "actualArtifactBytes": 1075622667,
+  "finishedAt": "2026-11-15T11:27:30.157Z",
+  "assets": {
+    "latest.yml": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 366,
+      "sha256": "276225683f6d8e64edee821e78bc40531f70b89a3b7a31a94b3f88a2f6cda65c",
+      "sha512": "WstyNnqzxOlTokE6BuLEP5gpMEHD5xGTjLGhll/bwuKc4N+1hww1IV6pZbk+bATiq8WRpzYzKIgfpEq+lqjAcw==",
+      "encoding": "identity",
+      "advertisedLength": "366",
+      "finalURL": "https://lolzcloud.com/downloads/latest.yml"
+    },
+    "android-update.json": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 439,
+      "sha256": "113448605b2bc85fd488c859f2f1b2799e89604a805e7de2b6aad54229b7f255",
+      "sha512": "nbfnQ2HReTUJZeitUK5/SsjRIzkNHDmO5w7DkmkumzuA2fK3uC8m8CNHhyLs7LenFRbzET4FXwjtXks/XJepNQ==",
+      "encoding": "identity",
+      "advertisedLength": "439",
+      "finalURL": "https://lolzcloud.com/downloads/android-update.json"
+    },
+    "legacy.yml": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 373,
+      "sha256": "d78635bec0503dd92147b6e4b064836581cbae46df120222c444980f67e2f468",
+      "sha512": "7tGTm2YhRmPTysLRsbaOZKkncV4JrPSIJYEtTUhr7yIemrV6QlwD9JoD2652BjLaWCh8Y8uf44M9bVNIJeGSGg==",
+      "encoding": "identity",
+      "advertisedLength": "373",
+      "finalURL": "https://lolzcloud.com/downloads/legacy.yml"
+    },
+    "LolzCloud-0.9.19-linux-arm64.tar.gz": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 159411964,
+      "sha256": "e03a093c2e436f932666fbfa7d417211da2e9e67d6da69df608b5ae4bb7c37f9",
+      "sha512": "74mZnGDXS7xHWaynHKUJC430Sp1YBYUZGF8Rqsmqc3mBVmmJpZOHzyU/xXfOFc6mYlBx5xr1j5r3+sDGsiePqA==",
+      "encoding": "identity",
+      "advertisedLength": "159411964",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-linux-arm64.tar.gz",
+      "reusedFrom": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\public-qa\\public-downloads-origin-20261115112246248.json"
+    },
+    "LolzCloud-0.9.19-linux-x64.AppImage": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 147470840,
+      "sha256": "2e4f1e49d234dc310869b719acce1e05b2b2730271aa4f84755ce8f6b4e6bd98",
+      "sha512": "+X2oGdr9KVtek+R0aIoDVYhRhiPY2C+OhgaYL9vzlNEFZx4qeESYQ42JaTWDI7srncA6cnR29sAL+4JULcdIZQ==",
+      "encoding": "identity",
+      "advertisedLength": "147470840",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-linux-x64.AppImage",
+      "reusedFrom": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\public-qa\\public-downloads-origin-20261115112246248.json"
+    },
+    "LolzCloud-0.9.19-linux-x64.tar.gz": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 160325692,
+      "sha256": "17affd53051995f994e1103a650e47b619e021a7f6569abbba05719e8ca3d541",
+      "sha512": "G56bi6SVKDz98GVEW96eY3AkYkJ0YR8LK3YxBbpN7nVmhwmbxKzV6kFlWKisrhykJYcXqJMgORfg6JjddpagkA==",
+      "encoding": "identity",
+      "advertisedLength": "160325692",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-linux-x64.tar.gz",
+      "reusedFrom": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\public-qa\\public-downloads-origin-20261115112246248.json"
+    },
+    "LolzCloud-0.9.19-win-x64-Setup.exe": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 146396374,
+      "sha256": "eca24d822cfbff7e7891a0c958ca6bff91cff3718766e3b7a5b93fcf8406007f",
+      "sha512": "Yf7MgysIEqC7T4xED2IApG04QGjA2DuhncMD4/6LsPvvSdoJxWIPP37BR4ONT7oTH54X4pUd7KCUtpHTIX8AXw==",
+      "encoding": "identity",
+      "advertisedLength": "146396374",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-win-x64-Setup.exe",
+      "reusedFrom": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\public-qa\\public-downloads-origin-20261115112246248.json"
+    },
+    "LolzCloud-0.9.19-win-x64-Setup.exe.blockmap": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 152714,
+      "sha256": "294da34c65f6e28bbbaa0eaa9f4fc4c4570b2c42a34ff40653f7b6876c671d7f",
+      "sha512": "JhQ93+b5qi7ZuFm3x8b2NFZT9p8cuYUXSdlyqSb6pvXuNJ5yqn4ivXHeVJD+C0SeekkKQdiG6Yltl0/sKbPReg==",
+      "encoding": "identity",
+      "advertisedLength": "152714",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-win-x64-Setup.exe.blockmap",
+      "reusedFrom": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\public-qa\\public-downloads-origin-20261115112246248.json"
+    },
+    "LolzCloud-0.9.19-source.zip": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 26944551,
+      "sha256": "d5b9efc1c8862cb633ca02789d51bdd5f708e03deb952404c38b9fac139843ad",
+      "sha512": "vsGahJ5TGMlqpzrKv9NEnwLnbbBf5BQvtClToBZPuwumeV2vUahnvZru6ZuEFRAe/z7bc1jT70xi9iJmvaFHYA==",
+      "encoding": "identity",
+      "advertisedLength": "26944551",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-source.zip"
+    },
+    "LolzCloud-0.9.19-win7-legacy-Setup.exe.blockmap": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 105166,
+      "sha256": "29d2ee97d1e3c17dc83b9c7a5e77b0e8985afbc75e507ce05bea0f97738b0374",
+      "sha512": "DrxkcWLtkiB6r85IoKEq+975Jsh3MwpjasY1CUBRJWov/9BEglFuHcUhsNCodyQPa9NZgYMGpEutSCAK3gkd+g==",
+      "encoding": "identity",
+      "advertisedLength": "105166",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-win7-legacy-Setup.exe.blockmap"
+    },
+    "LolzCloud-0.9.19-win7-legacy-Setup.exe": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 99541416,
+      "sha256": "d041beca12f657eddacbfc5efd70e5364b8180292cc96861324c2ad70872e68f",
+      "sha512": "DtAzjJyqxW8DR5crc/OkBOkhg1n8DgGgYwa/NoFpLx4q7CqsP0bc8rLORZgX+PeBU1dwUdnpntLI2rdCFGiMsA==",
+      "encoding": "identity",
+      "advertisedLength": "99541416",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-win7-legacy-Setup.exe"
+    },
+    "LolzCloud-0.9.19-win-x64.zip": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 196682066,
+      "sha256": "2ebe5bab34c295562fc00a17326a9a40d802aff443bb9bd2052e2fc52c54f5ed",
+      "sha512": "i1U54+hGTpG0zY+mNESLIR7/dEVrLk51obaQeJz7UeX9SJfV5Cupy/euaw69/fq30EjXiNZiAr14SIHrvJMSaw==",
+      "encoding": "identity",
+      "advertisedLength": "196682066",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-win-x64.zip"
+    },
+    "LolzCloud-browser-helper-1.2.0-chromium.zip": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 10190,
+      "sha256": "b656175abd7283ab4ddb43eb46cc3b38ce666af4d9b5378c3a6e1ed98a23b129",
+      "sha512": "/Ph1oiISO32a/eAMugLQmDWYjMPEs31utKaNc6OPyQj6wbj7QvsTLy8Bj15IaPJqPM0NYIPhPbN8952Rqu43XQ==",
+      "encoding": "identity",
+      "advertisedLength": "10190",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-browser-helper-1.2.0-chromium.zip"
+    },
+    "LolzCloud-0.9.19-win7-legacy-x64.zip": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 134399138,
+      "sha256": "bb3885ab49f67f6ac6ccfe6e3da5909c340c45cd2554f81bd6d391efadfbc0f9",
+      "sha512": "CBUABo4Hbe8Mkt4RlrnAR0xE5V+n0I7CqxaMxYgwp/LpzoiMcELO5VEnj0ENFbdptIh0jCHWVwXxFvYx2X7u9Q==",
+      "encoding": "identity",
+      "advertisedLength": "134399138",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-win7-legacy-x64.zip"
+    },
+    "LolzCloud-Android-0.1.9.apk": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 2614813,
+      "sha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693",
+      "sha512": "eRKVE9bm+binHi7MGpZd17DjJGBwEyRV8QUhDqgm2J8tXtf9M66n77/volk6iqtBZM3NbsLhdiT0cZH/Tu6+bw==",
+      "encoding": "identity",
+      "advertisedLength": "2614813",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.9.apk"
+    },
+    "LolzCloud-browser-helper-1.2.0-firefox.zip": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 10190,
+      "sha256": "bd1b43bb821a5fb2a122f0d5e8e3e3d2b0c3bbb94f887016be79f9e6ed98aebe",
+      "sha512": "DHlCUxYm+5DCM05cq2k3nTXtJqRzJV5Ufz1Ns7cbKOaLa8GDFACHjqh/+rfdgO++zzZ/Ya/Hk+3+ti5SOTVC3Q==",
+      "encoding": "identity",
+      "advertisedLength": "10190",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-browser-helper-1.2.0-firefox.zip"
+    },
+    "LolzCloud-iOS-0.1.4-simulator.zip": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 1092068,
+      "sha256": "599659f85b1b0f3f239b6bbfe28e45f7b0fbd9318057fa55b4a7af4e29a2054f",
+      "sha512": "FKAhHtr16+aOYtOHITEbOVDeAYEaCHdNb4Fb4pjptktQUxpupKgLcHO7MjIW+Hv+VuCIZpUh0UZWOr0U49IBRA==",
+      "encoding": "identity",
+      "advertisedLength": "1092068",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.4-simulator.zip"
+    },
+    "LolzCloud-iOS-0.1.4-source.zip": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 178816,
+      "sha256": "c0e6fcd98322248c60397bbfb97c8a5cc7d07da985834142614cec49006096b8",
+      "sha512": "6zlVa1l3gBe96uoOQjSj6o3hxCbuFH/QIb1nWSsh8LZIjWtfkEVAR5910kcfXz2kDYe0yR2pUAwwMSfR+DBTjg==",
+      "encoding": "identity",
+      "advertisedLength": "178816",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.4-source.zip"
+    },
+    "LolzCloud-iOS-0.1.4-unsigned.ipa": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 282300,
+      "sha256": "59437333340311d22d87740cbca673765b31916aa6aad14a14e82b26b7a2f9a2",
+      "sha512": "RdzLL65+lP1U4cSLoSpYp/o92xzfLzn7uXw3utErUe9Lrcw0qbGXUJ3e3tzSi4T4YIQKKydsORc9A5NruI0fVw==",
+      "encoding": "identity",
+      "advertisedLength": "282300",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.4-unsigned.ipa"
+    },
+    "update.json": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 565,
+      "sha256": "764fc3e647aeef8fa6637d2484f5d17ddf586c981f136ba57ada2fd838c22114",
+      "sha512": "gyINnJG38i6VmuGPGP8lUbwY9p5kvCGSO8smzxkYMB1UewZH7ESprCOHruMv309NBwXqkjbJytk6tU9ObI7Zsg==",
+      "encoding": "identity",
+      "advertisedLength": "565",
+      "finalURL": "https://lolzcloud.com/downloads/update.json"
+    },
+    "update-legacy.json": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 588,
+      "sha256": "c852adbddabce0f7537782021385e236899c5af7f0ac0a52ebf4b46f25548aa9",
+      "sha512": "D00KT27uNSHQ+RjDPG/G2gxF+Tkw/5IVBO5/Uz5n6uj8s/n6cSrImCJfTXnq8XZ5qs4hSdhSJeHvc1NFRzbRkw==",
+      "encoding": "identity",
+      "advertisedLength": "588",
+      "finalURL": "https://lolzcloud.com/downloads/update-legacy.json"
+    },
+    "LolzCloud-0.9.19-SHA256SUMS.txt": {
+      "probe": "origin-SSH-public-HTTPS",
+      "bytes": 2038,
+      "sha256": "32e459d167acae09aa4cb51b6707afeb3bd9e76fe739ccfc50cebd36a055a7b0",
+      "sha512": "Ai2M1P1Yol2Or3fTdE65/wjUj1ecuj4/77nNsmG5zWSr8dejxmf+okvB+lf1w9mJhROVi+QLx+w2TS/mFTc29A==",
+      "encoding": "identity",
+      "advertisedLength": "2038",
+      "finalURL": "https://lolzcloud.com/downloads/LolzCloud-0.9.19-SHA256SUMS.txt"
+    }
+  }
+}

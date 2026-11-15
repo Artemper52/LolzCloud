@@ -1,0 +1,24 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T11:07:39.641801+00:00",
+  "sourceCommit": "a98eef6f2ef1403cc621c99fa82ae6398c5ed440",
+  "root": "/opt/lolzcloud-builds/release-0.9.19/.build/final-source-qa-a98eef6f/source",
+  "uid": 986,
+  "node": "v24.22.2",
+  "checkExitCode": 0,
+  "testExitCode": 0,
+  "counts": {
+    "tests": 489,
+    "pass": 489,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "javascriptCheck": "JavaScript syntax checked: 283 files.",
+  "tapSha256": "92999fa669ea4e4db101375bf060666458279169e6b029470f8ed187f83b299f",
+  "taskOwnedTemp": "/opt/lolzcloud-builds/release-0.9.19/.build/final-source-qa-a98eef6f/tmp",
+  "taskOwnedUpdaterFixtures": "/opt/lolzcloud-builds/release-0.9.19/.build/final-source-qa-a98eef6f/linux-updater-fixtures",
+  "originalBuildRootSourceMutated": false,
+  "noDeployment": true
+}
