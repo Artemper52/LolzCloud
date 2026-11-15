@@ -1,7 +1,7 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),http=require('node:http');
 const {PublicWave,validateWaveRequest,MAX_BODY}=require('../music/wave.cjs');
-const {BotCatalog}=require('../telegram/catalog.cjs'),{BotState,MediaLinks}=require('../telegram/state.cjs'),{createMediaServer}=require('../telegram/http.cjs');
+const {BotCatalog}=require('../telegram/catalog.cjs'),{BotState,MediaLinks,publicTrack}=require('../telegram/state.cjs'),{createMediaServer}=require('../telegram/http.cjs');
 const desktopHistory=require('../source/integrations/wave-history.cjs'),browserHistory=require('../server/public/app/wave-history.js');
 const raw=(id,patch={})=>({id,permalink_url:'https://soundcloud.com/artist/song-'+id,title:'Песня '+id,user:{username:'Артист '+id,permalink_url:'https://soundcloud.com/artist'},duration:90000,genre:'jazz',...patch});
 const portable=value=>({id:value.id,url:value.permalink_url,title:value.title,artist:value.user.username,duration:value.duration/1000});
@@ -41,6 +41,55 @@ test('familiar mode verifies imported likes, preserves bans/day history, and doe
  const result=await f.wave.recommend(request);assert.deepEqual(result.tracks.map(row=>row.id),[5]);assert.equal(calls,0);
  assert.deepEqual((await f.wave.recommend({...request,omit:[portable(raw(5))]})).tracks,[]);assert.equal(calls,0);
 });
+test('verified genre ranking survives cold state, hot cache, cache expiry and process restart',async t=>{
+ let clock=Date.now(),calls=0;const f=fixture(t,{provider:{async request(){calls++;throw Error('Rich state must not need upstream');}}});f.wave.now=()=>clock;
+ const rows=[raw(1,{title:'Neutral A',genre:'techno',tag_list:'dance',bpm:140,release_year:2024}),raw(2,{title:'Neutral B',genre:'jazz',tag_list:'acoustic',bpm:85,release_year:1958})];
+ for(const row of rows)f.state.upsert(f.catalog.normalize(row));
+ const request=body({likes:rows.map(portable),preferences:{character:'familiar',genre:'jazz'}}),ids=result=>result.tracks.map(row=>row.id);
+ assert.deepEqual(ids(await f.wave.recommend(request)),[2,1]);
+ rows.forEach(row=>f.wave.remember(row));assert.deepEqual(ids(await f.wave.recommend(request)),[2,1]);
+ clock+=21*60000;assert.deepEqual(ids(await f.wave.recommend(request)),[2,1]);
+ f.state.save();const restored=new BotState(f.state.filename,f.state.botId);t.after(()=>clearTimeout(restored.timer));
+ const fresh=new PublicWave({catalog:new BotCatalog(restored,{provider:f.catalog.provider}),now:()=>clock,random:()=>0});
+ assert.deepEqual(ids(await fresh.recommend(request)),[2,1]);assert.equal(restored.get('2').genre,'jazz');assert.equal(restored.get('2').releaseYear,1958);assert.equal(calls,0);
+});
+test('verified genre and era eligibility remains identical after restart and metadata cache expiry',async t=>{
+ let clock=Date.now(),hydrations=0;const f=fixture(t,{provider:{async request(endpoint){if(endpoint!=='/search/tracks'){hydrations++;throw Error('No metadata hydration expected');}return {collection:[]};}}});f.wave.now=()=>clock;
+ const rows=[raw(1,{title:'Neutral A',genre:'jazz',release_year:1958}),raw(2,{title:'Neutral B',genre:'jazz',release_year:2024})];
+ rows.forEach(row=>f.wave.remember(row));const request=body({likes:rows.map(portable),prompt:'джаз 1950-1959'});
+ const check=async wave=>{const result=await wave.recommend(request);assert.deepEqual(result.tracks.map(row=>row.id),[1]);assert.equal(result.tracks[0].releaseYear,1958);assert.match(result.tracks[0].reason,/1958/);};
+ await check(f.wave);clock+=21*60000;await check(f.wave);f.state.save();
+ const restored=new BotState(f.state.filename,f.state.botId);t.after(()=>clearTimeout(restored.timer));await check(new PublicWave({catalog:new BotCatalog(restored,{provider:f.catalog.provider}),now:()=>clock,random:()=>0}));assert.equal(hydrations,0);
+});
+test('legacy basic favourites hydrate at most eight exact identities per request and gradually upgrade',async t=>{
+ let active=0,maximum=0;const calls=[],f=fixture(t,{provider:{async request(endpoint,params,{signal}){assert.match(endpoint,/^\/tracks\/[1-9]\d*$/);assert.deepEqual(params,{});calls.push(endpoint);maximum=Math.max(maximum,++active);try{await new Promise(resolve=>setImmediate(resolve));signal.throwIfAborted();return raw(Number(endpoint.split('/').pop()));}finally{active--;}}}});
+ const likes=Array.from({length:40},(_,index)=>portable(raw(index+1)));likes.forEach(row=>f.state.upsert(row));const request=body({likes,preferences:{character:'familiar'}});
+ assert.equal((await f.wave.recommend(request)).tracks.length,8);assert.equal(calls.length,8);assert.ok(maximum<=4);assert.equal(f.state.get('1').metadataVersion,1);assert.equal(f.state.get('9').metadataVersion,undefined);
+ assert.equal((await f.wave.recommend(request)).tracks.length,16);assert.equal(calls.length,16);assert.equal(f.state.get('16').metadataVersion,1);assert.equal(f.state.get('17').metadataVersion,undefined);
+});
+test('legacy hydration trusts provider metadata and rejects a substituted fixed ID or URL',async t=>{
+ const source=raw(1,{title:'Authoritative title',genre:'techno',release_year:2024}),f=fixture(t,{provider:{async request(endpoint){assert.equal(endpoint,'/tracks/1');return source;}}});f.state.upsert(portable(source));
+ const forged={...portable(source),title:'Forged Jazz 1958',genre:'jazz',releaseYear:1958,description:'client-supplied old jazz'},result=await f.wave.recommend(body({likes:[forged],preferences:{character:'familiar',genre:'jazz'}}));
+ assert.equal(result.tracks[0].title,'Authoritative title');assert.equal(result.tracks[0].genre,'techno');assert.equal(result.tracks[0].releaseYear,2024);
+ for(const replacement of [raw(2,{permalink_url:source.permalink_url}),raw(1,{permalink_url:raw(2).permalink_url})]){
+  const bad=fixture(t,{provider:{async request(){return replacement;}}});bad.state.upsert(portable(source));assert.equal(await bad.wave.verify(forged),null);assert.equal(bad.state.get('1').metadataVersion,undefined);assert.equal(bad.state.get('2'),undefined);
+ }
+});
+test('state retains only complete bounded public metadata across basic writes and disk roundtrip',t=>{
+ const f=fixture(t),row=f.catalog.normalize(raw(1,{genre:'g'.repeat(100),tag_list:'t'.repeat(400),description:'d'.repeat(800),release_year:1958,bpm:90}));
+ const saved=f.state.upsert({...row,cookies:'private-cookie-marker',oauth:'private-oauth-marker',feedback:{personal:true}});
+ assert.equal(saved.metadataVersion,1);assert.equal(saved.genre.length,80);assert.equal(saved.tags.length,300);assert.equal(saved.description.length,600);assert.equal(saved.releaseYear,1958);assert.equal(saved.bpm,90);
+ for(const key of ['genre','tags','description','releaseYear','bpm','artistUrl']){const incomplete={...row,metadataVersion:1};delete incomplete[key];assert.equal(publicTrack(incomplete).metadataVersion,undefined);}
+ for(const patch of [{bpm:true},{bpm:301},{releaseYear:3000},{releaseYear:'1958'},{artistUrl:'https://evil.test/artist'},{artistUrl:'https://soundcloud.com/'+ 'a'.repeat(500)}])assert.equal(publicTrack({...row,...patch}).metadataVersion,undefined);
+ f.state.upsert(portable(raw(1)));assert.equal(f.state.get('1').genre,saved.genre);assert.equal(f.state.get('1').metadataVersion,1);f.state.save();
+ const text=fs.readFileSync(f.state.filename,'utf8');assert.ok(!text.includes('private-cookie-marker')&&!text.includes('private-oauth-marker')&&!text.includes('feedback'));assert.equal(JSON.parse(text).version,1);
+ const restored=new BotState(f.state.filename,f.state.botId);t.after(()=>clearTimeout(restored.timer));assert.equal(restored.get('1').metadataVersion,1);assert.equal(restored.get('1').genre,saved.genre);assert.equal(restored.get('1').description,saved.description);
+});
+test('cancelling legacy hydration does not promote incomplete state or persist request taste',async t=>{
+ let enter,release;const entered=new Promise(resolve=>{enter=resolve;}),gate=new Promise(resolve=>{release=resolve;}),f=fixture(t,{provider:{async request(endpoint,params,{signal}){assert.equal(endpoint,'/tracks/1');enter();await gate;signal.throwIfAborted();return raw(1);}}});t.after(release);
+ f.state.upsert(portable(raw(1)));const controller=new AbortController(),pending=f.wave.recommend(body({preferences:{character:'familiar'},feedback:{[raw(1).permalink_url]:{track:portable(raw(1)),loves:1}}}),{signal:controller.signal});await entered;controller.abort();release();await assert.rejects(pending,{name:'AbortError'});
+ assert.equal(f.state.get('1').metadataVersion,undefined);f.state.save();const persisted=fs.readFileSync(f.state.filename,'utf8');assert.ok(!persisted.includes('feedback')&&!persisted.includes('played24h'));
+});
 test('natural requests reuse PC era/genre/negative filters and public searches with bounded offsets',async t=>{
  const requests=[],rows=[raw(10,{title:'Jazz 1958',release_year:1958}),raw(11,{title:'Jazz remix 2024',release_year:2024}),raw(12,{title:'Metal 1958',genre:'metal',release_year:1958})];
  const f=fixture(t,{provider:{async request(endpoint,params){requests.push([endpoint,params]);if(endpoint==='/resolve')return raw(1);assert.equal(endpoint,'/search/tracks');return {collection:rows};}}});
@@ -62,7 +111,7 @@ test('aborting one wave leaves public metadata usable by another and does not pe
 });
 test('HTTP wave issues existing signed music URLs with no conversion or session requirement',async t=>{
  const f=fixture(t),base=await listen(f.server),response=await post(base,body({}),{Origin:'https://lolzcloud.com'});assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'no-store');assert.equal(response.headers.get('access-control-allow-origin'),null);
- const result=await response.json();assert.equal(result.version,1);assert.ok(result.tracks.length>0&&result.tracks.length<=20);assert.ok(Buffer.byteLength(JSON.stringify(result))<=256*1024);for(const row of result.tracks){assert.equal(row.audioUrl,f.links.audio(row.id));assert.ok(!('score'in row));}
+ const result=await response.json();assert.equal(result.version,1);assert.ok(result.tracks.length>0&&result.tracks.length<=20);assert.ok(Buffer.byteLength(JSON.stringify(result))<=256*1024);for(const row of result.tracks){assert.equal(row.audioUrl,f.links.audio(row.id));assert.ok(!('score'in row));assert.ok(!('metadataVersion'in row));}
 });
 test('HTTP wave rejects foreign origins, method/query/type/body abuse before contacting the recommender',async t=>{
  let calls=0;const f=fixture(t,{implementation:{async recommend(){calls++;throw Error('must not call');}}}),base=await listen(f.server);

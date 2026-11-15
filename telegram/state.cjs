@@ -4,7 +4,21 @@ const validId = value => /^[1-9]\d{0,15}$/.test(String(value || ''));
 function clean(value, max = 180) { return typeof value === 'string' ? value.replace(/[\p{Cc}\p{Cf}]/gu, ' ').replace(/\s+/g, ' ').trim().slice(0, max) : ''; }
 function publicTrack(value) {
   if (!validId(value?.id) || !/^https:\/\/soundcloud\.com\/[\w-]+\/[\w-]+$/.test(value?.url || '') || !clean(value.title)) return null;
-  return { id: String(value.id), url: value.url, title: clean(value.title), artist: clean(value.artist, 100), duration: Math.max(0, Math.round(Number(value.duration) || 0)), cover: /^https:\/\/(?:[^./]+\.)?sndcdn\.com\//.test(value.cover || '') ? value.cover.slice(0, 2048) : '' };
+  const row = { id: String(value.id), url: value.url, title: clean(value.title), artist: clean(value.artist, 100), duration: Math.max(0, Math.round(Number(value.duration) || 0)), cover: /^https:\/\/(?:[^./]+\.)?sndcdn\.com\//.test(value.cover || '') ? value.cover.slice(0, 2048) : '' };
+  // Only a complete catalogue metadata record is rich. Legacy/basic writes
+  // omit these keys, so upsert's existing spread retains previously verified
+  // fields without promoting client titles/likes into catalogue evidence.
+  const keys = ['genre','tags','description','releaseYear','bpm','artistUrl'];
+  if (keys.every(key => Object.hasOwn(value,key)) &&
+      ['genre','tags','description','artistUrl'].every(key => typeof value[key] === 'string') &&
+      (value.metadataVersion === undefined || value.metadataVersion === 1) &&
+      (value.releaseYear === 0 || Number.isInteger(value.releaseYear) && value.releaseYear >= 1800 && value.releaseYear <= new Date().getFullYear()+1) &&
+      (value.bpm === 0 || Number.isFinite(value.bpm) && value.bpm >= 30 && value.bpm <= 300) &&
+      value.artistUrl.length <= 500 && (!value.artistUrl || /^https:\/\/(?:www\.)?soundcloud\.com\/[\w-]+\/?$/.test(value.artistUrl))) {
+    Object.assign(row,{genre:clean(value.genre,80),tags:clean(value.tags,300),description:clean(value.description,600),
+      releaseYear:value.releaseYear,bpm:value.bpm,artistUrl:value.artistUrl,metadataVersion:1});
+  }
+  return row;
 }
 class BotState {
   constructor(filename, botId) {

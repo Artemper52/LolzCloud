@@ -17,7 +17,7 @@ const base=process.env.LOLZCLOUD_TELEGRAM_STAGE||'D:/LolzCloud-Android-Toolchain
 fs.mkdirSync(stage,{recursive:true});
 const names=new Set();
 for(const file of Object.keys(require.cache)) {
- const rel=path.relative(root,file).replaceAll('\\','/');if(/^(?:telegram|source)\//.test(rel)&&!rel.includes('/node_modules/'))names.add(rel);
+ const rel=path.relative(root,file).replaceAll('\\','/');if(/^(?:music|telegram|source)\//.test(rel)&&!rel.includes('/node_modules/'))names.add(rel);
 }
 for(const name of ['telegram/README.md','telegram/.env.example','telegram/ops/lolzcloud-telegram.service','telegram/ops/nginx-proxy.conf'])names.add(name);
 for(const name of names){const dest=path.join(stage,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.copyFileSync(path.join(root,name),dest);}
