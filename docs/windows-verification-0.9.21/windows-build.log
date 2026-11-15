@@ -1,0 +1,26 @@
+Packaging app for platform win32 x64 using electron v45.2.1
+Built: D:\LolzCloud-Android-Toolchain\release-0.9.21\modern\LolzCloud-win32-x64\LolzCloud.exe
+
+Compatibility self-test passed: Electron 45.2.1, Node 24.22.1, binary fetch/streams, session cookies, stored bookmarks and native renderer.
+  • electron-builder  version=26.18.0 os=10.0.26200
+  • building        target=nsis file=D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win-x64-Setup.exe archs=x64 oneClick=true perMachine=false
+  • no code signing certificate configured, signing is skipped  path=D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win-x64-Setup.__uninstaller.exe
+  • no code signing certificate configured, signing is skipped  path=D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win-x64-Setup.exe
+  • building block map  blockMapFile=D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win-x64-Setup.exe.blockmap
+Installer: D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win-x64-Setup.exe.blockmap
+Installer: D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win-x64-Setup.exe
+Portable archive: D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win-x64.zip
+Packaging app for platform win32 x64 using electron v22.3.27
+Built: D:\LolzCloud-Android-Toolchain\release-0.9.21\legacy\LolzCloud-win32-x64\LolzCloud.exe
+
+Compatibility self-test passed: Electron 22.3.27, Node 16.17.1, binary fetch/streams, session cookies, stored bookmarks and native renderer.
+  • electron-builder  version=26.18.0 os=10.0.26200
+  • building        target=nsis file=D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win7-legacy-Setup.exe archs=x64 oneClick=true perMachine=false
+  • no code signing certificate configured, signing is skipped  path=D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win7-legacy-Setup.__uninstaller.exe
+  • no code signing certificate configured, signing is skipped  path=D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win7-legacy-Setup.exe
+  • building block map  blockMapFile=D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win7-legacy-Setup.exe.blockmap
+Installer: D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win7-legacy-Setup.exe.blockmap
+Installer: D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win7-legacy-Setup.exe
+Portable archive: D:\LolzCloud-Android-Toolchain\release-0.9.21\LolzCloud-0.9.21-win7-legacy-x64.zip
+Update manifests generated for Windows and Windows 7 Legacy.
+WINDOWS21_READY

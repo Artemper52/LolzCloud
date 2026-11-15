@@ -1,0 +1,186 @@
+{
+  "status": "source-frozen-staged-not-published",
+  "checkedAt": "2026-11-15T16:52:06.617Z",
+  "versions": {
+    "desktop": "0.9.21",
+    "android": "0.1.11",
+    "nativeIos": "0.1.6",
+    "pwa": "candidate backend0.9.24/SW9; canonical /app/ unchanged",
+    "helpers": "1.2.0"
+  },
+  "sourceInputs": [
+    {
+      "name": "website/index.html",
+      "size": 12176,
+      "sha256": "739540bf167a8517888886aad0b3912d49848e425f498d8c7b44bec7e1ce28ac",
+      "canonicalLfSha256": "739540bf167a8517888886aad0b3912d49848e425f498d8c7b44bec7e1ce28ac"
+    },
+    {
+      "name": "website/install.html",
+      "size": 24574,
+      "sha256": "3bcd4cf43fa33237491969df9e39eaebc48fd5a0477b9c1f3b2c9857cc4d65a4",
+      "canonicalLfSha256": "3bcd4cf43fa33237491969df9e39eaebc48fd5a0477b9c1f3b2c9857cc4d65a4"
+    },
+    {
+      "name": "website/site-config.js",
+      "size": 1409,
+      "sha256": "103bac87f2d7195b62f42894aab0f974810dfba743b87709547e6adede579667",
+      "canonicalLfSha256": "332157a18e88d057bf0ee354c806f9dcd694d1a78d8afed67e8f4447498457d9"
+    },
+    {
+      "name": "tools/deploy-website.cjs",
+      "size": 6008,
+      "sha256": "6c0d5025b5ae3d3c0db8a5516c60725f57aa43674fc479129c972de8f1538fe6",
+      "canonicalLfSha256": "6c0d5025b5ae3d3c0db8a5516c60725f57aa43674fc479129c972de8f1538fe6"
+    },
+    {
+      "name": "tests/website-ui.cjs",
+      "size": 9996,
+      "sha256": "f1b4a5652840df6864069ddf024e126726f686895a3fd93e1dc59e1e41d510da",
+      "canonicalLfSha256": "f1b4a5652840df6864069ddf024e126726f686895a3fd93e1dc59e1e41d510da"
+    }
+  ],
+  "stage": {
+    "directory": "D:/LolzCloud-Android-Toolchain/website-releases/20261115T165156-website-0.9.21-c66cb5fa",
+    "id": "20261115T165156-website-0.9.21-c66cb5fa",
+    "archiveBytes": 1474906,
+    "archiveSha256": "86a5a06010b0a05bd3d87973b268253166d5cb2b3ce108f999531680be7ad556",
+    "publisherSha256": "a576f1ee4feee1618b897a5a2aa04a63dac78cdb8c95b16cb7c1d03e45967f39",
+    "files": [
+      {
+        "name": "index.html",
+        "size": 12176,
+        "sha256": "739540bf167a8517888886aad0b3912d49848e425f498d8c7b44bec7e1ce28ac"
+      },
+      {
+        "name": "app.js",
+        "size": 5731,
+        "sha256": "b3eeea84c681bd8825f53e1f2cedc1c384ccf376c879bf9c87889961d323b590"
+      },
+      {
+        "name": "site-config.js",
+        "size": 1409,
+        "sha256": "103bac87f2d7195b62f42894aab0f974810dfba743b87709547e6adede579667"
+      },
+      {
+        "name": "style.css",
+        "size": 13750,
+        "sha256": "ee775bd4799ee126ab356a7e1af80da7a5cc12e4843c58591c10463d4ac298a6"
+      },
+      {
+        "name": "downloads.css",
+        "size": 5475,
+        "sha256": "c06f7b6b1d24f494702b7e917bacd2e343cc8570ae716c40143cebf53a3a9b5c"
+      },
+      {
+        "name": "install.html",
+        "size": 24574,
+        "sha256": "3bcd4cf43fa33237491969df9e39eaebc48fd5a0477b9c1f3b2c9857cc4d65a4"
+      },
+      {
+        "name": "install.js",
+        "size": 198,
+        "sha256": "cb749cac3621f6076f2181f3f218e315cd6e5f49e96234c47d709cde18219c43"
+      },
+      {
+        "name": "assets/logo.svg",
+        "size": 396,
+        "sha256": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512"
+      },
+      {
+        "name": "assets/lyrics.png",
+        "size": 466926,
+        "sha256": "68d7bd25cef2e91230fb61b613e86e43cd8db86575885db039102809e77e0024"
+      },
+      {
+        "name": "assets/mini.png",
+        "size": 208458,
+        "sha256": "f077fddaae2e91bd45fb1d1eabff964ecdd4a67e137a1c391beaab309a7db1f7"
+      },
+      {
+        "name": "assets/record.svg",
+        "size": 3353,
+        "sha256": "ba31b0fa22b3f202223aec6400f9b2b665fa5cda321a1ca0afa4756cee1a535b"
+      },
+      {
+        "name": "assets/sound.png",
+        "size": 277759,
+        "sha256": "149ae16294bc08be918479ee655b763eaa2fff6057b5a119dfb8afa4d12bcf0d"
+      },
+      {
+        "name": "assets/wave.png",
+        "size": 501215,
+        "sha256": "079fcb00a64ec53828b3f13308d79702d02ed7c4d6346694787e2dbd1b5e55cd"
+      }
+    ],
+    "allArchiveMembersByteVerified": true,
+    "requiredArtifacts": [
+      "LolzCloud-0.9.21-win-x64-Setup.exe",
+      "LolzCloud-0.9.21-win-x64.zip",
+      "LolzCloud-0.9.21-win7-legacy-Setup.exe",
+      "LolzCloud-0.9.21-win7-legacy-x64.zip",
+      "LolzCloud-0.9.21-linux-x64.AppImage",
+      "LolzCloud-0.9.21-linux-x64.tar.gz",
+      "LolzCloud-0.9.21-linux-arm64.tar.gz",
+      "LolzCloud-Android-0.1.11.apk",
+      "LolzCloud-0.9.21-source.zip",
+      "LolzCloud-iOS-0.1.6-source.zip",
+      "LolzCloud-iOS-0.1.6-unsigned.ipa",
+      "LolzCloud-iOS-0.1.6-simulator.zip",
+      "LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "LolzCloud-browser-helper-1.2.0-firefox.zip"
+    ]
+  },
+  "native": {
+    "proof": {
+      "path": "docs/ios-runtime-0.1.6-verification.json",
+      "size": 37301,
+      "sha256": "fe73f5382f155b3873370f66f3aaff34f186842d74b7f032996f641946f28f56"
+    },
+    "compiledCommit": "55e3ac9700ce8e9330b5c190746f3fd6544f16cd",
+    "runURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43736437440",
+    "sdk": "26.3/SDK26.2",
+    "purePassed": 102,
+    "runtime": {
+      "iphone": 20,
+      "ipad": 20,
+      "failed": 0,
+      "skipped": 0
+    },
+    "signedIPA": false,
+    "physicalDeviceTested": false
+  },
+  "ui": {
+    "passed": 22,
+    "failed": 0,
+    "widths": [
+      360,
+      390,
+      1440
+    ],
+    "engine": "Actual isolated Electron45/Chromium",
+    "report": "D:/LolzCloud-Android-Toolchain/release-0.9.21/qa/website-source/website-ui-results.json",
+    "sha256": "8e28666022f69205d24124deb1f643d0220635fbff3e413e91a1c3bca81c1f46",
+    "harnessCodeUnchangedFrom": "tests/website-ui.cjs"
+  },
+  "review": {
+    "screenshots": [
+      "website-downloads-360.png",
+      "website-install-native-ios-390.png"
+    ],
+    "findings": "No blocking readability/layout defect. Free Safari PWA remains primary. Unsigned native IPA requires own Apple signing; free personal Xcode provisioning lasts7 days. Simulator proof is explicitly distinct from physical-device testing."
+  },
+  "publication": {
+    "held": true,
+    "remoteOperations": 0,
+    "availabilityChecked": false,
+    "availabilityFixtures": false,
+    "platformsMetadataChecked": false,
+    "reason": "Coordinator publishes only after exact official21 artifacts exist. Future platforms.json/22-file plan are not fabricated; a separate metadata binding follows when the final inventory exists."
+  },
+  "limits": [
+    "Local website rendering/source target verification only; no public21 availability claim.",
+    "No physical Win7/ARM64/iPhone/iPad or Safari install/runtime claim from these browser checks.",
+    "Native proof uses exact55e3 commit and43736437440; old successful native runs are not substituted."
+  ]
+}

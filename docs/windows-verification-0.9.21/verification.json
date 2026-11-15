@@ -1,0 +1,89 @@
+{
+  "status": "candidate-verified-not-published",
+  "version": "0.9.21",
+  "checkedAt": "2026-11-15T16:42:13.601Z",
+  "canonicalPerFlavor": 155,
+  "exactPerFlavor": 154,
+  "packageMetadataEquivalent": 1,
+  "bundledRoomAssetsPerFlavor": 13,
+  "fullPayload": {
+    "files": 3008,
+    "identical": 3008
+  },
+  "artifacts": [
+    {
+      "name": "LolzCloud-0.9.21-win-x64-Setup.exe",
+      "size": 146408053,
+      "sha256": "ec601852357f8b82608df62d4126c8b4a8e0db5620c6b8daee894c84beffaacc",
+      "sha512": "S+0Fxjc4d7m3C1OZn/TfAqk1hIAR1y9kzrjykN/D9WWl8Mmm4XCYPQ/8ZDWPbqDFOhqScvZcCACpQUhCwmMptA=="
+    },
+    {
+      "name": "LolzCloud-0.9.21-win-x64-Setup.exe.blockmap",
+      "size": 152448,
+      "sha256": "985ff651efde11e485b5505b73253469caa28b8ea414da2e9de2fe2c3e8e43b3",
+      "sha512": "0lx3L9F8E1g+xYwOzhYs6Oetbzcd9G5pLufZoMQ26Bt89a2WyZq2vScrKMzC+DpBwOh6NAGpMk5vKWnpYoB95g=="
+    },
+    {
+      "name": "LolzCloud-0.9.21-win-x64.zip",
+      "size": 196706829,
+      "sha256": "9a299f727a37173cd95ea417fef1dc74277bf06f0f0d320cb7fa6410ebbbc9dd",
+      "sha512": "T7cy36jM7hdvG3XwIBPW/6IItyBsnrQ5FmiXMOGM509qZTWxTqp6fXxuf4AISOqXuGSlugN8qFRb4WiILqRUJw=="
+    },
+    {
+      "name": "LolzCloud-0.9.21-win7-legacy-Setup.exe",
+      "size": 99553180,
+      "sha256": "124eaaf5ffe9ff4f614a2d3ab408d55d35ca439796166960c3e904d89f743bd8",
+      "sha512": "XhnT8wOWxnPFg3/RIKtQ4BvEjOJ7NyCLx9rgj9gnp0kO2OPMwJCa93bqvlHJgstsFBqSu60FMFiFkD6eta1hHQ=="
+    },
+    {
+      "name": "LolzCloud-0.9.21-win7-legacy-Setup.exe.blockmap",
+      "size": 104830,
+      "sha256": "f33db2c8518bff8d5960647211e9e39e1057c2b65f7aaa8c819ea25d3ae5fe48",
+      "sha512": "oczwHyejROCFN7rA/ERAjRxDPx4n3usw7RMVW4dqb59mdj3wojcd7SNUWKH/TSmfxwzjfKzWcXTegExu5askBQ=="
+    },
+    {
+      "name": "LolzCloud-0.9.21-win7-legacy-x64.zip",
+      "size": 134423904,
+      "sha256": "18dd9c7f0bad8dcfaef22ad9dc855fe1b95e655dabb4141c2833073f887cf5ba",
+      "sha512": "Xfk+GeQ1iyD7PB6ytt5sIZR9oeEMXTH1lpl6YNkAWQRpQ5AgwJHRJQfFMg8/cPTFQQ9N0v/Lnlf9ueuQF3NnsQ=="
+    }
+  ],
+  "manifests": [
+    {
+      "file": "update.json",
+      "version": "0.9.21",
+      "channel": "latest",
+      "artifactChecks": true,
+      "yamlSha512": true,
+      "blockmapCoverage": 146408053
+    },
+    {
+      "file": "update-legacy.json",
+      "version": "0.9.21",
+      "channel": "legacy",
+      "artifactChecks": true,
+      "yamlSha512": true,
+      "blockmapCoverage": 99553180
+    }
+  ],
+  "setupUpgrade": {
+    "previous": "0.9.20",
+    "current": "0.9.21",
+    "status": "passed-real-isolated-NSIS",
+    "profileSavedAndRestored": true,
+    "insufficientSpaceLeavesPreviousAndProfileIntact": true
+  },
+  "packagedUpdaterChecks": 10,
+  "node": {
+    "total": 564,
+    "passed": 548,
+    "failed": 0,
+    "skipped": 16,
+    "skipReason": "Linux-specific checks run separately on Linux"
+  },
+  "limits": [
+    "Current Windows host; no physical Windows 7 machine.",
+    "Public updater feeds will be verified only after promotion.",
+    "First private launcher failed before building because ESM import needed pathToFileURL on Windows; corrected launcher and both final builds passed. No product change was needed."
+  ]
+}

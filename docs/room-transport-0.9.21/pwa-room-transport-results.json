@@ -1,0 +1,34 @@
+{
+  "ok": true,
+  "count": 18,
+  "checks": [
+    "MediaSession updates artist and artwork when two different recordings have the same title",
+    "Explicit room listening pauses solo and retains its queue while using listener permissions",
+    "A listener system Next cannot resume or advance the old solo queue or steal the room controller",
+    "Listener hardware Pause mutes locally and keeps room ownership for Resume",
+    "Hardware Resume resumes the same room epoch and never starts the solo recording",
+    "Room lyrics use the shared cleaned search, duration estimate and real word timings",
+    "Read-only listener lyrics preserve room audio, source document and chat draft",
+    "Reopening found room lyrics makes no provider request",
+    "A valid room Next acknowledged as preparing does not falsely time out after 2.5 seconds or consume another queue entry",
+    "Host system Next consumes only the room queue head and leaves solo selected and paused",
+    "System Seek and Previous use the active room lease and shared source clock",
+    "Solo handoff during a slow room Next pauses the room immediately and late completion never reacquires audio",
+    "A delayed active snapshot from before release cannot pause solo or regain system ownership",
+    "A delayed controller claim after an explicit solo choice cannot reacquire or autoplay room audio",
+    "Leaving the room document does not restart or stop the explicitly selected solo stream",
+    "After leaving an owned room stale system Play/Next cannot restart the retained solo queue",
+    "An explicit solo UI choice after room exit restores playback and its own MediaSession metadata",
+    "390px room integration has no horizontal overflow or uncaught JavaScript errors"
+  ],
+  "errors": [],
+  "requests": [
+    {
+      "path": "/api/search",
+      "title": "Room Song",
+      "artist": "Room Artist"
+    }
+  ],
+  "failure": "",
+  "fixtureNote": "Real isolated Chromium app/room DOM, MediaSession handlers, audible-clock HTMLAudio synthetic WAV, local HTTP/SSE/CSRF/room lease/queue; external SC/YT SDK and LRCLIB responses are declared deterministic fixtures. No physical phone, real external-provider audio or native OS command proof."
+}

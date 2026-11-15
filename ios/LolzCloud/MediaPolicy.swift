@@ -221,6 +221,20 @@ struct QueuePolicy {
     }
 }
 
+struct ImportedAudioMetadata: Equatable, Sendable {
+    let title: String, artist: String
+    init(title: String?,artist: String?,fallbackTitle: String) {
+        func clean(_ value: String?) -> String {
+            let bounded=String(decoding:(value ?? "").utf8.prefix(4096),as:UTF8.self)
+            let printable=String(String.UnicodeScalarView(bounded.unicodeScalars.filter { !CharacterSet.controlCharacters.contains($0) || CharacterSet.whitespacesAndNewlines.contains($0) }))
+            return String(printable.components(separatedBy:.whitespacesAndNewlines).filter{!$0.isEmpty}.joined(separator:" ").prefix(300))
+        }
+        let name=clean(title),fallback=clean(fallbackTitle),performer=clean(artist)
+        self.title = !name.isEmpty ? name:!fallback.isEmpty ? fallback:"Локальная запись"
+        self.artist = performer.isEmpty ? "Локальная музыка":performer
+    }
+}
+
 enum UserError: LocalizedError {
     case message(String)
     var errorDescription: String? { if case .message(let message) = self { return message }; return nil }
