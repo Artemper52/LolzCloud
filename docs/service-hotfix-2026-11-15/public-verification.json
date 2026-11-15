@@ -1,0 +1,178 @@
+{
+  "startedAt": "2026-11-15T10:36:50.248Z",
+  "status": "passed",
+  "source": "Windows Node HTTPS + directSSH read-only runtime audit",
+  "checks": [
+    {
+      "name": "music: exact runtime source closure",
+      "status": "passed",
+      "files": 49
+    },
+    {
+      "name": "music: process identity",
+      "status": "passed",
+      "pid": 4109267
+    },
+    {
+      "name": "music: protected config and private data preserved",
+      "status": "passed"
+    },
+    {
+      "name": "telegram: exact runtime source closure",
+      "status": "passed",
+      "files": 53
+    },
+    {
+      "name": "telegram: process identity",
+      "status": "passed",
+      "pid": 4109542
+    },
+    {
+      "name": "telegram: protected config and private data preserved",
+      "status": "passed"
+    },
+    {
+      "name": "single normal Telegram poller and main22 preserved",
+      "status": "passed"
+    },
+    {
+      "name": "music: public health",
+      "status": "passed",
+      "health": {
+        "ok": true,
+        "service": "lolzcloud-music",
+        "protocol": 1,
+        "waveProtocol": 1,
+        "activeDownloads": 0
+      }
+    },
+    {
+      "name": "music: public signed range",
+      "status": "passed",
+      "bytes": 128
+    },
+    {
+      "name": "music: public full MP3 bytes",
+      "status": "passed",
+      "bytes": 1799586,
+      "sha256": "44bcf81d69ffdb38b5efc3706b8668fec4d2ca79ff96de1b77447ab482f6512b",
+      "decodedSeconds": 111.502222,
+      "decodeProbe": "origin ffmpeg audio-only; independently byte-identical here",
+      "attachedCover": true
+    },
+    {
+      "name": "telegram: public health",
+      "status": "passed",
+      "health": {
+        "ok": true,
+        "bot": "lolzcloudbot",
+        "pollAgeSeconds": 5,
+        "activeDownloads": 0,
+        "cacheTracks": 1,
+        "inlineMode": "covers-with-feedback",
+        "cacheChannelConfigured": false
+      }
+    },
+    {
+      "name": "telegram: public signed range",
+      "status": "passed",
+      "bytes": 128
+    },
+    {
+      "name": "telegram: public full MP3 bytes",
+      "status": "passed",
+      "bytes": 1799586,
+      "sha256": "44bcf81d69ffdb38b5efc3706b8668fec4d2ca79ff96de1b77447ab482f6512b",
+      "decodedSeconds": 111.502222,
+      "decodeProbe": "origin ffmpeg audio-only; independently byte-identical here",
+      "attachedCover": true
+    },
+    {
+      "name": "public genuine catalog",
+      "status": "passed",
+      "results": 20,
+      "allSignedOwnAudioUrls": true
+    },
+    {
+      "name": "main22 health preserved",
+      "status": "passed",
+      "health": {
+        "ok": true,
+        "version": "0.9.22",
+        "roomProtocol": 2,
+        "socialProtocol": 1,
+        "oauthConfigured": true,
+        "spicyConfigured": true
+      }
+    },
+    {
+      "name": "PWA22 app.js unchanged",
+      "status": "passed",
+      "bytes": 107861,
+      "sha256": "56d1b64ac93b11080cdbaff5359cb388aeb5ecaf1569c525acc7fd41bdb7a51e"
+    },
+    {
+      "name": "PWA22 sw.js unchanged",
+      "status": "passed",
+      "bytes": 1854,
+      "sha256": "7595a92b982049ae8cd5a8518d2c6c4086417e42b5c4886ec4775191ec443c72"
+    }
+  ],
+  "scope": {
+    "manualTelegramApiCalls": 0,
+    "manualMessages": 0,
+    "accountWrites": 0,
+    "privateStateValuesExported": false,
+    "configurationChanges": 0,
+    "productSourceChanges": 0
+  },
+  "runtime": {
+    "music": {
+      "status": "passed",
+      "current": "/opt/lolzcloud-music/releases/20261115T021102-music-21beb271",
+      "pid": 4109267,
+      "processCwdMatches": true,
+      "processUidMatches": true,
+      "manifestFiles": 49,
+      "allManifestHashesMatch": true,
+      "protectedConfigurationUnchanged": true,
+      "backupMode": "0700",
+      "privateFilesMode": "0600",
+      "offsetUnchanged": true,
+      "offsetNondecreasing": true,
+      "baselineFileIdsRetained": 0,
+      "brandEntriesRetained": 0,
+      "runtimeSha256": {
+        "telegram/state.cjs": "b302239801b644b4d70f4c3fcd621cb47e0d908a6c3ebd25cc92f8a38a2d04ec",
+        "telegram/media.cjs": "21014a7bd808d83242198f9b86742feb454a1fb4d14c7c40ac03617d75fce0f6",
+        "music/wave.cjs": "2db4f9e4d2bd56f3df5ef21c6a50866d9c3b96a17d58d512ce5f6ae6e83a8d2f"
+      }
+    },
+    "telegram": {
+      "status": "passed",
+      "current": "/opt/lolzcloud-telegram/releases/20261115T021103-telegram-ed8eaaba",
+      "pid": 4109542,
+      "processCwdMatches": true,
+      "processUidMatches": true,
+      "manifestFiles": 53,
+      "allManifestHashesMatch": true,
+      "protectedConfigurationUnchanged": true,
+      "backupMode": "0700",
+      "privateFilesMode": "0600",
+      "offsetUnchanged": true,
+      "offsetNondecreasing": true,
+      "baselineFileIdsRetained": 1,
+      "brandEntriesRetained": 1,
+      "runtimeSha256": {
+        "telegram/state.cjs": "b302239801b644b4d70f4c3fcd621cb47e0d908a6c3ebd25cc92f8a38a2d04ec",
+        "telegram/media.cjs": "21014a7bd808d83242198f9b86742feb454a1fb4d14c7c40ac03617d75fce0f6",
+        "music/wave.cjs": "2db4f9e4d2bd56f3df5ef21c6a50866d9c3b96a17d58d512ce5f6ae6e83a8d2f"
+      }
+    },
+    "singleBotPoller": true,
+    "server": "/opt/lolzcloud-server/releases/20261115-social-0.9.22-f798f619"
+  },
+  "finishedAt": "2026-11-15T10:36:54.863Z",
+  "passed": 17,
+  "failed": 0
+}

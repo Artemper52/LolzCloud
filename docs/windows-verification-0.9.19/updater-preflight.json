@@ -1,0 +1,63 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T01:41:36.083Z",
+  "checks": 10,
+  "results": [
+    "Actual C free space is below1536MiB and D has capacity; real statfs and bounded DriveInfo independently measured both",
+    "modern exact released18 updater selects candidate19 official mirror over older GitHub fixture",
+    "modern packaged19 updater correctly reports its own equal version without downgrade/install",
+    "modern actual candidate setup fullhash verification precedes real C-full→D sibling probe and scoped native-handoff fixture",
+    "modern same-size corrupt installer is rejected by actual packaged SHA check before preflight/shutdown/env/handoff",
+    "legacy exact released18 updater selects candidate19 official mirror over older GitHub fixture",
+    "legacy packaged19 updater correctly reports its own equal version without downgrade/install",
+    "legacy actual candidate setup fullhash verification precedes real C-full→D sibling probe and scoped native-handoff fixture",
+    "legacy same-size corrupt installer is rejected by actual packaged SHA check before preflight/shutdown/env/handoff",
+    "Real helper leaves no write probes; process environment and global OS temp configuration are unchanged"
+  ],
+  "space": {
+    "cStatfs": 480935936,
+    "dStatfs": 39206043648,
+    "cDriveInfo": 480935936,
+    "dDriveInfo": 39206043648
+  },
+  "details": [
+    {
+      "flavor": "modern",
+      "selected": {
+        "directory": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\qa\\updater-owned\\.LolzCloud-update-temp",
+        "alternate": true,
+        "requiredBytes": 2147483648
+      },
+      "events": [
+        "verified-cached-download",
+        "real-space-probe",
+        "prepare-profile-fixture",
+        "native-handoff-fixture"
+      ],
+      "legacyDriveInfoForced": false,
+      "nativeInstall": "fixture only; genuine isolated NSIS upgrade is a separate completed test"
+    },
+    {
+      "flavor": "legacy",
+      "selected": {
+        "directory": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\qa\\updater-owned\\.LolzCloud-update-temp",
+        "alternate": true,
+        "requiredBytes": 2147483648
+      },
+      "events": [
+        "verified-cached-download",
+        "real-space-probe",
+        "prepare-profile-fixture",
+        "native-handoff-fixture"
+      ],
+      "legacyDriveInfoForced": true,
+      "nativeInstall": "fixture only; genuine isolated NSIS upgrade is a separate completed test"
+    }
+  ],
+  "limits": [
+    "No public candidate19 feed exists yet; HTTP manifests/native quit are explicitly fixtures.",
+    "Checks execute actual extracted packaged source and real cached installer hashes/filesystem/DriveInfo.",
+    "Legacy code path uses statfs unavailable fault injection on current Node; actual legacy Electron22 execution is separately proven by packaged self-test.",
+    "No user application/account/profile or global environment setting is touched."
+  ]
+}

@@ -1,0 +1,30 @@
+dbus-daemon[4074315]: [session uid=986 pid=4074315 pidfd=5] Activating service name='org.a11y.Bus' requested by ':1.3' (uid=986 pid=4074327 comm="/opt/lolzcloud-builds/release-0.9.19/node_modules/")
+dbus-daemon[4074315]: [session uid=986 pid=4074315 pidfd=5] Successfully activated service 'org.a11y.Bus'
+{
+  "checkedAt": "2026-11-15T01:48:14.878Z",
+  "status": "passed",
+  "version": "0.9.19",
+  "platform": "linux",
+  "arch": "x64",
+  "uid": 986,
+  "packagedX64TarSelfTest": "passed",
+  "appImageNormalFuseSelfTest": "passed",
+  "realKeyring": {
+    "status": "passed",
+    "platform": "linux",
+    "arch": "x64",
+    "electron": "45.2.1",
+    "node": "24.22.1",
+    "realSystemKeyring": true,
+    "backend": "gnome_libsecret",
+    "encryptedRoundTrip": true,
+    "personalAccountsUsed": false,
+    "rendererSandboxed": true,
+    "rendererSeccomp": 2,
+    "noSandboxSwitch": false
+  },
+  "personalAccountsUsed": false,
+  "arm64Runtime": "not-tested-static-only",
+  "physicalAudio": false,
+  "scope": "Native packaged self-test + real OS keyring and sandbox. No repeat of previous full music/provider/UI suites, no user installation or deploy."
+}

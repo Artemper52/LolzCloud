@@ -1,0 +1,85 @@
+{
+  "candidate-proof.json": {
+    "status": "candidate-passed",
+    "kind": "music",
+    "elapsedMs": 2165,
+    "catalogResults": 20,
+    "richMetadataSurvivesStateRestart": true,
+    "richCachedVerifyMakesNoRequest": true,
+    "metadataDigest": "76f23ba34a2d69e59eb3f5d0cbc6213cedfc72809d93f67af5e71b0c641c0902",
+    "wave": {
+      "results": 20,
+      "requestBytes": 56764,
+      "richFieldsPresent": true
+    },
+    "audio": {
+      "id": "1950440187",
+      "bytes": 1799586,
+      "sha256": "44bcf81d69ffdb38b5efc3706b8668fec4d2ca79ff96de1b77447ab482f6512b",
+      "metadataDuration": 111,
+      "decodedSeconds": 111.502222,
+      "attachedCover": true
+    },
+    "telegramApiCalls": 0
+  },
+  "state-load.json": {
+    "status": "state-load-passed",
+    "kind": "music",
+    "offsetUnchanged": true,
+    "offsetNondecreasing": true,
+    "baselineFileIds": 0,
+    "retainedFileIds": 0,
+    "baselineBrandEntries": 0,
+    "brandEntriesPreserved": true
+  },
+  "postflight.json": {
+    "status": "public-postflight-passed",
+    "kind": "music",
+    "health": {
+      "ok": true,
+      "service": "lolzcloud-music",
+      "protocol": 1,
+      "waveProtocol": 1,
+      "activeDownloads": 0
+    },
+    "wave": {
+      "requestBytes": 62598,
+      "results": 20,
+      "richFieldsPresent": true
+    },
+    "privateState": {
+      "offsetUnchanged": true,
+      "offsetNondecreasing": true,
+      "baselineFileIds": 0,
+      "retainedFileIds": 0,
+      "baselineBrandEntries": 0,
+      "brandEntriesPreserved": true
+    },
+    "media": {
+      "id": "1950440187",
+      "audioUrl": "https://lolzcloud.com/music/audio/1950440187/015a8728dbbdbf251575f0ec.mp3",
+      "rangeStatus": 206,
+      "rangeBytes": 128,
+      "fullStatus": 200,
+      "bytes": 1799586,
+      "sha256": "44bcf81d69ffdb38b5efc3706b8668fec4d2ca79ff96de1b77447ab482f6512b",
+      "metadataDuration": 111,
+      "decodedSeconds": 111.502222,
+      "attachedCover": true
+    },
+    "manualTelegramApiCalls": 0,
+    "normalPolling": false,
+    "offsetValuesExported": false,
+    "fileIdValuesExported": false
+  },
+  "protected-after.json": {
+    "status": "protected-configuration-passed",
+    "kind": "music",
+    "credentialsUnchanged": true,
+    "brandSourceIdentical": true,
+    "singleBotPoller": false
+  },
+  "current": "/opt/lolzcloud-music/releases/20261115T021102-music-21beb271",
+  "backupDirectoryMode": "0700",
+  "privateBackupFilesMode": "0600"
+}

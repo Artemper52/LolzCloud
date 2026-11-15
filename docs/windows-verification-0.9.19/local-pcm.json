@@ -1,0 +1,34 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T01:50:46.226Z",
+  "source": "Actual locally saved genuine SoundCloud1950440187 MP3 decoded using the candidate19 packaged ffmpeg; no synthetic source/no network",
+  "mp3Sha256": "43d158f729bc5ecdd3672170f6def51e81f09a116cf558c8e6e7d1556f9d266d",
+  "pcm": {
+    "offsetSeconds": 20,
+    "seconds": 2,
+    "sampleRate": 48000,
+    "channels": 1,
+    "samples": 96000,
+    "invalid": 0,
+    "rms": 0.6316803012709239,
+    "peak": 1.5633716583251953
+  },
+  "dspModules": [
+    {
+      "file": "source/plugins/sound-effects.js",
+      "sha256": "dfa59395d72460e186d6c89a9ffa7992980bc92c731d637e106cff0986e1efed",
+      "identicalTo18": true
+    },
+    {
+      "file": "source/app/lib/js/local-player.js",
+      "sha256": "920a855e9ac472813229d0bdae3f89e599fb119f881e197c701d40e6f9275042",
+      "identicalTo18": true
+    },
+    {
+      "file": "source/integrations/sound-settings.cjs",
+      "sha256": "07f61e21a1416625d91efcaadd98de25bb33e1bd466a3345e14a1d8b6ce5febe",
+      "identicalTo18": true
+    }
+  ],
+  "limits": "PCM file decode/energy only; no physical audio output, no additional full player or DSP effects rerun. Existing DSP source bytes are unchanged."
+}

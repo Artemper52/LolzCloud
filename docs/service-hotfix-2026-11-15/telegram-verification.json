@@ -1,0 +1,79 @@
+{
+  "candidate-proof.json": {
+    "status": "candidate-passed",
+    "kind": "telegram",
+    "elapsedMs": 1983,
+    "catalogResults": 20,
+    "richMetadataSurvivesStateRestart": true,
+    "richCachedVerifyMakesNoRequest": true,
+    "metadataDigest": "76f23ba34a2d69e59eb3f5d0cbc6213cedfc72809d93f67af5e71b0c641c0902",
+    "wave": null,
+    "audio": {
+      "id": "1950440187",
+      "bytes": 1799586,
+      "sha256": "44bcf81d69ffdb38b5efc3706b8668fec4d2ca79ff96de1b77447ab482f6512b",
+      "metadataDuration": 111,
+      "decodedSeconds": 111.502222,
+      "attachedCover": true
+    },
+    "telegramApiCalls": 0
+  },
+  "state-load.json": {
+    "status": "state-load-passed",
+    "kind": "telegram",
+    "offsetUnchanged": true,
+    "offsetNondecreasing": true,
+    "baselineFileIds": 1,
+    "retainedFileIds": 1,
+    "baselineBrandEntries": 1,
+    "brandEntriesPreserved": true
+  },
+  "postflight.json": {
+    "status": "public-postflight-passed",
+    "kind": "telegram",
+    "health": {
+      "ok": true,
+      "bot": "lolzcloudbot",
+      "pollAgeSeconds": 0,
+      "activeDownloads": 0,
+      "cacheTracks": 1,
+      "inlineMode": "covers-with-feedback",
+      "cacheChannelConfigured": false
+    },
+    "wave": null,
+    "privateState": {
+      "offsetUnchanged": true,
+      "offsetNondecreasing": true,
+      "baselineFileIds": 1,
+      "retainedFileIds": 1,
+      "baselineBrandEntries": 1,
+      "brandEntriesPreserved": true
+    },
+    "media": {
+      "id": "1950440187",
+      "audioUrl": "https://lolzcloud.com/telegram/audio/1950440187/13874ab3290101ea09ee0349.mp3",
+      "rangeStatus": 206,
+      "rangeBytes": 128,
+      "fullStatus": 200,
+      "bytes": 1799586,
+      "sha256": "44bcf81d69ffdb38b5efc3706b8668fec4d2ca79ff96de1b77447ab482f6512b",
+      "metadataDuration": 111,
+      "decodedSeconds": 111.502222,
+      "attachedCover": true
+    },
+    "manualTelegramApiCalls": 0,
+    "normalPolling": true,
+    "offsetValuesExported": false,
+    "fileIdValuesExported": false
+  },
+  "protected-after.json": {
+    "status": "protected-configuration-passed",
+    "kind": "telegram",
+    "credentialsUnchanged": true,
+    "brandSourceIdentical": true,
+    "singleBotPoller": true
+  },
+  "current": "/opt/lolzcloud-telegram/releases/20261115T021103-telegram-ed8eaaba",
+  "backupDirectoryMode": "0700",
+  "privateBackupFilesMode": "0600"
+}

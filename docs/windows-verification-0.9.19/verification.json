@@ -1,0 +1,217 @@
+{
+  "status": "candidate-verified-not-published",
+  "version": "0.9.19",
+  "checkedAt": "2026-11-15T01:53:40.012Z",
+  "host": {
+    "platform": "win32",
+    "arch": "x64",
+    "osRelease": "10.0.26200"
+  },
+  "input": {
+    "file": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\build-input.zip",
+    "size": 24945757,
+    "sha256": "5fc3a558003494ee1019b70416a691f3c741f80c03b9477b121f7cb4d6370a42",
+    "sha512": "ZgVn2Lx2lsnE4ptPyhR8Mj54bDubLts059p4Vcgiapr/VydPAP8ehrtBKze0MYm8wBA2Ts0bvXPNrdVKvAs3gQ==",
+    "runtimeFiles": 153
+  },
+  "canonical": {
+    "eachBuild": 153,
+    "eachExact": 152,
+    "eachPackageMetadataEquivalent": 1,
+    "helperZIPs": "Both raw containers match input exactly; no generated-payload exception needed.",
+    "completeModernLegacyPayload": {
+      "totalFiles": 3005,
+      "identical": 3005,
+      "payloadEquivalent": [],
+      "completeNameSetIdentical": true
+    },
+    "asar": [
+      {
+        "flavor": "modern",
+        "size": 19138822,
+        "sha256": "feb89bd60dabd3d21b9e83fc686095130cfdf2c4951f92513bec2fa62d6c7f6b"
+      },
+      {
+        "flavor": "legacy",
+        "size": 19138822,
+        "sha256": "feb89bd60dabd3d21b9e83fc686095130cfdf2c4951f92513bec2fa62d6c7f6b"
+      }
+    ]
+  },
+  "artifacts": [
+    {
+      "name": "LolzCloud-0.9.19-win-x64-Setup.exe",
+      "size": 146396374,
+      "sha256": "eca24d822cfbff7e7891a0c958ca6bff91cff3718766e3b7a5b93fcf8406007f",
+      "sha512": "Yf7MgysIEqC7T4xED2IApG04QGjA2DuhncMD4/6LsPvvSdoJxWIPP37BR4ONT7oTH54X4pUd7KCUtpHTIX8AXw=="
+    },
+    {
+      "name": "LolzCloud-0.9.19-win-x64-Setup.exe.blockmap",
+      "size": 152714,
+      "sha256": "294da34c65f6e28bbbaa0eaa9f4fc4c4570b2c42a34ff40653f7b6876c671d7f",
+      "sha512": "JhQ93+b5qi7ZuFm3x8b2NFZT9p8cuYUXSdlyqSb6pvXuNJ5yqn4ivXHeVJD+C0SeekkKQdiG6Yltl0/sKbPReg=="
+    },
+    {
+      "name": "LolzCloud-0.9.19-win-x64.zip",
+      "size": 196682066,
+      "sha256": "2ebe5bab34c295562fc00a17326a9a40d802aff443bb9bd2052e2fc52c54f5ed",
+      "sha512": "i1U54+hGTpG0zY+mNESLIR7/dEVrLk51obaQeJz7UeX9SJfV5Cupy/euaw69/fq30EjXiNZiAr14SIHrvJMSaw=="
+    },
+    {
+      "name": "LolzCloud-0.9.19-win7-legacy-Setup.exe",
+      "size": 99541416,
+      "sha256": "d041beca12f657eddacbfc5efd70e5364b8180292cc96861324c2ad70872e68f",
+      "sha512": "DtAzjJyqxW8DR5crc/OkBOkhg1n8DgGgYwa/NoFpLx4q7CqsP0bc8rLORZgX+PeBU1dwUdnpntLI2rdCFGiMsA=="
+    },
+    {
+      "name": "LolzCloud-0.9.19-win7-legacy-Setup.exe.blockmap",
+      "size": 105166,
+      "sha256": "29d2ee97d1e3c17dc83b9c7a5e77b0e8985afbc75e507ce05bea0f97738b0374",
+      "sha512": "DrxkcWLtkiB6r85IoKEq+975Jsh3MwpjasY1CUBRJWov/9BEglFuHcUhsNCodyQPa9NZgYMGpEutSCAK3gkd+g=="
+    },
+    {
+      "name": "LolzCloud-0.9.19-win7-legacy-x64.zip",
+      "size": 134399138,
+      "sha256": "bb3885ab49f67f6ac6ccfe6e3da5909c340c45cd2554f81bd6d391efadfbc0f9",
+      "sha512": "CBUABo4Hbe8Mkt4RlrnAR0xE5V+n0I7CqxaMxYgwp/LpzoiMcELO5VEnj0ENFbdptIh0jCHWVwXxFvYx2X7u9Q=="
+    }
+  ],
+  "manifests": [
+    {
+      "file": "update.json",
+      "version": "0.9.19",
+      "channel": "latest",
+      "artifactChecks": true,
+      "yamlSha512": true,
+      "blockmapCoverage": 146396374
+    },
+    {
+      "file": "update-legacy.json",
+      "version": "0.9.19",
+      "channel": "legacy",
+      "artifactChecks": true,
+      "yamlSha512": true,
+      "blockmapCoverage": 99541416
+    }
+  ],
+  "setup": {
+    "status": "passed",
+    "from": "0.9.18",
+    "to": "0.9.19",
+    "actualNSIS": true,
+    "profile": "Declared isolated fixture; exact JSONhashes+encrypted sessions/settings/collections/history/wave/bookmarks/lyrics/mini/voicetags/YTcookie verified",
+    "target": "D temporary task-owned directory",
+    "installerIdentity": "Unique test appId/uninstall key; same exact packaged app payload, no user install/shortcuts/autorun",
+    "installed19NativeSelfTest": "Electron45.2.1/Node24.22.1 passed",
+    "simulatedInsufficientSpace": "Exit112 before previous app/profile mutation",
+    "cleanup": "Own test target/uninstall key removed by reviewed harness; only newly created bb7 test updater-cache preserved onD after exactpath+SHA checks."
+  },
+  "space": {
+    "cStatfs": 480935936,
+    "dStatfs": 39206043648,
+    "cDriveInfo": 480935936,
+    "dDriveInfo": 39206043648,
+    "actualModernApplicationBytes": 476021723,
+    "actualNsisTempRequiredBytes": 1220478976,
+    "helperMinimumTempBytes": 1610612736,
+    "coverage": true,
+    "actualDSelected": true,
+    "globalEnvironmentUnchanged": true
+  },
+  "updater": {
+    "status": "passed",
+    "checks": 10,
+    "old18Sees19": "Both exact released18 sources select candidate19 over older GitHub fixture",
+    "checksum": "Real fullcandidateSetup SHA verified; same-size corruption fails before preflight/shutdown/env/handoff",
+    "nativeHandoff": "Explicit fixture only; genuine NSIS run separate",
+    "legacyDriveInfo": "Actual PowerShell measurement under statfs-unavailable injection; not a physical Win7 test"
+  },
+  "genuineAudio": {
+    "status": "passed",
+    "id": "1950440187",
+    "elapsedMs": 5387,
+    "sourceBytes": 2252506,
+    "sourceHTTP": 18,
+    "sourceHTTPAll200": true,
+    "refreshes": 0,
+    "mp3": {
+      "bytes": 2621649,
+      "sha256": "43d158f729bc5ecdd3672170f6def51e81f09a116cf558c8e6e7d1556f9d266d",
+      "decodedSeconds": 111.491678
+    },
+    "pcm": {
+      "offsetSeconds": 20,
+      "seconds": 2,
+      "sampleRate": 48000,
+      "channels": 1,
+      "samples": 96000,
+      "invalid": 0,
+      "rms": 0.6316803012709239,
+      "peak": 1.5633716583251953
+    }
+  },
+  "finalSourceChecks": {
+    "node": {
+      "total": 483,
+      "passed": 467,
+      "failed": 0,
+      "skipped": 16,
+      "skipScope": "Linux helper process fixtures on Windows; actual Linux QA belongs to root"
+    },
+    "syntaxFiles": 289,
+    "toolOnlyDelta": {
+      "description": "Final source-archive hardening and1fixture test after the Windows frozen input;153 runtime files unchanged and no binary rebuild",
+      "files": [
+        {
+          "file": "tools/source-archive.cjs",
+          "sha256": "f75183b27b16d0e3f4bf94fc6dca4ceea685ae9c2208fde557463a6db18c2e5f"
+        },
+        {
+          "file": "tests/source-archive.test.cjs",
+          "sha256": "d468a42e2640bc4073e59c83373aa79591423394af547d5072a1f34dd240a4e1"
+        }
+      ]
+    }
+  },
+  "proofs": [
+    {
+      "file": "windows-artifacts.json",
+      "sha256": "f692a60b8a12fc7235b7a0951bcc5735fb61df253ffa69373bb750d810fbc779"
+    },
+    {
+      "file": "updater-preflight.json",
+      "sha256": "e310f131de162e93ce48f46bc6e9e61c8c44d377f4f8bb25e9aaef99c85f6529"
+    },
+    {
+      "file": "genuine-audio.json",
+      "sha256": "5e3700f97b968ca76bf94efa9ab201a30eafcf5c92459f02014e0f32f1014beb"
+    },
+    {
+      "file": "local-pcm.json",
+      "sha256": "45f27f5b9ba750256195abb4bde4bb8001d5db250754626b0d88b12fb7256226"
+    },
+    {
+      "file": "setup-cache-relocation.json",
+      "sha256": "ee1a59982c5c44f588240d6553186017bd423c4e70791a147ddcbca71e1738d6"
+    },
+    {
+      "file": "full-node-final.txt",
+      "sha256": "0d917ed35cd99b6ffb5df7ff20633dd41c661fcb463ce594f323da9d56ffb969"
+    },
+    {
+      "file": "javascript-check-final.txt",
+      "sha256": "e4f39585466d57d209d8ec837f3c227f0234e4c03812da4ade1d036621b8835e"
+    },
+    {
+      "file": "setup-upgrade.txt",
+      "sha256": "dc5d88ad7cb6ee40a20e8c4997bf26a52a5497c6733f9221289a95eaba10a934"
+    }
+  ],
+  "limits": [
+    "No publication/deploy/git operation or personal app/profile installation by this task.",
+    "Legacy Electron22 self-test ran on current Windows; no physical Windows7 proof.",
+    "Candidate19 public release/feed availability is not claimed; feed replies/native handoff are declared fixtures.",
+    "Genuine source download used actual extractedASAR code and packagedFFmpeg on Node24, no personalOAuth; refresh branch was not triggered in this all200 recording.",
+    "Local PCM verifies genuine decoded music energy/duration, not physical output or a fullDSP/player rerun; three DSP modules remain byte-identical to18."
+  ]
+}

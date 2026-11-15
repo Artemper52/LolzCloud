@@ -3,6 +3,7 @@ const {tasteProfile,rankCandidates}=require('../source/integrations/wave.cjs');
 const {DEFAULTS,validatePreferences,contextProfile,contextLabel,searchHint,normalize:norm}=require('../source/integrations/wave-preferences.cjs');
 const {parseRequest}=require('../source/integrations/wave-request.cjs');
 const {DAY,fingerprints,prunePlayed}=require('../source/integrations/wave-history.cjs');
+const {publicTrack}=require('../telegram/state.cjs');
 const MAX_BODY=1000000,MAX_RESPONSE=256*1024;
 function invalid(message='Некорректные настройки волны.'){return Object.assign(Error(message),{status:400});}
 function object(value,keys){if(!value||typeof value!=='object'||Array.isArray(value)||Object.keys(value).some(key=>!keys.includes(key)))throw invalid();return value;}
@@ -47,12 +48,15 @@ class PublicWave {
   const pending=Promise.resolve().then(()=>this.provider.request(endpoint,params,{signal:cancel})).finally(()=>{this.providerActive--;});
   return abortable(pending,cancel);
  }
- remember(raw){const row=this.catalog.normalize(raw);if(!row||!/^https:\/\/soundcloud\.com\/[\w-]+\/[\w-]+$/.test(row.url))return null;const saved=this.state.upsert(row);if(!saved)return null;const value={...row,id:Number(saved.id)};if(this.metadataCache.size>=1000)this.metadataCache.delete(this.metadataCache.keys().next().value);this.metadataCache.set(String(row.id),{until:this.now()+20*60000,value});return value;}
+ remember(raw){const row=this.catalog.normalize(raw);if(!row||!/^https:\/\/soundcloud\.com\/[\w-]+\/[\w-]+$/.test(row.url))return null;const saved=this.state.upsert(row);if(!saved)return null;const value={...publicTrack(saved),id:Number(saved.id)};if(this.metadataCache.size>=1000)this.metadataCache.delete(this.metadataCache.keys().next().value);this.metadataCache.set(String(row.id),{until:this.now()+20*60000,value});return value;}
+ knownMetadata(input){const id=String(input.id||''),cached=this.metadataCache.get(id);if(cached?.until>this.now()&&cached.value.metadataVersion===1&&cached.value.url===input.url)return cached.value;const saved=this.state.get(id);return saved?.metadataVersion===1&&saved.url===input.url?saved:null;}
  async verify(input,signal){
-  throwIfAborted(signal);const id=input.id?String(input.id):'',known=id?this.metadataCache.get(id):null;
-  if(known?.until>this.now()&&known.value.url===input.url)return known.value;
-  const saved=id?this.state.get(id):null;if(saved?.url===input.url)return {...saved,id:Number(saved.id)};
-  const raw=await this.request('/resolve',{url:input.url},signal);throwIfAborted(signal);const row=this.catalog.normalize(raw);if(!row||row.url!==input.url)return null;return this.remember(raw);
+  throwIfAborted(signal);const id=input.id?String(input.id):'',known=this.knownMetadata(input);
+  if(known)return {...publicTrack(known),id:Number(known.id)};
+  const saved=id?this.state.get(id):null,legacy=saved?.url===input.url;
+  // Basic state is an identity, not genre/year evidence. Rehydrate that exact
+  // previously verified ID/URL; a forged imported ID still resolves by URL.
+  const raw=await this.request(legacy?'/tracks/'+id:'/resolve',legacy?{}:{url:input.url},signal);throwIfAborted(signal);const row=this.catalog.normalize(raw);if(!row||row.url!==input.url||legacy&&String(row.id)!==id)return null;return this.remember(raw);
  }
  async related(seed,signal){
   throwIfAborted(signal);const id=String(seed.id),cached=this.relatedCache.get(id);if(cached?.until>this.now())return cached.rows;
@@ -80,7 +84,7 @@ class PublicWave {
   // Candidates must come from our verified catalogue/provider, never from a
   // client's exported title/ID pair. Taste input is used only for ranking.
   let unknown=0;
-  const familiarInput=settings.character==='familiar'?rotated.slice(0,40).filter(seed=>this.state.get(String(seed.id))?.url===seed.url||this.metadataCache.get(String(seed.id))?.value.url===seed.url||unknown++<8):selected;
+  const familiarInput=settings.character==='familiar'?rotated.slice(0,40).filter(seed=>this.knownMetadata(seed)||unknown++<8):selected;
   const verified=await eachLimit(familiarInput,4,async seed=>{const row=await this.verify(seed,cancel);return row?{...row,seedWeight:seed.weight||0}:null;});collect(verified);throwIfAborted(signal);
   if(!cancel.aborted&&data.request){collect(await eachLimit(data.request.queries,3,query=>this.search(query,(data.cursor%7)*50,cancel)),true);}
   else if(!cancel.aborted&&settings.character!=='familiar'){

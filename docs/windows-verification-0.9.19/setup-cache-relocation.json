@@ -1,0 +1,8 @@
+{
+  "status": "preserved-on-D",
+  "purpose": "Own isolated NSIS test cache only; older/user caches untouched",
+  "source": "C:\\Users\\27nov\\AppData\\Local\\lolzcloud-setup-check-bb7d8ddba1f3d6aa-updater",
+  "destination": "D:\\LolzCloud-Android-Toolchain\\release-0.9.19\\qa\\setup-updater-cache-bb7d8ddba1f3d6aa",
+  "bytes": 146394911,
+  "sha256": "0f230485acc76d1669a7cf8a2c44aa0e78ff111f38b237347ea816385de3d940"
+}

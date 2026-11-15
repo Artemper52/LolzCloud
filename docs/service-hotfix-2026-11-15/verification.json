@@ -1,0 +1,251 @@
+{
+  "status": "passed",
+  "verifiedAt": "2026-11-15T10:36:54.863Z",
+  "services": {
+    "music": {
+      "release": "20261115T021102-music-21beb271",
+      "current": "/opt/lolzcloud-music/releases/20261115T021102-music-21beb271",
+      "previous": "/opt/lolzcloud-music/releases/20261115T010411-music-bfe7ef6d",
+      "archive": {
+        "bytes": 261860,
+        "sha256": "2f6808bcbdfe32a607744f0f10e267507a37707627daa090278c288596573001"
+      },
+      "files": 49,
+      "moduleClosure": 35,
+      "backup": "/var/backups/lolzcloud-music/20261115T021102-music-21beb271",
+      "backupDirectoryMode": "0700",
+      "privateBackupFilesMode": "0600",
+      "wrapper": {
+        "name": "20261115T021102-music-21beb271-resume-reviewed.sh",
+        "sha256": "02169da1c3c6197b9f0c8297879782ad2df8ff8a1426a5b0d866f6d5b398b71e"
+      },
+      "proof": "music-verification.json",
+      "proofSha256": "2be7868c0bf56b801b67290cfa4c660c9cbb8a59ec38810fd884f37968fa4c14",
+      "candidate": {
+        "status": "candidate-passed",
+        "kind": "music",
+        "elapsedMs": 2165,
+        "catalogResults": 20,
+        "richMetadataSurvivesStateRestart": true,
+        "richCachedVerifyMakesNoRequest": true,
+        "metadataDigest": "76f23ba34a2d69e59eb3f5d0cbc6213cedfc72809d93f67af5e71b0c641c0902",
+        "wave": {
+          "results": 20,
+          "requestBytes": 56764,
+          "richFieldsPresent": true
+        },
+        "audio": {
+          "id": "1950440187",
+          "bytes": 1799586,
+          "sha256": "44bcf81d69ffdb38b5efc3706b8668fec4d2ca79ff96de1b77447ab482f6512b",
+          "metadataDuration": 111,
+          "decodedSeconds": 111.502222,
+          "attachedCover": true
+        },
+        "telegramApiCalls": 0
+      },
+      "postflight": {
+        "status": "public-postflight-passed",
+        "kind": "music",
+        "health": {
+          "ok": true,
+          "service": "lolzcloud-music",
+          "protocol": 1,
+          "waveProtocol": 1,
+          "activeDownloads": 0
+        },
+        "wave": {
+          "requestBytes": 62598,
+          "results": 20,
+          "richFieldsPresent": true
+        },
+        "privateState": {
+          "offsetUnchanged": true,
+          "offsetNondecreasing": true,
+          "baselineFileIds": 0,
+          "retainedFileIds": 0,
+          "baselineBrandEntries": 0,
+          "brandEntriesPreserved": true
+        },
+        "media": {
+          "id": "1950440187",
+          "audioUrl": "https://lolzcloud.com/music/audio/1950440187/015a8728dbbdbf251575f0ec.mp3",
+          "rangeStatus": 206,
+          "rangeBytes": 128,
+          "fullStatus": 200,
+          "bytes": 1799586,
+          "sha256": "44bcf81d69ffdb38b5efc3706b8668fec4d2ca79ff96de1b77447ab482f6512b",
+          "metadataDuration": 111,
+          "decodedSeconds": 111.502222,
+          "attachedCover": true
+        },
+        "manualTelegramApiCalls": 0,
+        "normalPolling": false,
+        "offsetValuesExported": false,
+        "fileIdValuesExported": false
+      },
+      "runtime": {
+        "status": "passed",
+        "current": "/opt/lolzcloud-music/releases/20261115T021102-music-21beb271",
+        "pid": 4109267,
+        "processCwdMatches": true,
+        "processUidMatches": true,
+        "manifestFiles": 49,
+        "allManifestHashesMatch": true,
+        "protectedConfigurationUnchanged": true,
+        "backupMode": "0700",
+        "privateFilesMode": "0600",
+        "offsetUnchanged": true,
+        "offsetNondecreasing": true,
+        "baselineFileIdsRetained": 0,
+        "brandEntriesRetained": 0,
+        "runtimeSha256": {
+          "telegram/state.cjs": "b302239801b644b4d70f4c3fcd621cb47e0d908a6c3ebd25cc92f8a38a2d04ec",
+          "telegram/media.cjs": "21014a7bd808d83242198f9b86742feb454a1fb4d14c7c40ac03617d75fce0f6",
+          "music/wave.cjs": "2db4f9e4d2bd56f3df5ef21c6a50866d9c3b96a17d58d512ce5f6ae6e83a8d2f"
+        }
+      }
+    },
+    "telegram": {
+      "release": "20261115T021103-telegram-ed8eaaba",
+      "current": "/opt/lolzcloud-telegram/releases/20261115T021103-telegram-ed8eaaba",
+      "previous": "/opt/lolzcloud-telegram/releases/20261114T202807-telegram-c81c8f2e",
+      "archive": {
+        "bytes": 269730,
+        "sha256": "8df377b41c2e6befe39fa355fd368ddd9d14d399831054793e315660731221c5"
+      },
+      "files": 53,
+      "moduleClosure": 38,
+      "backup": "/var/backups/lolzcloud-telegram/20261115T021103-telegram-ed8eaaba",
+      "backupDirectoryMode": "0700",
+      "privateBackupFilesMode": "0600",
+      "wrapper": {
+        "name": "20261115T021103-telegram-ed8eaaba-cwd-reviewed.sh",
+        "sha256": "61c0e312203cf64ddbda2b33428a1763c37663cd96a91ea1c5600ee900e6fd1b"
+      },
+      "proof": "telegram-verification.json",
+      "proofSha256": "0bc8bf640028a441b4275298ebb8db757d17da39bbe2ad4a3bb36cd778d0238a",
+      "candidate": {
+        "status": "candidate-passed",
+        "kind": "telegram",
+        "elapsedMs": 1983,
+        "catalogResults": 20,
+        "richMetadataSurvivesStateRestart": true,
+        "richCachedVerifyMakesNoRequest": true,
+        "metadataDigest": "76f23ba34a2d69e59eb3f5d0cbc6213cedfc72809d93f67af5e71b0c641c0902",
+        "wave": null,
+        "audio": {
+          "id": "1950440187",
+          "bytes": 1799586,
+          "sha256": "44bcf81d69ffdb38b5efc3706b8668fec4d2ca79ff96de1b77447ab482f6512b",
+          "metadataDuration": 111,
+          "decodedSeconds": 111.502222,
+          "attachedCover": true
+        },
+        "telegramApiCalls": 0
+      },
+      "postflight": {
+        "status": "public-postflight-passed",
+        "kind": "telegram",
+        "health": {
+          "ok": true,
+          "bot": "lolzcloudbot",
+          "pollAgeSeconds": 0,
+          "activeDownloads": 0,
+          "cacheTracks": 1,
+          "inlineMode": "covers-with-feedback",
+          "cacheChannelConfigured": false
+        },
+        "wave": null,
+        "privateState": {
+          "offsetUnchanged": true,
+          "offsetNondecreasing": true,
+          "baselineFileIds": 1,
+          "retainedFileIds": 1,
+          "baselineBrandEntries": 1,
+          "brandEntriesPreserved": true
+        },
+        "media": {
+          "id": "1950440187",
+          "audioUrl": "https://lolzcloud.com/telegram/audio/1950440187/13874ab3290101ea09ee0349.mp3",
+          "rangeStatus": 206,
+          "rangeBytes": 128,
+          "fullStatus": 200,
+          "bytes": 1799586,
+          "sha256": "44bcf81d69ffdb38b5efc3706b8668fec4d2ca79ff96de1b77447ab482f6512b",
+          "metadataDuration": 111,
+          "decodedSeconds": 111.502222,
+          "attachedCover": true
+        },
+        "manualTelegramApiCalls": 0,
+        "normalPolling": true,
+        "offsetValuesExported": false,
+        "fileIdValuesExported": false
+      },
+      "runtime": {
+        "status": "passed",
+        "current": "/opt/lolzcloud-telegram/releases/20261115T021103-telegram-ed8eaaba",
+        "pid": 4109542,
+        "processCwdMatches": true,
+        "processUidMatches": true,
+        "manifestFiles": 53,
+        "allManifestHashesMatch": true,
+        "protectedConfigurationUnchanged": true,
+        "backupMode": "0700",
+        "privateFilesMode": "0600",
+        "offsetUnchanged": true,
+        "offsetNondecreasing": true,
+        "baselineFileIdsRetained": 1,
+        "brandEntriesRetained": 1,
+        "runtimeSha256": {
+          "telegram/state.cjs": "b302239801b644b4d70f4c3fcd621cb47e0d908a6c3ebd25cc92f8a38a2d04ec",
+          "telegram/media.cjs": "21014a7bd808d83242198f9b86742feb454a1fb4d14c7c40ac03617d75fce0f6",
+          "music/wave.cjs": "2db4f9e4d2bd56f3df5ef21c6a50866d9c3b96a17d58d512ce5f6ae6e83a8d2f"
+        }
+      }
+    }
+  },
+  "peerRegression": {
+    "checks": 88,
+    "scope": "Targeted HTTP/catalog/Telegram/PWA source tests, supplied by implementation owner",
+    "proof": "D:/LolzCloud-Android-Toolchain/wave-metadata-tests/verification.json",
+    "freeze": {
+      "receivedAt": "2026-11-15T02:11:02.429Z",
+      "owner": "android_function_audit",
+      "tests": "D:/LolzCloud-Android-Toolchain/wave-metadata-tests/verification.json",
+      "files": {
+        "telegram/state.cjs": "b302239801b644b4d70f4c3fcd621cb47e0d908a6c3ebd25cc92f8a38a2d04ec",
+        "music/wave.cjs": "2db4f9e4d2bd56f3df5ef21c6a50866d9c3b96a17d58d512ce5f6ae6e83a8d2f",
+        "telegram/media.cjs": "21014a7bd808d83242198f9b86742feb454a1fb4d14c7c40ac03617d75fce0f6"
+      }
+    }
+  },
+  "independentPostflight": {
+    "passed": 17,
+    "failed": 0,
+    "proof": "public-verification.json",
+    "proofSha256": "7eef595980ec76fb1c63f00db6276858bb9d79828d9a50cb0be91193d851b1c2"
+  },
+  "mainServerUnchanged": "/opt/lolzcloud-server/releases/20261115-social-0.9.22-f798f619",
+  "scope": {
+    "manualTelegramApiCalls": 0,
+    "manualMessages": 0,
+    "accountWrites": 0,
+    "privateStateValuesExported": false,
+    "configurationChanges": 0,
+    "productSourceChanges": 0
+  },
+  "preflightCorrection": {
+    "kind": "Deployment harness only",
+    "initialFailure": "Node stdin inherited inaccessible /root working directory under the service UID; failed before service stop or switch",
+    "correction": "Use explicit staged release cwd; verify complete file manifest before candidate or resuming the existing stage",
+    "productEdits": false,
+    "uncertainActionRepeated": false
+  },
+  "limits": [
+    "No personal account or room mutation, no manual Telegram messages or Telegram API/profile/command calls. Only the existing running bot resumed its normal poll.",
+    "No end-to-end Telegram recipient delivery tested; real signed public media HTTP and full MP3 decoded duration tested instead.",
+    "Candidate catalog/metadata persistence runs used isolated service-owned storage; live private offset/fileId/brand values remained on the server.",
+    "No main server/PWA, nginx, service unit or credential changes; no repository build/version/commit/tag operation in this task."
+  ]
+}

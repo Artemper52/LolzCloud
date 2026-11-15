@@ -1,0 +1,96 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T01:44:13.547Z",
+  "elapsedMs": 5387,
+  "source": "Actual extracted candidate19 ASAR discovery/client/audio-download/encodeMp3 code; genuine public SoundCloud without app/session/OAuth; packaged ffmpeg executable.",
+  "track": {
+    "id": "1950440187",
+    "url": "https://soundcloud.com/darkprinceee/project_1",
+    "title": "Project_1(FFM FREESTYLE) +tewiq",
+    "artist": "тёмный принц",
+    "duration": 111
+  },
+  "publicClientRefreshes": 0,
+  "responses": [
+    {
+      "host": "soundcloud.com",
+      "status": 200
+    },
+    {
+      "host": "a-v2.sndcdn.com",
+      "status": 200
+    },
+    {
+      "host": "api-v2.soundcloud.com",
+      "status": 200
+    },
+    {
+      "host": "api-v2.soundcloud.com",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    },
+    {
+      "host": "playback.media-streaming.soundcloud.cloud",
+      "status": 200
+    }
+  ],
+  "sourceBytes": 2252506,
+  "mp3": {
+    "bytes": 2621649,
+    "sha256": "43d158f729bc5ecdd3672170f6def51e81f09a116cf558c8e6e7d1556f9d266d",
+    "decodedSeconds": 111.491678
+  },
+  "failure": "",
+  "limits": "A single recording proves this real download/encode path, not perpetual source availability. No signed URLs, cookies, client IDs or media content are printed."
+}
