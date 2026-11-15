@@ -1,0 +1,67 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T16:39:27.796Z",
+  "scope": "Hosted XCTest on a fresh disposable iOS Simulator. No physical-device, external Document Provider, signing or personal-account verification.",
+  "version": "0.1.6",
+  "commit": "55e3ac9700ce8e9330b5c190746f3fd6544f16cd",
+  "sourceHashes": {
+    "App.swift": "1c6866502e19d58f07da0a7affdd52704e4028b3d272b7708e38197ea49ebf58",
+    "MediaPolicy.swift": "9674f8c92c96eb695579f85b21e97fe943d8a6d272f445c728c669d07d3d9f68",
+    "NativePlayer.swift": "4b4a1c885eb257d8f1f7056efc4b55c10f3445a66718d71cc036a3f6fe562d78",
+    "AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
+    "AudioEffectsPolicy.swift": "6896cb5c5f14f552cf874ce2abb051a9223c8107818eaee1f706ac1415a05f80",
+    "NativeAudioEffects.swift": "acf5527e749b4ed5a512ea63c2e96245b46c928d4cdfd8f3f619894999bcbc82",
+    "NativeCatalog.swift": "757ee942d3f9d6e9854f8b2ffed1bdb3ebcd8da0d25e45ac22be8c8795937c0f",
+    "NativeProfileShare.swift": "2818dccc99e4c9e61c8603ca979ccf77b62389797a0fdaf5bc75734665eb23c5",
+    "NativeRatePolicy.swift": "fc6feb5626219cdec2f0a3e6b4f2233ae7c19e15f183ef57f84a7c5abb18da39",
+    "NativeRoomPolicy.swift": "b8e270f95827c199ffb621c33f71440c28ab82f7156a810c379aa8ee7965008f",
+    "DSPCore.c": "f8c4d8ccdf7651a5ef795207abbd69435a417885f3e08279f246afbc32fc443e",
+    "PitchCore.c": "577adbdad248f57bf66b53146eabf21b6b90acddae5ad6c7acef19bf1b7b3e0b",
+    "PCMStream.c": "c457db11ca8452c64d8ed61843e09203090df24ef9ccf29ecca45110e54cc5cf",
+    "NativeAudioTap.c": "357042c12d2a2e7c4e1b7d3703be8b5b090b6cf5734105cac29f01112dfb2e43"
+  },
+  "simulator": {
+    "uuid": "FE21AEEF-0349-4614-8850-093E8FDC0E43",
+    "family": "ipad",
+    "device": "iPad Pro 11-inch (M4) (16GB)",
+    "runtime": "iOS 26.2",
+    "version": "26.2"
+  },
+  "xcresult": "/Users/runner/work/_temp/ios-runtime/NativeRuntime.xcresult",
+  "tests": {
+    "devicesAndConfigurations": [
+      {
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "FE21AEEF-0349-4614-8850-093E8FDC0E43",
+          "deviceName": "LolzCloud-runtime-1794760800469",
+          "modelName": "iPad Pro 11-inch (M4) (16GB)",
+          "osBuildNumber": "23C54",
+          "osVersion": "26.2",
+          "platform": "iOS Simulator"
+        },
+        "expectedFailures": 0,
+        "failedTests": 0,
+        "passedTests": 20,
+        "skippedTests": 0,
+        "testPlanConfiguration": {
+          "configurationId": "1",
+          "configurationName": "Test Scheme Action"
+        }
+      }
+    ],
+    "environmentDescription": "LolzCloudRuntime · Built with macOS 15.8.2",
+    "expectedFailures": 0,
+    "failedTests": 0,
+    "finishTime": 1794761302.495,
+    "passedTests": 20,
+    "result": "Passed",
+    "skippedTests": 0,
+    "startTime": 1794761013.737,
+    "statistics": [],
+    "testFailures": [],
+    "title": "Test - LolzCloudRuntime",
+    "topInsights": [],
+    "totalTestCount": 20
+  }
+}

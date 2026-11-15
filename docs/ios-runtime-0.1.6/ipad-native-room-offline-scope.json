@@ -1,0 +1,5 @@
+{
+  "commands" : 5,
+  "fixture" : "Declared own-origin HTMLAudio room and actual WK message bridge; no provider login or server mutation",
+  "offline" : "Permanent media suspension, blank-document commit, private file play, seek\/next\/previous\/repeat-one, fresh app reload without autoplay"
+}
