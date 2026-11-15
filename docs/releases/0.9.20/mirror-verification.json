@@ -1,0 +1,529 @@
+{
+  "status": "passed",
+  "stage": "complete",
+  "runId": "43725524721",
+  "runAttempt": "1",
+  "workflowCommit": "664e4adb9a1854913eeced2d0c5bf85495baaf19",
+  "sourceChecks": [
+    {
+      "name": "legacy.yml",
+      "url": "https://lolzcloud.com/downloads/legacy.yml",
+      "expectedSize": 373,
+      "expectedSha256": "1af1dc5146c17edd2450e16ba37410b43e2c53c4c29399ebb6af281daac44bf4",
+      "actualSize": 373,
+      "actualSha256": "1af1dc5146c17edd2450e16ba37410b43e2c53c4c29399ebb6af281daac44bf4",
+      "passed": true
+    },
+    {
+      "name": "android-update.json",
+      "url": "https://lolzcloud.com/downloads/android-update.json",
+      "expectedSize": 441,
+      "expectedSha256": "c14815be2a3a7f52bc98d4125d1f4c78c823796e0ba656e1369693f7bef95114",
+      "actualSize": 441,
+      "actualSha256": "c14815be2a3a7f52bc98d4125d1f4c78c823796e0ba656e1369693f7bef95114",
+      "passed": true
+    },
+    {
+      "name": "latest.yml",
+      "url": "https://lolzcloud.com/downloads/latest.yml",
+      "expectedSize": 366,
+      "expectedSha256": "258ed5b117d3059be86a596c02cc44c40b0b4ef7e914f1fc7c7a3c9e64bfcd54",
+      "actualSize": 366,
+      "actualSha256": "258ed5b117d3059be86a596c02cc44c40b0b4ef7e914f1fc7c7a3c9e64bfcd54",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-linux-x64.AppImage",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.20-linux-x64.AppImage",
+      "expectedSize": 147495416,
+      "expectedSha256": "a4109051ae8172121849add05c181b8276dae89f19a425d96acc8b2452f50770",
+      "actualSize": 147495416,
+      "actualSha256": "a4109051ae8172121849add05c181b8276dae89f19a425d96acc8b2452f50770",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-source.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.20-source.zip",
+      "expectedSize": 27767562,
+      "expectedSha256": "865c01bfe830f12f831056bcdab16cad194e7526032294d77e8ff0ed3647e930",
+      "actualSize": 27767562,
+      "actualSha256": "865c01bfe830f12f831056bcdab16cad194e7526032294d77e8ff0ed3647e930",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-linux-x64.tar.gz",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.20-linux-x64.tar.gz",
+      "expectedSize": 160354329,
+      "expectedSha256": "0e3be74f29814036b57c9365fb646030758588148b3dd66a0122584b9ffdefc6",
+      "actualSize": 160354329,
+      "actualSha256": "0e3be74f29814036b57c9365fb646030758588148b3dd66a0122584b9ffdefc6",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-win-x64-Setup.exe.blockmap",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.20-win-x64-Setup.exe.blockmap",
+      "expectedSize": 152544,
+      "expectedSha256": "3b0b5701e96eeba980145020f81041f02534b5e8b5ca326d62db1e58d7b74139",
+      "actualSize": 152544,
+      "actualSha256": "3b0b5701e96eeba980145020f81041f02534b5e8b5ca326d62db1e58d7b74139",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-win-x64-Setup.exe",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.20-win-x64-Setup.exe",
+      "expectedSize": 146405865,
+      "expectedSha256": "f4510fcc776143e31a7e8de75b94f4bb24b1950892b4891aebd0c7779a7a7018",
+      "actualSize": 146405865,
+      "actualSha256": "f4510fcc776143e31a7e8de75b94f4bb24b1950892b4891aebd0c7779a7a7018",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-linux-arm64.tar.gz",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.20-linux-arm64.tar.gz",
+      "expectedSize": 159435858,
+      "expectedSha256": "a45c657a7f1535453f6c3303e3de872221896e4f2d71c0379782f4d4196d0744",
+      "actualSize": 159435858,
+      "actualSha256": "a45c657a7f1535453f6c3303e3de872221896e4f2d71c0379782f4d4196d0744",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-win7-legacy-Setup.exe.blockmap",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.20-win7-legacy-Setup.exe.blockmap",
+      "expectedSize": 104985,
+      "expectedSha256": "1afdbdc46cb08b84eaced6b38a17a9a6ea6bd96a1f44d15fcaf48d2cff78b336",
+      "actualSize": 104985,
+      "actualSha256": "1afdbdc46cb08b84eaced6b38a17a9a6ea6bd96a1f44d15fcaf48d2cff78b336",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-win7-legacy-x64.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.20-win7-legacy-x64.zip",
+      "expectedSize": 134420209,
+      "expectedSha256": "81ccdbfe5284674cbde4f3388689355afd421fd1d1899bd83a3c1387904c390a",
+      "actualSize": 134420209,
+      "actualSha256": "81ccdbfe5284674cbde4f3388689355afd421fd1d1899bd83a3c1387904c390a",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-win7-legacy-Setup.exe",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.20-win7-legacy-Setup.exe",
+      "expectedSize": 99550972,
+      "expectedSha256": "24ae08a6ece6dcbabc97d5cbafc95d8530f759a915675ca88777800550da16da",
+      "actualSize": 99550972,
+      "actualSha256": "24ae08a6ece6dcbabc97d5cbafc95d8530f759a915675ca88777800550da16da",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "expectedSize": 10190,
+      "expectedSha256": "b656175abd7283ab4ddb43eb46cc3b38ce666af4d9b5378c3a6e1ed98a23b129",
+      "actualSize": 10190,
+      "actualSha256": "b656175abd7283ab4ddb43eb46cc3b38ce666af4d9b5378c3a6e1ed98a23b129",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-Android-0.1.10.apk",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.10.apk",
+      "expectedSize": 2623004,
+      "expectedSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "actualSize": 2623004,
+      "actualSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "expectedSize": 10190,
+      "expectedSha256": "bd1b43bb821a5fb2a122f0d5e8e3e3d2b0c3bbb94f887016be79f9e6ed98aebe",
+      "actualSize": 10190,
+      "actualSha256": "bd1b43bb821a5fb2a122f0d5e8e3e3d2b0c3bbb94f887016be79f9e6ed98aebe",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.5-simulator.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.5-simulator.zip",
+      "expectedSize": 1106970,
+      "expectedSha256": "f10ee1d6c48477c1c732bf2b6c9ebf045ca26163f34e79a8ba02ecb7b58ed5d1",
+      "actualSize": 1106970,
+      "actualSha256": "f10ee1d6c48477c1c732bf2b6c9ebf045ca26163f34e79a8ba02ecb7b58ed5d1",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.5-source.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.5-source.zip",
+      "expectedSize": 228567,
+      "expectedSha256": "86b721aed7ddc5558a7840178f635dfa417ac947f72c0773a4a5c08fc48b33c5",
+      "actualSize": 228567,
+      "actualSha256": "86b721aed7ddc5558a7840178f635dfa417ac947f72c0773a4a5c08fc48b33c5",
+      "passed": true
+    },
+    {
+      "name": "update-legacy.json",
+      "url": "https://lolzcloud.com/downloads/update-legacy.json",
+      "expectedSize": 588,
+      "expectedSha256": "61a5759a01ac2a1d57898a30b35c096e4ae5233ff84bd0559291a6a9bc7adad7",
+      "actualSize": 588,
+      "actualSha256": "61a5759a01ac2a1d57898a30b35c096e4ae5233ff84bd0559291a6a9bc7adad7",
+      "passed": true
+    },
+    {
+      "name": "update.json",
+      "url": "https://lolzcloud.com/downloads/update.json",
+      "expectedSize": 565,
+      "expectedSha256": "271e24622926a7daffc4315ec5558ae781f4ab03e6d5a21d0e9084c3f1e39be9",
+      "actualSize": 565,
+      "actualSha256": "271e24622926a7daffc4315ec5558ae781f4ab03e6d5a21d0e9084c3f1e39be9",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-SHA256SUMS.txt",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.20-SHA256SUMS.txt",
+      "expectedSize": 2039,
+      "expectedSha256": "c3a89dff879592a60283b73824a816071684d2e53adcb0c7ad259cc53d95c0af",
+      "actualSize": 2039,
+      "actualSha256": "c3a89dff879592a60283b73824a816071684d2e53adcb0c7ad259cc53d95c0af",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.5-unsigned.ipa",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.5-unsigned.ipa",
+      "expectedSize": 287374,
+      "expectedSha256": "d834698cedde7f12b9077f2cbc535186790e9560673bf9cdb70734100fcfdbe1",
+      "actualSize": 287374,
+      "actualSha256": "d834698cedde7f12b9077f2cbc535186790e9560673bf9cdb70734100fcfdbe1",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-win-x64.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.20-win-x64.zip",
+      "expectedSize": 196703136,
+      "expectedSha256": "9e301f5bb5a2e12d6bfe73900aa2a5c13b84447f83fae4df7c4b840b28808c25",
+      "actualSize": 196703136,
+      "actualSha256": "9e301f5bb5a2e12d6bfe73900aa2a5c13b84447f83fae4df7c4b840b28808c25",
+      "passed": true
+    }
+  ],
+  "githubChecks": [
+    {
+      "name": "android-update.json",
+      "assetId": 751290477,
+      "expectedSize": 441,
+      "expectedSha256": "c14815be2a3a7f52bc98d4125d1f4c78c823796e0ba656e1369693f7bef95114",
+      "actualSize": 441,
+      "actualSha256": "c14815be2a3a7f52bc98d4125d1f4c78c823796e0ba656e1369693f7bef95114",
+      "passed": true
+    },
+    {
+      "name": "latest.yml",
+      "assetId": 751290565,
+      "expectedSize": 366,
+      "expectedSha256": "258ed5b117d3059be86a596c02cc44c40b0b4ef7e914f1fc7c7a3c9e64bfcd54",
+      "actualSize": 366,
+      "actualSha256": "258ed5b117d3059be86a596c02cc44c40b0b4ef7e914f1fc7c7a3c9e64bfcd54",
+      "passed": true
+    },
+    {
+      "name": "legacy.yml",
+      "assetId": 751290682,
+      "expectedSize": 373,
+      "expectedSha256": "1af1dc5146c17edd2450e16ba37410b43e2c53c4c29399ebb6af281daac44bf4",
+      "actualSize": 373,
+      "actualSha256": "1af1dc5146c17edd2450e16ba37410b43e2c53c4c29399ebb6af281daac44bf4",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-linux-arm64.tar.gz",
+      "assetId": 751290843,
+      "expectedSize": 159435858,
+      "expectedSha256": "a45c657a7f1535453f6c3303e3de872221896e4f2d71c0379782f4d4196d0744",
+      "actualSize": 159435858,
+      "actualSha256": "a45c657a7f1535453f6c3303e3de872221896e4f2d71c0379782f4d4196d0744",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-linux-x64.AppImage",
+      "assetId": 751291455,
+      "expectedSize": 147495416,
+      "expectedSha256": "a4109051ae8172121849add05c181b8276dae89f19a425d96acc8b2452f50770",
+      "actualSize": 147495416,
+      "actualSha256": "a4109051ae8172121849add05c181b8276dae89f19a425d96acc8b2452f50770",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-linux-x64.tar.gz",
+      "assetId": 751291976,
+      "expectedSize": 160354329,
+      "expectedSha256": "0e3be74f29814036b57c9365fb646030758588148b3dd66a0122584b9ffdefc6",
+      "actualSize": 160354329,
+      "actualSha256": "0e3be74f29814036b57c9365fb646030758588148b3dd66a0122584b9ffdefc6",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-source.zip",
+      "assetId": 751292585,
+      "expectedSize": 27767562,
+      "expectedSha256": "865c01bfe830f12f831056bcdab16cad194e7526032294d77e8ff0ed3647e930",
+      "actualSize": 27767562,
+      "actualSha256": "865c01bfe830f12f831056bcdab16cad194e7526032294d77e8ff0ed3647e930",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-win-x64-Setup.exe",
+      "assetId": 751292842,
+      "expectedSize": 146405865,
+      "expectedSha256": "f4510fcc776143e31a7e8de75b94f4bb24b1950892b4891aebd0c7779a7a7018",
+      "actualSize": 146405865,
+      "actualSha256": "f4510fcc776143e31a7e8de75b94f4bb24b1950892b4891aebd0c7779a7a7018",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-win-x64-Setup.exe.blockmap",
+      "assetId": 751293267,
+      "expectedSize": 152544,
+      "expectedSha256": "3b0b5701e96eeba980145020f81041f02534b5e8b5ca326d62db1e58d7b74139",
+      "actualSize": 152544,
+      "actualSha256": "3b0b5701e96eeba980145020f81041f02534b5e8b5ca326d62db1e58d7b74139",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-win-x64.zip",
+      "assetId": 751293416,
+      "expectedSize": 196703136,
+      "expectedSha256": "9e301f5bb5a2e12d6bfe73900aa2a5c13b84447f83fae4df7c4b840b28808c25",
+      "actualSize": 196703136,
+      "actualSha256": "9e301f5bb5a2e12d6bfe73900aa2a5c13b84447f83fae4df7c4b840b28808c25",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-win7-legacy-Setup.exe",
+      "assetId": 751294047,
+      "expectedSize": 99550972,
+      "expectedSha256": "24ae08a6ece6dcbabc97d5cbafc95d8530f759a915675ca88777800550da16da",
+      "actualSize": 99550972,
+      "actualSha256": "24ae08a6ece6dcbabc97d5cbafc95d8530f759a915675ca88777800550da16da",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-win7-legacy-Setup.exe.blockmap",
+      "assetId": 751294342,
+      "expectedSize": 104985,
+      "expectedSha256": "1afdbdc46cb08b84eaced6b38a17a9a6ea6bd96a1f44d15fcaf48d2cff78b336",
+      "actualSize": 104985,
+      "actualSha256": "1afdbdc46cb08b84eaced6b38a17a9a6ea6bd96a1f44d15fcaf48d2cff78b336",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-win7-legacy-x64.zip",
+      "assetId": 751294435,
+      "expectedSize": 134420209,
+      "expectedSha256": "81ccdbfe5284674cbde4f3388689355afd421fd1d1899bd83a3c1387904c390a",
+      "actualSize": 134420209,
+      "actualSha256": "81ccdbfe5284674cbde4f3388689355afd421fd1d1899bd83a3c1387904c390a",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-Android-0.1.10.apk",
+      "assetId": 751294726,
+      "expectedSize": 2623004,
+      "expectedSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "actualSize": 2623004,
+      "actualSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "assetId": 751294841,
+      "expectedSize": 10190,
+      "expectedSha256": "b656175abd7283ab4ddb43eb46cc3b38ce666af4d9b5378c3a6e1ed98a23b129",
+      "actualSize": 10190,
+      "actualSha256": "b656175abd7283ab4ddb43eb46cc3b38ce666af4d9b5378c3a6e1ed98a23b129",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "assetId": 751294922,
+      "expectedSize": 10190,
+      "expectedSha256": "bd1b43bb821a5fb2a122f0d5e8e3e3d2b0c3bbb94f887016be79f9e6ed98aebe",
+      "actualSize": 10190,
+      "actualSha256": "bd1b43bb821a5fb2a122f0d5e8e3e3d2b0c3bbb94f887016be79f9e6ed98aebe",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.5-simulator.zip",
+      "assetId": 751295016,
+      "expectedSize": 1106970,
+      "expectedSha256": "f10ee1d6c48477c1c732bf2b6c9ebf045ca26163f34e79a8ba02ecb7b58ed5d1",
+      "actualSize": 1106970,
+      "actualSha256": "f10ee1d6c48477c1c732bf2b6c9ebf045ca26163f34e79a8ba02ecb7b58ed5d1",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.5-source.zip",
+      "assetId": 751295102,
+      "expectedSize": 228567,
+      "expectedSha256": "86b721aed7ddc5558a7840178f635dfa417ac947f72c0773a4a5c08fc48b33c5",
+      "actualSize": 228567,
+      "actualSha256": "86b721aed7ddc5558a7840178f635dfa417ac947f72c0773a4a5c08fc48b33c5",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.5-unsigned.ipa",
+      "assetId": 751295193,
+      "expectedSize": 287374,
+      "expectedSha256": "d834698cedde7f12b9077f2cbc535186790e9560673bf9cdb70734100fcfdbe1",
+      "actualSize": 287374,
+      "actualSha256": "d834698cedde7f12b9077f2cbc535186790e9560673bf9cdb70734100fcfdbe1",
+      "passed": true
+    },
+    {
+      "name": "update-legacy.json",
+      "assetId": 751295348,
+      "expectedSize": 588,
+      "expectedSha256": "61a5759a01ac2a1d57898a30b35c096e4ae5233ff84bd0559291a6a9bc7adad7",
+      "actualSize": 588,
+      "actualSha256": "61a5759a01ac2a1d57898a30b35c096e4ae5233ff84bd0559291a6a9bc7adad7",
+      "passed": true
+    },
+    {
+      "name": "update.json",
+      "assetId": 751295452,
+      "expectedSize": 565,
+      "expectedSha256": "271e24622926a7daffc4315ec5558ae781f4ab03e6d5a21d0e9084c3f1e39be9",
+      "actualSize": 565,
+      "actualSha256": "271e24622926a7daffc4315ec5558ae781f4ab03e6d5a21d0e9084c3f1e39be9",
+      "passed": true
+    },
+    {
+      "name": "LolzCloud-0.9.20-SHA256SUMS.txt",
+      "assetId": 751295564,
+      "expectedSize": 2039,
+      "expectedSha256": "c3a89dff879592a60283b73824a816071684d2e53adcb0c7ad259cc53d95c0af",
+      "actualSize": 2039,
+      "actualSha256": "c3a89dff879592a60283b73824a816071684d2e53adcb0c7ad259cc53d95c0af",
+      "passed": true
+    }
+  ],
+  "mutations": [
+    {
+      "action": "created-missing-tag",
+      "ref": "refs/tags/v0.9.20",
+      "commit": "ddcd722fe533390de3ae00680dbf41dac176c604"
+    },
+    {
+      "action": "created-draft",
+      "tag": "v0.9.20",
+      "releaseId": 446125613
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "android-update.json"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "latest.yml"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "legacy.yml"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-0.9.20-linux-arm64.tar.gz"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-0.9.20-linux-x64.AppImage"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-0.9.20-linux-x64.tar.gz"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-0.9.20-source.zip"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-0.9.20-win-x64-Setup.exe"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-0.9.20-win-x64-Setup.exe.blockmap"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-0.9.20-win-x64.zip"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-0.9.20-win7-legacy-Setup.exe"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-0.9.20-win7-legacy-Setup.exe.blockmap"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-0.9.20-win7-legacy-x64.zip"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-Android-0.1.10.apk"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-browser-helper-1.2.0-chromium.zip"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-browser-helper-1.2.0-firefox.zip"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-iOS-0.1.5-simulator.zip"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-iOS-0.1.5-source.zip"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-iOS-0.1.5-unsigned.ipa"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "update-legacy.json"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "update.json"
+    },
+    {
+      "action": "uploaded-missing-asset",
+      "name": "LolzCloud-0.9.20-SHA256SUMS.txt"
+    },
+    {
+      "action": "published-latest",
+      "releaseId": 446125613
+    }
+  ],
+  "planSha256": "c7a7ab50e2627c16345744adfd096b3c99d238c3e3768e8c949ee88be342d019",
+  "repository": "Artemper52/LolzCloud",
+  "tag": "v0.9.20",
+  "expectedCommit": "ddcd722fe533390de3ae00680dbf41dac176c604",
+  "totalPlannedBytes": 1076661543,
+  "preexistingTag": null,
+  "tagResolution": {
+    "refSha": "ddcd722fe533390de3ae00680dbf41dac176c604",
+    "commit": "ddcd722fe533390de3ae00680dbf41dac176c604"
+  },
+  "preexistingRelease": null,
+  "release": {
+    "id": 446125613,
+    "url": "https://github.com/Artemper52/LolzCloud/releases/tag/v0.9.20",
+    "draft": false,
+    "latest": true
+  },
+  "finishedAt": "2026-11-15T14:41:55.091Z"
+}

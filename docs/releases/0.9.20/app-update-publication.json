@@ -1,0 +1,15 @@
+{
+  "status": "published-and-verified",
+  "modern": "20261115T134348-updates-0.9.20-35f3fbe8",
+  "android": "20261115T135855-android-0.1.10-7baa8db7",
+  "previous": "/srv/lolzcloud/releases/20261115T113004-platforms-0.9.19-b4ba9174/downloads",
+  "current": "/srv/lolzcloud/releases/20261115T135855-android-0.1.10-7baa8db7/downloads",
+  "windowsVersion": "0.9.20",
+  "androidVersion": "0.1.10",
+  "androidVersionCode": 11,
+  "publicManifestsExact": true,
+  "olderImmutableFilesVerified": 17,
+  "servicesUnrestarted": true,
+  "sourceCommit": "ddcd722fe533390de3ae00680dbf41dac176c604",
+  "checkedAt": "2026-11-15T14:35:43.462Z"
+}

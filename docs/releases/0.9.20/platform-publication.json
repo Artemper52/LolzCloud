@@ -1,0 +1,105 @@
+{
+  "status": "published-and-origin-byte-verified",
+  "receipt": {
+    "status": "published",
+    "release": "20261115T143036-platforms-0.9.20-dc313cea",
+    "version": "0.9.20",
+    "previous": "/srv/lolzcloud/releases/20261115T135855-android-0.1.10-7baa8db7/downloads",
+    "destination": "/srv/lolzcloud/releases/20261115T143036-platforms-0.9.20-dc313cea/downloads",
+    "files": [
+      {
+        "name": "LolzCloud-0.9.20-linux-x64.AppImage",
+        "remote": "/opt/lolzcloud-builds/release-0.9.20/dist/LolzCloud-0.9.20-linux-x64.AppImage",
+        "size": 147495416,
+        "sha256": "a4109051ae8172121849add05c181b8276dae89f19a425d96acc8b2452f50770",
+        "source": "build"
+      },
+      {
+        "name": "LolzCloud-0.9.20-linux-x64.tar.gz",
+        "remote": "/opt/lolzcloud-builds/release-0.9.20/dist/LolzCloud-0.9.20-linux-x64.tar.gz",
+        "size": 160354329,
+        "sha256": "0e3be74f29814036b57c9365fb646030758588148b3dd66a0122584b9ffdefc6",
+        "source": "build"
+      },
+      {
+        "name": "LolzCloud-0.9.20-linux-arm64.tar.gz",
+        "remote": "/opt/lolzcloud-builds/release-0.9.20/dist/LolzCloud-0.9.20-linux-arm64.tar.gz",
+        "size": 159435858,
+        "sha256": "a45c657a7f1535453f6c3303e3de872221896e4f2d71c0379782f4d4196d0744",
+        "source": "build"
+      },
+      {
+        "name": "LolzCloud-0.9.20-win7-legacy-Setup.exe",
+        "size": 99550972,
+        "sha256": "24ae08a6ece6dcbabc97d5cbafc95d8530f759a915675ca88777800550da16da",
+        "source": "upload"
+      },
+      {
+        "name": "LolzCloud-0.9.20-win7-legacy-x64.zip",
+        "size": 134420209,
+        "sha256": "81ccdbfe5284674cbde4f3388689355afd421fd1d1899bd83a3c1387904c390a",
+        "source": "upload"
+      },
+      {
+        "name": "LolzCloud-0.9.20-win7-legacy-Setup.exe.blockmap",
+        "size": 104985,
+        "sha256": "1afdbdc46cb08b84eaced6b38a17a9a6ea6bd96a1f44d15fcaf48d2cff78b336",
+        "source": "upload"
+      },
+      {
+        "name": "legacy.yml",
+        "size": 373,
+        "sha256": "1af1dc5146c17edd2450e16ba37410b43e2c53c4c29399ebb6af281daac44bf4",
+        "source": "upload"
+      },
+      {
+        "name": "LolzCloud-iOS-0.1.5-source.zip",
+        "size": 228567,
+        "sha256": "86b721aed7ddc5558a7840178f635dfa417ac947f72c0773a4a5c08fc48b33c5",
+        "source": "upload"
+      },
+      {
+        "name": "LolzCloud-iOS-0.1.5-unsigned.ipa",
+        "size": 287374,
+        "sha256": "d834698cedde7f12b9077f2cbc535186790e9560673bf9cdb70734100fcfdbe1",
+        "source": "upload"
+      },
+      {
+        "name": "LolzCloud-iOS-0.1.5-simulator.zip",
+        "size": 1106970,
+        "sha256": "f10ee1d6c48477c1c732bf2b6c9ebf045ca26163f34e79a8ba02ecb7b58ed5d1",
+        "source": "upload"
+      },
+      {
+        "name": "update-legacy.json",
+        "size": 588,
+        "sha256": "61a5759a01ac2a1d57898a30b35c096e4ae5233ff84bd0559291a6a9bc7adad7",
+        "source": "upload"
+      },
+      {
+        "name": "LolzCloud-0.9.20-source.zip",
+        "size": 27767562,
+        "sha256": "865c01bfe830f12f831056bcdab16cad194e7526032294d77e8ff0ed3647e930",
+        "source": "upload"
+      },
+      {
+        "name": "LolzCloud-0.9.20-SHA256SUMS.txt",
+        "size": 2039,
+        "sha256": "c3a89dff879592a60283b73824a816071684d2e53adcb0c7ad259cc53d95c0af",
+        "source": "upload"
+      },
+      {
+        "name": "platforms.json",
+        "size": 6678,
+        "sha256": "66c8b158b114e56832f07c4f6725a36dc1f8de916024b4a6a7db8bf4d127dc83",
+        "source": "upload"
+      }
+    ]
+  },
+  "all22SHA256Passed": true,
+  "older17ImmutableSHA256Passed": true,
+  "publicInventoryVersion": "0.9.20",
+  "servicesUnrestarted": true,
+  "sourceCommit": "ddcd722fe533390de3ae00680dbf41dac176c604",
+  "checkedAt": "2026-11-15T14:37:37.284Z"
+}

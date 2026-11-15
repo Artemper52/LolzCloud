@@ -1,0 +1,103 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T14:26:59.526Z",
+  "version": "0.9.20",
+  "sourceCommit": "ddcd722fe533390de3ae00680dbf41dac176c604",
+  "branch": "codex/recover-music-0.9.20",
+  "sourceArchive": {
+    "name": "LolzCloud-0.9.20-source.zip",
+    "path": "D:\\LolzCloud-Android-Toolchain\\release-0.9.20\\LolzCloud-0.9.20-source.zip",
+    "size": 27767562,
+    "sha256": "865c01bfe830f12f831056bcdab16cad194e7526032294d77e8ff0ed3647e930",
+    "entries": 1392,
+    "files": 1260,
+    "directories": 132,
+    "uncompressedBytes": 35091481
+  },
+  "archive": {
+    "method": "git -c core.autocrlf=false -c core.eol=lf archive --format=zip REF -- matching tools/source-archive roots",
+    "overlays": 0,
+    "commitComment": "ddcd722fe533390de3ae00680dbf41dac176c604",
+    "allSelectedGitBlobsRawEqual": 1260,
+    "strictSafePaths": true,
+    "duplicates": 0,
+    "symlinks": 0,
+    "encrypted": 0,
+    "privateScan": "passed"
+  },
+  "canonical": {
+    "native": {
+      "files": 31,
+      "exact": 31
+    },
+    "pwa": {
+      "files": 26,
+      "exact": 26
+    },
+    "desktop": {
+      "files": 155,
+      "exact": 155
+    },
+    "android": {
+      "files": 63,
+      "exact": 63
+    },
+    "websiteChanged": {
+      "files": 5,
+      "exact": 5
+    },
+    "website13": {
+      "files": 13,
+      "exact": 13
+    }
+  },
+  "androidGeneratedAssets": {
+    "notTrackedOrArchived": 11,
+    "recreatedOnlyInIsolatedScratch": 11,
+    "sourceDigest": "6338119feb0a54eae8a837eae71de47c3dc08d9e23f4a750db9df3bdbbd1ae8e"
+  },
+  "websiteLineEndings": {
+    "rawSourceCompared": true,
+    "siteConfigRawSha256": "f6e2155cca27f5ec27f716c92aa9623d01246624342f8ddaa40bcdf9c34f7440",
+    "canonicalLfSha256": "ef34b73f160e8353f492d59a52f924ec9435fa85f72f2281ab757ebc357827ab",
+    "sourceNotNormalized": true
+  },
+  "originalGitUntouched": true,
+  "originalBefore": {
+    "head": "ec8fe2fa88ead02ed1fca9c435d8932b3c1ce794",
+    "branch": "release/0.9.5",
+    "indexSha256": "ddb79f8ddb4f505a12bd687c0c6df46acc27d2b14077284217004544c74f535e"
+  },
+  "originalAfter": {
+    "head": "ec8fe2fa88ead02ed1fca9c435d8932b3c1ce794",
+    "branch": "release/0.9.5",
+    "indexSha256": "ddb79f8ddb4f505a12bd687c0c6df46acc27d2b14077284217004544c74f535e"
+  },
+  "scratch": "D:\\LolzCloud-Android-Toolchain\\release-0.9.20\\final-source-qa-ddcd722f\\source",
+  "noPublication": true,
+  "finalLinuxNodeQA": {
+    "status": "passed",
+    "sourceCommit": "ddcd722fe533390de3ae00680dbf41dac176c604",
+    "tests": {
+      "tests": 526,
+      "pass": 526,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0
+    },
+    "check": "JavaScript syntax checked: 297 files.",
+    "node": "v24.22.2",
+    "uid": 986,
+    "report": "linux/verification.json",
+    "reportSha256": "5b1a8d9179732d1da3f852b83086f238e752e72797d9304515a20ea891c3395c",
+    "tap": "linux/full-node.tap",
+    "tapSha256": "5b2cd4dd9ec22dbbf00518ff8d3fb2f4a6bb9c4dcc7da9c4d9a59be8823e35bd",
+    "frozenBuildRoot": {
+      "files": 155,
+      "exactOriginalInput": 153,
+      "documentedGeneratedHelperContainers": 2,
+      "unexpectedChanges": 0
+    }
+  }
+}

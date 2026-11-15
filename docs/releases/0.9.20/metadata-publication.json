@@ -1,0 +1,24 @@
+{
+  "status": "published-github-inventory-verified",
+  "receipt": {
+    "status": "published",
+    "release": "20261115T145410-platforms-0.9.20-8c1e6fac",
+    "version": "0.9.20",
+    "previous": "/srv/lolzcloud/releases/20261115T143036-platforms-0.9.20-dc313cea/downloads",
+    "destination": "/srv/lolzcloud/releases/20261115T145410-platforms-0.9.20-8c1e6fac/downloads",
+    "files": [
+      {
+        "name": "platforms.json",
+        "size": 7021,
+        "sha256": "376ba534484284c9f37d9feabfa7787c124f8f8dae8f917987c4bd3d61230d6a",
+        "source": "upload"
+      }
+    ]
+  },
+  "all22SHA256AndInodesPreserved": true,
+  "mutableInventoryUsesNewInode": true,
+  "oldInventoryPreserved": true,
+  "githubRelease": 446125613,
+  "sourceCommit": "ddcd722fe533390de3ae00680dbf41dac176c604",
+  "checkedAt": "2026-11-15T14:56:04.260Z"
+}

@@ -1,0 +1,29 @@
+{
+  "status": "passed",
+  "runId": 43725524721,
+  "artifactId": 14165344605,
+  "bytes": 6840,
+  "sha256": "28732e8b32930b3f265d5bf121917b3aa5efd93c0257d15f37f7ac0c16d31ef3",
+  "officialChecks": 22,
+  "githubChecks": 22,
+  "sourceCommit": "ddcd722fe533390de3ae00680dbf41dac176c604",
+  "releaseId": 446125613,
+  "latest": true,
+  "members": [
+    {
+      "name": "actual-SHA256SUMS.txt",
+      "bytes": 2137,
+      "sha256": "1660657139b78cd9af7c2daf6e31d71f85b8512b4978658332ed44050b1c49ac"
+    },
+    {
+      "name": "reviewed-plan.json",
+      "bytes": 8536,
+      "sha256": "d82b2e9206c77573ed35431d80386744e40f194b612fe7d6b38135f8e495e8ba"
+    },
+    {
+      "name": "verification.json",
+      "bytes": 19987,
+      "sha256": "0b565fa4deceba0639ef1f07453df4cbc9de78844be02658472e6c970bcc3393"
+    }
+  ]
+}

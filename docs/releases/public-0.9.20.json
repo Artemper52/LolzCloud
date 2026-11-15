@@ -1,0 +1,109 @@
+{
+  "status": "published-and-verified",
+  "checkedAt": "2026-11-15T15:04:48.896Z",
+  "versions": {
+    "desktop": "0.9.20",
+    "android": "0.1.10",
+    "androidVersionCode": 11,
+    "nativeIOS": "0.1.5",
+    "nativeIOSBuild": 6,
+    "pwa": "0.9.23",
+    "serviceWorker": 8
+  },
+  "source": {
+    "commit": "ddcd722fe533390de3ae00680dbf41dac176c604",
+    "branch": "codex/recover-music-0.9.20",
+    "archive": "LolzCloud-0.9.20-source.zip",
+    "bytes": 27767562,
+    "sha256": "865c01bfe830f12f831056bcdab16cad194e7526032294d77e8ff0ed3647e930",
+    "rawGitFiles": 1260,
+    "overlays": 0,
+    "canonical": {
+      "native": {
+        "files": 31,
+        "exact": 31
+      },
+      "pwa": {
+        "files": 26,
+        "exact": 26
+      },
+      "desktop": {
+        "files": 155,
+        "exact": 155
+      },
+      "android": {
+        "files": 63,
+        "exact": 63
+      },
+      "websiteChanged": {
+        "files": 5,
+        "exact": 5
+      },
+      "website13": {
+        "files": 13,
+        "exact": 13
+      }
+    }
+  },
+  "github": {
+    "url": "https://github.com/Artemper52/LolzCloud/releases/tag/v0.9.20",
+    "releaseId": 446125613,
+    "tag": "v0.9.20",
+    "latest": true,
+    "workflowCommit": "664e4adb9a1854913eeced2d0c5bf85495baaf19",
+    "run": "https://github.com/Artemper52/LolzCloud/actions/runs/43725524721",
+    "artifact": 14165344605,
+    "artifactBytes": 6840,
+    "artifactSha256": "28732e8b32930b3f265d5bf121917b3aa5efd93c0257d15f37f7ac0c16d31ef3",
+    "files": 22,
+    "bytes": 1076661543,
+    "officialFullByteChecks": 22,
+    "githubFullByteChecks": 22
+  },
+  "android": {
+    "versionName": "0.1.10",
+    "versionCode": 11,
+    "packageName": "com.lolzcloud.mobile",
+    "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.10.apk",
+    "size": 2623004,
+    "sha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+    "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+    "sourceSha256": "6338119feb0a54eae8a837eae71de47c3dc08d9e23f4a750db9df3bdbbd1ae8e"
+  },
+  "checks": {
+    "linuxSource": {
+      "passed": 526,
+      "failed": 0,
+      "skipped": 0
+    },
+    "desktopActualPitch": 9,
+    "desktopActualCacheUI": 12,
+    "androidRuntimeSuites": 9,
+    "pwaActualPitch": 47,
+    "pwaActualLyrics": 23,
+    "nativeSDKPolicy": 84,
+    "nativeIphone": 17,
+    "nativeIpad": 17,
+    "websiteUI": 22,
+    "publicHTTPS": 56,
+    "publicUpdateCases": 4
+  },
+  "deployment": {
+    "site": "/srv/lolzcloud/releases/20261115T141741-website-0.9.20-1b587b49",
+    "downloads": "/srv/lolzcloud/releases/20261115T145410-platforms-0.9.20-8c1e6fac/downloads",
+    "mainServer": "20261115-social-0.9.23-18ab51d0",
+    "older17VersionedFilesPreserved": true,
+    "all22FilesPreservedDuringMetadataUpdate": true,
+    "privateBackupsRetainedOnServer": true
+  },
+  "originalWorkspaceGitUntouched": {
+    "head": "ec8fe2fa88ead02ed1fca9c435d8932b3c1ce794",
+    "index": "ddb79f8ddb4f505a12bd687c0c6df46acc27d2b14077284217004544c74f535e"
+  },
+  "limits": [
+    "Physical Android/iPhone/iPad, physical Windows7 and ARM64 Linux runtime were not tested.",
+    "Native iOS IPA is unsigned and requires the user’s own Apple signing; the installed web app is the free route.",
+    "Lyrics timing adaptation estimates the ratio of complete recording durations; changed arrangements/excerpts/ambiguous originals remain plain text.",
+    "External recording or lyric availability can change; these checks do not establish zero possible bugs."
+  ]
+}

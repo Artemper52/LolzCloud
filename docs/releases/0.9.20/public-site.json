@@ -1,0 +1,362 @@
+{
+  "status": "passed",
+  "startedAt": "2026-11-15T14:59:50.838Z",
+  "probe": "origin-host SSH executing genuine public HTTPS GET/Range",
+  "checks": [
+    {
+      "name": "Website source index.html",
+      "passed": true,
+      "bytes": 12176,
+      "sha256": "7e2d78f0e501066b46c5615169776d201859987080f269f7d844fee8cc276248"
+    },
+    {
+      "name": "Website source app.js",
+      "passed": true,
+      "bytes": 5731,
+      "sha256": "b3eeea84c681bd8825f53e1f2cedc1c384ccf376c879bf9c87889961d323b590"
+    },
+    {
+      "name": "Website source site-config.js",
+      "passed": true,
+      "bytes": 1409,
+      "sha256": "f6e2155cca27f5ec27f716c92aa9623d01246624342f8ddaa40bcdf9c34f7440"
+    },
+    {
+      "name": "Website source downloads.css",
+      "passed": true,
+      "bytes": 5475,
+      "sha256": "c06f7b6b1d24f494702b7e917bacd2e343cc8570ae716c40143cebf53a3a9b5c"
+    },
+    {
+      "name": "Website source style.css",
+      "passed": true,
+      "bytes": 13750,
+      "sha256": "ee775bd4799ee126ab356a7e1af80da7a5cc12e4843c58591c10463d4ac298a6"
+    },
+    {
+      "name": "Website source install.html",
+      "passed": true,
+      "bytes": 24542,
+      "sha256": "9aa9afa5047ac14aa4c5d84f110535a247966e79ea5b2343620bf80556691232"
+    },
+    {
+      "name": "Website source assets/lyrics.png",
+      "passed": true,
+      "bytes": 466926,
+      "sha256": "68d7bd25cef2e91230fb61b613e86e43cd8db86575885db039102809e77e0024"
+    },
+    {
+      "name": "Website source install.js",
+      "passed": true,
+      "bytes": 198,
+      "sha256": "cb749cac3621f6076f2181f3f218e315cd6e5f49e96234c47d709cde18219c43"
+    },
+    {
+      "name": "Website source assets/logo.svg",
+      "passed": true,
+      "bytes": 396,
+      "sha256": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512"
+    },
+    {
+      "name": "Website source assets/mini.png",
+      "passed": true,
+      "bytes": 208458,
+      "sha256": "f077fddaae2e91bd45fb1d1eabff964ecdd4a67e137a1c391beaab309a7db1f7"
+    },
+    {
+      "name": "Website source assets/sound.png",
+      "passed": true,
+      "bytes": 277759,
+      "sha256": "149ae16294bc08be918479ee655b763eaa2fff6057b5a119dfb8afa4d12bcf0d"
+    },
+    {
+      "name": "Website source assets/record.svg",
+      "passed": true,
+      "bytes": 3353,
+      "sha256": "ba31b0fa22b3f202223aec6400f9b2b665fa5cda321a1ca0afa4756cee1a535b"
+    },
+    {
+      "name": "Website source assets/wave.png",
+      "passed": true,
+      "bytes": 501215,
+      "sha256": "079fcb00a64ec53828b3f13308d79702d02ed7c4d6346694787e2dbd1b5e55cd"
+    },
+    {
+      "name": "PWA23 source app.css",
+      "passed": true,
+      "bytes": 22196,
+      "sha256": "9009c62e3918ee15d9e526f75b275751363fb93b69f31a5b278b483064ab6994"
+    },
+    {
+      "name": "PWA23 source core.js",
+      "passed": true,
+      "bytes": 9897,
+      "sha256": "20a8d5b82f1c392438cd6655dd0f40f253e6d8ce6aace96e123dba4edca97daf"
+    },
+    {
+      "name": "PWA23 source app.js",
+      "passed": true,
+      "bytes": 109015,
+      "sha256": "717488069a937285bfa90b55d80a7497a6f54d67a1fb33a378acd721c70434ed"
+    },
+    {
+      "name": "PWA23 source icon-192.png",
+      "passed": true,
+      "bytes": 7875,
+      "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4"
+    },
+    {
+      "name": "PWA23 source effects-policy.js",
+      "passed": true,
+      "bytes": 5822,
+      "sha256": "bf64ce15a3bf67c957cb4a71e0ada1562c243d7a72bd81d8cc80b32e1c25ec8d"
+    },
+    {
+      "name": "PWA23 source effects.js",
+      "passed": true,
+      "bytes": 15926,
+      "sha256": "38b99aab18e973a71178ff07f48a6e9b3f14e5a72be1dc7c6e3a6a4cf6c52b4b"
+    },
+    {
+      "name": "PWA23 source imports.js",
+      "passed": true,
+      "bytes": 2375,
+      "sha256": "9c025444b795b53b730d27723d18006a743c11601f22c86b2f89bea9d384abc2"
+    },
+    {
+      "name": "PWA23 source icon.svg",
+      "passed": true,
+      "bytes": 366,
+      "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6"
+    },
+    {
+      "name": "PWA23 source icon-512.png",
+      "passed": true,
+      "bytes": 9687,
+      "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef"
+    },
+    {
+      "name": "PWA23 source limiter-worklet.js",
+      "passed": true,
+      "bytes": 2197,
+      "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112"
+    },
+    {
+      "name": "PWA23 source lyric-tempo.js",
+      "passed": true,
+      "bytes": 9015,
+      "sha256": "fd820683ae0016c0d03db791386650d836b001d3a3872e7ea0d3c944e9205bb3"
+    },
+    {
+      "name": "PWA23 source index.html",
+      "passed": true,
+      "bytes": 27501,
+      "sha256": "99f1eb4bbcfaf75b662b12b06dd740aed53e214aa0f0909e5286b490249c09eb"
+    },
+    {
+      "name": "PWA23 source lyrics.js",
+      "passed": true,
+      "bytes": 8186,
+      "sha256": "1ec2bda958ca4f56db27886fa49b51c54114bb9ac65e497264a920c06e6baf2c"
+    },
+    {
+      "name": "PWA23 source normalization-worklet.js",
+      "passed": true,
+      "bytes": 3376,
+      "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664"
+    },
+    {
+      "name": "PWA23 source manifest.webmanifest",
+      "passed": true,
+      "bytes": 440,
+      "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7"
+    },
+    {
+      "name": "PWA23 source offline.js",
+      "passed": true,
+      "bytes": 6286,
+      "sha256": "90356fe86dbb0140ee054e9fb3ebc50291cf5b4765e841bd827c30dc2d97f205"
+    },
+    {
+      "name": "PWA23 source pitch-worklet.js",
+      "passed": true,
+      "bytes": 10303,
+      "sha256": "7002ef718d7928978c3674ea721a5a248b0a028d698add83e81757cf632bbfc5"
+    },
+    {
+      "name": "PWA23 source profile-cloud.js",
+      "passed": true,
+      "bytes": 9042,
+      "sha256": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64"
+    },
+    {
+      "name": "PWA23 source profile-policy.js",
+      "passed": true,
+      "bytes": 9653,
+      "sha256": "93caf6e8b253316e4e9267a28c7b28356480ccf5308ac17aac560dee553bcc0e"
+    },
+    {
+      "name": "PWA23 source profile-crypto.js",
+      "passed": true,
+      "bytes": 2972,
+      "sha256": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206"
+    },
+    {
+      "name": "PWA23 source profile-crypto-worker.js",
+      "passed": true,
+      "bytes": 4898,
+      "sha256": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66"
+    },
+    {
+      "name": "PWA23 source vendor-scrypt-3.0.1.js",
+      "passed": true,
+      "bytes": 17811,
+      "sha256": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d"
+    },
+    {
+      "name": "PWA23 source sw.js",
+      "passed": true,
+      "bytes": 1920,
+      "sha256": "e6f320559a5f4b9f3fdb48149396e9727427c0ec407403ea778c830048c5e940"
+    },
+    {
+      "name": "PWA23 source profile.js",
+      "passed": true,
+      "bytes": 15541,
+      "sha256": "aeb95b56609cd3d77d5d5a6cda0c360132694837f1d027855016eac0df309429"
+    },
+    {
+      "name": "PWA23 source wave-history.js",
+      "passed": true,
+      "bytes": 2065,
+      "sha256": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3"
+    },
+    {
+      "name": "PWA23 source wave.js",
+      "passed": true,
+      "bytes": 15089,
+      "sha256": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4"
+    },
+    {
+      "name": "Root exact20 index alias",
+      "passed": true
+    },
+    {
+      "name": "Advertised download available LolzCloud-0.9.20-win7-legacy-Setup.exe",
+      "passed": true,
+      "size": 99550972,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-0.9.20-win-x64-Setup.exe",
+      "passed": true,
+      "size": 146405865,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-0.9.20-win-x64.zip",
+      "passed": true,
+      "size": 196703136,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-0.9.20-linux-x64.AppImage",
+      "passed": true,
+      "size": 147495416,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-0.9.20-linux-x64.tar.gz",
+      "passed": true,
+      "size": 160354329,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-0.9.20-win7-legacy-x64.zip",
+      "passed": true,
+      "size": 134420209,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-0.9.20-linux-arm64.tar.gz",
+      "passed": true,
+      "size": 159435858,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-0.9.20-source.zip",
+      "passed": true,
+      "size": 27767562,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-Android-0.1.10.apk",
+      "passed": true,
+      "size": 2623004,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-iOS-0.1.5-unsigned.ipa",
+      "passed": true,
+      "size": 287374,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-iOS-0.1.5-source.zip",
+      "passed": true,
+      "size": 228567,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-iOS-0.1.5-simulator.zip",
+      "passed": true,
+      "size": 1106970,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "passed": true,
+      "size": 10190,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Advertised download available LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "passed": true,
+      "size": 10190,
+      "rangeBytes": 1,
+      "fullSHA256Claimed": false
+    },
+    {
+      "name": "Backend23 room2/social1 health",
+      "passed": true
+    },
+    {
+      "name": "Music wave1 health",
+      "passed": true
+    }
+  ],
+  "versions": {
+    "website": "0.9.20",
+    "pwa": "0.9.23",
+    "worker": "v8"
+  },
+  "personalAccountsUsed": false,
+  "publicationAttempted": false,
+  "manualTelegramApiCalls": 0,
+  "finishedAt": "2026-11-15T14:59:52.000Z",
+  "passed": 56,
+  "failed": 0
+}

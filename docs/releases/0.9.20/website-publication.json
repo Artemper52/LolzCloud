@@ -1,0 +1,111 @@
+{
+  "status": "published-and-origin-verified",
+  "receipt": {
+    "status": "published",
+    "release": "20261115T141741-website-0.9.20-1b587b49",
+    "version": "0.9.20",
+    "previous": "/srv/lolzcloud/releases/20261115T104642-website-0.9.19-70d41537",
+    "destination": "/srv/lolzcloud/releases/20261115T141741-website-0.9.20-1b587b49",
+    "downloads": "/srv/lolzcloud/releases/20261115T145410-platforms-0.9.20-8c1e6fac/downloads",
+    "files": [
+      {
+        "name": "index.html",
+        "size": 12176,
+        "sha256": "7e2d78f0e501066b46c5615169776d201859987080f269f7d844fee8cc276248"
+      },
+      {
+        "name": "app.js",
+        "size": 5731,
+        "sha256": "b3eeea84c681bd8825f53e1f2cedc1c384ccf376c879bf9c87889961d323b590"
+      },
+      {
+        "name": "site-config.js",
+        "size": 1409,
+        "sha256": "f6e2155cca27f5ec27f716c92aa9623d01246624342f8ddaa40bcdf9c34f7440"
+      },
+      {
+        "name": "style.css",
+        "size": 13750,
+        "sha256": "ee775bd4799ee126ab356a7e1af80da7a5cc12e4843c58591c10463d4ac298a6"
+      },
+      {
+        "name": "downloads.css",
+        "size": 5475,
+        "sha256": "c06f7b6b1d24f494702b7e917bacd2e343cc8570ae716c40143cebf53a3a9b5c"
+      },
+      {
+        "name": "install.html",
+        "size": 24542,
+        "sha256": "9aa9afa5047ac14aa4c5d84f110535a247966e79ea5b2343620bf80556691232"
+      },
+      {
+        "name": "install.js",
+        "size": 198,
+        "sha256": "cb749cac3621f6076f2181f3f218e315cd6e5f49e96234c47d709cde18219c43"
+      },
+      {
+        "name": "assets/logo.svg",
+        "size": 396,
+        "sha256": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512"
+      },
+      {
+        "name": "assets/lyrics.png",
+        "size": 466926,
+        "sha256": "68d7bd25cef2e91230fb61b613e86e43cd8db86575885db039102809e77e0024"
+      },
+      {
+        "name": "assets/mini.png",
+        "size": 208458,
+        "sha256": "f077fddaae2e91bd45fb1d1eabff964ecdd4a67e137a1c391beaab309a7db1f7"
+      },
+      {
+        "name": "assets/record.svg",
+        "size": 3353,
+        "sha256": "ba31b0fa22b3f202223aec6400f9b2b665fa5cda321a1ca0afa4756cee1a535b"
+      },
+      {
+        "name": "assets/sound.png",
+        "size": 277759,
+        "sha256": "149ae16294bc08be918479ee655b763eaa2fff6057b5a119dfb8afa4d12bcf0d"
+      },
+      {
+        "name": "assets/wave.png",
+        "size": 501215,
+        "sha256": "079fcb00a64ec53828b3f13308d79702d02ed7c4d6346694787e2dbd1b5e55cd"
+      }
+    ]
+  },
+  "preflight": {
+    "uploads": [
+      {
+        "name": "website.tar.gz",
+        "bytes": 1474900,
+        "sha256": "1dd6d5cd0025d8af3f22c1caa7b2a54abb1ce5fca84a59c0de0007316481b97c"
+      },
+      {
+        "name": "plan.json",
+        "bytes": 2100,
+        "sha256": "0c4ef1d4f23f13a0285aa5220edef8cc09b810d05ce4ffcdecc280784da36e1a"
+      },
+      {
+        "name": "publish.cjs",
+        "bytes": 3376,
+        "sha256": "2a858c7fb0ed5f7fed31b6c18328a3e17d1fa2f61ed1988c91287e0b66100db5"
+      }
+    ],
+    "requiredPayloads": 14,
+    "requiredFullSHA256Passed": true
+  },
+  "current": "/srv/lolzcloud/releases/20261115T141741-website-0.9.20-1b587b49",
+  "previousPreserved": true,
+  "filesSHA256Passed": 13,
+  "backup": {
+    "path": "/var/backups/lolzcloud-website/20261115T141741-website-0.9.20-1b587b49",
+    "directoryMode": "0700",
+    "fileMode": "0600"
+  },
+  "servicesUnrestarted": true,
+  "mainCurrent": "/opt/lolzcloud-server/releases/20261115-social-0.9.23-18ab51d0",
+  "sourceCommit": "ddcd722fe533390de3ae00680dbf41dac176c604",
+  "checkedAt": "2026-11-15T14:57:42.704Z"
+}

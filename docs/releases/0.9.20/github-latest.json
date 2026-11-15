@@ -1,0 +1,187 @@
+{
+  "id": 446125613,
+  "tag_name": "v0.9.20",
+  "draft": false,
+  "prerelease": false,
+  "html_url": "https://github.com/Artemper52/LolzCloud/releases/tag/v0.9.20",
+  "name": "LolzCloud 0.9.20",
+  "published_at": "2026-11-15T14:41:53Z",
+  "assets": [
+    {
+      "id": 751290477,
+      "name": "android-update.json",
+      "size": 441,
+      "digest": "sha256:c14815be2a3a7f52bc98d4125d1f4c78c823796e0ba656e1369693f7bef95114",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/android-update.json"
+    },
+    {
+      "id": 751290565,
+      "name": "latest.yml",
+      "size": 366,
+      "digest": "sha256:258ed5b117d3059be86a596c02cc44c40b0b4ef7e914f1fc7c7a3c9e64bfcd54",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/latest.yml"
+    },
+    {
+      "id": 751290682,
+      "name": "legacy.yml",
+      "size": 373,
+      "digest": "sha256:1af1dc5146c17edd2450e16ba37410b43e2c53c4c29399ebb6af281daac44bf4",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/legacy.yml"
+    },
+    {
+      "id": 751290843,
+      "name": "LolzCloud-0.9.20-linux-arm64.tar.gz",
+      "size": 159435858,
+      "digest": "sha256:a45c657a7f1535453f6c3303e3de872221896e4f2d71c0379782f4d4196d0744",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-0.9.20-linux-arm64.tar.gz"
+    },
+    {
+      "id": 751291455,
+      "name": "LolzCloud-0.9.20-linux-x64.AppImage",
+      "size": 147495416,
+      "digest": "sha256:a4109051ae8172121849add05c181b8276dae89f19a425d96acc8b2452f50770",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-0.9.20-linux-x64.AppImage"
+    },
+    {
+      "id": 751291976,
+      "name": "LolzCloud-0.9.20-linux-x64.tar.gz",
+      "size": 160354329,
+      "digest": "sha256:0e3be74f29814036b57c9365fb646030758588148b3dd66a0122584b9ffdefc6",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-0.9.20-linux-x64.tar.gz"
+    },
+    {
+      "id": 751295564,
+      "name": "LolzCloud-0.9.20-SHA256SUMS.txt",
+      "size": 2039,
+      "digest": "sha256:c3a89dff879592a60283b73824a816071684d2e53adcb0c7ad259cc53d95c0af",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-0.9.20-SHA256SUMS.txt"
+    },
+    {
+      "id": 751292585,
+      "name": "LolzCloud-0.9.20-source.zip",
+      "size": 27767562,
+      "digest": "sha256:865c01bfe830f12f831056bcdab16cad194e7526032294d77e8ff0ed3647e930",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-0.9.20-source.zip"
+    },
+    {
+      "id": 751292842,
+      "name": "LolzCloud-0.9.20-win-x64-Setup.exe",
+      "size": 146405865,
+      "digest": "sha256:f4510fcc776143e31a7e8de75b94f4bb24b1950892b4891aebd0c7779a7a7018",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-0.9.20-win-x64-Setup.exe"
+    },
+    {
+      "id": 751293267,
+      "name": "LolzCloud-0.9.20-win-x64-Setup.exe.blockmap",
+      "size": 152544,
+      "digest": "sha256:3b0b5701e96eeba980145020f81041f02534b5e8b5ca326d62db1e58d7b74139",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-0.9.20-win-x64-Setup.exe.blockmap"
+    },
+    {
+      "id": 751293416,
+      "name": "LolzCloud-0.9.20-win-x64.zip",
+      "size": 196703136,
+      "digest": "sha256:9e301f5bb5a2e12d6bfe73900aa2a5c13b84447f83fae4df7c4b840b28808c25",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-0.9.20-win-x64.zip"
+    },
+    {
+      "id": 751294047,
+      "name": "LolzCloud-0.9.20-win7-legacy-Setup.exe",
+      "size": 99550972,
+      "digest": "sha256:24ae08a6ece6dcbabc97d5cbafc95d8530f759a915675ca88777800550da16da",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-0.9.20-win7-legacy-Setup.exe"
+    },
+    {
+      "id": 751294342,
+      "name": "LolzCloud-0.9.20-win7-legacy-Setup.exe.blockmap",
+      "size": 104985,
+      "digest": "sha256:1afdbdc46cb08b84eaced6b38a17a9a6ea6bd96a1f44d15fcaf48d2cff78b336",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-0.9.20-win7-legacy-Setup.exe.blockmap"
+    },
+    {
+      "id": 751294435,
+      "name": "LolzCloud-0.9.20-win7-legacy-x64.zip",
+      "size": 134420209,
+      "digest": "sha256:81ccdbfe5284674cbde4f3388689355afd421fd1d1899bd83a3c1387904c390a",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-0.9.20-win7-legacy-x64.zip"
+    },
+    {
+      "id": 751294726,
+      "name": "LolzCloud-Android-0.1.10.apk",
+      "size": 2623004,
+      "digest": "sha256:06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-Android-0.1.10.apk"
+    },
+    {
+      "id": 751294841,
+      "name": "LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "size": 10190,
+      "digest": "sha256:b656175abd7283ab4ddb43eb46cc3b38ce666af4d9b5378c3a6e1ed98a23b129",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-browser-helper-1.2.0-chromium.zip"
+    },
+    {
+      "id": 751294922,
+      "name": "LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "size": 10190,
+      "digest": "sha256:bd1b43bb821a5fb2a122f0d5e8e3e3d2b0c3bbb94f887016be79f9e6ed98aebe",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-browser-helper-1.2.0-firefox.zip"
+    },
+    {
+      "id": 751295016,
+      "name": "LolzCloud-iOS-0.1.5-simulator.zip",
+      "size": 1106970,
+      "digest": "sha256:f10ee1d6c48477c1c732bf2b6c9ebf045ca26163f34e79a8ba02ecb7b58ed5d1",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-iOS-0.1.5-simulator.zip"
+    },
+    {
+      "id": 751295102,
+      "name": "LolzCloud-iOS-0.1.5-source.zip",
+      "size": 228567,
+      "digest": "sha256:86b721aed7ddc5558a7840178f635dfa417ac947f72c0773a4a5c08fc48b33c5",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-iOS-0.1.5-source.zip"
+    },
+    {
+      "id": 751295193,
+      "name": "LolzCloud-iOS-0.1.5-unsigned.ipa",
+      "size": 287374,
+      "digest": "sha256:d834698cedde7f12b9077f2cbc535186790e9560673bf9cdb70734100fcfdbe1",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/LolzCloud-iOS-0.1.5-unsigned.ipa"
+    },
+    {
+      "id": 751295348,
+      "name": "update-legacy.json",
+      "size": 588,
+      "digest": "sha256:61a5759a01ac2a1d57898a30b35c096e4ae5233ff84bd0559291a6a9bc7adad7",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/update-legacy.json"
+    },
+    {
+      "id": 751295452,
+      "name": "update.json",
+      "size": 565,
+      "digest": "sha256:271e24622926a7daffc4315ec5558ae781f4ab03e6d5a21d0e9084c3f1e39be9",
+      "state": "uploaded",
+      "browser_download_url": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.20/update.json"
+    }
+  ]
+}

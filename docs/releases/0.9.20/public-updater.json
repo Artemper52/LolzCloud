@@ -1,0 +1,90 @@
+{
+  "status": "passed",
+  "scope": "Exact released19 canonical updater source, unchanged in20; actual public official/GitHub HTTPS from origin Node24; explicit app version and Windows/Legacy flags, no physical Windows claim or install",
+  "cases": [
+    {
+      "legacy": false,
+      "currentVersion": "0.9.19",
+      "offeredVersion": "0.9.20",
+      "status": "available",
+      "available": true,
+      "selectedFeed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/"
+    },
+    {
+      "legacy": false,
+      "currentVersion": "0.9.20",
+      "offeredVersion": "0.9.20",
+      "status": "current",
+      "available": false,
+      "selectedFeed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/"
+    },
+    {
+      "legacy": true,
+      "currentVersion": "0.9.19",
+      "offeredVersion": "0.9.20",
+      "status": "available",
+      "available": true,
+      "selectedFeed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/"
+    },
+    {
+      "legacy": true,
+      "currentVersion": "0.9.20",
+      "offeredVersion": "0.9.20",
+      "status": "current",
+      "available": false,
+      "selectedFeed": "https://github.com/Artemper52/LolzCloud/releases/latest/download/"
+    }
+  ],
+  "requests": [
+    {
+      "host": "github.com",
+      "status": 200,
+      "legacy": false,
+      "current": "0.9.19"
+    },
+    {
+      "host": "lolzcloud.com",
+      "status": 200,
+      "legacy": false,
+      "current": "0.9.19"
+    },
+    {
+      "host": "lolzcloud.com",
+      "status": 200,
+      "legacy": false,
+      "current": "0.9.20"
+    },
+    {
+      "host": "github.com",
+      "status": 200,
+      "legacy": false,
+      "current": "0.9.20"
+    },
+    {
+      "host": "lolzcloud.com",
+      "status": 200,
+      "legacy": true,
+      "current": "0.9.19"
+    },
+    {
+      "host": "github.com",
+      "status": 200,
+      "legacy": true,
+      "current": "0.9.19"
+    },
+    {
+      "host": "lolzcloud.com",
+      "status": 200,
+      "legacy": true,
+      "current": "0.9.20"
+    },
+    {
+      "host": "github.com",
+      "status": 200,
+      "legacy": true,
+      "current": "0.9.20"
+    }
+  ],
+  "installCalled": false,
+  "sourceSha256": "ea3648c194c55846aa15f093cf21198ed46b7b5fe717fefec5b563241648e9f0"
+}
