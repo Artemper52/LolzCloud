@@ -1,6 +1,15 @@
 import Foundation
 import CoreFoundation
 
+enum NativeRoomDelivery {
+    static func mayEvaluate(event: String,applicationActive: Bool,pageReady: Bool,trustedParent: Bool,offline: Bool) -> Bool {
+        guard pageReady,trustedParent,!offline else { return false }
+        // An audible WK document can remain runnable in the background. Try
+        // the bound command immediately; actual suspension still uses its TTL.
+        return applicationActive || event=="room-command" || event=="room-command-result"
+    }
+}
+
 // Room ownership is independent of the solo queue, settings revisions and
 // provider frames. Only the trusted parent document can bind this policy.
 struct NativeRoomTransport: Equatable {

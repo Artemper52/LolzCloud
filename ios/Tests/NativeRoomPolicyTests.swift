@@ -112,4 +112,23 @@ final class NativeRoomPolicyTests: XCTestCase {
         var command=try XCTUnwrap(binding.command("next",value:nil,now:0))
         XCTAssertFalse(command.acceptDelivery(now:3.1));XCTAssertFalse(command.acceptedDelivery);XCTAssertEqual(command.deadline,3)
     }
+    func testOnlyRoomCommandsAttemptBackgroundDeliveryOnReadyTrustedParent() {
+        for event in ["room-command","room-command-result","playback","effects","account","download","profileExport","capabilities"] {
+            let room=event=="room-command" || event=="room-command-result"
+            XCTAssertEqual(NativeRoomDelivery.mayEvaluate(event:event,applicationActive:false,pageReady:true,trustedParent:true,offline:false),room)
+            XCTAssertTrue(NativeRoomDelivery.mayEvaluate(event:event,applicationActive:true,pageReady:true,trustedParent:true,offline:false))
+            XCTAssertFalse(NativeRoomDelivery.mayEvaluate(event:event,applicationActive:false,pageReady:false,trustedParent:true,offline:false))
+            XCTAssertFalse(NativeRoomDelivery.mayEvaluate(event:event,applicationActive:false,pageReady:true,trustedParent:false,offline:false))
+            XCTAssertFalse(NativeRoomDelivery.mayEvaluate(event:event,applicationActive:true,pageReady:true,trustedParent:true,offline:true))
+        }
+    }
+    func testBackgroundAttemptNeverExtendsExpiredCommandOrCrossesOwnerRelease() throws {
+        var binding=NativeRoomBinding();_=binding.accept(try XCTUnwrap(NativeRoomTransport(object())),client:client,request:1)
+        let command=try XCTUnwrap(binding.command("next",value:nil,now:0))
+        let allowed=NativeRoomDelivery.mayEvaluate(event:"room-command",applicationActive:false,pageReady:true,trustedParent:true,offline:false)
+        XCTAssertTrue(allowed && binding.owns(command,now:1))
+        XCTAssertFalse(allowed && binding.owns(command,now:3.1))
+        _=binding.accept(try XCTUnwrap(NativeRoomTransport(object(active:false,revision:2))),client:client,request:1)
+        XCTAssertFalse(allowed && binding.owns(command,now:1))
+    }
 }

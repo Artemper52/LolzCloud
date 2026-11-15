@@ -20,8 +20,8 @@
     },
     {
       "file": "ios/LolzCloud/App.swift",
-      "bytes": 24568,
-      "sha256": "2d2fbb32847078ba859da9cc8f508687bd3602a0f569753da914e3a2fc0161e0"
+      "bytes": 24658,
+      "sha256": "1c6866502e19d58f07da0a7affdd52704e4028b3d272b7708e38197ea49ebf58"
     },
     {
       "file": "ios/LolzCloud/AudioEffectsPolicy.swift",
@@ -110,8 +110,8 @@
     },
     {
       "file": "ios/LolzCloud/NativeRoomPolicy.swift",
-      "bytes": 9232,
-      "sha256": "378f73cc3fa4980d1f062e77ecea9c951678c429bbd8adb887857df7deae9741"
+      "bytes": 9710,
+      "sha256": "b8e270f95827c199ffb621c33f71440c28ab82f7156a810c379aa8ee7965008f"
     },
     {
       "file": "ios/Package.swift",
@@ -120,8 +120,8 @@
     },
     {
       "file": "ios/ROOM_HANDOFF.md",
-      "bytes": 6853,
-      "sha256": "edb3edc002113f425952774ed646a06768c17726e9cc4947a9250476a11111ec"
+      "bytes": 7836,
+      "sha256": "6c03c15d304b3307946d212ca41100304a4e09007df736b3dfa3f7ab154f5f06"
     },
     {
       "file": "ios/RuntimeTests/NativeRuntimeTests.swift",
@@ -165,8 +165,8 @@
     },
     {
       "file": "ios/Tests/NativeRoomPolicyTests.swift",
-      "bytes": 9747,
-      "sha256": "f349cc0fea98948db57525dfff1a569ae001e49ee5e874848293d743f123a358"
+      "bytes": 11525,
+      "sha256": "74219eb7034924a022aa9b8653c374f9ac3fd0b8c5924eb7167c552035307d9a"
     },
     {
       "file": "ios/Tests/PortableProfileFileTests.swift",

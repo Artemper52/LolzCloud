@@ -102,7 +102,7 @@ import UniformTypeIdentifiers
     func playOffline(_ track: SavedTrack) { guard offline,offlineReady else { return };player.playOffline(track) }
     private func event(_ name: String,_ detail: [String:Any]) {
         if name == "room-command", !player.canDeliverRoomCommand(detail) { return }
-        guard !offline,UIApplication.shared.applicationState == .active, !loading, MediaPolicy.bridgePage(webView.url) else {
+        guard NativeRoomDelivery.mayEvaluate(event:name,applicationActive:UIApplication.shared.applicationState == .active,pageReady:!loading,trustedParent:MediaPolicy.bridgePage(webView.url),offline:offline) else {
             if name == "account" { pendingAccount = detail }
             else if name == "download", let id = detail["id"] as? String, pendingDownloads.count < 200 || pendingDownloads[id] != nil { pendingDownloads[id] = detail }
             else if name == "profileExport" { pendingProfileExport = detail }
