@@ -1,0 +1,126 @@
+{
+  "ok": true,
+  "count": 23,
+  "checks": [
+    "Canonical search selects exact Unicode-normalized title/artist while preserving the marked slowed version",
+    "Own title/artist with a five-second duration mismatch renders plain text without clickable timings",
+    "A foreign title and artist never become this track lyrics",
+    "Correction fields and actions fit the actual 360px player",
+    "Manual correction persists separately from catalogue metadata and cached lyric content",
+    "Cache is bound to corrected identity and survives reload without confusing original metadata",
+    "HTTP429 never starts a search fallback",
+    "Actual user93s metadata chooses111s consensus and labels the1.19× timing as an estimate",
+    "Actual browser API request identifies the client and explicitly omits credentials",
+    "Marked uploader-title metadata uses one canonical query and no doomed duration GET",
+    "A retimed line seeks the actual source clock once, even with playbackRate1.5, and does not resume pause",
+    "Warm same-source lyrics survive duration0 plus harmless file/marker formatting without any new provider request",
+    "An explicit refresh keeps already found lines visible while its response is pending",
+    "A late empty result cannot replace found text or its persisted adapted timing",
+    "The second actual86s metadata variant uses its own source-duration ratio",
+    "The actual139s slowed metadata extends line times using the same corroborated111s reference",
+    "Conflicting original duration clusters keep plain text without invented timings",
+    "An exact modified-version transcript wins before any original retiming",
+    "User-imported LRC remains higher priority and never triggers a canonical provider request",
+    "Public lyric cache pruning is atomic and bounded to500 records while imported user text remains untouched",
+    "Public cache prunes to8MiB by actual UTF8 size without deleting imported lyrics or the newly saved row",
+    "Retimed/cached lyric states remain within360px",
+    "Targeted lyric scenarios have no uncaught browser errors"
+  ],
+  "requests": [
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/search",
+      "title": "Песня",
+      "artist": "Артист"
+    },
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/get",
+      "title": "Другая длительность",
+      "artist": "Артист"
+    },
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/search",
+      "title": "Другая длительность",
+      "artist": "Артист"
+    },
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/get",
+      "title": "Сырое имя из каталога",
+      "artist": "Артист"
+    },
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/search",
+      "title": "Сырое имя из каталога",
+      "artist": "Артист"
+    },
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/get",
+      "title": "Исправленная песня",
+      "artist": "Правильный артист"
+    },
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/get",
+      "title": "Слишком много запросов",
+      "artist": "Артист"
+    },
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/search",
+      "title": "отвратительный король",
+      "artist": "тёмный принц",
+      "rendererCredentials": "omit"
+    },
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/search",
+      "title": "ОТВРАТИТЕЛЬНЫЙ КОРОЛЬ",
+      "artist": "ТЁМНЫЙ ПРИНЦ"
+    },
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/search",
+      "title": "отвратительный король",
+      "artist": "Темный принц"
+    },
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/search",
+      "title": "отвратительный король",
+      "artist": "тёмный принц"
+    },
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/search",
+      "title": "Песня",
+      "artist": "Артист"
+    },
+    {
+      "protocolCredentials": "same-origin",
+      "client": "LolzCloud-PWA/8 (https://lolzcloud.com)",
+      "path": "/api/search",
+      "title": "Песня",
+      "artist": "Артист"
+    }
+  ],
+  "errors": [],
+  "failure": "",
+  "fixtureNote": "Actual isolated Chromium UI + real local app HTTP; LRCLIB text is synthetic;13 public duration metadata entries and3 SoundCloud durations reproduce the user pattern; actual93s generated MP3/HTMLAudio proves seeking. LRCLIB JSON/status responses are deterministic protocol fixtures. No physical Safari or live provider success claim."
+}

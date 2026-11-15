@@ -1,0 +1,87 @@
+{
+  "status": "passed-source-frozen",
+  "checkedAt": "2026-11-15T15:56:47.875Z",
+  "files": [
+    {
+      "name": "server/public/app/audio-metadata.js",
+      "size": 6571,
+      "sha256": "7c0e4e894f060f75c62cb0baafabea6cb3c17e8abaa49cf5d2634b4d94011770"
+    },
+    {
+      "name": "server/public/app/imports.js",
+      "size": 2481,
+      "sha256": "6b36f3e7f079930a2b0416b0ad96d1273da9ef2c2951cd12fd4793073138bc83"
+    },
+    {
+      "name": "tests/pwa-audio-metadata.test.cjs",
+      "size": 5813,
+      "sha256": "ad35f41dfafc2f785cf7e5e1e82c617b309feb81c05cf44682506ef02dc62bfc"
+    },
+    {
+      "name": "tests/pwa-local-tags-ui.cjs",
+      "size": 11562,
+      "sha256": "8e72909e4890aa91b51fa64111358cc14c42cb3035c27a39e0840ad8bf9d2417"
+    },
+    {
+      "name": "tests/fixtures/pwa-audio-tags.cjs",
+      "size": 2012,
+      "sha256": "8d1b643f851d93142660e9fbc1501ed863447c0bfd781f6baec6e995603997dd"
+    }
+  ],
+  "supported": {
+    "mp3": [
+      "ID3v2.3",
+      "ID3v2.4",
+      "ID3v1 fallback"
+    ],
+    "text": [
+      "ISO8859-1",
+      "UTF16LE/BE BOM",
+      "UTF16BE",
+      "UTF8"
+    ],
+    "flac": "Bounded Vorbis TITLE/ARTIST comments"
+  },
+  "fallback": "Missing/unsupported/corrupt tags =>original filename title/empty artist; no performer guessing",
+  "limits": {
+    "prefixBytes": 262144,
+    "tailBytes": 128,
+    "totalTagReadBytes": 262272,
+    "textBytesPerField": 16384,
+    "framesOrComments": 128,
+    "deadlineMilliseconds": 2000
+  },
+  "tests": {
+    "pure": {
+      "passed": 10,
+      "command": "node --test tests/pwa-audio-metadata.test.cjs"
+    },
+    "combined": {
+      "passed": 23,
+      "command": "node --test tests/pwa-audio-metadata.test.cjs tests/pwa-core.test.cjs"
+    },
+    "browser": {
+      "passed": 14,
+      "failed": 0,
+      "report": "browser.json",
+      "sourceInputsStable": true
+    }
+  },
+  "scope": "Helper/imports only; parent owns index/service-worker inclusion and final atomic shell update.",
+  "evidence": "Actual generated MP3/FLAC with synthetic tags via real CDP file chooser, HTMLMediaElement validity probe, IndexedDB and app reload. Correct lyric identity verified against deterministic synthetic LRCLIB response. Current playback survives concurrent import.",
+  "limitations": [
+    "No M4A/WAV tag parser; playable files in these formats retain filename/empty-artist fallback.",
+    "Oversized artwork/tag blocks beyond the prefix limit are not scanned; supported tags within the bound are read.",
+    "No full-file metadata read, acoustic recognition, network catalog request or cover-art extraction.",
+    "Physical Safari/iOS not verified here; browser format support is still decided by the existing real media probe.",
+    "Existing imported records are not silently rescanned; metadata is read for new explicit imports.",
+    "No version/build/deploy performed."
+  ],
+  "references": [
+    "https://id3.org/id3v2.3.0",
+    "https://id3.org/id3v2.4.0-structure",
+    "https://id3.org/id3v2.4.0-frames",
+    "https://id3.org/ID3v1",
+    "https://www.rfc-editor.org/rfc/rfc9639.html"
+  ]
+}

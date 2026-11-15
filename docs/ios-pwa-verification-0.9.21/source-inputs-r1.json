@@ -1,0 +1,314 @@
+{
+  "preparedAt": "2026-11-15T16:15:16.364Z",
+  "current": {
+    "server": "0.9.24",
+    "sw": 9,
+    "count": 29,
+    "files": [
+      {
+        "name": "app.css",
+        "size": 22457,
+        "sha256": "8b7140c75fc575339789e67809fcdf31015cb613add868a7095046824c827f56"
+      },
+      {
+        "name": "app.js",
+        "size": 119140,
+        "sha256": "9f84bb0a802f89e5574498925aef0f3b450257960b7b7a2578b7739afa74d91a"
+      },
+      {
+        "name": "audio-metadata.js",
+        "size": 6571,
+        "sha256": "7c0e4e894f060f75c62cb0baafabea6cb3c17e8abaa49cf5d2634b4d94011770"
+      },
+      {
+        "name": "core.js",
+        "size": 12644,
+        "sha256": "0f58186762de522eb5f8022cd5af963a5992f88076f5a0153a788b08a702506b"
+      },
+      {
+        "name": "effects-policy.js",
+        "size": 5822,
+        "sha256": "bf64ce15a3bf67c957cb4a71e0ada1562c243d7a72bd81d8cc80b32e1c25ec8d"
+      },
+      {
+        "name": "effects.js",
+        "size": 15926,
+        "sha256": "38b99aab18e973a71178ff07f48a6e9b3f14e5a72be1dc7c6e3a6a4cf6c52b4b"
+      },
+      {
+        "name": "icon-192.png",
+        "size": 7875,
+        "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4"
+      },
+      {
+        "name": "icon-512.png",
+        "size": 9687,
+        "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef"
+      },
+      {
+        "name": "icon.svg",
+        "size": 366,
+        "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6"
+      },
+      {
+        "name": "imports.js",
+        "size": 2481,
+        "sha256": "6b36f3e7f079930a2b0416b0ad96d1273da9ef2c2951cd12fd4793073138bc83"
+      },
+      {
+        "name": "index.html",
+        "size": 27665,
+        "sha256": "ffa8e4dda2ecd87cd4a919aeba3372766aacdc19637534d5b4c88f1a63e737ea"
+      },
+      {
+        "name": "limiter-worklet.js",
+        "size": 2197,
+        "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112"
+      },
+      {
+        "name": "lyric-tempo.js",
+        "size": 9015,
+        "sha256": "fd820683ae0016c0d03db791386650d836b001d3a3872e7ea0d3c944e9205bb3"
+      },
+      {
+        "name": "lyric-view.js",
+        "size": 4800,
+        "sha256": "e2195c1f2164ca3911170fd7ae3b562a8d9ac056feb965a62c1339a2289d6989"
+      },
+      {
+        "name": "lyrics.js",
+        "size": 8186,
+        "sha256": "1ec2bda958ca4f56db27886fa49b51c54114bb9ac65e497264a920c06e6baf2c"
+      },
+      {
+        "name": "manifest.webmanifest",
+        "size": 440,
+        "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7"
+      },
+      {
+        "name": "normalization-worklet.js",
+        "size": 3376,
+        "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664"
+      },
+      {
+        "name": "offline.js",
+        "size": 6286,
+        "sha256": "90356fe86dbb0140ee054e9fb3ebc50291cf5b4765e841bd827c30dc2d97f205"
+      },
+      {
+        "name": "pitch-worklet.js",
+        "size": 10303,
+        "sha256": "7002ef718d7928978c3674ea721a5a248b0a028d698add83e81757cf632bbfc5"
+      },
+      {
+        "name": "profile-cloud.js",
+        "size": 9042,
+        "sha256": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64"
+      },
+      {
+        "name": "profile-crypto-worker.js",
+        "size": 4898,
+        "sha256": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66"
+      },
+      {
+        "name": "profile-crypto.js",
+        "size": 2972,
+        "sha256": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206"
+      },
+      {
+        "name": "profile-policy.js",
+        "size": 9653,
+        "sha256": "93caf6e8b253316e4e9267a28c7b28356480ccf5308ac17aac560dee553bcc0e"
+      },
+      {
+        "name": "profile.js",
+        "size": 15541,
+        "sha256": "aeb95b56609cd3d77d5d5a6cda0c360132694837f1d027855016eac0df309429"
+      },
+      {
+        "name": "room-transport.js",
+        "size": 6341,
+        "sha256": "bb4d1ac5cc88ae77c9eca78637922942d8a4df8dd42bcd25cfda0fdc72da9b46"
+      },
+      {
+        "name": "sw.js",
+        "size": 1994,
+        "sha256": "92e195f5925bd58c4771a249360b032ff3bd2fd1ffd5b036df02be04fce9b1c8"
+      },
+      {
+        "name": "vendor-scrypt-3.0.1.js",
+        "size": 17811,
+        "sha256": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d"
+      },
+      {
+        "name": "wave-history.js",
+        "size": 2065,
+        "sha256": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3"
+      },
+      {
+        "name": "wave.js",
+        "size": 15089,
+        "sha256": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4"
+      }
+    ]
+  },
+  "baseline": {
+    "archive": "D:/LolzCloud-Android-Toolchain/release-0.9.20/LolzCloud-0.9.20-source.zip",
+    "sha256": "865c01bfe830f12f831056bcdab16cad194e7526032294d77e8ff0ed3647e930",
+    "sourceCommit": "ddcd722fe533390de3ae00680dbf41dac176c604",
+    "count": 26,
+    "files": [
+      {
+        "name": "app.css",
+        "size": 22196,
+        "sha256": "9009c62e3918ee15d9e526f75b275751363fb93b69f31a5b278b483064ab6994"
+      },
+      {
+        "name": "app.js",
+        "size": 109015,
+        "sha256": "717488069a937285bfa90b55d80a7497a6f54d67a1fb33a378acd721c70434ed"
+      },
+      {
+        "name": "core.js",
+        "size": 9897,
+        "sha256": "20a8d5b82f1c392438cd6655dd0f40f253e6d8ce6aace96e123dba4edca97daf"
+      },
+      {
+        "name": "effects-policy.js",
+        "size": 5822,
+        "sha256": "bf64ce15a3bf67c957cb4a71e0ada1562c243d7a72bd81d8cc80b32e1c25ec8d"
+      },
+      {
+        "name": "effects.js",
+        "size": 15926,
+        "sha256": "38b99aab18e973a71178ff07f48a6e9b3f14e5a72be1dc7c6e3a6a4cf6c52b4b"
+      },
+      {
+        "name": "icon-192.png",
+        "size": 7875,
+        "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4"
+      },
+      {
+        "name": "icon-512.png",
+        "size": 9687,
+        "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef"
+      },
+      {
+        "name": "icon.svg",
+        "size": 366,
+        "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6"
+      },
+      {
+        "name": "imports.js",
+        "size": 2375,
+        "sha256": "9c025444b795b53b730d27723d18006a743c11601f22c86b2f89bea9d384abc2"
+      },
+      {
+        "name": "index.html",
+        "size": 27501,
+        "sha256": "99f1eb4bbcfaf75b662b12b06dd740aed53e214aa0f0909e5286b490249c09eb"
+      },
+      {
+        "name": "limiter-worklet.js",
+        "size": 2197,
+        "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112"
+      },
+      {
+        "name": "lyric-tempo.js",
+        "size": 9015,
+        "sha256": "fd820683ae0016c0d03db791386650d836b001d3a3872e7ea0d3c944e9205bb3"
+      },
+      {
+        "name": "lyrics.js",
+        "size": 8186,
+        "sha256": "1ec2bda958ca4f56db27886fa49b51c54114bb9ac65e497264a920c06e6baf2c"
+      },
+      {
+        "name": "manifest.webmanifest",
+        "size": 440,
+        "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7"
+      },
+      {
+        "name": "normalization-worklet.js",
+        "size": 3376,
+        "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664"
+      },
+      {
+        "name": "offline.js",
+        "size": 6286,
+        "sha256": "90356fe86dbb0140ee054e9fb3ebc50291cf5b4765e841bd827c30dc2d97f205"
+      },
+      {
+        "name": "pitch-worklet.js",
+        "size": 10303,
+        "sha256": "7002ef718d7928978c3674ea721a5a248b0a028d698add83e81757cf632bbfc5"
+      },
+      {
+        "name": "profile-cloud.js",
+        "size": 9042,
+        "sha256": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64"
+      },
+      {
+        "name": "profile-crypto-worker.js",
+        "size": 4898,
+        "sha256": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66"
+      },
+      {
+        "name": "profile-crypto.js",
+        "size": 2972,
+        "sha256": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206"
+      },
+      {
+        "name": "profile-policy.js",
+        "size": 9653,
+        "sha256": "93caf6e8b253316e4e9267a28c7b28356480ccf5308ac17aac560dee553bcc0e"
+      },
+      {
+        "name": "profile.js",
+        "size": 15541,
+        "sha256": "aeb95b56609cd3d77d5d5a6cda0c360132694837f1d027855016eac0df309429"
+      },
+      {
+        "name": "sw.js",
+        "size": 1920,
+        "sha256": "e6f320559a5f4b9f3fdb48149396e9727427c0ec407403ea778c830048c5e940"
+      },
+      {
+        "name": "vendor-scrypt-3.0.1.js",
+        "size": 17811,
+        "sha256": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d"
+      },
+      {
+        "name": "wave-history.js",
+        "size": 2065,
+        "sha256": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3"
+      },
+      {
+        "name": "wave.js",
+        "size": 15089,
+        "sha256": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4"
+      }
+    ]
+  },
+  "testMaintenance": {
+    "name": "tests/pwa-independent-pitch-ui.cjs",
+    "beforeSha256": "8d0dee741603778a6f27053e37cd44aa7bf1f514b26bd5c94af36dfea7d33962",
+    "afterSha256": "726c52df6f381fd59f01860f6f6fcf49aa1273ca2118c044d645bc6b83cba877",
+    "scope": "Declared old-cache fixture8/current9; failure targets new metadata module; actual worklet/IPC assertions unchanged"
+  },
+  "testInputs": [
+    {
+      "name": "tests/pwa-independent-pitch-ui.cjs",
+      "size": 35894,
+      "sha256": "726c52df6f381fd59f01860f6f6fcf49aa1273ca2118c044d645bc6b83cba877"
+    },
+    {
+      "name": "tests/pwa-shell-upgrade-ui.cjs",
+      "size": 18428,
+      "sha256": "49aef09da6b048aca375412f63ca7a3a3168ce18645033ec23f9e79a46b155aa"
+    }
+  ],
+  "finalCheckAt": "2026-11-15T16:24:10.763Z",
+  "productUnchangedDuringVerification": true,
+  "productDigest": "cbeb64f7b7d9a09fe5fccddb42277b9e87fe15aea3b1ac41f9fccccc7ff2e864"
+}

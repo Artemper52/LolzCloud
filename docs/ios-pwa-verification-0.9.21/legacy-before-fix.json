@@ -1,0 +1,1143 @@
+{
+  "ok": false,
+  "count": 14,
+  "checks": [
+    "Baseline is the exact26-file frozen20/SW8 source; candidate is the current29-file SW9 source",
+    "The running baseline really is old20 code without any of the three new modules",
+    "Actual old8 provider 913 persists policy3 line-only cache with raw enhanced markers at existing 10s",
+    "Actual old8 provider 914 persists policy3 line-only cache with raw enhanced markers at existing 8s",
+    "Real old8 UI has a local Blob/heart/moment/imported LRC and merged commonv1 profile/wave preferences before upgrade",
+    "Old8 cache excludes actually fetched session/profile/room/social/signed-audio responses",
+    "A failed new metadata-module precache keeps the actual old8 controller and commits no partial9 shell",
+    "After failed upgrade the complete old8 app still reloads offline with its selected song paused",
+    "Successful8→9 precache is the exact complete29-entry shell with all source sizes/SHA256 and all three new modules",
+    "Active SW9 also excludes genuinely fetched session/profile/rooms/social/signed-audio responses from its cache",
+    "Atomic upgrade retains the same durable audio Blob/local UUID, heart and personal moment",
+    "Wave preferences and supported/sidecar commonv1 collections, notes and custom DSP survive the actual source upgrade",
+    "Own imported LRC and provider lyric cache remain separate and unchanged through the worker upgrade",
+    "New9 shell reloads offline without autoplay while a real uncached HTTP request fails"
+  ],
+  "errors": [],
+  "failure": "AssertionError [ERR_ASSERTION]: Upgraded cached 913 displays clean inert text/aria, keeps existing 10s, and invents no word timing\n    at check (C:\\Users\\27nov\\LolzCloud\\tests\\pwa-shell-upgrade-ui.cjs:12:37)\n    at C:\\Users\\27nov\\LolzCloud\\tests\\pwa-shell-upgrade-ui.cjs:71:5",
+  "requests": [
+    {
+      "path": "/app/",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/app.css",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/icon.svg",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/lyric-tempo.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/lyrics.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/core.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/effects-policy.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/effects.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile-policy.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile-crypto.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/imports.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/offline.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile-cloud.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/wave-history.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/wave.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/app.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/sw.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/app.css",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/index.html",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/core.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/lyric-tempo.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/lyrics.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/offline.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/imports.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/effects-policy.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/effects.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/normalization-worklet.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/limiter-worklet.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/pitch-worklet.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile-policy.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile-crypto.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile-cloud.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile-crypto-worker.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/vendor-scrypt-3.0.1.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/wave-history.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/wave.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/app.js",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/icon.svg",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/icon-192.png",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/icon-512.png",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/manifest.webmanifest",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/api/session",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/music/search",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/music/prepare/913/aaaaaaaaaaaaaaaaaaaaaaaa",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/music/audio/913/aaaaaaaaaaaaaaaaaaaaaaaa.mp3",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/music/prepare/914/aaaaaaaaaaaaaaaaaaaaaaaa",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/music/audio/914/aaaaaaaaaaaaaaaaaaaaaaaa.mp3",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/api/session",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/api/profile",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/social",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/rooms",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/room/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/music/audio/999/aaaaaaaaaaaaaaaaaaaaaaaa.mp3",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/login",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/login",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/login",
+      "candidate": false,
+      "networkDown": false
+    },
+    {
+      "path": "/app/sw.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/app.css",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/index.html",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/core.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/room-transport.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/lyric-tempo.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/lyrics.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/lyric-view.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/offline.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/audio-metadata.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/imports.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/effects-policy.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/effects.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/normalization-worklet.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/pitch-worklet.js",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/app/profile-policy.js",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/app/profile-crypto.js",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/app/limiter-worklet.js",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/app/profile-crypto-worker.js",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/app/profile.js",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/app/icon.svg",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/app/icon-192.png",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/app/icon-512.png",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/app/sw.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/index.html",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/app.css",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/core.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/room-transport.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/lyric-tempo.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/lyrics.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/lyric-view.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/offline.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/audio-metadata.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/imports.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/effects-policy.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/effects.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/normalization-worklet.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/limiter-worklet.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/pitch-worklet.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile-policy.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile-crypto.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile-cloud.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile-crypto-worker.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/vendor-scrypt-3.0.1.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/profile.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/wave-history.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/wave.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/app.js",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/icon.svg",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/icon-192.png",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/icon-512.png",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/app/manifest.webmanifest",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/api/session",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/rooms",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/api/profile",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/social",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/room/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/music/audio/999/aaaaaaaaaaaaaaaaaaaaaaaa.mp3",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/login",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/login",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/login",
+      "candidate": true,
+      "networkDown": false
+    },
+    {
+      "path": "/api/health",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/api/health",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/api/health",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/api/health",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/api/health",
+      "candidate": true,
+      "networkDown": true
+    },
+    {
+      "path": "/music/prepare/913/aaaaaaaaaaaaaaaaaaaaaaaa",
+      "candidate": true,
+      "networkDown": true
+    }
+  ],
+  "providerRequests": [
+    {
+      "path": "/api/get",
+      "title": "Legacy cache",
+      "artist": "Fixture artist",
+      "candidate": false
+    },
+    {
+      "path": "/api/search",
+      "title": "Legacy adapted",
+      "artist": "Fixture artist",
+      "candidate": false
+    }
+  ],
+  "providerAtUpgrade": 2,
+  "legacyCacheBefore": [
+    {
+      "found": true,
+      "lines": [
+        {
+          "time": 10,
+          "text": "<00:10>Старые <00:12><b>слова</b><00:14>"
+        }
+      ],
+      "plain": "Старые <b>слова</b>",
+      "source": "LRCLIB",
+      "recordId": 913,
+      "adapted": false,
+      "versionMismatch": false,
+      "identity": "legacy cache|fixture artist|100",
+      "instrumental": false,
+      "policy": 3,
+      "metadataIdentity": "legacy cache|fixture artist",
+      "variantIdentity": "legacy cache|none||false",
+      "sourceId": "913",
+      "sourceUrl": "https://soundcloud.com/fixture/legacy-913",
+      "sourceDuration": 100,
+      "cachedAt": 1794760295670,
+      "expiresAt": 1797352295670,
+      "durationMatched": true,
+      "id": "913"
+    },
+    {
+      "found": true,
+      "lines": [
+        {
+          "time": 8,
+          "text": "<00:10>Старые <00:12><b>слова</b><00:14>"
+        }
+      ],
+      "plain": "Старые <b>слова</b>",
+      "source": "LRCLIB",
+      "recordId": 914,
+      "adapted": true,
+      "versionMismatch": false,
+      "identity": "legacy adapted|fixture artist|80",
+      "tempo": {
+        "rate": 1.25,
+        "referenceDuration": 100,
+        "sourceDuration": 80,
+        "method": "duration",
+        "estimated": true
+      },
+      "policy": 3,
+      "metadataIdentity": "legacy adapted|fixture artist",
+      "variantIdentity": "legacy adapted|faster||false",
+      "sourceId": "914",
+      "sourceUrl": "https://soundcloud.com/fixture/legacy-914",
+      "sourceDuration": 80,
+      "cachedAt": 1794760295725,
+      "expiresAt": 1797352295725,
+      "durationMatched": true,
+      "id": "914"
+    }
+  ],
+  "screenshots": [
+    "D:\\LolzCloud-Android-Toolchain\\release-0.9.21\\PWAQA\\legacy-cache-before-fix\\failure.png"
+  ],
+  "cacheProof": [
+    {
+      "path": "/app/",
+      "size": 27665,
+      "sha256": "ffa8e4dda2ecd87cd4a919aeba3372766aacdc19637534d5b4c88f1a63e737ea"
+    },
+    {
+      "path": "/app/index.html",
+      "size": 27665,
+      "sha256": "ffa8e4dda2ecd87cd4a919aeba3372766aacdc19637534d5b4c88f1a63e737ea"
+    },
+    {
+      "path": "/app/app.css",
+      "size": 22457,
+      "sha256": "8b7140c75fc575339789e67809fcdf31015cb613add868a7095046824c827f56"
+    },
+    {
+      "path": "/app/core.js",
+      "size": 12644,
+      "sha256": "0f58186762de522eb5f8022cd5af963a5992f88076f5a0153a788b08a702506b"
+    },
+    {
+      "path": "/app/room-transport.js",
+      "size": 6341,
+      "sha256": "bb4d1ac5cc88ae77c9eca78637922942d8a4df8dd42bcd25cfda0fdc72da9b46"
+    },
+    {
+      "path": "/app/lyric-tempo.js",
+      "size": 9015,
+      "sha256": "fd820683ae0016c0d03db791386650d836b001d3a3872e7ea0d3c944e9205bb3"
+    },
+    {
+      "path": "/app/lyrics.js",
+      "size": 8186,
+      "sha256": "1ec2bda958ca4f56db27886fa49b51c54114bb9ac65e497264a920c06e6baf2c"
+    },
+    {
+      "path": "/app/lyric-view.js",
+      "size": 4800,
+      "sha256": "e2195c1f2164ca3911170fd7ae3b562a8d9ac056feb965a62c1339a2289d6989"
+    },
+    {
+      "path": "/app/offline.js",
+      "size": 6286,
+      "sha256": "90356fe86dbb0140ee054e9fb3ebc50291cf5b4765e841bd827c30dc2d97f205"
+    },
+    {
+      "path": "/app/audio-metadata.js",
+      "size": 6571,
+      "sha256": "7c0e4e894f060f75c62cb0baafabea6cb3c17e8abaa49cf5d2634b4d94011770"
+    },
+    {
+      "path": "/app/imports.js",
+      "size": 2481,
+      "sha256": "6b36f3e7f079930a2b0416b0ad96d1273da9ef2c2951cd12fd4793073138bc83"
+    },
+    {
+      "path": "/app/effects-policy.js",
+      "size": 5822,
+      "sha256": "bf64ce15a3bf67c957cb4a71e0ada1562c243d7a72bd81d8cc80b32e1c25ec8d"
+    },
+    {
+      "path": "/app/effects.js",
+      "size": 15926,
+      "sha256": "38b99aab18e973a71178ff07f48a6e9b3f14e5a72be1dc7c6e3a6a4cf6c52b4b"
+    },
+    {
+      "path": "/app/normalization-worklet.js",
+      "size": 3376,
+      "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664"
+    },
+    {
+      "path": "/app/limiter-worklet.js",
+      "size": 2197,
+      "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112"
+    },
+    {
+      "path": "/app/pitch-worklet.js",
+      "size": 10303,
+      "sha256": "7002ef718d7928978c3674ea721a5a248b0a028d698add83e81757cf632bbfc5"
+    },
+    {
+      "path": "/app/profile-policy.js",
+      "size": 9653,
+      "sha256": "93caf6e8b253316e4e9267a28c7b28356480ccf5308ac17aac560dee553bcc0e"
+    },
+    {
+      "path": "/app/profile-crypto.js",
+      "size": 2972,
+      "sha256": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206"
+    },
+    {
+      "path": "/app/profile-cloud.js",
+      "size": 9042,
+      "sha256": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64"
+    },
+    {
+      "path": "/app/profile-crypto-worker.js",
+      "size": 4898,
+      "sha256": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66"
+    },
+    {
+      "path": "/app/vendor-scrypt-3.0.1.js",
+      "size": 17811,
+      "sha256": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d"
+    },
+    {
+      "path": "/app/profile.js",
+      "size": 15541,
+      "sha256": "aeb95b56609cd3d77d5d5a6cda0c360132694837f1d027855016eac0df309429"
+    },
+    {
+      "path": "/app/wave-history.js",
+      "size": 2065,
+      "sha256": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3"
+    },
+    {
+      "path": "/app/wave.js",
+      "size": 15089,
+      "sha256": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4"
+    },
+    {
+      "path": "/app/app.js",
+      "size": 119140,
+      "sha256": "9f84bb0a802f89e5574498925aef0f3b450257960b7b7a2578b7739afa74d91a"
+    },
+    {
+      "path": "/app/icon.svg",
+      "size": 366,
+      "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6"
+    },
+    {
+      "path": "/app/icon-192.png",
+      "size": 7875,
+      "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4"
+    },
+    {
+      "path": "/app/icon-512.png",
+      "size": 9687,
+      "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef"
+    },
+    {
+      "path": "/app/manifest.webmanifest",
+      "size": 440,
+      "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7"
+    }
+  ],
+  "sourceInputs": [
+    {
+      "name": "app.css",
+      "size": 22457,
+      "sha256": "8b7140c75fc575339789e67809fcdf31015cb613add868a7095046824c827f56"
+    },
+    {
+      "name": "app.js",
+      "size": 119140,
+      "sha256": "9f84bb0a802f89e5574498925aef0f3b450257960b7b7a2578b7739afa74d91a"
+    },
+    {
+      "name": "audio-metadata.js",
+      "size": 6571,
+      "sha256": "7c0e4e894f060f75c62cb0baafabea6cb3c17e8abaa49cf5d2634b4d94011770"
+    },
+    {
+      "name": "core.js",
+      "size": 12644,
+      "sha256": "0f58186762de522eb5f8022cd5af963a5992f88076f5a0153a788b08a702506b"
+    },
+    {
+      "name": "effects-policy.js",
+      "size": 5822,
+      "sha256": "bf64ce15a3bf67c957cb4a71e0ada1562c243d7a72bd81d8cc80b32e1c25ec8d"
+    },
+    {
+      "name": "effects.js",
+      "size": 15926,
+      "sha256": "38b99aab18e973a71178ff07f48a6e9b3f14e5a72be1dc7c6e3a6a4cf6c52b4b"
+    },
+    {
+      "name": "icon-192.png",
+      "size": 7875,
+      "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4"
+    },
+    {
+      "name": "icon-512.png",
+      "size": 9687,
+      "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef"
+    },
+    {
+      "name": "icon.svg",
+      "size": 366,
+      "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6"
+    },
+    {
+      "name": "imports.js",
+      "size": 2481,
+      "sha256": "6b36f3e7f079930a2b0416b0ad96d1273da9ef2c2951cd12fd4793073138bc83"
+    },
+    {
+      "name": "index.html",
+      "size": 27665,
+      "sha256": "ffa8e4dda2ecd87cd4a919aeba3372766aacdc19637534d5b4c88f1a63e737ea"
+    },
+    {
+      "name": "limiter-worklet.js",
+      "size": 2197,
+      "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112"
+    },
+    {
+      "name": "lyric-tempo.js",
+      "size": 9015,
+      "sha256": "fd820683ae0016c0d03db791386650d836b001d3a3872e7ea0d3c944e9205bb3"
+    },
+    {
+      "name": "lyric-view.js",
+      "size": 4800,
+      "sha256": "e2195c1f2164ca3911170fd7ae3b562a8d9ac056feb965a62c1339a2289d6989"
+    },
+    {
+      "name": "lyrics.js",
+      "size": 8186,
+      "sha256": "1ec2bda958ca4f56db27886fa49b51c54114bb9ac65e497264a920c06e6baf2c"
+    },
+    {
+      "name": "manifest.webmanifest",
+      "size": 440,
+      "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7"
+    },
+    {
+      "name": "normalization-worklet.js",
+      "size": 3376,
+      "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664"
+    },
+    {
+      "name": "offline.js",
+      "size": 6286,
+      "sha256": "90356fe86dbb0140ee054e9fb3ebc50291cf5b4765e841bd827c30dc2d97f205"
+    },
+    {
+      "name": "pitch-worklet.js",
+      "size": 10303,
+      "sha256": "7002ef718d7928978c3674ea721a5a248b0a028d698add83e81757cf632bbfc5"
+    },
+    {
+      "name": "profile-cloud.js",
+      "size": 9042,
+      "sha256": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64"
+    },
+    {
+      "name": "profile-crypto-worker.js",
+      "size": 4898,
+      "sha256": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66"
+    },
+    {
+      "name": "profile-crypto.js",
+      "size": 2972,
+      "sha256": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206"
+    },
+    {
+      "name": "profile-policy.js",
+      "size": 9653,
+      "sha256": "93caf6e8b253316e4e9267a28c7b28356480ccf5308ac17aac560dee553bcc0e"
+    },
+    {
+      "name": "profile.js",
+      "size": 15541,
+      "sha256": "aeb95b56609cd3d77d5d5a6cda0c360132694837f1d027855016eac0df309429"
+    },
+    {
+      "name": "room-transport.js",
+      "size": 6341,
+      "sha256": "bb4d1ac5cc88ae77c9eca78637922942d8a4df8dd42bcd25cfda0fdc72da9b46"
+    },
+    {
+      "name": "sw.js",
+      "size": 1994,
+      "sha256": "92e195f5925bd58c4771a249360b032ff3bd2fd1ffd5b036df02be04fce9b1c8"
+    },
+    {
+      "name": "vendor-scrypt-3.0.1.js",
+      "size": 17811,
+      "sha256": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d"
+    },
+    {
+      "name": "wave-history.js",
+      "size": 2065,
+      "sha256": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3"
+    },
+    {
+      "name": "wave.js",
+      "size": 15089,
+      "sha256": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4"
+    }
+  ],
+  "baselineInputs": [
+    {
+      "name": "app.css",
+      "sha256": "9009c62e3918ee15d9e526f75b275751363fb93b69f31a5b278b483064ab6994"
+    },
+    {
+      "name": "app.js",
+      "sha256": "717488069a937285bfa90b55d80a7497a6f54d67a1fb33a378acd721c70434ed"
+    },
+    {
+      "name": "core.js",
+      "sha256": "20a8d5b82f1c392438cd6655dd0f40f253e6d8ce6aace96e123dba4edca97daf"
+    },
+    {
+      "name": "effects-policy.js",
+      "sha256": "bf64ce15a3bf67c957cb4a71e0ada1562c243d7a72bd81d8cc80b32e1c25ec8d"
+    },
+    {
+      "name": "effects.js",
+      "sha256": "38b99aab18e973a71178ff07f48a6e9b3f14e5a72be1dc7c6e3a6a4cf6c52b4b"
+    },
+    {
+      "name": "icon-192.png",
+      "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4"
+    },
+    {
+      "name": "icon-512.png",
+      "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef"
+    },
+    {
+      "name": "icon.svg",
+      "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6"
+    },
+    {
+      "name": "imports.js",
+      "sha256": "9c025444b795b53b730d27723d18006a743c11601f22c86b2f89bea9d384abc2"
+    },
+    {
+      "name": "index.html",
+      "sha256": "99f1eb4bbcfaf75b662b12b06dd740aed53e214aa0f0909e5286b490249c09eb"
+    },
+    {
+      "name": "limiter-worklet.js",
+      "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112"
+    },
+    {
+      "name": "lyric-tempo.js",
+      "sha256": "fd820683ae0016c0d03db791386650d836b001d3a3872e7ea0d3c944e9205bb3"
+    },
+    {
+      "name": "lyrics.js",
+      "sha256": "1ec2bda958ca4f56db27886fa49b51c54114bb9ac65e497264a920c06e6baf2c"
+    },
+    {
+      "name": "manifest.webmanifest",
+      "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7"
+    },
+    {
+      "name": "normalization-worklet.js",
+      "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664"
+    },
+    {
+      "name": "offline.js",
+      "sha256": "90356fe86dbb0140ee054e9fb3ebc50291cf5b4765e841bd827c30dc2d97f205"
+    },
+    {
+      "name": "pitch-worklet.js",
+      "sha256": "7002ef718d7928978c3674ea721a5a248b0a028d698add83e81757cf632bbfc5"
+    },
+    {
+      "name": "profile-cloud.js",
+      "sha256": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64"
+    },
+    {
+      "name": "profile-crypto-worker.js",
+      "sha256": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66"
+    },
+    {
+      "name": "profile-crypto.js",
+      "sha256": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206"
+    },
+    {
+      "name": "profile-policy.js",
+      "sha256": "93caf6e8b253316e4e9267a28c7b28356480ccf5308ac17aac560dee553bcc0e"
+    },
+    {
+      "name": "profile.js",
+      "sha256": "aeb95b56609cd3d77d5d5a6cda0c360132694837f1d027855016eac0df309429"
+    },
+    {
+      "name": "sw.js",
+      "sha256": "e6f320559a5f4b9f3fdb48149396e9727427c0ec407403ea778c830048c5e940"
+    },
+    {
+      "name": "vendor-scrypt-3.0.1.js",
+      "sha256": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d"
+    },
+    {
+      "name": "wave-history.js",
+      "sha256": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3"
+    },
+    {
+      "name": "wave.js",
+      "sha256": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4"
+    }
+  ],
+  "fixtureNote": "Real isolated Chromium ServiceWorker/cache/IndexedDB/CDP file chooser/HTMLMediaElement; exact old20 source extracted from SHA-verified frozen sourceZIP, real current29-file candidate. Generated audio/synthetic local tags/profile/LRC/cache data; public provider responses deterministic. No personal account writes, physical Safari or native device proof."
+}

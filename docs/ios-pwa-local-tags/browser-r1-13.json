@@ -1,0 +1,98 @@
+{
+  "ok": true,
+  "count": 13,
+  "checks": [
+    "Actual CDP file chooser imports a playable ID3v2.3 UTF16 title and artist instead of its unrelated filename",
+    "Actual ID3v2.4 UTF8 metadata is retained in the local IndexedDB record",
+    "A genuinely playable MP3 with trailing ID3v1 recovers its real title/artist",
+    "Malformed text tags fall back to the whole filename and never guess its prefix as an artist",
+    "Tag extraction preserves strict local identity and actual media-probed duration for every accepted file",
+    "Actual ffmpeg FLAC Vorbis comments import UTF8 metadata through the same bounded path",
+    "Reading tags and probing another import do not replace or pause the currently playing local song",
+    "Actual lyric provider request uses the imported title/artist rather than the private filename or an empty artist",
+    "Reload preserves real tag metadata and the same local UUID in durable IndexedDB/library state",
+    "The reloaded tagged recording reuses its own lyric cache without another provider search",
+    "Local tagged import, playback and lyric lookup never call the network music catalog/prepare endpoints",
+    "Tagged Unicode identity remains within the real360px player",
+    "Focused local-tag scenarios have no uncaught renderer errors"
+  ],
+  "requests": [
+    "/app/",
+    "/app/app.css",
+    "/app/icon.svg",
+    "/app/core.js",
+    "/app/room-transport.js",
+    "/app/lyric-view.js",
+    "/app/audio-metadata.js",
+    "/app/lyrics.js",
+    "/app/offline.js",
+    "/app/lyric-tempo.js",
+    "/app/imports.js",
+    "/app/effects-policy.js",
+    "/app/effects.js",
+    "/app/profile-policy.js",
+    "/app/profile-crypto.js",
+    "/app/profile-cloud.js",
+    "/app/wave-history.js",
+    "/app/wave.js",
+    "/app/app.js",
+    "/app/profile.js",
+    "/app/sw.js",
+    "/app/",
+    "/app/app.css",
+    "/app/index.html",
+    "/app/core.js",
+    "/app/lyric-tempo.js",
+    "/app/lyrics.js",
+    "/app/offline.js",
+    "/app/imports.js",
+    "/app/effects-policy.js",
+    "/app/effects.js",
+    "/app/normalization-worklet.js",
+    "/app/limiter-worklet.js",
+    "/app/pitch-worklet.js",
+    "/app/profile-policy.js",
+    "/app/profile-crypto.js",
+    "/app/profile-cloud.js",
+    "/app/vendor-scrypt-3.0.1.js",
+    "/app/profile-crypto-worker.js",
+    "/app/profile.js",
+    "/app/wave-history.js",
+    "/app/wave.js",
+    "/app/app.js",
+    "/app/icon.svg",
+    "/app/icon-192.png",
+    "/app/icon-512.png",
+    "/app/manifest.webmanifest",
+    "/app/room-transport.js",
+    "/app/lyric-view.js",
+    "/app/audio-metadata.js"
+  ],
+  "lyricRequests": [
+    {
+      "path": "/api/get",
+      "title": "Песня из тегов",
+      "artist": "Исполнитель из тегов"
+    }
+  ],
+  "errors": [],
+  "failure": "",
+  "screenshots": [
+    "D:\\LolzCloud-Android-Toolchain\\independent-pitch\\local-tags-final\\tagged-local-lyrics-360.png"
+  ],
+  "sourceInputs": [
+    {
+      "name": "server/public/app/audio-metadata.js",
+      "sha256": "7c0e4e894f060f75c62cb0baafabea6cb3c17e8abaa49cf5d2634b4d94011770"
+    },
+    {
+      "name": "server/public/app/imports.js",
+      "sha256": "6b36f3e7f079930a2b0416b0ad96d1273da9ef2c2951cd12fd4793073138bc83"
+    },
+    {
+      "name": "server/public/app/index.html",
+      "sha256": "ffa8e4dda2ecd87cd4a919aeba3372766aacdc19637534d5b4c88f1a63e737ea"
+    }
+  ],
+  "fixtureNote": "Actual isolated Chromium app/IndexedDB/CDP file input/HTMLMediaElement; real ffmpeg-generated MP3 and FLAC with synthetic tags. LRCLIB response is a deterministic synthetic fixture. No physical Safari/native Apple claim."
+}

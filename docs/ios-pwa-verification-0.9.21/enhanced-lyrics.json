@@ -1,0 +1,57 @@
+{
+  "ok": true,
+  "count": 17,
+  "checks": [
+    "Actual file chooser→UTF8 import→IndexedDB→renderer applies positive offset to exact word boundaries",
+    "Enhanced text is preserved literally and cannot inject HTML into the real player",
+    "Line-only imported lyrics retain a clickable line without invented word timings",
+    "Actual source seek highlights the first word while preserving pause",
+    "Word updates patch existing active markers without rebuilding lyric DOM or stealing keyboard focus",
+    "Repeated clock ticks inside the same word perform no lyric DOM writes",
+    "Clicking a timed line seeks exact source time and never calls Play",
+    "The explicit enhanced end clears active text during a genuine pause between lines",
+    "Enhanced lyric buttons fit360px and keep44px minimum targets",
+    "Warm reload preserves imported exact word timings and priority without a provider request",
+    "Verified original25s→modified20s retimes line and word source boundaries exactly once",
+    "Transport rate1.5 does not multiply adapted word clocks or resume a paused seek",
+    "Word/line content remains within the tablet player at1024px",
+    "Declared listener-mode component keeps real word highlights in paragraphs and exposes no seek action",
+    "Role-capability rerender enables explicit seek once, and clear removes old timing state",
+    "Renderer plain/instrumental states contain only safe text and no fake timed words",
+    "Focused enhanced lyric scenarios have no uncaught renderer errors"
+  ],
+  "requests": [
+    "/api/get",
+    "/api/search"
+  ],
+  "errors": [],
+  "failure": "",
+  "screenshots": [
+    "D:\\LolzCloud-Android-Toolchain\\release-0.9.21\\PWAQA\\enhanced-lyrics\\enhanced-import-360.png",
+    "D:\\LolzCloud-Android-Toolchain\\release-0.9.21\\PWAQA\\enhanced-lyrics\\enhanced-retimed-360.png",
+    "D:\\LolzCloud-Android-Toolchain\\release-0.9.21\\PWAQA\\enhanced-lyrics\\enhanced-retimed-1024.png"
+  ],
+  "sourceInputs": [
+    {
+      "name": "server/public/app/core.js",
+      "sha256": "0f58186762de522eb5f8022cd5af963a5992f88076f5a0153a788b08a702506b"
+    },
+    {
+      "name": "server/public/app/lyric-view.js",
+      "sha256": "e2195c1f2164ca3911170fd7ae3b562a8d9ac056feb965a62c1339a2289d6989"
+    },
+    {
+      "name": "server/public/app/app.css",
+      "sha256": "8b7140c75fc575339789e67809fcdf31015cb613add868a7095046824c827f56"
+    },
+    {
+      "name": "server/public/app/app.js",
+      "sha256": "9f84bb0a802f89e5574498925aef0f3b450257960b7b7a2578b7739afa74d91a"
+    },
+    {
+      "name": "server/public/app/index.html",
+      "sha256": "ffa8e4dda2ecd87cd4a919aeba3372766aacdc19637534d5b4c88f1a63e737ea"
+    }
+  ],
+  "fixtureNote": "Actual isolated Chromium app HTTP +generated910Hz MP3/HTMLAudio and actual CDP system-file selection. LRC/LRCLIB text synthetic; provider JSON is deterministic fixture. Listener/role component is declared DOM mode fixture, not a live multiparty room/Apple proof."
+}

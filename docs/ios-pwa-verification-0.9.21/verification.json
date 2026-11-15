@@ -1,0 +1,200 @@
+{
+  "status": "passed-after-legacy-display-fix-not-published",
+  "checkedAt": "2026-11-15T16:35:09.006Z",
+  "candidate": {
+    "desktop": "0.9.21",
+    "server": "0.9.24",
+    "sw": 9
+  },
+  "sourceInputs": "source-inputs.json",
+  "sourceInputsSha256": "70866d7a35d25f810d600a7578bc6e7b5104d6d58159a0194d9f03f587ab66a9",
+  "pwaSourceFiles": 29,
+  "suites": [
+    {
+      "name": "lyric-cache-versions",
+      "passed": 23,
+      "failed": 0,
+      "errors": 0,
+      "report": "lyrics-cache-r2.json",
+      "sourceReport": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/lyric-cache-legacy-fixed/pwa-lyric-versions-results.json",
+      "sha256": "31e92e76601e545712aa65ddb3eadbb2ff820c57621315a389603375a570b6e3",
+      "testInput": {
+        "test": "pwa-lyric-versions-ui.cjs",
+        "sha256": "dc074f007fbb8012c598fd49e1646641920e4d288fbaac66819efa86c948e004",
+        "profile": "D:\\LolzCloud-Android-Toolchain\\tmp\\LolzCloud-pwa-ui-final21-NEGiGZ",
+        "output": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/lyric-cache-legacy-fixed"
+      },
+      "sourceRevision": "after legacy-display fix"
+    },
+    {
+      "name": "enhanced-lyrics",
+      "passed": 19,
+      "failed": 0,
+      "errors": 0,
+      "report": "enhanced-lyrics-r2.json",
+      "sourceReport": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/enhanced-legacy-fixed/pwa-enhanced-lyrics-results.json",
+      "sha256": "79dadac46b6cf653cd820a39f8486c60a438fc9b11c40fb6a1edb583d3749664",
+      "testInput": {
+        "test": "pwa-enhanced-lyrics-ui.cjs",
+        "sha256": "b663e9b79a946e3cfdb84149984e7d898b6a2ec702d96c3c265f9ac96371eeea",
+        "profile": "D:\\LolzCloud-Android-Toolchain\\tmp\\LolzCloud-pwa-ui-final21-jhaWug",
+        "output": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/enhanced-legacy-fixed"
+      },
+      "sourceRevision": "after legacy-display fix"
+    },
+    {
+      "name": "local-tags",
+      "passed": 14,
+      "failed": 0,
+      "errors": 0,
+      "report": "local-tags.json",
+      "sourceReport": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/local-tags/pwa-local-tags-results.json",
+      "sha256": "0e0858f6f9a396aba86d604af596626bd1f68a8c763471eb57f14f4c7125e6e6",
+      "testInput": {
+        "test": "pwa-local-tags-ui.cjs",
+        "sha256": "8e72909e4890aa91b51fa64111358cc14c42cb3035c27a39e0840ad8bf9d2417",
+        "profile": "D:\\LolzCloud-Android-Toolchain\\tmp\\LolzCloud-pwa-ui-final21-VP7Djm",
+        "output": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/local-tags"
+      },
+      "sourceRevision": "before display-onlyfix; unaffected module paths intentionally not rerun",
+      "viewSha256AtRun": "e2195c1f2164ca3911170fd7ae3b562a8d9ac056feb965a62c1339a2289d6989"
+    },
+    {
+      "name": "imports-offline",
+      "passed": 17,
+      "failed": 0,
+      "errors": 0,
+      "report": "imports-offline.json",
+      "sourceReport": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/imports-offline/pwa-imports-results.json",
+      "sha256": "b8d706f1cf822caad7e84d8357078d6c8f4ea99b499db4d5a0c79f2e50f548b7",
+      "testInput": {
+        "test": "pwa-imports-ui.cjs",
+        "sha256": "9fa258c72108b5b46c645e49e27342d39c0d73e8c90d3d9b5523c47930e8180c",
+        "profile": "D:\\LolzCloud-Android-Toolchain\\tmp\\LolzCloud-pwa-ui-final21-PSVvmP",
+        "output": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/imports-offline"
+      },
+      "sourceRevision": "before display-onlyfix; unaffected module paths intentionally not rerun",
+      "viewSha256AtRun": "e2195c1f2164ca3911170fd7ae3b562a8d9ac056feb965a62c1339a2289d6989"
+    },
+    {
+      "name": "independent-native-compat",
+      "passed": 47,
+      "failed": 0,
+      "errors": 0,
+      "report": "pitch-native-compat.json",
+      "sourceReport": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/independent-native-compat/pwa-independent-pitch-results.json",
+      "sha256": "4b8441fb2157495720ac3df1247bdeb410ffd4481e8703452a45c0770fe26c0d",
+      "testInput": {
+        "test": "pwa-independent-pitch-ui.cjs",
+        "sha256": "726c52df6f381fd59f01860f6f6fcf49aa1273ca2118c044d645bc6b83cba877",
+        "profile": "D:\\LolzCloud-Android-Toolchain\\tmp\\LolzCloud-pwa-ui-final21-lz3jCr",
+        "output": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/independent-native-compat"
+      },
+      "sourceRevision": "before display-onlyfix; unaffected module paths intentionally not rerun",
+      "viewSha256AtRun": "e2195c1f2164ca3911170fd7ae3b562a8d9ac056feb965a62c1339a2289d6989"
+    },
+    {
+      "name": "exact8-to9-final",
+      "passed": 22,
+      "failed": 0,
+      "errors": 0,
+      "report": "shell8-to9-r2.json",
+      "sourceReport": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/legacy-cache-fixed-final/pwa-shell-upgrade-results.json",
+      "sha256": "a53318f22566e32bb21701861e81239011bf5f2ef315ffa0df9e4724f2c46d0c",
+      "testInput": {
+        "test": "pwa-shell-upgrade-ui.cjs",
+        "sha256": "cf18a431983e7ab7417f4f6c2b319e42c9cd0c279a895f450356e4c4fc736043",
+        "profile": "D:\\LolzCloud-Android-Toolchain\\tmp\\LolzCloud-pwa-ui-final21-f4g96y",
+        "output": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/legacy-cache-fixed-final"
+      },
+      "sourceRevision": "after legacy-display fix"
+    }
+  ],
+  "countsOverlap": true,
+  "serviceWorker": {
+    "baseline": "Exact26-file old20source/SW8 from frozen SHA-verified sourceZIP, not a newApp/oldCache mock",
+    "baselineSourceCommit": "ddcd722fe533390de3ae00680dbf41dac176c604",
+    "baselineArchiveSha256": "865c01bfe830f12f831056bcdab16cad194e7526032294d77e8ff0ed3647e930",
+    "currentShellEntries": 29,
+    "allCachedResponseSizesAndSha256MatchCurrentSource": true,
+    "shellAlias": "Both /app/ and /app/index.html are cached; sw.js itself is fetched/registered and is not a shell-cache entry.",
+    "failedNewModuleRetainsWorkingOldOffline": true,
+    "actualNewWorkerPrivateFetchExclusion": [
+      "/api/session",
+      "/api/profile",
+      "/rooms",
+      "/social",
+      "/room/<fixture>/",
+      "/music/audio/<signed-fixture>.mp3"
+    ],
+    "retained": [
+      "local audio Blob and exact UUID",
+      "heart/likes",
+      "personal moment",
+      "imported Enhanced LRC",
+      "separate provider lyric cache",
+      "commonv1 collections/bookmark note/custom DSP sidecar",
+      "wave mood and novelty preferences"
+    ],
+    "noAutoplay": true,
+    "explicitOfflinePlaybackAdvancesClock": true,
+    "newMetadataModuleImportsRealTaggedMp3Offline": true,
+    "newLyricParserRendererWorksFromOldImportedLrcOffline": true
+  },
+  "historicalAttempts": [
+    {
+      "path": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/exact8-to9-attempt1",
+      "reason": "Test expected61% despite the actual old5-point range quantizing to60%; diagnostic snapshot added."
+    },
+    {
+      "path": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/exact8-to9-attempt2",
+      "reason": "Same pre-upgrade fixture assertion; saved complete synthetic diagnostic state showed correct60%."
+    },
+    {
+      "path": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/exact8-to9-attempt3",
+      "reason": "Repeated Chromium network emulation allowed loopback request; server socket outage added, preserving the actual uncached-fetch failure assertion."
+    },
+    {
+      "path": "D:/LolzCloud-Android-Toolchain/release-0.9.21/PWAQA/exact8-to9-attempt4",
+      "reason": "16PASS predecessor; final adds explicit SW9 private endpoint fetch/cache exclusion."
+    }
+  ],
+  "limits": [
+    "Actual isolated Electron45/Chromium, generated audio and synthetic LRC/profile/tags/cache fixture data. No physical Safari/iPhone/iPad proof.",
+    "Native1.3/1.4/1.5 compatibility is strict tagged IPC fixture coverage; native Apple SDK/OS evidence is separate.",
+    "External LRCLIB/SC/YT responses in these suites are deterministic adapters; no live-provider/catalog success claim.",
+    "Offline means browser emulation plus explicit origin socket outage; uncached request failure is asserted, not inferred from navigator.onLine.",
+    "No product edits, versions, account writes outside isolated fixtures, Git, build, deploy or publication performed by this final phase.",
+    "After the single view exception, reran only affected23cache/19enhancement/22exactupgrade cases; tags14/imports17/pitch47 reports are retained from the preceding source with explicit earlier view SHA."
+  ],
+  "productionDelta": {
+    "path": "server/public/app/lyric-view.js",
+    "before": {
+      "name": "lyric-view.js",
+      "size": 4800,
+      "sha256": "e2195c1f2164ca3911170fd7ae3b562a8d9ac056feb965a62c1339a2289d6989"
+    },
+    "after": {
+      "name": "lyric-view.js",
+      "size": 5369,
+      "sha256": "d77b6a6d83be5c2c7ad3cec5448d296c29c1c5d20be4f6b899c8583d7402b120"
+    },
+    "scope": "Display-only strip valid Enhanced LRC timestamp syntax from legacy cached line text/aria; existingline times, verifiedworddata, DB/provider behavior unchanged."
+  },
+  "newCaseExecutions": 64,
+  "unaffectedEarlierCaseExecutions": 78,
+  "latestMatrixCases": 142,
+  "previousVerification": "verification-r1.json",
+  "legacyCacheFix": {
+    "reproduction": "legacy-before-fix.json",
+    "confirmed": true,
+    "actualOldProviderCaches": [
+      "913:unmodified10s",
+      "914:alreadyadapted8s withoriginal10/12/14anglemarkers"
+    ],
+    "cleanup": "Display text/aria only; no newword timestamps, no offset/ratio reapplication",
+    "storedCacheBytesUnchanged": true,
+    "providerRequestsAfterUpgrade": 0,
+    "freshVerifiedWordsUnchanged": true
+  }
+}
