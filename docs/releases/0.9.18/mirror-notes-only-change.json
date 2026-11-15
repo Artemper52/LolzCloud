@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "change": "notes URL only; exact original byte snapshot preserved",
+  "snapshot": "D:\\LolzCloud-Android-Toolchain\\release-0.9.18\\public-qa\\verified-plan.json",
+  "verifiedPlanSha256": "31b68228837511d0e72b78a842686190bc4a578482067e994ee1190bfaf622c7",
+  "updatedPlanFileSha256": "b8b7e069f5762e512445ea0c399049a2f906d4580a7521cc6843e53ea30e3f1f",
+  "filesAndCommitUnchanged": true,
+  "files": 22
+}

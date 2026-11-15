@@ -1,0 +1,33 @@
+{
+  "status": "passed",
+  "sourceCommit": "d0b51bcda8cd55cbf215fc2cc11e046430ca92dd",
+  "entries": 1077,
+  "files": 964,
+  "sourceZipBytes": 24433860,
+  "sourceZipSha256": "ca276671e3581ce346851695952cdbd2250ed09e3378e72b65097a180e4c119b",
+  "runtimeCanonicalFiles": 153,
+  "runtimeMismatches": [],
+  "payloadEquivalentZipContainers": [
+    "source/app/session-transfer/helper-firefox.zip",
+    "source/app/session-transfer/helper.zip"
+  ],
+  "nativeCanonicalInputs": 23,
+  "pwaCanonicalInputs": 21,
+  "androidCanonicalFiles": 57,
+  "androidReproducibleGeneratedInputs": {
+    "app/src/main/assets/room-client/room.html": "server/public/room.html",
+    "app/src/main/assets/room-client/room.css": "server/public/room.css",
+    "app/src/main/assets/room-client/room.js": "server/public/room.js",
+    "app/src/main/assets/room-client/room-sync.js": "server/public/room-sync.js",
+    "app/src/main/assets/room-client/room-players.js": "server/public/room-players.js",
+    "app/src/main/assets/room-client/media-source.js": "server/public/media-source.js",
+    "app/src/main/assets/room-client/site.js": "server/public/site.js",
+    "app/src/main/assets/room-client/social.html": "server/public/social.html",
+    "app/src/main/assets/room-client/social.js": "server/public/social.js",
+    "app/src/main/assets/room-client/social.css": "server/public/social.css",
+    "app/src/main/assets/room-client/logo.svg": "source/app/lib/assets/logo.svg"
+  },
+  "androidSourceSha256": "3e02ce8cee193b986218a4f1290ec816bac94d664b2b9bf531b01201daf409cc",
+  "unsafeOrPrivatePaths": [],
+  "credentialPatternMatches": []
+}

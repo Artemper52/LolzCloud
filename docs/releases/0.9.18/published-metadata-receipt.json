@@ -1,0 +1,15 @@
+{
+  "status": "published",
+  "release": "20261114T235741-platforms-0.9.18-d110dcf2",
+  "version": "0.9.18",
+  "previous": "/srv/lolzcloud/releases/20261114T233354-platforms-0.9.18-d32dc63c/downloads",
+  "destination": "/srv/lolzcloud/releases/20261114T235741-platforms-0.9.18-d110dcf2/downloads",
+  "files": [
+    {
+      "name": "platforms.json",
+      "size": 6895,
+      "sha256": "b1053f4939e1864cabfaa82cd542192e93e28756edf4bc86dad47032e33a37ee",
+      "source": "upload"
+    }
+  ]
+}

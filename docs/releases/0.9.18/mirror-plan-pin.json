@@ -1,0 +1,31 @@
+{
+  "status": "passed",
+  "scope": "LOCAL ONLY: syntax, YAML, pinned manifest and fail-closed context tests; no official download or GitHub mutation executed",
+  "workflow": ".github/workflows/mirror-profiles.yml",
+  "branch": "codex/recover-profile-0.9.18",
+  "tag": "v0.9.18",
+  "sourceCommit": "d0b51bcda8cd55cbf215fc2cc11e046430ca92dd",
+  "planSha256": "3f5aa94925e76cabb4714383cadf0e6fd067fdf8ed47eb1bf674b0de1a5dc27e",
+  "planCompactBytes": 7611,
+  "planFileSha256": "b8b7e069f5762e512445ea0c399049a2f906d4580a7521cc6843e53ea30e3f1f",
+  "workflowSha256": "ad934a705efc1e3d563d3b4a622d9b588392e608c48d40b6b38f3e2ed4cb93bb",
+  "workflowBytes": 36297,
+  "codeSha256": "ea5f1f915a9ad9a9f062fdce434a831acc26d140db3b59f26b1030d0f8d77671",
+  "codeBytes": 24142,
+  "files": 22,
+  "totalBytes": 1073010085,
+  "syntax": "passed",
+  "yaml": "passed",
+  "invalidPlansRejected": 18,
+  "invalidContextsRejected": 5,
+  "reviewed017BodyPreservedWithOnlyReleaseIdentifierChanges": true,
+  "requiredOfficialByteHashChecks": 22,
+  "requiredGitHubByteHashChecks": 22,
+  "actualLocalDownloadChecks": 0,
+  "githubWritesExecuted": 0,
+  "latestPromotion": "only after complete official and GitHub byte verification",
+  "historicalWorkflowHashes": {
+    ".github/workflows/mirror-comfort.yml": "60b5c4753739d39815b71402353eb8f32a0f631b304993cc7977a36b82816a6a",
+    ".github/workflows/mirror-rooms.yml": "ad1cce85ea4ce944a4722831921364158fb1b41b8907337e27e5e3c5b96020bf"
+  }
+}

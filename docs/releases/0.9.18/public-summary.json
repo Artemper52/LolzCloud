@@ -1,0 +1,44 @@
+{
+  "status": "passed",
+  "sourceCommit": "d0b51bcda8cd55cbf215fc2cc11e046430ca92dd",
+  "planSha256": "31b68228837511d0e72b78a842686190bc4a578482067e994ee1190bfaf622c7",
+  "reportSha256": "29ae9ea8b69ff5e477444cb1bf86a2a54956d9b0a5ece87b96809eaeb4d64bad",
+  "startedAt": "2026-11-14T23:41:34.728Z",
+  "finishedAt": "2026-11-14T23:42:39.608Z",
+  "probe": "local Windows Node public HTTPS GET",
+  "checks": 70,
+  "fullArtifacts": 22,
+  "fullArtifactBytes": 1073010085,
+  "siteLinks": 14,
+  "websiteFiles": 3,
+  "pwaAssets": 21,
+  "oldAppUpdates": [
+    {
+      "name": "Modern released17 detects18 without install",
+      "passed": true,
+      "feed": "https://lolzcloud.com/downloads/"
+    },
+    {
+      "name": "Legacy released17 detects18 without install",
+      "passed": true,
+      "feed": "https://lolzcloud.com/downloads/"
+    }
+  ],
+  "limits": {
+    "files": 22,
+    "perFile": 350000000,
+    "total": 2000000000,
+    "parallel": 3,
+    "artifactTimeoutMs": 300000,
+    "metadataTimeoutMs": 30000
+  },
+  "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+  "PWAInventorySha256": "2b93ea460856c8efc1269fd3cdc0447a92b629b8bdd1a49de7ae26b0c8d4b42c",
+  "nativeProofSha256": "6d82e65fbd296be7abe211f446315f332160deb11f5622cc4d98901324768f41",
+  "sourceComparison": "Actual source ZIP Git comment exactcommit; package versions,21 PWA text canonical/Binary exact and23 native canonical files matched. Separate native source archive matched23 canonical inputs. IPA/simulator hash matches actual12/12 Apple SDK proof.",
+  "limitations": [
+    "No user installation, account writes or CUA",
+    "Native signed Apple distribution and physical device not asserted",
+    "GitHub release/latest publication state intentionally not gated during mirror release"
+  ]
+}

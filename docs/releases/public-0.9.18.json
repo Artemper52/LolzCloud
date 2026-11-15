@@ -1,15 +1,320 @@
 {
-  "status": "prepared",
-  "version": "0.9.18",
-  "published": false,
-  "checkedAt": "2026-11-14T23:22:52.508Z",
-  "expectedPlatforms": {
-    "desktop": "0.9.18",
-    "android": "0.1.8",
-    "androidVersionCode": 9,
-    "nativeIOS": "0.1.3",
-    "nativeIOSBuild": 4,
-    "server": "0.9.21"
+  "revision": "0.9.18",
+  "status": "published",
+  "published": true,
+  "checkedAt": "2026-11-14T23:57:41.546Z",
+  "sourceCommit": "d0b51bcda8cd55cbf215fc2cc11e046430ca92dd",
+  "sourceBranch": "codex/recover-profile-0.9.18",
+  "website": "https://lolzcloud.com/#download",
+  "webServiceVersion": "0.9.21",
+  "android": {
+    "versionName": "0.1.8",
+    "versionCode": 9,
+    "packageName": "com.lolzcloud.mobile",
+    "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.8.apk",
+    "size": 2573850,
+    "sha256": "e98fbdaf0fb815922a6efb3081a9d85539ff47a2ad028f2229774fc1a5989ff0",
+    "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+    "sourceSha256": "3e02ce8cee193b986218a4f1290ec816bac94d664b2b9bf531b01201daf409cc"
   },
-  "note": "Build snapshot before publication. Public availability is checked separately and recorded after promotion."
+  "nativeIOS": {
+    "version": "0.1.3",
+    "build": 4,
+    "status": "unsigned-sdk-build",
+    "source": {
+      "name": "LolzCloud-iOS-0.1.3-source.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.3-source.zip",
+      "size": 162846,
+      "sha256": "7a137211425db4e39d83317a03dd15863c9afd820028be43fd8312c42bc0572b"
+    },
+    "unsignedIPA": {
+      "name": "LolzCloud-iOS-0.1.3-unsigned.ipa",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.3-unsigned.ipa",
+      "size": 275908,
+      "sha256": "fe815d77baccbb1d36444a63fea34237873d699f6e2fbb855d0ec773849320fb"
+    },
+    "simulator": {
+      "name": "LolzCloud-iOS-0.1.3-simulator.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.3-simulator.zip",
+      "size": 1060184,
+      "sha256": "71a6b7d5556002393b1e966bf502c2ae64166a0be25dfebb34fd7a4e14133cf5"
+    },
+    "appleSDKBuild": true,
+    "deviceTest": false,
+    "signedIPA": false,
+    "compiledCommit": "74e3273b702abcc24882290475729a642f8852c8",
+    "verification": "https://github.com/Artemper52/LolzCloud/actions/runs/43649974098",
+    "xcode": "26.3",
+    "sdk": "26.2",
+    "simulatorRuntimeTest": {
+      "status": "passed",
+      "verification": "https://github.com/Artemper52/LolzCloud/actions/runs/43649974098",
+      "iphonePassed": 12,
+      "ipadPassed": 12,
+      "skipped": 0,
+      "physicalDeviceTested": false
+    }
+  },
+  "github": {
+    "id": 445680696,
+    "url": "https://github.com/Artemper52/LolzCloud/releases/tag/v0.9.18",
+    "tag": "v0.9.18",
+    "latest": true,
+    "files": 22,
+    "verification": "https://github.com/Artemper52/LolzCloud/actions/runs/43654933564",
+    "allReportedDigestsMatched": true,
+    "actualOfficialAndGitHubBytesVerified": true,
+    "checksumReportArtifact": 14136953980
+  },
+  "files": [
+    {
+      "name": "android-update.json",
+      "url": "https://lolzcloud.com/downloads/android-update.json",
+      "size": 438,
+      "sha256": "474dfc0e730a09b0315ded7384f0b26f747726809001e1624815f761096a347e",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/android-update.json",
+      "digestVerified": true
+    },
+    {
+      "name": "latest.yml",
+      "url": "https://lolzcloud.com/downloads/latest.yml",
+      "size": 366,
+      "sha256": "714c7a27ce1349833d3ad512daf3790d7570e4b722d67f2b14eed150eb19bb01",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/latest.yml",
+      "digestVerified": true
+    },
+    {
+      "name": "legacy.yml",
+      "url": "https://lolzcloud.com/downloads/legacy.yml",
+      "size": 373,
+      "sha256": "8b00ec7f458ce533fc84eb4edc335d02f95f55fae1a7267cf6db53918f4a9124",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/legacy.yml",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.18-linux-arm64.tar.gz",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.18-linux-arm64.tar.gz",
+      "size": 159411491,
+      "sha256": "3796a4484fd55e5f3483100ec2888a8d58f5edb12a4d2d3ba5223bbbb12e982e",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-0.9.18-linux-arm64.tar.gz",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.18-linux-x64.AppImage",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.18-linux-x64.AppImage",
+      "size": 147466744,
+      "sha256": "97a30c5dbdf55bd4bad473e91b872e443a3b3a9f437c2749a593b0915ee4446e",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-0.9.18-linux-x64.AppImage",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.18-linux-x64.tar.gz",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.18-linux-x64.tar.gz",
+      "size": 160326261,
+      "sha256": "3c52fcf8e08accd900fce6d28a9eba3ac91b93f51b3882668d9f6703d8206350",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-0.9.18-linux-x64.tar.gz",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.18-source.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.18-source.zip",
+      "size": 24433860,
+      "sha256": "ca276671e3581ce346851695952cdbd2250ed09e3378e72b65097a180e4c119b",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-0.9.18-source.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.18-win-x64-Setup.exe",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.18-win-x64-Setup.exe",
+      "size": 146396034,
+      "sha256": "b7606190fb81698c593d0c7e4f0ea764e68868193d3cb32e3a4b4d84d27bdb33",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-0.9.18-win-x64-Setup.exe",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.18-win-x64-Setup.exe.blockmap",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.18-win-x64-Setup.exe.blockmap",
+      "size": 152578,
+      "sha256": "dfdaeffb8afb62d128d8ae64633b1c406f2e8c8fe56c53a5df84e6ebf5c9de6b",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-0.9.18-win-x64-Setup.exe.blockmap",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.18-win-x64.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.18-win-x64.zip",
+      "size": 196681229,
+      "sha256": "8222409f97383646d6fa8e24c7e15d6f543e8b940c59baf0d4bcba57ac5e4e75",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-0.9.18-win-x64.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.18-win7-legacy-Setup.exe",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.18-win7-legacy-Setup.exe",
+      "size": 99541039,
+      "sha256": "2e1a9d4014263e4cbba34e972fe236b8a6f67e7df5afceffad5b05e814140c6a",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-0.9.18-win7-legacy-Setup.exe",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.18-win7-legacy-Setup.exe.blockmap",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.18-win7-legacy-Setup.exe.blockmap",
+      "size": 105010,
+      "sha256": "1bf3259e8d05a52ce8b61c41f6911fbf26e2d110e07635a6012b9a9827ea806a",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-0.9.18-win7-legacy-Setup.exe.blockmap",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.18-win7-legacy-x64.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.18-win7-legacy-x64.zip",
+      "size": 134398303,
+      "sha256": "d6634f880094aa1123b49f25a4393ad75be9269750043a9a7d3ac4cfa47a9de8",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-0.9.18-win7-legacy-x64.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-Android-0.1.8.apk",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-Android-0.1.8.apk",
+      "size": 2573850,
+      "sha256": "e98fbdaf0fb815922a6efb3081a9d85539ff47a2ad028f2229774fc1a5989ff0",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-Android-0.1.8.apk",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "size": 10190,
+      "sha256": "b656175abd7283ab4ddb43eb46cc3b38ce666af4d9b5378c3a6e1ed98a23b129",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "size": 10190,
+      "sha256": "bd1b43bb821a5fb2a122f0d5e8e3e3d2b0c3bbb94f887016be79f9e6ed98aebe",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.3-simulator.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.3-simulator.zip",
+      "size": 1060184,
+      "sha256": "71a6b7d5556002393b1e966bf502c2ae64166a0be25dfebb34fd7a4e14133cf5",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-iOS-0.1.3-simulator.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.3-source.zip",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.3-source.zip",
+      "size": 162846,
+      "sha256": "7a137211425db4e39d83317a03dd15863c9afd820028be43fd8312c42bc0572b",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-iOS-0.1.3-source.zip",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-iOS-0.1.3-unsigned.ipa",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-iOS-0.1.3-unsigned.ipa",
+      "size": 275908,
+      "sha256": "fe815d77baccbb1d36444a63fea34237873d699f6e2fbb855d0ec773849320fb",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-iOS-0.1.3-unsigned.ipa",
+      "digestVerified": true
+    },
+    {
+      "name": "update-legacy.json",
+      "url": "https://lolzcloud.com/downloads/update-legacy.json",
+      "size": 588,
+      "sha256": "290775b03c3168538c727e48e87d87e12e36e2fbc1a1eb4305d1276754036664",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/update-legacy.json",
+      "digestVerified": true
+    },
+    {
+      "name": "update.json",
+      "url": "https://lolzcloud.com/downloads/update.json",
+      "size": 565,
+      "sha256": "e1483da9c8b795541aca3856b38c937e993a7dbd8e0229e80eed8d2431ad15e8",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/update.json",
+      "digestVerified": true
+    },
+    {
+      "name": "LolzCloud-0.9.18-SHA256SUMS.txt",
+      "url": "https://lolzcloud.com/downloads/LolzCloud-0.9.18-SHA256SUMS.txt",
+      "size": 2038,
+      "sha256": "3aadf8eff5ffdf098eb8e1cdcbf7517f1fc2262fac34af87f7048a934870d098",
+      "github": "https://github.com/Artemper52/LolzCloud/releases/download/v0.9.18/LolzCloud-0.9.18-SHA256SUMS.txt",
+      "digestVerified": true
+    }
+  ],
+  "tests": {
+    "nodeLinux": {
+      "passed": 445,
+      "skipped": 0,
+      "pinnedInput": true
+    },
+    "nodeWindows": {
+      "total": 446,
+      "passed": 430,
+      "skippedLinuxSpecific": 16
+    },
+    "android": {
+      "portableActual": 37,
+      "cloudActualFixture": 24,
+      "purePortable": 62,
+      "cryptoInterop": 19,
+      "personalOAuthOrPublicCloudWrite": false
+    },
+    "pwa": {
+      "profile": 36,
+      "cloud": 19,
+      "effects": 40,
+      "full": 66,
+      "imports": 17,
+      "queue": 11,
+      "login": 13,
+      "pure": 55,
+      "setsOverlap": true
+    },
+    "windows": {
+      "nativeModern": "passed",
+      "nativeLegacyOnModernWindows": "passed",
+      "exactAsarFiles": 48,
+      "upgrade017to018": "passed",
+      "profilePreserved": true,
+      "lowDiskGuard": "passed",
+      "actualSoundCloudAndLocalPreampPCM": true
+    },
+    "linux": {
+      "x64TarAndFuse": "passed",
+      "nativeKeyring": "passed",
+      "rendererSandbox": "passed",
+      "updaterTransactions": 22,
+      "arm64": "static-only"
+    },
+    "nativeIOS": {
+      "policy": 65,
+      "iphoneSimulator": 12,
+      "ipadSimulator": 12,
+      "skipped": 0,
+      "appleSDK": "26.2",
+      "xcode": "26.3",
+      "physicalDeviceTested": false,
+      "actualUIKitFilePresentation": true,
+      "userShareDestinationOrCancel": false
+    },
+    "website": {
+      "localUi": 22,
+      "publicChecks": 70,
+      "actualArtifacts": 22,
+      "actualArtifactBytes": 1073010085,
+      "actualReleased17ModernAndLegacyDetect18": true
+    }
+  },
+  "limitations": [
+    "No physical Android/iPhone/iPad or acoustic hardware test.",
+    "Native iOS IPA is unsigned; Apple signing and personal-device provisioning are still required.",
+    "Independent pitch and personal YouTube Music in PWA/native iOS, desktop RPC/studio and all-platform feature parity remain incomplete; see the platform matrix.",
+    "Android common reverb strength, echo and normalization are retained for portability, without claiming native support.",
+    "ARM64 runtime, physical Windows7, personal external OAuth and cloud mutation, external iOS document providers and share destinations remain unverified.",
+    "GitHub main remains the existing0.9.12 branch; release18 source is available through the verified tag, release branch and source ZIP.",
+    "Test suites overlap and must not be summed as unique user scenarios."
+  ]
 }

@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T23:59:05.876Z",
+  "url": "https://lolzcloud.com/downloads/platforms.json",
+  "bytes": 6895,
+  "sha256": "b1053f4939e1864cabfaa82cd542192e93e28756edf4bc86dad47032e33a37ee",
+  "releaseId": 445680696,
+  "sourceCommit": "d0b51bcda8cd55cbf215fc2cc11e046430ca92dd",
+  "github": {
+    "url": "https://github.com/Artemper52/LolzCloud",
+    "sourceCommit": "d0b51bcda8cd55cbf215fc2cc11e046430ca92dd",
+    "sourceBranch": "codex/recover-profile-0.9.18",
+    "releasePublication": "published",
+    "releaseURL": "https://github.com/Artemper52/LolzCloud/releases/tag/v0.9.18",
+    "releaseId": 445680696,
+    "verifiedFiles": 22,
+    "verification": "https://github.com/Artemper52/LolzCloud/actions/runs/43654933564"
+  }
+}

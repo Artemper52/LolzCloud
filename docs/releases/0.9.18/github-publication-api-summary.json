@@ -1,0 +1,27 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-14T23:56:53.772Z",
+  "scope": "Read-only GitHub release/tag/latest API snapshots; complete byte hashing is in the successful mirror verification artifact",
+  "runId": 43654933564,
+  "jobId": 132631269582,
+  "runURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43654933564",
+  "workflowCommit": "673054be053a16f14590736a90b848afb41b8ca0",
+  "sourceCommit": "d0b51bcda8cd55cbf215fc2cc11e046430ca92dd",
+  "planSha256": "3f5aa94925e76cabb4714383cadf0e6fd067fdf8ed47eb1bf674b0de1a5dc27e",
+  "releaseId": 445680696,
+  "releaseURL": "https://github.com/Artemper52/LolzCloud/releases/tag/v0.9.18",
+  "tag": "v0.9.18",
+  "assets": 22,
+  "totalBytes": 1073010085,
+  "allAssetApiDigestsMatchPlan": true,
+  "latestMatchesRelease": true,
+  "tagMatchesSourceCommit": true,
+  "draft": false,
+  "prerelease": false,
+  "files": [
+    "github-release-published.json",
+    "github-tag-published.json",
+    "github-latest-published.json"
+  ],
+  "extraGitHubWrites": 0
+}
