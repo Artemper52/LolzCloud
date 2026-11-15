@@ -1,0 +1,390 @@
+{
+  "createdAt": "2026-11-15T17:12:39.128Z",
+  "testApk": {
+    "bytes": 8160560,
+    "sha256": "c4ff95cc2e85725d398445d68bc87cb89acc3b2a070cf9774affaf8c9349fabc"
+  },
+  "files": [
+    {
+      "path": "android/tests/AccountCookieCommitTest.java",
+      "bytes": 5223,
+      "sha256": "f91c5bf7b9776ae063cbb3ff2bf37f16b375fbb66ed9d2eac97900243e42d9d2"
+    },
+    {
+      "path": "android/tests/AccountPolicyTest.java",
+      "bytes": 5175,
+      "sha256": "5cfa5f6c5b047a9817c0da861b518a7135cad6920d35bb13fa3965e1be792372"
+    },
+    {
+      "path": "android/tests/AndroidReleasePolicyTest.java",
+      "bytes": 15874,
+      "sha256": "e9e659d10c466fb4e4bb0c3e7879274304ab10c6d0e12928815a3ed0dfe8359c"
+    },
+    {
+      "path": "android/tests/AudioEffectsPolicyTest.java",
+      "bytes": 4107,
+      "sha256": "15714831da5aebdb8d2c8bbcfa55c98b0d138172a21754bdfa8c26d1997308b1"
+    },
+    {
+      "path": "android/tests/AudioPreparationPolicyTest.java",
+      "bytes": 4217,
+      "sha256": "1a7752a6a051fddaebb8a77c2469cc7d35aec0b113d5ac58395a7fefbe9cce69"
+    },
+    {
+      "path": "android/tests/build-instrumentation.cjs",
+      "bytes": 6702,
+      "sha256": "85994b20c8cca7dc4381dedf5315282617a9702631f5c6cd42683989d13ab9ae"
+    },
+    {
+      "path": "android/tests/build-update-fixtures.cjs",
+      "bytes": 7921,
+      "sha256": "f8653184e75a4f3cb12fffa76c31d8aabf4daed2ba540a4814c5523c8b7baf3f"
+    },
+    {
+      "path": "android/tests/instrumentation/AndroidManifest.xml",
+      "bytes": 5082,
+      "sha256": "62dd17252e01f933ca65d63f365752c4bd2ac0ca52b47e6d8e958de283291d99"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/AccountFlowFixtures.java",
+      "bytes": 12827,
+      "sha256": "1f255ca14591316133b8a6c30472e1bee3cd2fd54c8ee9f24226edc5a132c404"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/CloudProfileTestSupport.java",
+      "bytes": 16165,
+      "sha256": "12361a5f7cc869493be9a80603c4e4e5ec6132c30409ebf0c9d3053a68b1f542"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/LyricsFixtures.java",
+      "bytes": 24523,
+      "sha256": "5f79e93b0abdb1aa7d994203f170a301835cfae6537a7fd7835ce73682f504b3"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/AudioCaptureFixtureActivity.java",
+      "bytes": 2437,
+      "sha256": "b6a0f2f4cdade88c1f41d9105ffa1514495cb30c39c0378ecb8232f0c45371a1"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/AudioCaptureFixtureService.java",
+      "bytes": 7988,
+      "sha256": "19bd751a0825a83b6fb7369fe193bc1a814a60e22d8598656533b75a1c6060ca"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/AudioComfortInstrumentation.java",
+      "bytes": 20177,
+      "sha256": "e151f38e0052d0909584eb524ed1629bd106d4b32c7b483466a3bb7be8bae01d"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/AudioFocusFixtureActivity.java",
+      "bytes": 1140,
+      "sha256": "8fc38c0241a81fe76c809b119e0a0a7805f0ef7383bbb31ada018dbbe2a71010"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/CatalogInstrumentation.java",
+      "bytes": 48176,
+      "sha256": "6007af86abd11b810a3f51662342906ce8960da0ec3b33bfdec11813c145719b"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/CloudProfileInstrumentation.java",
+      "bytes": 7801,
+      "sha256": "9fff8833dc5dc752999a0b9f4b369b3f73ec9b6bb836824d7be86db288006198"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/CoreInstrumentation.java",
+      "bytes": 35240,
+      "sha256": "a4ee2e3b4da086832557547a1163b5ebb0b48a75854cf28ed54e81dc195520eb"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/FixtureDocumentsProvider.java",
+      "bytes": 6064,
+      "sha256": "6e4273aed8b59a4bf03cf3a14c786f34387486a056812799a9e47b18373e3c98"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/FixtureImageProvider.java",
+      "bytes": 4410,
+      "sha256": "b058e88e4aa66a190052d1dff54591594e1b3be4b0dc8c903c74efef112b699f"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/LoginInstrumentation.java",
+      "bytes": 11833,
+      "sha256": "ce432c2096f0ada681dffd3d6d42aaeb14e0bf4c726eb5cbb6128327174f7508"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/LyricsInstrumentation.java",
+      "bytes": 4112,
+      "sha256": "3e0567732447f0df0c3e32b8974651d6bc5820aa667ac87f4d765145941c97df"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/PcmEffectsInstrumentation.java",
+      "bytes": 23280,
+      "sha256": "dd30310acc458f1fde380529c0a4ed2f77d0edae8f931e1136fdf133cd027151"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/PitchInstrumentation.java",
+      "bytes": 29277,
+      "sha256": "df7398e920f6f56cdf39fe7c8d901b802ec38834e6488cf0e0dd609eac85cfc9"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/PortableProfileInstrumentation.java",
+      "bytes": 29440,
+      "sha256": "2857f82b2ff3926e6b0a2453c3743362adfec2486cef31ff3c37e70cd6524f7a"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/ProfileDocumentsProvider.java",
+      "bytes": 5612,
+      "sha256": "a8ca243b0f14b41d530e4b93bbdd0e6595e96a2a69621c4c25560a456605c1c4"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/RoomMediaInstrumentation.java",
+      "bytes": 15203,
+      "sha256": "bd15e27f82a1ba33f830aad487fb3fa4ccdeb0478996a4cfb787cefefb1e1e09"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/RoomTransportInstrumentation.java",
+      "bytes": 26894,
+      "sha256": "b89b8215bd2c21d56609aecc8c2460643db15e00913cdff2cfd2a354323152b0"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/SocialAndroidInstrumentation.java",
+      "bytes": 52187,
+      "sha256": "d7202051b5554350240e1fd7b6ad6a1e487190c4697f17fb83e86d0812253bb2"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/VideoFixesInstrumentation.java",
+      "bytes": 22634,
+      "sha256": "a7b7e46fcc9ca605b90f6781c977a7fff1becd02a0d0a1c4b983072e4c81239c"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/WaveInstrumentation.java",
+      "bytes": 38303,
+      "sha256": "b48535b1044631c2440bb727f9524bb6e7b67bf11139f52e6c713c90cdef3bfa"
+    },
+    {
+      "path": "android/tests/instrumentation/src/com/lolzcloud/mobile/test/WebRenderingInstrumentation.java",
+      "bytes": 15599,
+      "sha256": "79e9dd6b3a1e46bde99e6278d5cc97e705b31fdd36653cf515d41799886e6add"
+    },
+    {
+      "path": "android/tests/LinkPolicyTest.java",
+      "bytes": 1973,
+      "sha256": "f3bfae7d273fd631918706262c5633db29b12329570f4a25fdd98b6a0511f2f6"
+    },
+    {
+      "path": "android/tests/LrcParserTest.java",
+      "bytes": 5497,
+      "sha256": "42ec400da9947dd52e5052c7e4460aed03590e56a7d7faa1a7d77a2c76cc1d20"
+    },
+    {
+      "path": "android/tests/LyricsMetadataTest.java",
+      "bytes": 6969,
+      "sha256": "201ba0c910b72eea87d5668aec4eba01dc27ea7b710acaf2ecbef0dcc1904cab"
+    },
+    {
+      "path": "android/tests/LyricsProviderTest.java",
+      "bytes": 17874,
+      "sha256": "03fb83532922b1b3edefe9ca227a1dd56c74b963151baeeee0d34fc9a2cd9ec6"
+    },
+    {
+      "path": "android/tests/LyricsRepresentativeProbe.java",
+      "bytes": 2019,
+      "sha256": "956f87677af2b9a18368ef2835b46a4151812381570eac7c379d965ff952c51a"
+    },
+    {
+      "path": "android/tests/LyricsTempoLiveProbe.java",
+      "bytes": 3727,
+      "sha256": "44515dc30277608d5753cc1d95e1ba6494f0fb5310147b6c02e990eab9fa687f"
+    },
+    {
+      "path": "android/tests/OfflineFilesTest.java",
+      "bytes": 3462,
+      "sha256": "0a12be0ad8e0cfa0a5faf886a1efec6b535c5c000b0ca7a79002157272d4edec"
+    },
+    {
+      "path": "android/tests/OnlineCatalogPolicyTest.java",
+      "bytes": 5703,
+      "sha256": "cbe6de37493ed61d30d602d9a8da12c8e26ef95c7b1616ac6594a1e48b80e301"
+    },
+    {
+      "path": "android/tests/PcmDspPolicyTest.java",
+      "bytes": 6993,
+      "sha256": "4d868a9ad05ae67c9f6b00fbc747be986f2963b97c7c16121059660985d9ba0f"
+    },
+    {
+      "path": "android/tests/PitchPolicyTest.java",
+      "bytes": 4638,
+      "sha256": "12cc8e7af7ff551324032be68ceabec5a72da448053a2f0b8652799d5842af3b"
+    },
+    {
+      "path": "android/tests/PortableProfilePolicyTest.java",
+      "bytes": 6491,
+      "sha256": "434531ec1f01e7e2f0d3c8cfd7c5a585c1307b87fd89555f0fcd7f6f5386e427"
+    },
+    {
+      "path": "android/tests/ProfileCryptoVectorCli.java",
+      "bytes": 1968,
+      "sha256": "0f411f4245a1deadbb05ae4d0d3e8e3a31e8646a329a70e5c3325661c067faa0"
+    },
+    {
+      "path": "android/tests/RoomAssetsPolicyTest.java",
+      "bytes": 7102,
+      "sha256": "1d3ac03de436c89dfb2339f26ef48ce9d0a249dac8e7b7d7a70509a98703ab1d"
+    },
+    {
+      "path": "android/tests/RoomTransportPolicyTest.java",
+      "bytes": 6078,
+      "sha256": "b201ac5a20ea6fe7314ae4a37ab157c6a07c9e9c5e765ddc0da92b847427ff02"
+    },
+    {
+      "path": "android/tests/run-audio-comfort.cjs",
+      "bytes": 4590,
+      "sha256": "d4c18115776a539c8597e1fcbab5038afbf4b14610eaad0bf60857f9b0d453e7"
+    },
+    {
+      "path": "android/tests/run-audio-settings-policy.cjs",
+      "bytes": 2312,
+      "sha256": "f13d48e37a4975c9c4c6bb600d72485805a4ca538a5c8c7292f9d644ed9c43b3"
+    },
+    {
+      "path": "android/tests/run-catalog.cjs",
+      "bytes": 3382,
+      "sha256": "d2ed870b39af0d9361cd504c44a143b0af6e6b8282d541460bc04a5f441ad072"
+    },
+    {
+      "path": "android/tests/run-cloud-profile.cjs",
+      "bytes": 5265,
+      "sha256": "261e5ba019da72062da773f081f6b81432a3e911b31ca29ebb291ea04192e471"
+    },
+    {
+      "path": "android/tests/run-configuration.cjs",
+      "bytes": 1951,
+      "sha256": "dd9fb8cc6428295dc617327a98c3029db86718f513b1db77d3d1bd0909d4969b"
+    },
+    {
+      "path": "android/tests/run-installer.cjs",
+      "bytes": 5646,
+      "sha256": "6e6443f1eb0046a7c9516191661c7b764582f7a79f8517df2d5c4c21632759fe"
+    },
+    {
+      "path": "android/tests/run-instrumentation.cjs",
+      "bytes": 3013,
+      "sha256": "6c00a0b68234cd696c63586b1740aa5b07a61a156cdc50e7fd2297cc1c66d1de"
+    },
+    {
+      "path": "android/tests/run-login.cjs",
+      "bytes": 1929,
+      "sha256": "6d9d5eecac82b3b185d3389c7480f0772071e6064225e1431eb050b4baec95f5"
+    },
+    {
+      "path": "android/tests/run-lyrics-offline-policy.cjs",
+      "bytes": 3924,
+      "sha256": "d17fd15582580b5418b6fc126b82d8f29ce506c69c440ca8fc25410b79426925"
+    },
+    {
+      "path": "android/tests/run-lyrics-policy.cjs",
+      "bytes": 2803,
+      "sha256": "740557fbd3fb07cd6e3f0b11fe57c94bdf5837b4e7924675145fd366eabd35b5"
+    },
+    {
+      "path": "android/tests/run-lyrics.cjs",
+      "bytes": 2636,
+      "sha256": "7f9a0fc3eae8306bc4872872b5e58b8abf7db15ece60bd546f318d601a83be43"
+    },
+    {
+      "path": "android/tests/run-pcm-dsp-policy.cjs",
+      "bytes": 1310,
+      "sha256": "c55bd4ece9d87f4b445ca45e34b01f5104a2df014e4d32113cb8078f1bc06166"
+    },
+    {
+      "path": "android/tests/run-pcm-effects.cjs",
+      "bytes": 3508,
+      "sha256": "bfe176e6015aed5a6b94067c4d11d02308857576a403f60c210da0e5a12bcf7f"
+    },
+    {
+      "path": "android/tests/run-pitch-policy.cjs",
+      "bytes": 1601,
+      "sha256": "9c043569107f0910a1294999caabdcd7dcefb5aedf633fc6a6f86bbdd18244f2"
+    },
+    {
+      "path": "android/tests/run-pitch.cjs",
+      "bytes": 4073,
+      "sha256": "8aa1ed3745a8d4e1594239189940365533b5484e49c1e310635c7a6586a76a46"
+    },
+    {
+      "path": "android/tests/run-portable-profile-policy.cjs",
+      "bytes": 2017,
+      "sha256": "d568f3f26ead1e531f893a67d3418c5b1e2f731e95117467b0752779fcc622d8"
+    },
+    {
+      "path": "android/tests/run-portable-profile.cjs",
+      "bytes": 5818,
+      "sha256": "888c81abd78b09c4a2f829e82928ce08ef8e449a20919b0f3b8f387a24303410"
+    },
+    {
+      "path": "android/tests/run-profile-crypto-vectors.cjs",
+      "bytes": 4235,
+      "sha256": "09e3e88eb352ab5e88e7d29d772328f6385b768753eca0b3670563fe283a56fe"
+    },
+    {
+      "path": "android/tests/run-room-media.cjs",
+      "bytes": 2620,
+      "sha256": "bbc1cfaa7ce5ccc9aee5ced4efd697d44d29478567f8cfff7ae65d960c344dfd"
+    },
+    {
+      "path": "android/tests/run-room-transport.cjs",
+      "bytes": 3148,
+      "sha256": "76e759cd7c6a5e32a08b173c6ed656160d8bbc1891660065748e1ace92308ee2"
+    },
+    {
+      "path": "android/tests/run-social-native.cjs",
+      "bytes": 4561,
+      "sha256": "e32bbcf4632d99a4ea1ed4dfff0a194c47f2a72ec53833985fcf518f12a951e8"
+    },
+    {
+      "path": "android/tests/run-video-fixes.cjs",
+      "bytes": 2573,
+      "sha256": "7e02af2d9bd561c4864c9136012c398dadcb58113f2529fbe4132d9b936e0f0d"
+    },
+    {
+      "path": "android/tests/run-video-layout.cjs",
+      "bytes": 2259,
+      "sha256": "23b8a8dc6a76db111263fd5a41276050bcbacf232ba021fddb2b18ee183286a3"
+    },
+    {
+      "path": "android/tests/run-wave-policy.cjs",
+      "bytes": 3000,
+      "sha256": "60a4267825a4e47ffb795392cb5068ce40e7a09f2c3e96f26f151cddb9980bbc"
+    },
+    {
+      "path": "android/tests/run-wave.cjs",
+      "bytes": 3562,
+      "sha256": "0ca8d770252dadc1aef46c419e1c7af01174fc853ed66fa8a5a20e8676311dee"
+    },
+    {
+      "path": "android/tests/SleepTimerPolicyTest.java",
+      "bytes": 2474,
+      "sha256": "d231fbb210e408521b95e8d343fe0d431b65c660b245afeeeba482fdb21231d4"
+    },
+    {
+      "path": "android/tests/SocialPolicyTest.java",
+      "bytes": 5762,
+      "sha256": "256368389c3f7b598b0f436f028cf1774f4c3b11659328e22590d8cb560d68dd"
+    },
+    {
+      "path": "android/tests/SourceBrowserPolicyTest.java",
+      "bytes": 7836,
+      "sha256": "64e0b60b351b83c11f1b5cb8f20973e03db12545cf9c338d7f21a69a72e7ecc5"
+    },
+    {
+      "path": "android/tests/verify-room-assets.cjs",
+      "bytes": 3383,
+      "sha256": "a8f9762cc54bd328dd095c44dc26161e51690fd242f54ab873f45ff0092f8b33"
+    },
+    {
+      "path": "android/tests/WavePolicyTest.java",
+      "bytes": 3242,
+      "sha256": "bd876a176144240f245a3b7d795b478bcd16a077dacf7dc226fdb647ab4e7e34"
+    }
+  ],
+  "scope": "Test-only bounded DocumentsUI scrolling was rebuilt after the final production APK; no production source or APK changed."
+}

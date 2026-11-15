@@ -1,0 +1,77 @@
+{
+  "status": "passed-source-frozen",
+  "checkedAt": "2026-11-15T15:44:24.432Z",
+  "inputs": [
+    {
+      "name": "server/public/app/core.js",
+      "size": 12644,
+      "sha256": "0f58186762de522eb5f8022cd5af963a5992f88076f5a0153a788b08a702506b"
+    },
+    {
+      "name": "server/public/app/lyric-view.js",
+      "size": 4800,
+      "sha256": "e2195c1f2164ca3911170fd7ae3b562a8d9ac056feb965a62c1339a2289d6989"
+    },
+    {
+      "name": "server/public/app/app.css",
+      "size": 22457,
+      "sha256": "8b7140c75fc575339789e67809fcdf31015cb613add868a7095046824c827f56"
+    },
+    {
+      "name": "tests/pwa-enhanced-lyrics.test.cjs",
+      "size": 4439,
+      "sha256": "c79c13bc42e2e41566c10fc0b20563bd3ad4eca143a0748ac5438ab8961f4cfd"
+    },
+    {
+      "name": "tests/pwa-enhanced-lyrics-ui.cjs",
+      "size": 14826,
+      "sha256": "fc9e489ae376f01961bc6685e782652b5c5f19f0a032562809769a68b5637b01"
+    }
+  ],
+  "scope": "parseLyrics only within core.js; new lyric-view.js; appended word-highlight CSS; focused tests. Parent owns app/index/room wiring.",
+  "tests": {
+    "pure": {
+      "passed": 7,
+      "command": "node --test tests/pwa-enhanced-lyrics.test.cjs"
+    },
+    "combined": {
+      "passed": 28,
+      "command": "node --test tests/pwa-enhanced-lyrics.test.cjs tests/pwa-core.test.cjs tests/pwa-lyric-cache.test.cjs"
+    },
+    "actualBrowser": {
+      "passed": 17,
+      "report": "browser.json",
+      "sourceInputsStableDuringRun": true
+    }
+  },
+  "semantics": {
+    "offset": "milliseconds added consistently with existing PC parser",
+    "bounds": {
+      "textCharacters": 524288,
+      "lines": 4000,
+      "wordsPerLine": 512,
+      "totalWords": 16000,
+      "seconds": 86400
+    },
+    "wordEnds": "Next explicit word marker or terminal marker; no fabricated timing for ordinary line-only lyrics",
+    "renderer": "Binary search and previous/current active markers only; unchanged word =>zero DOM writes",
+    "seek": "Explicit line timestamp only; never Play",
+    "readOnly": "seekable:false =>paragraphs and word highlight, no interactive seek"
+  },
+  "historicalHarnessAttempts": [
+    {
+      "path": "D:/LolzCloud-Android-Toolchain/independent-pitch/enhanced-lyrics-attempt1",
+      "reason": "Initial fixture storage overwritten by normal pagehide persistence; fixed fixture hook order."
+    },
+    {
+      "path": "D:/LolzCloud-Android-Toolchain/independent-pitch/enhanced-lyrics-attempt2",
+      "reason": "Test sent slider preview input instead of actual committed change; corrected test event."
+    }
+  ],
+  "limits": [
+    "Actual isolated Chromium with generated MP3 and real file input/CDP, synthetic LRC/LRCLIB text.",
+    "Room listener mode in this suite is an explicit component fixture, not multiparty/SSE or native Apple proof.",
+    "Physical Safari/iOS untested here; parent separately verifies room transport.",
+    "No version/build/deploy performed."
+  ]
+}
