@@ -1,0 +1,563 @@
+{
+  "status": "passed",
+  "stage": "private candidate; no publication performed by this agent",
+  "checkedAt": "2026-11-15T13:31:21.129Z",
+  "version": "0.1.10",
+  "versionCode": 11,
+  "artifact": {
+    "status": "passed",
+    "version": "0.1.10",
+    "versionCode": 11,
+    "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+    "bytes": 2623004,
+    "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+    "sourceDigest": "6338119feb0a54eae8a837eae71de47c3dc08d9e23f4a750db9df3bdbbd1ae8e",
+    "sourceFiles": 63,
+    "javaFiles": 44,
+    "compiledWithGeneratedR": 45,
+    "dexSha256": "1bc01b863526cac576cd91f218ba8536db7826cbd2f26f1bd2cb6d4edf55521f",
+    "dexBytes": 534532,
+    "dexMatchesPackaged": true,
+    "canonicalRawZipNames": true,
+    "zipEntries": [
+      {
+        "path": "AndroidManifest.xml",
+        "size": 5956,
+        "sha256": "52922a848b85cd63a1b06e34a4906d082dc4c7e6cac5724f5ca7d2479c5ecec7"
+      },
+      {
+        "path": "res/drawable/ic_launcher.xml",
+        "size": 1080,
+        "sha256": "17b7a767e13ed00ef8dd46ccd606ae72decd1777fc8aa20e2eebc81262c1f0f8"
+      },
+      {
+        "path": "res/drawable-nodpi-v4/forest_art.png",
+        "size": 2326396,
+        "sha256": "955f5fd5eb463cab47e045e8a52e205a8f8c2416fe2ded5c143c4d90c1124f71"
+      },
+      {
+        "path": "resources.arsc",
+        "size": 1608,
+        "sha256": "99d7cef1d29b27b657c4a447eeafa10ec47654125acbf4f30b6cb2f14e7d90ec"
+      },
+      {
+        "path": "classes.dex",
+        "size": 534532,
+        "sha256": "1bc01b863526cac576cd91f218ba8536db7826cbd2f26f1bd2cb6d4edf55521f"
+      },
+      {
+        "path": "assets/licenses/wg-scrypt-Apache-2.0.txt",
+        "size": 10174,
+        "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+      },
+      {
+        "path": "assets/licenses/wg-scrypt-provenance.json",
+        "size": 1130,
+        "sha256": "a5f7cef3ca08957aea60417f6c3eabef96bd924f5dda9ecc16f57e5948ab3af0"
+      },
+      {
+        "path": "assets/room-client/logo.svg",
+        "size": 396,
+        "sha256": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512"
+      },
+      {
+        "path": "assets/room-client/media-source.js",
+        "size": 1517,
+        "sha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c"
+      },
+      {
+        "path": "assets/room-client/room-players.js",
+        "size": 3441,
+        "sha256": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9"
+      },
+      {
+        "path": "assets/room-client/room-sync.js",
+        "size": 3584,
+        "sha256": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab"
+      },
+      {
+        "path": "assets/room-client/room.css",
+        "size": 41933,
+        "sha256": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340"
+      },
+      {
+        "path": "assets/room-client/room.html",
+        "size": 10998,
+        "sha256": "a195898b4526c70d68f8b2627d61ba98902daefb7472ad3cf990cc2cc9807af1"
+      },
+      {
+        "path": "assets/room-client/room.js",
+        "size": 48674,
+        "sha256": "1bbaf4f4580e43c00a731efbc9dd1dc6c3cf57a1a570c50a30a3852d23fb4e08"
+      },
+      {
+        "path": "assets/room-client/site.js",
+        "size": 7569,
+        "sha256": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616"
+      },
+      {
+        "path": "assets/room-client/social.css",
+        "size": 12818,
+        "sha256": "d16d9131ad980d13e441a7ae866d2b08e7c4b58e0a387ec892a1de1aa80ffa86"
+      },
+      {
+        "path": "assets/room-client/social.html",
+        "size": 1011,
+        "sha256": "d905f78fe734677728c9e3d3b9e426f8d7fd984c4fdc66a7ea5318834aefd3fe"
+      },
+      {
+        "path": "assets/room-client/social.js",
+        "size": 38894,
+        "sha256": "c3e8b8c0c185afd7fa7f13c5692bfe8339c8e2aeeb139fb70485a1d0c50da601"
+      },
+      {
+        "path": "META-INF/LOLZCLOU.SF",
+        "size": 1957,
+        "sha256": "2408bba3cb14a0820bd271d7560b150bb000154482f1263e25e579d3dbf8c851"
+      },
+      {
+        "path": "META-INF/LOLZCLOU.RSA",
+        "size": 1635,
+        "sha256": "cda65a5b23fb1c4d14cf774fb9dbe1bbb59871f2e1385558031604680e400733"
+      },
+      {
+        "path": "META-INF/MANIFEST.MF",
+        "size": 1830,
+        "sha256": "13945864cf79f8c40bfc73235d31b0da62098405bd39769bc04548cfc5d1f2f7"
+      }
+    ],
+    "privateApk": "D:\\LolzCloud-Android-Toolchain\\android-pitch\\candidate-0.1.10-r3\\LolzCloud-Android-0.1.10.apk",
+    "buildLog": "D:\\LolzCloud-Android-Toolchain\\android-pitch\\build-r3.txt"
+  },
+  "sourceInventory": "source-inventory.json",
+  "runtimeSuites": [
+    {
+      "name": "lyrics",
+      "status": "passed",
+      "checks": 43,
+      "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "report": "lyrics-verification.json",
+      "preferencesRestored": "explicit final fixture assertion",
+      "scope": "Declared bounded LRCLIB transport fixtures; real native UI, source LRC line highlighting/seeking, MediaPlayer, private cache/import priority/cancel. No substituted media SDK, real-user account or room navigation."
+    },
+    {
+      "name": "pitch",
+      "status": "passed",
+      "checks": 44,
+      "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "report": "pitch-verification.json",
+      "preferencesRestored": true,
+      "scope": "Isolated Android emulator; actual production portable/settings transactions and service/MediaPlayer/PCM lifecycles. Separate test APK UID obtains real system MediaProjection consent and captures only production MEDIA output after AudioTrack/PlaybackParams. Generated1000Hz WAV, FFT32768, no microphone, physical DAC, personal OAuth or public cloud PUT."
+    },
+    {
+      "name": "wave",
+      "status": "passed",
+      "checks": 33,
+      "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "report": "wave-verification.json",
+      "preferencesRestored": true,
+      "scope": "Real public /music/wave + known liked MP3 through MediaCodec/DSP/AudioTrack; genuine native start/pause touch. Cancellation/refill/end tests then use an explicitly controlled provider and generated private WAV fixtures with test metadata. Actual service, SharedPreferences, natural audio completions, background and Activity recreation. No personal account, protected-source, physical acoustic or arbitrary provider-success claim."
+    },
+    {
+      "name": "bookmark",
+      "status": "passed",
+      "checks": 4,
+      "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "report": "bookmark-verification.json",
+      "preferencesRestored": true,
+      "scope": "Declared provider fixture -> actual PCM -> genuine native PopupMenu -> moment list and portable JSON. No live Wave API or personal account in this focused phase."
+    },
+    {
+      "name": "pcm",
+      "status": "passed",
+      "checks": 30,
+      "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "report": "pcm-verification.json",
+      "preferencesRestored": true,
+      "scope": "Actual system decoder/raw PCM -> production DSP -> positive AudioTrack.write return samples and playback head. Real separate test-APK UID transient audio-focus request, background, queue/race, imported settings, sleep fixture deadline, public catalog MP3/offline. Isolated emulator; no personal account, physical acoustic output or room/YouTube effects claim."
+    },
+    {
+      "name": "catalog",
+      "status": "passed",
+      "checks": 58,
+      "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "report": "catalog-verification.json",
+      "preferencesRestored": "runner finally restoration; no boolean field",
+      "scope": "Actual public catalogue/native audio/queue/prepare/retry/offline fixture checks; no personal account or browser fallback."
+    },
+    {
+      "name": "portable",
+      "status": "passed",
+      "checks": 36,
+      "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "report": "portable-verification.json",
+      "preferencesRestored": true,
+      "scope": "Actual Java JSON/SharedPreferences/SAF DocumentsUI and native MediaPlayer; synthetic desktop data is explicitly separate from real public SoundCloud Gno playback. No personal account/cloud, physical device or acoustic EQ response claim."
+    },
+    {
+      "name": "cloud",
+      "status": "passed",
+      "checks": 24,
+      "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "report": "cloud-verification.json",
+      "preferencesRestored": true,
+      "scope": "Actual Android scrypt/AES-GCM providers and native dialog widgets, encrypted revision requests, strict owner/cookie/ABA/409/cancel guards. Explicit fixture account only. Personal OAuth, live authenticated server roundtrip and physical devices are not tested."
+    },
+    {
+      "name": "room",
+      "status": "passed",
+      "checks": 13,
+      "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "report": "room-verification.json",
+      "preferencesRestored": "runner finally restoration; no boolean field",
+      "scope": "Real Android WebView media pipeline using declared intercepted HTTPS main/child/audio fixtures, genuine generated PCM WAV, actual MotionEvent touches and audio clock. Not a real SoundCloud/YouTube provider, personal login, room membership or system audio fidelity test. Login is native-intercepted and is not opened by this test."
+    }
+  ],
+  "countsOverlap": true,
+  "hostPolicy": {
+    "pitch": 42,
+    "lyrics": 119,
+    "lyricsSuites": [
+      53,
+      12,
+      54
+    ]
+  },
+  "livePublicLyrics": {
+    "cases": 3,
+    "canonicalResponseCacheWrites": 1,
+    "report": "java-live-lyrics-tempo.json",
+    "compiledFromFrozenCandidate": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f"
+  },
+  "capture": {
+    "report": "pitch-verification.json",
+    "mode": "Separate test UID MediaProjection+AudioRecord; recorder/capture policy recreated between parameter cases, production engine/source generation unchanged",
+    "sampleRate": 48000,
+    "framesPerWindow": 32768,
+    "windows": 8,
+    "results": [
+      {
+        "case": "pcm-independent-rate1.2-pitch0.75",
+        "expectedHz": 750,
+        "measuredHz": 750.7727085619186,
+        "rms": 0.14140945984560385,
+        "sourceGeneration": 1,
+        "captureRouteRefreshed": true
+      },
+      {
+        "case": "pcm-varispeed-rate1.2",
+        "expectedHz": 1200,
+        "measuredHz": 1199.6022277848172,
+        "rms": 0.11581033813974714,
+        "sourceGeneration": 1,
+        "captureRouteRefreshed": true
+      },
+      {
+        "case": "pcm-varispeed-rate0.8",
+        "expectedHz": 800,
+        "measuredHz": 801.377363689929,
+        "rms": 0.12773959978462032,
+        "sourceGeneration": 1,
+        "captureRouteRefreshed": true
+      },
+      {
+        "case": "pcm-preserve-restored0.75",
+        "expectedHz": 750,
+        "measuredHz": 749.3613332764862,
+        "rms": 0.13159758580181538,
+        "sourceGeneration": 1,
+        "captureRouteRefreshed": true
+      },
+      {
+        "case": "pcm-independent-rate0.8-pitch1.4",
+        "expectedHz": 1400,
+        "measuredHz": 1398.6388920011993,
+        "rms": 0.09400117910109694,
+        "sourceGeneration": 1,
+        "captureRouteRefreshed": true
+      },
+      {
+        "case": "pcm-paused-silence",
+        "expectedHz": 0,
+        "measuredHz": 1.46484375,
+        "rms": 0,
+        "sourceGeneration": 1,
+        "captureRouteRefreshed": true
+      },
+      {
+        "case": "legacy-independent-rate1.25-pitch0.8",
+        "expectedHz": 800,
+        "measuredHz": 801.5621757759048,
+        "rms": 0.13356177177424958,
+        "sourceGeneration": 2,
+        "captureRouteRefreshed": true
+      },
+      {
+        "case": "legacy-independent-rate0.7-pitch1.3",
+        "expectedHz": 1300,
+        "measuredHz": 1298.0973217221954,
+        "rms": 0.07320109731917464,
+        "sourceGeneration": 2,
+        "captureRouteRefreshed": true
+      }
+    ]
+  },
+  "cleanup": {
+    "receipt": "device-receipt.json",
+    "beforeStop": "device-before-stop.json",
+    "wifi": "1",
+    "data": "1",
+    "activeWakeLocks": 0,
+    "mediaProjectionNull": true,
+    "ownedAvdStopped": true,
+    "adbEmpty": true
+  },
+  "historicalAttempts": [
+    {
+      "name": "consent-label-and-first-cleanup",
+      "status": "failed",
+      "apkSha256": "a9f09e7571ede4a5be70afa324c13fa513cfcf64dbd8bc3e16d17600999537a1",
+      "checks": 29,
+      "preferencesRestored": false,
+      "report": "history/consent-label-and-first-cleanup.json",
+      "reason": "Test harness omitted API35 START label; first cleanup timeout skipped restore inside the disposable owned AVD. No physical/personal device was used. Typed disk backup and independent cleanup blocks were added before subsequent runs."
+    },
+    {
+      "name": "capture-rate-snapshot",
+      "status": "failed",
+      "apkSha256": "a9f09e7571ede4a5be70afa324c13fa513cfcf64dbd8bc3e16d17600999537a1",
+      "checks": 31,
+      "preferencesRestored": true,
+      "report": "history/capture-rate-snapshot.json",
+      "reason": "Continuous capture route retained its initial sample rate despite new native params; four windows preserved. No product audio workaround was applied."
+    },
+    {
+      "name": "platform-capture-control",
+      "status": "diagnostic",
+      "apkSha256": "a9f09e7571ede4a5be70afa324c13fa513cfcf64dbd8bc3e16d17600999537a1",
+      "checks": 38,
+      "preferencesRestored": true,
+      "report": "history/platform-capture-control.json",
+      "reason": "Explicit diagnostic, not a PASS; direct AudioTrack control showed the same capture-route samplerate snapshot."
+    },
+    {
+      "name": "initial-route-refresh-pass",
+      "status": "passed",
+      "apkSha256": "a9f09e7571ede4a5be70afa324c13fa513cfcf64dbd8bc3e16d17600999537a1",
+      "checks": 43,
+      "preferencesRestored": true,
+      "report": "history/initial-route-refresh-pass.json",
+      "reason": "Earlier candidate43PASS with refreshed capture route; historical, excluded from finalR3 suite counts."
+    },
+    {
+      "name": "source-reference-duration-jitter",
+      "status": "failed",
+      "apkSha256": "a9f09e7571ede4a5be70afa324c13fa513cfcf64dbd8bc3e16d17600999537a1",
+      "checks": 13,
+      "preferencesRestored": null,
+      "report": "history/source-reference-duration-jitter.json",
+      "reason": "Actual source duration and provider reference were conflated at the2.5s cache boundary; product fixed beforeR2."
+    },
+    {
+      "name": "earlier-retimed-touch-observation",
+      "status": "failed",
+      "apkSha256": "c70e15404d5707e202c319f3e30a84bb2ba31843207c6cd01b8daddfd5a020d8",
+      "checks": 32,
+      "preferencesRestored": null,
+      "report": "history/earlier-retimed-touch-observation.json",
+      "reason": "Earlier seek observation failed; explicit neutral MediaPlayer fixture, current visible target geometry and exact paused seek passed on finalR3. No product seek workaround."
+    },
+    {
+      "name": "mp3-duration-fixture-assumption",
+      "status": "failed",
+      "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "checks": 30,
+      "preferencesRestored": null,
+      "report": "history/mp3-duration-fixture-assumption.json",
+      "reason": "Test assumed tag40s rather than actual source duration; assertion now uses production rate/reference formula. Product unchanged."
+    },
+    {
+      "name": "network-restoration-attempt",
+      "status": "failed",
+      "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+      "checks": 15,
+      "preferencesRestored": null,
+      "report": "history/network-restoration-attempt.json",
+      "reason": "Initial live catalogue request followed immediately after PCM network restoration and failed with the truthful no-network state; later validated network/DNS retry58PASS."
+    }
+  ],
+  "limitations": [
+    "API35x86_64 owned headless emulator; physical DAC/headphones/physical Android not tested",
+    "Captured digital spectral output and source clock; capture route refreshed because continuous API35 loopback retained its initial samplerate",
+    "No personal OAuth or live authenticated cloud PUT; cloud API uses an explicitly isolated injected transport",
+    "Wave/callback races and room WebView use clearly declared fixtures; live catalogue/WaveMP3/offline and3public lyrics variants are separate proofs",
+    "Android foreground lyrics/cache adapted here; no new2-track-ahead lyrics prefetch is claimed",
+    "SDK26 runtime and other device codec/capture policies remain separate"
+  ],
+  "evidence": [
+    {
+      "file": "lyrics-verification.json",
+      "sha256": "edeeb603f3bfcc18be7bd502f1e29c5c174848668a430a006a87f06d5adbb38c",
+      "bytes": 6278
+    },
+    {
+      "file": "pitch-verification.json",
+      "sha256": "8434742c423a41ebfa309ebe1400da55819532761ba0bae157447507ea87722f",
+      "bytes": 9934
+    },
+    {
+      "file": "wave-verification.json",
+      "sha256": "8f4799b6013b46b8b5f2b02cada909f76943290517022810da563c50d94f6fd7",
+      "bytes": 4272
+    },
+    {
+      "file": "bookmark-verification.json",
+      "sha256": "3668cba72ad17a430f0596e44e6e062a5f0fe885fa170043e3a8c1167af14402",
+      "bytes": 1026
+    },
+    {
+      "file": "pcm-verification.json",
+      "sha256": "497102c7d62e92c7534f5c1f7974aefda8946b934cdb091b9f24a18650fe2acc",
+      "bytes": 13769
+    },
+    {
+      "file": "catalog-verification.json",
+      "sha256": "7c6b80769142bb686ae8a2060673e58881661634763838be7cf102db772e0542",
+      "bytes": 4603
+    },
+    {
+      "file": "portable-verification.json",
+      "sha256": "5f9fc8c7d70d0e0902eee99a51149a48be014b2bdabb1277b4b70583fcda84dc",
+      "bytes": 3921
+    },
+    {
+      "file": "cloud-verification.json",
+      "sha256": "b7706a62e0e7cb89df78779c98b1fc7950c8635db3b31a4fa3e51c3d260b9a98",
+      "bytes": 2719
+    },
+    {
+      "file": "room-verification.json",
+      "sha256": "3ef4a05171f2220274370f7fd042d631e41ac4deb5c980d0d5a757afec595a3c",
+      "bytes": 2134
+    },
+    {
+      "file": "pitch-roundtrip.json",
+      "sha256": "4f3237eb0704a9ec3d6ce02f8ecfd396ec44251c9abf2eabc868e5d422e8ae86",
+      "bytes": 1449
+    },
+    {
+      "file": "node-java-roundtrip-verification.json",
+      "sha256": "fbed54186eae45d4f839b5d024697a9a3d0bfddd2c0184c67a6936c1bc4d6662",
+      "bytes": 657
+    },
+    {
+      "file": "node-android-cloud-crypto-verification.json",
+      "sha256": "c289b2a2d480a3cfa0d2c5418c40a77d799aa6a93894b505f95f24efbaeea6cf",
+      "bytes": 580
+    },
+    {
+      "file": "java-live-lyrics-tempo.json",
+      "sha256": "030e7d4c6eafc6f5138d595fc3b23b0c17d1b5c988f653944d932581e46aee85",
+      "bytes": 2928
+    },
+    {
+      "file": "pitch-policy-verification.json",
+      "sha256": "2813c08551cd4f6cf7eee791cb2b6996fb6a47eac8e0c22e30d93a06fe70aba5",
+      "bytes": 2395
+    },
+    {
+      "file": "room-assets-verification.json",
+      "sha256": "d4d4afce3308049ecdf7615561197ccb6c6c4d53237f65edc1a6989eb1bb7d13",
+      "bytes": 2101
+    },
+    {
+      "file": "final-source-check.json",
+      "sha256": "08f47e0a66b9c4732538cccab7064c87c2bfb986363e7a3901679a4ccab16afc",
+      "bytes": 387
+    },
+    {
+      "file": "device-receipt.json",
+      "sha256": "1ffd7f25ec5711a5c480a60c80a9191171feed9360914d743d78166b2606db15",
+      "bytes": 611
+    },
+    {
+      "file": "device-before-stop.json",
+      "sha256": "cdd309e3be3e966dc836e9be43576df2ac0298a6aa4819705f72909dbe60fe68",
+      "bytes": 1401
+    },
+    {
+      "file": "lyrics-adapted.png",
+      "sha256": "cbadaf962d7b46010809aa75111771be9458789c9dc9c718371f5f5f424a823b",
+      "bytes": 138232
+    },
+    {
+      "file": "native-pitch-controls.png",
+      "sha256": "1405b8b0792275293a2154ce9fa8fec8b110891763b6e5e3d9781d9b469b5ad3",
+      "bytes": 167530
+    },
+    {
+      "file": "lyrics-policy-verification.json",
+      "sha256": "f2eda9b12940f2f0d5884745487a2b3cd79d4e151e5d00431b051106d6a5c301",
+      "bytes": 622
+    },
+    {
+      "file": "provenance.json",
+      "sha256": "582b0b04b171159efa8f2a4358b6d2db206faa48f6e17af97a56a3c68510721c",
+      "bytes": 15736
+    },
+    {
+      "file": "source-inventory.json",
+      "sha256": "e72cd29f2277b34c486e21187414eeecfaeda58d9de118b8a1f4a923357581e8"
+    },
+    {
+      "file": "artifact-verification.json",
+      "sha256": "d8aac775476170b6da0c28e70bf42baab4a20472f9b8bbfdfc45398f220b2501"
+    },
+    {
+      "file": "history/consent-label-and-first-cleanup.json",
+      "sha256": "d06fc9e561330ff95e3cc397b59ae489b95bdd89fdd7b04e6bd6426171e85377",
+      "bytes": 4466
+    },
+    {
+      "file": "history/capture-rate-snapshot.json",
+      "sha256": "0712efd5be3a7507bb9bcacbec5c12cc38ce465cf001d9219d6c41ddd8023d24",
+      "bytes": 6609
+    },
+    {
+      "file": "history/platform-capture-control.json",
+      "sha256": "8767eecf31f4ddb779458ad5258a438e677730daa7fdaea18aed4b275237d1c6",
+      "bytes": 15753
+    },
+    {
+      "file": "history/initial-route-refresh-pass.json",
+      "sha256": "9cef2e59a9d87853fdc1b6a8cb28acf053cf2d65889a2a153599f5452d5b6ae0",
+      "bytes": 9809
+    },
+    {
+      "file": "history/source-reference-duration-jitter.json",
+      "sha256": "11db961a637c1e9b2065e49c13bfe93c62f48c4880e54a0b9ab1604f0676e42d",
+      "bytes": 2321
+    },
+    {
+      "file": "history/earlier-retimed-touch-observation.json",
+      "sha256": "4c5a9eb840fad7425b8504e6cf7e5308113c120a59434ebe1c637741b5a199e4",
+      "bytes": 4929
+    },
+    {
+      "file": "history/mp3-duration-fixture-assumption.json",
+      "sha256": "8134792f64d48e37025a9188ac71d05fc41fd3671878f37df7a80d6fb81a3950",
+      "bytes": 4668
+    },
+    {
+      "file": "history/network-restoration-attempt.json",
+      "sha256": "17508bef6e41d9ef97840fac70d1ac10f7221f9c89520eee20a8f9c691cbc111",
+      "bytes": 1490
+    },
+    {
+      "file": "upgrade-review.json",
+      "sha256": "5ea84618713ef8891ee7f26c39e0fe9a963941ffe147b6a4fba69e6bb7b95ce8",
+      "bytes": 1702
+    }
+  ],
+  "upgradeReview": "upgrade-review.json"
+}

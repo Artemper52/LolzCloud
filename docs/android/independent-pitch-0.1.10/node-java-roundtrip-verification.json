@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T13:21:40.002Z",
+  "apkSha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+  "runId": "cfa574e6-2202-4687-9010-6205be043617",
+  "comparisons": [
+    "Node fixture → Java import/export → Node normalize deep equal",
+    "Actual SAF output → authoritative Node deep equal",
+    "Unlike/remove do not resurrect SC entries",
+    "Unsupported collections/customEffects/wave/groups/YouTube metadata preserved after real Android edits"
+  ],
+  "scope": "Bidirectional clear portable-file interoperability only. Cloud crypto/account transfer and physical device are separate checks."
+}

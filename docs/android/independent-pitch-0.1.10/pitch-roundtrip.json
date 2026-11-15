@@ -1,0 +1,76 @@
+{
+  "format": "lolzcloud-profile",
+  "version": 1,
+  "exportedAt": 1794748560474,
+  "music": {
+    "preferences": {
+      "autoFollow": true,
+      "reduceMotion": false,
+      "density": "comfortable",
+      "startupView": "browser",
+      "windowStyle": "mac",
+      "lyricsFontScale": 1,
+      "uiScale": 1
+    },
+    "collections": [],
+    "dsp": {
+      "enabled": false,
+      "preset": "Original",
+      "gains": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "rate": 1.75,
+      "pitch": 0.949999988079071,
+      "preservesPitch": true,
+      "transportEnabled": true,
+      "reverb": 0,
+      "echo": 0.3,
+      "preampDb": 0
+    },
+    "customEffects": {
+      "Independent": {
+        "enabled": false,
+        "preset": "Original",
+        "gains": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rate": 0.6,
+        "pitch": 1.45,
+        "preservesPitch": true,
+        "transportEnabled": true,
+        "reverb": 0,
+        "echo": 0,
+        "preampDb": 0
+      }
+    }
+  },
+  "wave": {
+    "likes": [],
+    "feedback": {},
+    "adventurous": 0,
+    "preferences": {
+      "mood": "any",
+      "activity": "any",
+      "character": "mixed",
+      "language": "any",
+      "genre": "",
+      "autoContext": true
+    },
+    "blockedArtists": [],
+    "played24h": {}
+  },
+  "tools": {
+    "bookmarks": [],
+    "groups": [],
+    "normalization": false,
+    "gains": {}
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "status": "reviewed",
+  "kind": "read-only source and already signed artifact metadata review; no installer runtime claim",
+  "checkedAt": "2026-11-15T13:34:35.146Z",
+  "from": {
+    "versionName": "0.1.9",
+    "versionCode": 10
+  },
+  "candidate": {
+    "versionName": "0.1.10",
+    "versionCode": 11,
+    "name": "LolzCloud-Android-0.1.10.apk",
+    "packageName": "com.lolzcloud.mobile",
+    "size": 2623004,
+    "sha256": "06fec596b4dd11094b108a8004598902c9825454bfa8da15071fa49551a5dc0f",
+    "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44"
+  },
+  "findings": [
+    "Stable version regex accepts multi-digit patch10",
+    "Version.compareTo uses BigInteger numeric components, so0.1.10>0.1.9",
+    "Mirror and APK inspection require both newer semantic version and versionCode11>10",
+    "Package and certificate set are verified before explicit PackageInstaller handoff; same prior certificate84305e6a...",
+    "No installation, public manifest write, downgrade or reinstall was performed by this audit"
+  ],
+  "sources": [
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/AndroidReleasePolicy.java",
+      "sha256": "9ca6dbe7d613eabfb6073718c10935bf2ae448a54b6845dd8558c381508e9ffc",
+      "unchangedSince019": true
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/UpdateManager.java",
+      "sha256": "22485ec5c2cb84729d62a4d4a036f812512eb426ad98194ad21ef09914a117f1",
+      "unchangedSince019": true
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/UpdateFileProvider.java",
+      "sha256": "9c07dc521c527437ca091fe12fb0a2823596f76005bb7e7c18c6944a4e3866e4",
+      "unchangedSince019": true
+    }
+  ]
+}

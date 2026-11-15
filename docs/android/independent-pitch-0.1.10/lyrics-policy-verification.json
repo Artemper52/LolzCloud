@@ -1,0 +1,24 @@
+{
+  "status": "passed",
+  "generatedAt": "2026-11-15T13:08:07.080Z",
+  "checks": [
+    {
+      "suite": "LyricsMetadataTest",
+      "count": 53,
+      "passed": true
+    },
+    {
+      "suite": "LrcParserTest",
+      "count": 12,
+      "passed": true
+    },
+    {
+      "suite": "com.lolzcloud.mobile.LyricsProviderTest",
+      "count": 54,
+      "passed": true
+    }
+  ],
+  "total": 119,
+  "livePublicHttps": false,
+  "scope": "Host metadata matching, genuine LRC timing, bounded declared API fixtures; optional live public metadata-only lookup. No commercial source text printed, no account login, no Android device."
+}

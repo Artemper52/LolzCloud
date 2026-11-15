@@ -1,0 +1,77 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T13:36:24.725Z",
+  "candidate": {
+    "desktop": "0.9.20",
+    "server": "0.9.23",
+    "sw": 8
+  },
+  "source": "source-inputs.json",
+  "suites": {
+    "actualBrowserPitch": {
+      "passed": 47,
+      "failed": 0,
+      "report": "browser-pitch.json"
+    },
+    "actualBrowserLyrics": {
+      "passed": 23,
+      "failed": 0,
+      "report": "browser-lyrics.json"
+    },
+    "purePitch": {
+      "passed": 10,
+      "scope": "Actual shared JS worklet PCM, variable blocks/sample rates/stereo/unity/epoch/status, included in coordinator full Node run"
+    },
+    "pureLyricCache": {
+      "passed": 8,
+      "scope": "Canonical query, cache/metadata, cancellation, priority and Retry-After, included in coordinator full Node run"
+    }
+  },
+  "checksOverlap": true,
+  "fixtureLimits": {
+    "browser": "Isolated Chromium/Electron, generated 910 Hz MP3 through actual HTMLMediaElement and downstream MediaRecorder. No physical Safari/iOS listening proof.",
+    "native": "Strict synthetic tagged bridge fixtures only. Apple SDK/AVPlayer evidence belongs to the native agent.",
+    "lyrics": "Synthetic text. Public SC duration/identity metadata reproduce the user song; no copyrighted lyric content retained. External LRCLIB responses use deterministic protocol fixtures.",
+    "oldServiceWorker": "Declared v7 asset-set fixture upgrades to current complete v8, not a binary copy of every prior deployed script."
+  },
+  "pitch": {
+    "algorithm": "Bounded fixed-latency phase-locked STFT; no formant/studio-quality claim",
+    "eqIndependent": true,
+    "rateIndependent": true,
+    "pausedEditsAutoplay": false,
+    "sharedKernelSha256": "7002ef718d7928978c3674ea721a5a248b0a028d698add83e81757cf632bbfc5"
+  },
+  "lyrics": {
+    "sourceDuration": 93,
+    "referenceDuration": 111,
+    "ratio": 1.1935483870967742,
+    "estimateLabel": true,
+    "timeline": "LRCLIB timing divided once by source-duration ratio; HTMLMediaElement currentTime already uses source seconds",
+    "warmUnknownDurationNoHTTP": true,
+    "lateEmptyRetainsKnown": true,
+    "publicCache": {
+      "records": 500,
+      "utf8Bytes": 8388608
+    },
+    "userImportHigherPriority": true
+  },
+  "historicalHarnessFailures": [
+    {
+      "path": "D:/LolzCloud-Android-Toolchain/independent-pitch/independent-ui-attempt1",
+      "reason": "Observer expression returned an unserializable function; test-only void0 correction."
+    },
+    {
+      "path": "D:/LolzCloud-Android-Toolchain/independent-pitch/lyric-versions-attempt1",
+      "reason": "Test-only async callback syntax, before assertions."
+    },
+    {
+      "path": "D:/LolzCloud-Android-Toolchain/independent-pitch/lyric-versions-final",
+      "reason": "Electron protocol reconstructs Request.credentials; final test observes the actual renderer Request and separately verifies received identification header."
+    }
+  ],
+  "limits": [
+    "Room-specific embedded plain lyric lookup was not expanded by this change.",
+    "No physical Safari, physical iPhone/iPad or native PCM claim from these browser tests.",
+    "No release publication performed by this proof script."
+  ]
+}
