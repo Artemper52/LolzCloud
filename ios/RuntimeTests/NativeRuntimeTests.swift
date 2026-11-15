@@ -1,7 +1,9 @@
 import XCTest
 import AVFoundation
+import MediaPlayer
 import WebKit
 import UIKit
+import SwiftUI
 @testable import LolzCloud
 
 @MainActor private final class RuntimeFrameProbe: NSObject, WKScriptMessageHandler {
@@ -142,6 +144,102 @@ import UIKit
         XCTAssertTrue(records.contains { $0["event"] as? String == "download" && $0["state"] as? String == "error" })
         let recovery = subject()
         XCTAssertTrue(recovery.tracks.contains { $0.id == track.id })
+    }
+
+    func testImportReadsRealMP3MetadataAndPersistsPrivateCopy() async throws {
+        let player=subject(),fixture=try XCTUnwrap(Bundle(for:NativeRuntimeTests.self).url(forResource:"tone",withExtension:"mp3"))
+        var audio=try Data(contentsOf:fixture)
+        // Add real ID3v2.3 text frames to genuine MP3 bytes. No metadata API is
+        // substituted; AVFoundation reads this opaque-filename document.
+        if audio.count>=10,Array(audio.prefix(3))==Array("ID3".utf8) {
+            let header=Array(audio.prefix(10))
+            let length=header[6...9].reduce(0){($0<<7)|Int($1&0x7f)}
+            let total=10+length+(header[5]&0x10 != 0 ? 10:0)
+            guard total<audio.count else { throw UserError.message("Invalid MP3 fixture tag") }
+            audio.removeFirst(total)
+        }
+        func frame(_ name: String,_ value: String) -> Data {
+            var body=Data([0]);body.append(contentsOf:value.utf8)
+            var result=Data(name.utf8),size=UInt32(body.count).bigEndian
+            Swift.withUnsafeBytes(of:&size){result.append(contentsOf:$0)}
+            result.append(contentsOf:[0,0]);result.append(body);return result
+        }
+        var tag=frame("TIT2","Embedded fixture title");tag.append(frame("TPE1","Embedded fixture artist"))
+        let count=tag.count
+        var bytes=Data([0x49,0x44,0x33,3,0,0,UInt8((count>>21)&127),UInt8((count>>14)&127),UInt8((count>>7)&127),UInt8(count&127)])
+        bytes.append(tag);bytes.append(audio)
+        let source=scratch.appendingPathComponent("001.mp3");try bytes.write(to:source)
+        let track=try await importOne(player,source)
+        XCTAssertEqual(track.title,"Embedded fixture title");XCTAssertEqual(track.artist,"Embedded fixture artist")
+        XCTAssertTrue(track.isLocal);XCTAssertGreaterThan(track.duration,0)
+        let privateFile=try XCTUnwrap(LocalAudioFiles.existing(track,in:offline))
+        XCTAssertNotEqual(privateFile,source);XCTAssertEqual(try Data(contentsOf:privateFile),bytes)
+        XCTAssertEqual(try Data(contentsOf:source),bytes)
+        let recovered=subject(),restored=try XCTUnwrap(recovered.tracks.first{$0.id==track.id})
+        XCTAssertEqual(restored.title,track.title);XCTAssertEqual(restored.artist,track.artist)
+        XCTAssertEqual(restored.duration,track.duration,accuracy:0.001)
+    }
+
+    private func roomSnapshot(document: String,epoch: Int=1,revision: Int=1,active: Bool=true) -> [String:Any] {
+        ["roomId":String(repeating:"a",count:32),"documentId":document,"epoch":epoch,"revision":revision,"active":active,
+         "playback":["url":"https://soundcloud.com/fixture/room-song","title":"Fixture room","artist":"Room artist","cover":"","duration":120,"position":10,"playing":active],
+         "capabilities":["play":active,"pause":active,"next":active,"previous":active,"seek":active]]
+    }
+
+    func testRoomOwnershipFencesRealSoloAndRoutesSystemTransportWithoutAutoplay() async throws {
+        let player=subject(),rows=try await imported(player,[wave("Solo before room",seconds:8),wave("Solo next",seconds:8)])
+        let av=try avPlayer(player),client=UUID().uuidString.lowercased(),document=UUID().uuidString.lowercased()
+        XCTAssertTrue(player.acceptClientIntent(client:client,request:1,handshake:true))
+        player.configureQueue(rows,index:0,repeatMode:"off",shuffle:false);player.play(rows[0],queueIndex:0)
+        try await waitFor("actual solo audio runs before room handoff"){av.rate>0 && av.currentTime().seconds>0.25}
+        let savedPosition=av.currentTime().seconds
+        XCTAssertTrue(player.configureRoom(roomSnapshot(document:document),client:client,request:1))
+        XCTAssertEqual(av.rate,0);XCTAssertNil(av.currentItem);XCTAssertEqual(player.current?.id,rows[0].id)
+        XCTAssertEqual(MPNowPlayingInfoCenter.default().nowPlayingInfo?[MPMediaItemPropertyTitle] as? String,"Fixture room")
+        XCTAssertTrue(MPRemoteCommandCenter.shared().nextTrackCommand.isEnabled)
+        for command in ["play","pause","next","previous","seek"] {
+            XCTAssertTrue(player.mediaCommand(command,value:command=="seek" ? 17:nil))
+            let sent=try XCTUnwrap(records.last{$0["event"] as? String == "room-command"})
+            XCTAssertEqual(sent["command"] as? String,command);XCTAssertEqual(sent["documentId"] as? String,document)
+            XCTAssertEqual(sent["clientId"] as? String,client);XCTAssertEqual(sent["requestId"] as? Int,1)
+            XCTAssertTrue(player.canDeliverRoomCommand(sent))
+            if command=="seek" { XCTAssertEqual(sent["value"] as? Double,17) }
+            var ack=sent;ack["ok"]=true
+            XCTAssertTrue(player.roomCommandResult(ack,client:client,request:1))
+            XCTAssertFalse(player.canDeliverRoomCommand(sent));XCTAssertNil(av.currentItem);XCTAssertEqual(av.rate,0)
+            XCTAssertEqual(player.current?.id,rows[0].id,"A room Next must never start or select the saved solo queue")
+        }
+        XCTAssertTrue(player.mediaCommand("next"))
+        var accepted=try XCTUnwrap(records.last{$0["event"] as? String == "room-command"})
+        accepted["ok"]=true;accepted["pending"]=true
+        XCTAssertTrue(player.roomCommandResult(accepted,client:client,request:1))
+        try await settle(3.2)
+        XCTAssertTrue(player.canDeliverRoomCommand(accepted),"Accepted SDK work must survive the original three-second delivery watchdog")
+        XCTAssertNil(av.currentItem);XCTAssertEqual(av.rate,0)
+        accepted["pending"]=false;XCTAssertTrue(player.roomCommandResult(accepted,client:client,request:1))
+        XCTAssertFalse(player.canDeliverRoomCommand(accepted))
+        // A missing JS acknowledgement must expire honestly, without playing
+        // old solo audio or claiming the provider performed this command.
+        XCTAssertTrue(player.mediaCommand("next"))
+        let pending=try XCTUnwrap(records.last{$0["event"] as? String == "room-command"})
+        try await waitFor("unacknowledged room command expires",timeout:5){
+            self.records.contains{$0["event"] as? String == "room-command-result" && $0["id"] as? String == pending["id"] as? String && $0["state"] as? String == "expired"}
+        }
+        XCTAssertFalse(player.canDeliverRoomCommand(pending));XCTAssertNil(av.currentItem)
+        XCTAssertTrue(player.configureRoom(roomSnapshot(document:document,revision:2,active:false),client:client,request:1))
+        XCTAssertFalse(player.mediaCommand("play"));XCTAssertFalse(player.mediaCommand("next"));XCTAssertEqual(av.rate,0)
+        XCTAssertTrue(player.configureEffects(["enabled":false,"gains":[0,0,0,0,0],"preampDb":0],revision:1,client:client,request:1))
+        XCTAssertFalse(player.mediaCommand("play"),"Settings changes cannot remove the post-room solo fence")
+        player.resume()
+        try await waitFor("explicit solo resume uses the saved queue and position"){av.rate>0 && av.currentTime().seconds>savedPosition}
+        XCTAssertEqual(player.current?.id,rows[0].id)
+        // Cancel a genuinely pending production preparation in the same turn.
+        // It must not acquire an AVPlayer item after the room becomes owner.
+        let network=try XCTUnwrap(SavedTrack(["id":"123456789","title":"Pending source","audioUrl":"https://lolzcloud.com/music/audio/123456789/aaaaaaaaaaaaaaaaaaaaaaaa.mp3"]))
+        player.configureQueue([network],index:0,repeatMode:"off",shuffle:false);player.play(network,prepare:true,queueIndex:0)
+        XCTAssertTrue(player.configureRoom(roomSnapshot(document:document,epoch:2,revision:1),client:client,request:1))
+        try await settle(0.4);XCTAssertNil(av.currentItem);XCTAssertEqual(av.rate,0);XCTAssertEqual(player.state,"paused")
+        XCTAssertTrue(player.configureRoom(roomSnapshot(document:document,epoch:2,revision:2,active:false),client:client,request:1))
     }
 
     func testActualAVPlayerProgressPauseSeekRateAndEarlyPause() async throws {
@@ -758,6 +856,115 @@ import UIKit
         let data = try JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
         let json = try XCTUnwrap(String(data: data, encoding: .utf8))
         _ = try await javascript("window.webkit.messageHandlers.lolzcloud.postMessage("+json+"); true", in: web)
+    }
+
+    func testRealWebKitRoomCommandsAndSuspendedOfflineHandoff() async throws {
+        let shell=AppShell(),web=try XCTUnwrap(shell.webView)
+        let scene=try XCTUnwrap(UIApplication.shared.connectedScenes.compactMap{$0 as? UIWindowScene}.first{$0.activationState == .foregroundActive})
+        let previousKey=scene.windows.first{$0.isKeyWindow},window=UIWindow(windowScene:scene)
+        let controller=UIHostingController(rootView:AppScreen(shell:shell))
+        window.rootViewController=controller;window.frame=scene.screen.bounds;window.makeKeyAndVisible();controller.view.layoutIfNeeded()
+        subjects.append(shell.player)
+        let original=shell.player.emit
+        shell.player.emit={ [weak self] name,detail in
+            original?(name,detail);var row=detail;row["event"]=name;self?.records.append(row)
+        }
+        defer {
+            shell.login.cancel();web.stopLoading();web.configuration.userContentController.removeScriptMessageHandler(forName:"lolzcloud")
+            web.navigationDelegate=nil;web.uiDelegate=nil;window.isHidden=true;previousKey?.makeKeyAndVisible()
+        }
+        try await waitFor("real attached public PWA is ready for declared room bridge fixture",timeout:35){!shell.loading && MediaPolicy.bridgePage(web.url)}
+        XCTAssertTrue(shell.loadError.isEmpty,shell.loadError)
+        let rows=try await imported(shell.player,[wave("Offline A",seconds:3.5),wave("Offline B",seconds:3.5)])
+        let av=try avPlayer(shell.player)
+        var client=UUID().uuidString.lowercased(),document=UUID().uuidString.lowercased()
+        try await post(["action":"queue","clientId":client,"requestId":1,"handshake":true,"tracks":rows.map(\.object),"index":0,"repeat":"off","shuffle":false],in:web)
+        var play=rows[0].object;play.merge(["action":"play","clientId":client,"requestId":2,"queueIndex":0]){_,new in new}
+        try await post(play,in:web)
+        try await waitFor("actual native solo plays before the WebKit room fixture"){av.rate>0 && av.currentTime().seconds>0.2}
+        var room=roomSnapshot(document:document);room.merge(["action":"roomOwner","clientId":client,"requestId":2]){_,new in new}
+        try await post(room,in:web)
+        try await waitFor("real WK message transfers ownership away from native AVPlayer"){av.currentItem==nil && av.rate==0}
+        // This explicitly declared HTMLAudio fixture exercises actual WebKit
+        // media and message delivery. It is not a provider/account/room-server
+        // authentication test. The real room/lease integration is tested apart.
+        let bytes=try Data(contentsOf:wave("WebKit room audio",seconds:2)).base64EncodedString()
+        let roomAudioScript="""
+        window.__runtimeRoomCommands=[];
+        window.__runtimeRoomListener=e=>{
+          const d=e.detail;window.__runtimeRoomCommands.push(d);
+          const a=window.__runtimeRoomAudio;
+          if(d.command==='pause')a.pause();
+          if(d.command==='play'||d.command==='next')a.play().catch(()=>{});
+          if(d.command==='seek')a.currentTime=d.value;
+          if(d.command==='previous'||d.command==='next')a.currentTime=0;
+          window.webkit.messageHandlers.lolzcloud.postMessage({...d,action:'roomCommandResult',ok:true});
+        };
+        window.addEventListener('lolzcloud:room-command',window.__runtimeRoomListener);
+        const raw=atob('\(bytes)'),array=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)array[i]=raw.charCodeAt(i);
+        window.__runtimeRoomURL=URL.createObjectURL(new Blob([array],{type:'audio/wav'}));
+        window.__runtimeRoomAudio=new Audio(window.__runtimeRoomURL);window.__runtimeRoomAudio.loop=true;
+        window.__runtimeRoomAudio.play().catch(e=>window.__runtimeRoomError=String(e));true
+        """
+        _=try await javascript(roomAudioScript,in:web)
+        _=try await javascriptObject("!window.__runtimeRoomAudio.paused&&window.__runtimeRoomAudio.currentTime>0.1?{playing:true}:null",in:web)
+        for command in ["pause","play","next","previous","seek"] {
+            XCTAssertTrue(shell.player.mediaCommand(command,value:command=="seek" ? 0.4:nil))
+            let sent=try XCTUnwrap(records.last{$0["event"] as? String == "room-command"})
+            let received=try await javascriptObject("window.__runtimeRoomCommands.find(d=>d.id==='\(try XCTUnwrap(sent["id"] as? String))')||null",in:web)
+            XCTAssertEqual(received["command"] as? String,command);XCTAssertEqual(received["documentId"] as? String,document)
+            try await waitFor("room result crosses the real trusted WK bridge"){!shell.player.canDeliverRoomCommand(sent)}
+            XCTAssertNil(av.currentItem);XCTAssertEqual(av.rate,0);XCTAssertEqual(shell.player.current?.id,rows[0].id)
+        }
+        // A real parent-document replacement, rather than a mere request-ID
+        // change, retires the old owner. Its solo fence survives the reload.
+        web.reload()
+        try await waitFor("actual WK parent navigation starts"){shell.loading || web.isLoading}
+        try await waitFor("actual WK reload commits a fresh parent document",timeout:35){!shell.loading && !web.isLoading && MediaPolicy.bridgePage(web.url)}
+        XCTAssertFalse(shell.player.hasRoomOwner);XCTAssertFalse(shell.player.mediaCommand("play"))
+        XCTAssertNil(av.currentItem);XCTAssertEqual(av.rate,0)
+        client=UUID().uuidString.lowercased();document=UUID().uuidString.lowercased()
+        try await post(["action":"queue","clientId":client,"requestId":1,"handshake":true,"tracks":rows.map(\.object),"index":0,"repeat":"off","shuffle":false],in:web)
+        XCTAssertFalse(shell.player.mediaCommand("play"),"A new document handshake alone does not authorize old solo playback")
+        play=rows[0].object;play.merge(["action":"play","clientId":client,"requestId":2,"queueIndex":0]){_,new in new}
+        try await post(play,in:web)
+        try await waitFor("explicit new-document solo play is accepted after room retirement"){av.rate>0 && av.currentTime().seconds>0.1}
+        room=roomSnapshot(document:document);room.merge(["action":"roomOwner","clientId":client,"requestId":2]){_,new in new}
+        try await post(room,in:web)
+        try await waitFor("new room document can own the same native player"){shell.player.hasRoomOwner && av.currentItem==nil}
+        _=try await javascript(roomAudioScript,in:web)
+        _=try await javascriptObject("!window.__runtimeRoomAudio.paused&&window.__runtimeRoomAudio.currentTime>0.1?{playing:true}:null",in:web)
+        _=try await javascript("window.__runtimeRestart=setInterval(()=>window.__runtimeRoomAudio.play().catch(()=>{}),50);true",in:web)
+        shell.enterOffline()
+        // A queued message from the still-existing page must be refused as
+        // soon as the user chooses the offline handoff, before blank commit.
+        try await post(play,in:web)
+        try await waitFor("WebKit is persistently suspended and the former room document is gone",timeout:10){shell.offlineReady && web.url?.absoluteString=="about:blank"}
+        XCTAssertNil(av.currentItem);XCTAssertEqual(av.rate,0)
+        XCTAssertFalse(shell.player.mediaCommand("play"),"Leaving a room is not an implicit solo resume")
+        shell.playOffline(rows[0])
+        try await waitFor("explicit offline selection really starts its private local file"){av.rate>0 && av.currentTime().seconds>0.15}
+        XCTAssertTrue((av.currentItem?.asset as? AVURLAsset)?.url.isFileURL==true)
+        XCTAssertTrue(shell.player.isOfflineQueue)
+        shell.player.seek(2.25)
+        try await waitFor("native offline seek reaches the requested position"){abs(av.currentTime().seconds-2.25)<0.15}
+        XCTAssertTrue(shell.player.mediaCommand("next"))
+        try await waitFor("native offline Next uses the saved queue"){shell.player.current?.id==rows[1].id && av.rate>0}
+        XCTAssertTrue(shell.player.mediaCommand("previous"))
+        try await waitFor("native offline Previous follows queue history"){shell.player.current?.id==rows[0].id && av.rate>0}
+        shell.player.configureOffline(repeatMode:"one",shuffle:false);shell.player.seek(3.3)
+        try await waitFor("offline repeat fixture reaches the actual end window"){av.currentTime().seconds>3.15}
+        try await waitFor("actual EOF repeats the offline track through the shared queue policy",timeout:5){av.rate>0 && av.currentTime().seconds<1 && shell.player.current?.id==rows[0].id}
+        shell.player.pause();let item=av.currentItem,position=av.currentTime().seconds
+        let image=UIGraphicsImageRenderer(bounds:window.bounds).image{_ in window.drawHierarchy(in:window.bounds,afterScreenUpdates:true)}
+        let capture=XCTAttachment(image:image);capture.name="native-offline-controls-"+(UIDevice.current.userInterfaceIdiom == .pad ? "ipad":"iphone");capture.lifetime = .keepAlways;add(capture)
+        shell.reload()
+        try await waitFor("return from offline loads a fresh public app document",timeout:35){!shell.offline && !shell.loading && MediaPolicy.bridgePage(web.url)}
+        try await settle(0.3)
+        XCTAssertEqual(av.rate,0);XCTAssertTrue(av.currentItem===item);XCTAssertEqual(av.currentTime().seconds,position,accuracy:0.08)
+        XCTAssertEqual(shell.player.current?.id,rows[0].id)
+        let note=XCTAttachment(data:try JSONSerialization.data(withJSONObject:["fixture":"Declared own-origin HTMLAudio room and actual WK message bridge; no provider login or server mutation","commands":5,"offline":"Permanent media suspension, blank-document commit, private file play, seek/next/previous/repeat-one, fresh app reload without autoplay"],options:[.prettyPrinted,.sortedKeys]),uniformTypeIdentifier:"public.json")
+        note.name="native-room-offline-scope";note.lifetime = .keepAlways;add(note)
     }
 
     func testLiveHTTPSWebKitBridgeRejectsStaleClientAndWrongPage() async throws {

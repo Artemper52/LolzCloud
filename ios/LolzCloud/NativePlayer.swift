@@ -9,6 +9,10 @@ import Combine
     @Published private(set) var current: SavedTrack?
     @Published private(set) var state = "paused"
     @Published private(set) var error = ""
+    @Published private(set) var playbackPosition: Double = 0
+    @Published private(set) var playbackDuration: Double = 0
+    @Published private(set) var offlineRepeatMode = "off"
+    @Published private(set) var offlineShuffle = false
     var emit: ((String, [String: Any]) -> Void)?
     private let player = AVPlayer()
     private var tick: Any?
@@ -22,6 +26,10 @@ import Combine
     private var queue = QueuePolicy()
     private var selectionAlias: String?
     private var clientIntent = NativeClientIntent()
+    private var roomBinding = NativeRoomBinding()
+    private var roomCommands = [String:NativeRoomCommand]()
+    private var roomCommandTasks = [String:Task<Void,Never>]()
+    private var roomSampledAt = ProcessInfo.processInfo.systemUptime
     private var preparationTask: Task<Void,Never>?
     private var effectsTask: Task<Void,Never>?
     private var needsEffectsPreparation = false
@@ -38,6 +46,20 @@ import Combine
     private var importTask: Task<Void,Never>?
     private var importTicket: UUID?
     var importing: Bool { importTask != nil }
+    var isOfflineQueue: Bool { offlineQueue }
+    var hasRoomOwner: Bool { roomBinding.current != nil }
+    struct OfflineHandoff {
+        fileprivate let generation: Int
+        fileprivate let client: String?
+        fileprivate let request: Int?
+    }
+    func offlineHandoff() -> OfflineHandoff { OfflineHandoff(generation:roomBinding.generation,client:clientIntent.clientID,request:clientIntent.requestID) }
+    @discardableResult func finishOfflineHandoff(_ ticket: OfflineHandoff) -> Bool {
+        guard clientIntent.clientID==ticket.client,clientIntent.requestID==ticket.request,
+              roomBinding.retireForOffline(expectedGeneration:ticket.generation) else { return false }
+        clearRoomCommands();pause();return true
+    }
+    func parentDocumentReplaced() { roomBinding.parentDocumentReplaced();clearRoomCommands();publish() }
     private let directory: URL
     private let index: URL
     private var remoteTargets: [(MPRemoteCommand, Any)] = []
@@ -61,7 +83,7 @@ import Combine
         }
         statusObservation = player.observe(\.timeControlStatus, options: [.new]) { [weak self] _, _ in
             Task { @MainActor in
-                guard let self, self.current != nil, self.state != "error", self.state != "ended", !self.needsPreparation, !self.needsEffectsPreparation else { return }
+                guard let self, !self.roomBinding.soloBlocked, self.current != nil, self.state != "error", self.state != "ended", !self.needsPreparation, !self.needsEffectsPreparation else { return }
                 self.state = !self.intent.wantsPlay ? "paused" : self.player.timeControlStatus == .playing ? "playing" : self.player.timeControlStatus == .waitingToPlayAtSpecifiedRate ? "loading" : "paused"
                 if self.state == "loading" { self.watch() } else { self.watchdog?.cancel(); self.watchdog = nil }
                 self.publish()
@@ -80,7 +102,92 @@ import Combine
         return clientIntent.accept(client:client,request:request,handshake:handshake)
     }
     func ownsClientIntent(client: String, request: Int) -> Bool { clientIntent.clientID == client && clientIntent.requestID == request }
-    var capabilities: [String:Any] { clientIntent.fields.merging(["catalogReferences":1,"profileExport":1,"effectsSchema":2,"maxEffectsSchema":3,"independentPitch":1,"preservesPitch":1]) { _,new in new } }
+    var capabilities: [String:Any] { clientIntent.fields.merging(["catalogReferences":1,"profileExport":1,"effectsSchema":2,"maxEffectsSchema":3,"independentPitch":1,"preservesPitch":1,"roomTransport":1]) { _,new in new } }
+    @discardableResult func configureRoom(_ object: [String:Any],client: String,request: Int) -> Bool {
+        guard ownsClientIntent(client:client,request:request),let snapshot=NativeRoomTransport(object),
+              let change=roomBinding.accept(snapshot,client:client,request:request) else { return false }
+        if change == .acquired {
+            let position=player.currentTime().seconds
+            if player.currentItem != nil,position.isFinite,position>=0 { requestedPosition=position }
+            // Fence every old prepare, ready, EOF and interruption callback.
+            intent.stop();preparationTask?.cancel();preparationTask=nil;effectsTask?.cancel();effectsTask=nil
+            watchdog?.cancel();watchdog=nil;player.pause();itemObservation=nil
+            if let endObserver { NotificationCenter.default.removeObserver(endObserver);self.endObserver=nil }
+            player.replaceCurrentItem(with:nil);needsEffectsPreparation=false;audioEffects.clearItem()
+            needsPreparation=current?.isLocal != true;state="paused";error=""
+            clearRoomCommands()
+        } else if change == .released { clearRoomCommands() }
+        roomSampledAt=ProcessInfo.processInfo.systemUptime;publish();return true
+    }
+    private func clearRoomCommands() {
+        for task in roomCommandTasks.values { task.cancel() };roomCommandTasks.removeAll();roomCommands.removeAll()
+    }
+    func canDeliverRoomCommand(_ detail: [String:Any]) -> Bool {
+        guard let id=detail["id"] as? String,let command=roomCommands[id] else { return false }
+        return roomBinding.owns(command,now:ProcessInfo.processInfo.systemUptime) && ownsClientIntent(client:command.client,request:command.request)
+    }
+    @discardableResult func roomCommandResult(_ detail: [String:Any],client: String,request: Int) -> Bool {
+        guard ownsClientIntent(client:client,request:request),let id=detail["id"] as? String,var command=roomCommands[id],
+              command.client==client,command.request==request,roomBinding.owns(command,now:ProcessInfo.processInfo.systemUptime),
+              let current=roomBinding.current,current.matches(detail),current.documentID==command.transport.documentID,
+              current.epoch==command.transport.epoch,let ok=NativeRoomTransport.boolean(detail["ok"]),
+              detail["error"]==nil || detail["error"] is String else { return false }
+        let error=detail["error"] as? String ?? "";guard error.count<=300 else { return false }
+        let pending: Bool
+        if let value=detail["pending"] { guard let flag=NativeRoomTransport.boolean(value) else { return false };pending=flag }
+        else { pending=false }
+        if pending {
+            guard ok else { return false };let accepted=command.acceptedDelivery
+            guard command.acceptDelivery(now:ProcessInfo.processInfo.systemUptime) else { return false }
+            roomCommands[id]=command
+            if !accepted { scheduleRoomTimeout(command) }
+            return true
+        }
+        roomCommands.removeValue(forKey:id);roomCommandTasks.removeValue(forKey:id)?.cancel()
+        if !ok { emitRoomResult(command,state:"error",error:error.isEmpty ? "Комната не выполнила команду.":error) }
+        return true
+    }
+    private func refreshRemoteAvailability() {
+        let remote=MPRemoteCommandCenter.shared(),room=roomBinding.current,solo = !roomBinding.soloBlocked
+        remote.playCommand.isEnabled=room?.capabilities["play"] ?? solo
+        remote.pauseCommand.isEnabled=room?.capabilities["pause"] ?? solo
+        remote.togglePlayPauseCommand.isEnabled=room != nil ? (room!.capabilities["play"]==true || room!.capabilities["pause"]==true):solo
+        remote.nextTrackCommand.isEnabled=room?.capabilities["next"] ?? solo
+        remote.previousTrackCommand.isEnabled=room?.capabilities["previous"] ?? solo
+        remote.changePlaybackPositionCommand.isEnabled=room?.capabilities["seek"] ?? solo
+    }
+    private func emitRoomResult(_ command: NativeRoomCommand,state: String,error: String="") {
+        var detail=command.detail;detail["state"]=state;if !error.isEmpty { detail["error"]=error };emit?("room-command-result",detail)
+    }
+    private func scheduleRoomTimeout(_ command: NativeRoomCommand) {
+        roomCommandTasks.removeValue(forKey:command.id)?.cancel()
+        let remaining=max(0,command.deadline-ProcessInfo.processInfo.systemUptime)
+        roomCommandTasks[command.id]=Task { [weak self] in
+            do { try await Task.sleep(nanoseconds:UInt64(remaining*1_000_000_000)) } catch { return }
+            guard !Task.isCancelled,let self,let expired=self.roomCommands[command.id],expired.deadline==command.deadline else { return }
+            self.roomCommands.removeValue(forKey:command.id);self.roomCommandTasks.removeValue(forKey:command.id)
+            self.emitRoomResult(expired,state:"expired",error:"Команда комнаты не выполнена вовремя. Вернись в комнату и повтори.")
+        }
+    }
+    @discardableResult func mediaCommand(_ command: String,value: Double?=nil) -> Bool {
+        if roomBinding.current != nil {
+            guard roomCommands.count<8,let next=roomBinding.command(command,value:value,now:ProcessInfo.processInfo.systemUptime) else { return false }
+            roomCommands[next.id]=next
+            scheduleRoomTimeout(next)
+            emit?("room-command",next.detail)
+            return true
+        }
+        guard !roomBinding.soloBlocked else { return false }
+        switch command {
+        case "play":resume()
+        case "pause":pause()
+        case "next":advance(1)
+        case "previous":advance(-1)
+        case "seek":guard let value,value.isFinite,value>=0 else { return false };seek(value)
+        default:return false
+        }
+        return true
+    }
     @discardableResult func configureEffects(_ config: [String:Any], revision: Int, client: String, request: Int) -> Bool {
         // Settings acknowledge the current transport owner; they cannot advance
         // its request ID, change playback generation, cancel prepare or resume.
@@ -92,6 +199,7 @@ import Combine
         var result = audioEffects.status
         result["catalogReferences"] = 1
         result["preservesPitch"] = 1
+        result["roomTransport"] = 1
         if var normalization = result["normalization"] as? [String:Any] {
             normalization["key"] = current?.id ?? ""; result["normalization"] = normalization
         }
@@ -110,6 +218,7 @@ import Combine
         publish()
     }
     func play(_ requested: SavedTrack, position: Double = 0, localQueue: Bool = false, prepare: Bool = false, queueIndex: Int? = nil) {
+        guard roomBinding.current==nil else { return }
         var selected = requested
         if let queueIndex {
             guard queue.tracks.indices.contains(queueIndex), queue.tracks[queueIndex].sameCatalogIdentity(as:requested) else { return }
@@ -120,6 +229,7 @@ import Combine
             _ = queue.select(slot.id,index:queueIndex)
             if !selected.isLocal, !selected.isCatalogReference { guard queue.refreshCurrent(selected,expectedID:slot.id) else { return } }
         }
+        _ = roomBinding.chooseSolo();clearRoomCommands()
         let ticket = intent.select()
         queue.select(selected.id,index:queueIndex); selectionAlias = requested.isCatalogReference ? requested.id : nil
         preparationTask?.cancel(); preparationTask = nil
@@ -211,10 +321,22 @@ import Combine
             self.player.defaultRate = Float(self.settings.rate); self.player.play(); self.watch(); self.publish()
         }
     }
-    func playOffline(_ track: SavedTrack) { play(track,localQueue:true) }
+    func playOffline(_ track: SavedTrack) {
+        guard roomBinding.current==nil,let index=tracks.firstIndex(where:{$0.id==track.id}),
+              queue.configure(tracks,index:index,repeatMode:offlineRepeatMode,shuffle:offlineShuffle,currentID:nil) else { return }
+        play(tracks[index],localQueue:true,queueIndex:index)
+    }
+    func configureOffline(repeatMode: String,shuffle: Bool) {
+        guard ["off","all","one"].contains(repeatMode) else { return }
+        offlineRepeatMode=repeatMode;offlineShuffle=shuffle
+        if offlineQueue { _=queue.configure(queue.tracks,index:queue.index,repeatMode:repeatMode,shuffle:shuffle,currentID:current?.id) }
+        publish()
+    }
     func pause() { intent.pause(); preparationTask?.cancel(); effectsTask?.cancel(); watchdog?.cancel(); watchdog = nil; player.pause(); state = "paused"; publish() }
     func resume() {
+        guard roomBinding.current==nil else { return }
         guard let current else { return }
+        _ = roomBinding.chooseSolo()
         let position = MediaPolicy.replayPosition(ended:state == "ended",position:player.currentItem == nil || needsEffectsPreparation ? requestedPosition : player.currentTime().seconds,duration:player.currentItem?.duration.seconds ?? 0)
         if player.currentItem == nil || player.currentItem?.status == .failed || needsEffectsPreparation { play(current,position:position,localQueue:offlineQueue,prepare:needsPreparation); return }
         do { try activate(); intent.resume(); if position == 0 { seek(0) }; error = ""; state = "loading"; player.defaultRate = Float(settings.rate); player.play(); watch(); publish() }
@@ -233,6 +355,7 @@ import Combine
         requestedPosition = max(0,seconds)
         let duration = player.currentItem?.duration.seconds ?? 0
         player.seek(to: CMTime(seconds: min(max(0,seconds),duration.isFinite && duration > 0 ? duration : max(0,seconds)), preferredTimescale: 600), toleranceBefore: .zero, toleranceAfter: .zero)
+        playbackPosition=duration.isFinite && duration>0 ? min(max(0,seconds),duration):max(0,seconds)
     }
     func volume(_ value: Double) { player.volume = Float(value.isFinite ? min(1,max(0,value)) : 1) }
     func rate(_ value: Double) {
@@ -272,15 +395,27 @@ import Combine
             sleepTask = Task { [weak self] in
                 do { try await Task.sleep(nanoseconds:UInt64(minutes)*60_000_000_000) } catch { return }
                 guard let self, !Task.isCancelled, self.settings.expireSleep(deadline) else { return }
-                self.sleepTask = nil; self.error = ""; self.pause()
+                self.sleepTask = nil; self.error = ""; _ = self.mediaCommand("pause")
             }
         }
         publish()
     }
     func publish() {
+        refreshRemoteAvailability()
         if settings.sleepDeadline > 0, Date().timeIntervalSince1970*1000 >= settings.sleepDeadline,
-           settings.expireSleep(settings.sleepDeadline) { sleepTask?.cancel(); sleepTask = nil; error = ""; pause(); return }
+           settings.expireSleep(settings.sleepDeadline) { sleepTask?.cancel(); sleepTask = nil; error = ""; _ = mediaCommand("pause"); return }
+        if let room=roomBinding.current {
+            let elapsed=room.position+(room.playing ? max(0,ProcessInfo.processInfo.systemUptime-roomSampledAt):0)
+            MPNowPlayingInfoCenter.default().nowPlayingInfo=[MPMediaItemPropertyTitle:room.title.isEmpty ? "Комната LolzCloud":room.title,
+                MPMediaItemPropertyArtist:room.artist,MPMediaItemPropertyPlaybackDuration:room.duration,
+                MPNowPlayingInfoPropertyElapsedPlaybackTime:room.duration>0 ? min(elapsed,room.duration):elapsed,
+                MPNowPlayingInfoPropertyPlaybackRate:room.playing ? 1:0]
+            return
+        }
+        if roomBinding.soloBlocked { MPNowPlayingInfoCenter.default().nowPlayingInfo=nil;return }
         let time = player.currentTime().seconds, duration = player.currentItem?.duration.seconds ?? 0
+        playbackPosition=time.isFinite ? max(0,time):requestedPosition
+        playbackDuration=duration.isFinite && duration>0 ? duration:(current?.duration ?? 0)
         // Effects acknowledge their own last accepted request, never a newly
         // handshaken transport document that has not sent settings yet.
         emit?("effects",effectsStatus)
@@ -311,18 +446,11 @@ import Combine
             if self.state == "loading" { self.fail("Подготовка аудио заняла слишком много времени. Проверь сеть и повтори попытку.") }
         }
     }
-    private func advanceOffline(_ step: Int) {
-        guard let id = current?.id, let index = tracks.firstIndex(where: { $0.id == id }) else { return }
-        if step < 0, player.currentTime().seconds > 3 { seek(0); return }
-        let next = index+step
-        guard next >= 0, next < tracks.count else { if step > 0 { pause() }; return }
-        playOffline(tracks[next])
-    }
     private func advance(_ step: Int,automatic: Bool = false) {
-        if offlineQueue { advanceOffline(step); return }
+        guard !roomBinding.soloBlocked else { return }
         if step < 0, player.currentTime().seconds > 3 { seek(0); publish(); return }
         guard let selected = queue.step(step,automatic:automatic) else { if !automatic { pause() }; return }
-        play(selected,prepare:true)
+        play(selected,localQueue:offlineQueue,prepare:!offlineQueue,queueIndex:queue.index)
     }
     private func prepareRequest(_ endpoint: URL,timeout: TimeInterval,expected: String) async throws -> AudioPreparation.Reply {
         var request = URLRequest(url:endpoint); request.timeoutInterval = max(0.1,timeout); request.setValue("application/json",forHTTPHeaderField:"Accept")
@@ -342,13 +470,14 @@ import Combine
             let options = notification.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
             Task { @MainActor in
                 guard let self else { return }
+                if type == AVAudioSession.InterruptionType.began.rawValue, self.roomBinding.current != nil { _ = self.mediaCommand("pause");return }
                 if type == AVAudioSession.InterruptionType.began.rawValue { self.intent.interrupt(); self.watchdog?.cancel(); self.watchdog = nil; self.player.pause(); self.state = "paused"; self.publish() }
                 else if type == AVAudioSession.InterruptionType.ended.rawValue, self.intent.finishInterruption(shouldResume:AVAudioSession.InterruptionOptions(rawValue: options).contains(.shouldResume)) { self.resume() }
             }
         })
         audioObservers.append(NotificationCenter.default.addObserver(forName: AVAudioSession.routeChangeNotification, object: nil, queue: .main) { [weak self] notification in
             let reason = notification.userInfo?[AVAudioSessionRouteChangeReasonKey] as? UInt
-            if reason == AVAudioSession.RouteChangeReason.oldDeviceUnavailable.rawValue { Task { @MainActor in self?.pause() } }
+            if reason == AVAudioSession.RouteChangeReason.oldDeviceUnavailable.rawValue { Task { @MainActor in _ = self?.mediaCommand("pause") } }
         })
     }
     private func configureRemote() {
@@ -358,14 +487,14 @@ import Combine
             let token = command.addTarget { _ in Task { @MainActor in action() }; return .success }
             remoteTargets.append((command,token))
         }
-        add(remote.playCommand) { [weak self] in self?.resume() }
-        add(remote.pauseCommand) { [weak self] in self?.pause() }
-        add(remote.togglePlayPauseCommand) { [weak self] in guard let self else { return }; self.player.rate > 0 ? self.pause():self.resume() }
-        add(remote.nextTrackCommand) { [weak self] in self?.advance(1) }
-        add(remote.previousTrackCommand) { [weak self] in self?.advance(-1) }
+        add(remote.playCommand) { [weak self] in _ = self?.mediaCommand("play") }
+        add(remote.pauseCommand) { [weak self] in _ = self?.mediaCommand("pause") }
+        add(remote.togglePlayPauseCommand) { [weak self] in guard let self else { return }; _ = self.mediaCommand((self.roomBinding.current?.playing ?? (self.player.rate>0)) ? "pause":"play") }
+        add(remote.nextTrackCommand) { [weak self] in _ = self?.mediaCommand("next") }
+        add(remote.previousTrackCommand) { [weak self] in _ = self?.mediaCommand("previous") }
         let target = remote.changePlaybackPositionCommand.addTarget { [weak self] event in
             guard let event = event as? MPChangePlaybackPositionCommandEvent else { return .commandFailed }
-            Task { @MainActor in self?.seek(event.positionTime) }; return .success
+            Task { @MainActor in _ = self?.mediaCommand("seek",value:event.positionTime) }; return .success
         }
         remote.changePlaybackPositionCommand.isEnabled = true; remoteTargets.append((remote.changePlaybackPositionCommand,target))
     }
@@ -456,8 +585,9 @@ import Combine
                     let asset = AVURLAsset(url:staged.url)
                     let playable = try await asset.load(.isPlayable), duration = try await asset.load(.duration).seconds
                     let audio = try await asset.loadTracks(withMediaType:.audio)
-                    guard playable, !audio.isEmpty, duration.isFinite, duration > 0, duration <= 86400,
-                          let track = SavedTrack.imported(id:staged.id,title:staged.title,artist:"Локальная музыка",duration:duration,fileExtension:staged.fileExtension) else { throw UserError.message("iOS не может воспроизвести этот аудиофайл.") }
+                    guard playable, !audio.isEmpty, duration.isFinite, duration > 0, duration <= 86400 else { throw UserError.message("iOS не может воспроизвести этот аудиофайл.") }
+                    let metadata=await self.importedMetadata(asset,fallbackTitle:staged.title)
+                    guard let track=SavedTrack.imported(id:staged.id,title:metadata.title,artist:metadata.artist,duration:duration,fileExtension:staged.fileExtension) else { throw UserError.message("Не удалось прочитать сведения об аудио.") }
                     try Task.checkCancellation()
                     guard self.storedBytes()+staged.bytes <= LocalAudioFiles.quota else { throw UserError.message("Офлайн-хранилище заполнено. Удали ненужные записи.") }
                     self.tracks = try LocalAudioFiles.commit(track,temporary:staged.url,in:self.directory,index:self.index,registered:self.tracks)
@@ -466,6 +596,36 @@ import Combine
                 catch { self.emit?("download",["state":"error","import":true,"importing":true,"error":(error as? UserError)?.localizedDescription ?? "Не удалось импортировать аудио. Проверь доступ к файлу и свободное место."]) }
             }
         }
+    }
+    private func importedMetadata(_ asset: AVAsset,fallbackTitle: String) async -> ImportedAudioMetadata {
+        let fallback=ImportedAudioMetadata(title:nil,artist:nil,fallbackTitle:fallbackTitle)
+        // Read only title/artist values, never artwork blobs. This is a local
+        // private copy: all access stays within the existing import transaction.
+        return await withTaskCancellationHandler(operation:{
+            await withTaskGroup(of:ImportedAudioMetadata?.self) { group in
+                group.addTask {
+                    do {
+                        let loaded=try await asset.load(.commonMetadata),items=Array(loaded.prefix(64))
+                        var title: String?,artist: String?
+                        for item in AVMetadataItem.metadataItems(from:items,filteredByIdentifier:.commonIdentifierTitle).prefix(4) {
+                            try Task.checkCancellation();let value=try await item.load(.stringValue)
+                            if let value,!value.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty { title=value;break }
+                        }
+                        for item in AVMetadataItem.metadataItems(from:items,filteredByIdentifier:.commonIdentifierArtist).prefix(4) {
+                            try Task.checkCancellation();let value=try await item.load(.stringValue)
+                            if let value,!value.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty { artist=value;break }
+                        }
+                        return ImportedAudioMetadata(title:title,artist:artist,fallbackTitle:fallbackTitle)
+                    } catch { return fallback }
+                }
+                group.addTask {
+                    do { try await Task.sleep(nanoseconds:3_000_000_000) } catch { return nil }
+                    asset.cancelLoading();return nil
+                }
+                let result=await group.next() ?? nil;group.cancelAll()
+                if result==nil { asset.cancelLoading() };return result ?? fallback
+            }
+        },onCancel:{ asset.cancelLoading() })
     }
 }
 
