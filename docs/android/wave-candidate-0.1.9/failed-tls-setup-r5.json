@@ -1,0 +1,19 @@
+{
+  "status": "failed",
+  "error": "javax.net.ssl.SSLHandshakeException: connection closed",
+  "playbackError": "",
+  "waveError": "",
+  "checks": [],
+  "live": {},
+  "screenshots": [],
+  "preferencesRestored": true,
+  "runId": "c6190de8-e3f5-4256-96a3-1e286cd1610b",
+  "version": "0.1.9",
+  "versionCode": 10,
+  "apkSha256": "ed0e4b60f2694b7636484149866857a34e91071a3de549871f7f4597f3d711fb",
+  "scope": "Real public /music/wave + known liked MP3 through MediaCodec/DSP/AudioTrack; genuine native start/pause touch. Cancellation/refill/end tests then use an explicitly controlled provider and generated private WAV fixtures with test metadata. Actual service, SharedPreferences, natural audio completions, background and Activity recreation. No personal account, protected-source, physical acoustic or arbitrary provider-success claim.",
+  "productionShaUnchanged": true,
+  "checkedAt": "2026-11-15T01:52:50.268Z",
+  "emulator": "emulator-5554",
+  "avd": "LolzCloud"
+}

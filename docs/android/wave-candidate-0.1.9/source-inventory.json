@@ -1,0 +1,446 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T10:25:36.170Z",
+  "sourceDigest": "cdb5a2f7ff93beba3c58f1b38b5be3232608f2bb05c73d9f557d80039c865a17",
+  "files": 62,
+  "javaSourceFiles": 43,
+  "aggregateMatchesCandidate": true,
+  "productionClassesJarSha256": "9d136341cb909952cce0444329bfcc6cdb6b442e22b5b884f49f73b6e47a55c2",
+  "productionDexSha256": "219b7253390ec2e1cff536f7f201f869a0c9d4332eb2877f94200731f8cbf942",
+  "sources": [
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "bytes": 2582,
+      "sha256": "716c09db93c526446cd6a7f44542c4b584312faadede8c3556dfe11f7017e79e",
+      "normalizedBytes": 2582,
+      "normalizedSha256": "716c09db93c526446cd6a7f44542c4b584312faadede8c3556dfe11f7017e79e"
+    },
+    {
+      "path": "app/src/main/assets/licenses/wg-scrypt-Apache-2.0.txt",
+      "bytes": 10174,
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "normalizedBytes": 10174,
+      "normalizedSha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+    },
+    {
+      "path": "app/src/main/assets/licenses/wg-scrypt-provenance.json",
+      "bytes": 1130,
+      "sha256": "a5f7cef3ca08957aea60417f6c3eabef96bd924f5dda9ecc16f57e5948ab3af0",
+      "normalizedBytes": 1130,
+      "normalizedSha256": "a5f7cef3ca08957aea60417f6c3eabef96bd924f5dda9ecc16f57e5948ab3af0"
+    },
+    {
+      "path": "app/src/main/assets/room-client/logo.svg",
+      "bytes": 396,
+      "sha256": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512",
+      "normalizedBytes": 396,
+      "normalizedSha256": "9d9b794f55b821d1575d4f50811db00cf0c9057e0d704d2ffd325fab854df512"
+    },
+    {
+      "path": "app/src/main/assets/room-client/media-source.js",
+      "bytes": 1517,
+      "sha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c",
+      "normalizedBytes": 1517,
+      "normalizedSha256": "e6574e883296658a97af34ff687a78b892a58013a282e412a4bed4eb5b76555c"
+    },
+    {
+      "path": "app/src/main/assets/room-client/room-players.js",
+      "bytes": 3441,
+      "sha256": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9",
+      "normalizedBytes": 3441,
+      "normalizedSha256": "db760c726128b418c8d35a4089b1232e09ff1dfc6a17054b3d1fa05a45164ac9"
+    },
+    {
+      "path": "app/src/main/assets/room-client/room-sync.js",
+      "bytes": 3584,
+      "sha256": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab",
+      "normalizedBytes": 3584,
+      "normalizedSha256": "55574b3d82a897c5f926f1a90f13074f3e64b99c5d03497225b9a383fe0951ab"
+    },
+    {
+      "path": "app/src/main/assets/room-client/room.css",
+      "bytes": 41933,
+      "sha256": "713762f4d6603aed23db6dd07227c2525ca0388041658b724b13f879ca8bb340",
+      "normalizedBytes": 41535,
+      "normalizedSha256": "3889e07a3549c32345959f99396eb084367e58f5ac668c0d98248285cdb96a8b"
+    },
+    {
+      "path": "app/src/main/assets/room-client/room.html",
+      "bytes": 10998,
+      "sha256": "a195898b4526c70d68f8b2627d61ba98902daefb7472ad3cf990cc2cc9807af1",
+      "normalizedBytes": 10886,
+      "normalizedSha256": "914052f011ee310b8283f587a9fc5a6684f8b82b70a55f426fc203ac62e59c1a"
+    },
+    {
+      "path": "app/src/main/assets/room-client/room.js",
+      "bytes": 48674,
+      "sha256": "1bbaf4f4580e43c00a731efbc9dd1dc6c3cf57a1a570c50a30a3852d23fb4e08",
+      "normalizedBytes": 48674,
+      "normalizedSha256": "1bbaf4f4580e43c00a731efbc9dd1dc6c3cf57a1a570c50a30a3852d23fb4e08"
+    },
+    {
+      "path": "app/src/main/assets/room-client/site.js",
+      "bytes": 7569,
+      "sha256": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616",
+      "normalizedBytes": 7569,
+      "normalizedSha256": "5159097a17f451b57fb769188c3f3a010f115bde1c997165bc70951cb3e36616"
+    },
+    {
+      "path": "app/src/main/assets/room-client/social.css",
+      "bytes": 12818,
+      "sha256": "d16d9131ad980d13e441a7ae866d2b08e7c4b58e0a387ec892a1de1aa80ffa86",
+      "normalizedBytes": 12818,
+      "normalizedSha256": "d16d9131ad980d13e441a7ae866d2b08e7c4b58e0a387ec892a1de1aa80ffa86"
+    },
+    {
+      "path": "app/src/main/assets/room-client/social.html",
+      "bytes": 1011,
+      "sha256": "d905f78fe734677728c9e3d3b9e426f8d7fd984c4fdc66a7ea5318834aefd3fe",
+      "normalizedBytes": 1011,
+      "normalizedSha256": "d905f78fe734677728c9e3d3b9e426f8d7fd984c4fdc66a7ea5318834aefd3fe"
+    },
+    {
+      "path": "app/src/main/assets/room-client/social.js",
+      "bytes": 38894,
+      "sha256": "c3e8b8c0c185afd7fa7f13c5692bfe8339c8e2aeeb139fb70485a1d0c50da601",
+      "normalizedBytes": 38894,
+      "normalizedSha256": "c3e8b8c0c185afd7fa7f13c5692bfe8339c8e2aeeb139fb70485a1d0c50da601"
+    },
+    {
+      "path": "app/src/main/java/com/lambdaworks/crypto/PBKDF.java",
+      "bytes": 2744,
+      "sha256": "ed6a6325daa5674e658deff7d9e4371dddba56e51b5eca69c51d721aeccbe9de",
+      "normalizedBytes": 2744,
+      "normalizedSha256": "ed6a6325daa5674e658deff7d9e4371dddba56e51b5eca69c51d721aeccbe9de"
+    },
+    {
+      "path": "app/src/main/java/com/lambdaworks/crypto/SCrypt.java",
+      "bytes": 5322,
+      "sha256": "1901fb26a3ee3b1d3a3889a3172f8e3ff13a04588c969b564020d58e9530a140",
+      "normalizedBytes": 5322,
+      "normalizedSha256": "1901fb26a3ee3b1d3a3889a3172f8e3ff13a04588c969b564020d58e9530a140"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/AccountApi.java",
+      "bytes": 8344,
+      "sha256": "ea06f3d98796c795b9c8f97a46340223d1dc9742f0346b23dcc6427b2c6e13b0",
+      "normalizedBytes": 8344,
+      "normalizedSha256": "ea06f3d98796c795b9c8f97a46340223d1dc9742f0346b23dcc6427b2c6e13b0"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/AccountCookieCommit.java",
+      "bytes": 3003,
+      "sha256": "45f26c697201383da6a74c89e204fa2da4689ce5ae750fcac8b30d01903ea940",
+      "normalizedBytes": 3003,
+      "normalizedSha256": "45f26c697201383da6a74c89e204fa2da4689ce5ae750fcac8b30d01903ea940"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/AccountLoginActivity.java",
+      "bytes": 6849,
+      "sha256": "95ad11d8a0b9f55b7c4f75a8069c9d95e641329cec34f978fdb64ec8482f10d9",
+      "normalizedBytes": 6849,
+      "normalizedSha256": "95ad11d8a0b9f55b7c4f75a8069c9d95e641329cec34f978fdb64ec8482f10d9"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/AccountLoginController.java",
+      "bytes": 12761,
+      "sha256": "bed424100fa7bbdd00d7a1ede5f9b08d17b28e630c1cc4b3336f3424465c7730",
+      "normalizedBytes": 12760,
+      "normalizedSha256": "be93dd7b48c5deecc9831e58d1ee21fe6c49b79376a983c2072c19a2cacbce89"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/AccountPolicy.java",
+      "bytes": 4639,
+      "sha256": "982494c43f535e8564f6c98ca35bb9ff84a89cff4838c0f726b7cbc27e6e434b",
+      "normalizedBytes": 4639,
+      "normalizedSha256": "982494c43f535e8564f6c98ca35bb9ff84a89cff4838c0f726b7cbc27e6e434b"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/AndroidReleasePolicy.java",
+      "bytes": 12859,
+      "sha256": "9ca6dbe7d613eabfb6073718c10935bf2ae448a54b6845dd8558c381508e9ffc",
+      "normalizedBytes": 12859,
+      "normalizedSha256": "9ca6dbe7d613eabfb6073718c10935bf2ae448a54b6845dd8558c381508e9ffc"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/AudioEffectsPolicy.java",
+      "bytes": 2607,
+      "sha256": "607a4d194334f121037d67a871e6d4d855c7094801846e901872bd4b99334d7b",
+      "normalizedBytes": 2607,
+      "normalizedSha256": "607a4d194334f121037d67a871e6d4d855c7094801846e901872bd4b99334d7b"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/AudioPreparation.java",
+      "bytes": 2362,
+      "sha256": "8f7055917a0656c891f90f79b10c90d59a44c90c1c62af39c8410a976e17cbba",
+      "normalizedBytes": 2362,
+      "normalizedSha256": "8f7055917a0656c891f90f79b10c90d59a44c90c1c62af39c8410a976e17cbba"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/CloudProfileApi.java",
+      "bytes": 13789,
+      "sha256": "11dc998951b6b69bcea481614c736e94391de9e59630a1e622ecd5a7959a2b77",
+      "normalizedBytes": 13789,
+      "normalizedSha256": "11dc998951b6b69bcea481614c736e94391de9e59630a1e622ecd5a7959a2b77"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/CloudProfileDialog.java",
+      "bytes": 12118,
+      "sha256": "94358850bf6baa6d9558641cbd5b6ef4a19360c4b71b039b7a91a29fb35f6540",
+      "normalizedBytes": 12118,
+      "normalizedSha256": "94358850bf6baa6d9558641cbd5b6ef4a19360c4b71b039b7a91a29fb35f6540"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/LibraryStore.java",
+      "bytes": 63982,
+      "sha256": "a6f4810f22044707aa80e5b820d35e5a7a5c1baed0e8fd13f5302d7ec9b7f8b5",
+      "normalizedBytes": 63982,
+      "normalizedSha256": "a6f4810f22044707aa80e5b820d35e5a7a5c1baed0e8fd13f5302d7ec9b7f8b5"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/LinkPolicy.java",
+      "bytes": 1422,
+      "sha256": "6cf99d78c69b51a6197c9e363f0e0f8d859428ffeb55fafbaf55acd2340418f1",
+      "normalizedBytes": 1422,
+      "normalizedSha256": "6cf99d78c69b51a6197c9e363f0e0f8d859428ffeb55fafbaf55acd2340418f1"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/LolzCloudApplication.java",
+      "bytes": 1112,
+      "sha256": "7afef9c56b71f1f6b97269adb90f58cdacf9285211be5d1c86aa86fc7aea6ef6",
+      "normalizedBytes": 1112,
+      "normalizedSha256": "7afef9c56b71f1f6b97269adb90f58cdacf9285211be5d1c86aa86fc7aea6ef6"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/LrcParser.java",
+      "bytes": 2972,
+      "sha256": "063155dde3207798867a02d0429393cb34765fb86def284ed94567dd4f982298",
+      "normalizedBytes": 2972,
+      "normalizedSha256": "063155dde3207798867a02d0429393cb34765fb86def284ed94567dd4f982298"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/LyricsMetadata.java",
+      "bytes": 4680,
+      "sha256": "dabd9ae2c5677b8857720ddd459c37856c1fa3d9f93470c54dfdd583301ffddd",
+      "normalizedBytes": 4680,
+      "normalizedSha256": "dabd9ae2c5677b8857720ddd459c37856c1fa3d9f93470c54dfdd583301ffddd"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/LyricsProvider.java",
+      "bytes": 12322,
+      "sha256": "76b756e5f561c3a37f2ee2f0a8aa2bd35941cd9f94dc613cd841ec66bdeaed97",
+      "normalizedBytes": 12322,
+      "normalizedSha256": "76b756e5f561c3a37f2ee2f0a8aa2bd35941cd9f94dc613cd841ec66bdeaed97"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/LyricsRepository.java",
+      "bytes": 6022,
+      "sha256": "811f02887640b8711434a76c8d67e5f3a7085ccb5705eb1e1e12708921b2a972",
+      "normalizedBytes": 6022,
+      "normalizedSha256": "811f02887640b8711434a76c8d67e5f3a7085ccb5705eb1e1e12708921b2a972"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/MainActivity.java",
+      "bytes": 116730,
+      "sha256": "d845eaf11617638c2dcd7ee8b777edb904dac34abf5f92502474ed05e4a3e42c",
+      "normalizedBytes": 116725,
+      "normalizedSha256": "91659d50297de493f0f395ed0b092f586709e057b6aa4e1d1916e8dfd53d90a3"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/OnlineActivity.java",
+      "bytes": 37347,
+      "sha256": "d0942f47db0bfdf81cfee2842d4ebacb715150400e7d869805e20eabd4153e81",
+      "normalizedBytes": 37347,
+      "normalizedSha256": "d0942f47db0bfdf81cfee2842d4ebacb715150400e7d869805e20eabd4153e81"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/OnlineCatalog.java",
+      "bytes": 23832,
+      "sha256": "7561b439fcf1b3dbe8177a477ad9cb46cd73c6b729029c9cd6bcd8a2fe6eaba7",
+      "normalizedBytes": 23832,
+      "normalizedSha256": "7561b439fcf1b3dbe8177a477ad9cb46cd73c6b729029c9cd6bcd8a2fe6eaba7"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/PcmDsp.java",
+      "bytes": 10910,
+      "sha256": "6f7b2fd1e252d15c4839cf60648b14e280300ed0136c0bc241a4a51e62a07df9",
+      "normalizedBytes": 10910,
+      "normalizedSha256": "6f7b2fd1e252d15c4839cf60648b14e280300ed0136c0bc241a4a51e62a07df9"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/PcmPlayback.java",
+      "bytes": 25294,
+      "sha256": "f23c37b1fce0138c082a30abe096d12b4b9fc9252b757713fd74773e705f2b29",
+      "normalizedBytes": 25294,
+      "normalizedSha256": "f23c37b1fce0138c082a30abe096d12b4b9fc9252b757713fd74773e705f2b29"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/PlaybackService.java",
+      "bytes": 72252,
+      "sha256": "81a7de443529e5253a5ad6a8992c98718fb3f4a2636f5571713a08faee9c3263",
+      "normalizedBytes": 72252,
+      "normalizedSha256": "81a7de443529e5253a5ad6a8992c98718fb3f4a2636f5571713a08faee9c3263"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/PortableAudioCurve.java",
+      "bytes": 1748,
+      "sha256": "3b2859684bbefa12a5fe212e141c48291332207fcf7387ea79eef3ac7a613a4a",
+      "normalizedBytes": 1748,
+      "normalizedSha256": "3b2859684bbefa12a5fe212e141c48291332207fcf7387ea79eef3ac7a613a4a"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/PortableProfile.java",
+      "bytes": 16491,
+      "sha256": "b25cfa7c69dd648842b417be64dabd887af028110cee8455539562826f89bb89",
+      "normalizedBytes": 16491,
+      "normalizedSha256": "b25cfa7c69dd648842b417be64dabd887af028110cee8455539562826f89bb89"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/ProfileCrypto.java",
+      "bytes": 6740,
+      "sha256": "410d6a3f52be8a3c6c87c0953b972cff25f0db28c1975665326c2096860d95d9",
+      "normalizedBytes": 6740,
+      "normalizedSha256": "410d6a3f52be8a3c6c87c0953b972cff25f0db28c1975665326c2096860d95d9"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/ProfileJson.java",
+      "bytes": 3221,
+      "sha256": "0d50e134fc09128f53a34664089422a8f37515b7244310f91d083ef29ce76b53",
+      "normalizedBytes": 3221,
+      "normalizedSha256": "0d50e134fc09128f53a34664089422a8f37515b7244310f91d083ef29ce76b53"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/RoomAssets.java",
+      "bytes": 4612,
+      "sha256": "4ac076348de634320cdedccf11e09ad2bc85f065ec420be3712ae99ef61efd56",
+      "normalizedBytes": 4612,
+      "normalizedSha256": "4ac076348de634320cdedccf11e09ad2bc85f065ec420be3712ae99ef61efd56"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/SleepTimerPolicy.java",
+      "bytes": 1265,
+      "sha256": "d485f965fca458abc9955750b6b41d87ceadc6804a1618d75913e12adb58573e",
+      "normalizedBytes": 1265,
+      "normalizedSha256": "d485f965fca458abc9955750b6b41d87ceadc6804a1618d75913e12adb58573e"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/SocialApi.java",
+      "bytes": 6142,
+      "sha256": "00dba9890de404b5bb1180fdfca2ce718caba3e545c02241cddd962faac65624",
+      "normalizedBytes": 6142,
+      "normalizedSha256": "00dba9890de404b5bb1180fdfca2ce718caba3e545c02241cddd962faac65624"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/SocialNotificationJobService.java",
+      "bytes": 668,
+      "sha256": "22ae1d6f87ac411bd443476807c64e9a57a81032a262c8c3448b0462d46111d7",
+      "normalizedBytes": 668,
+      "normalizedSha256": "22ae1d6f87ac411bd443476807c64e9a57a81032a262c8c3448b0462d46111d7"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/SocialNotifications.java",
+      "bytes": 12310,
+      "sha256": "f8f54b7f40496afacf7d0345d3889742c6e026d0c8543e6a17ccaea079ef2cab",
+      "normalizedBytes": 12310,
+      "normalizedSha256": "f8f54b7f40496afacf7d0345d3889742c6e026d0c8543e6a17ccaea079ef2cab"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/SocialPolicy.java",
+      "bytes": 4313,
+      "sha256": "fa3c6f26248890d6a540243b0775e4d4658a56324edb36c05c1175b646680aa4",
+      "normalizedBytes": 4313,
+      "normalizedSha256": "fa3c6f26248890d6a540243b0775e4d4658a56324edb36c05c1175b646680aa4"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/SourceBrowser.java",
+      "bytes": 9076,
+      "sha256": "bd4f1148deb9e1be5b1c1d810b01c416962485877967389d159e4404d54052d2",
+      "normalizedBytes": 9076,
+      "normalizedSha256": "bd4f1148deb9e1be5b1c1d810b01c416962485877967389d159e4404d54052d2"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/StreamDownloads.java",
+      "bytes": 6701,
+      "sha256": "8d266a1ef9be3efe50fc5a8b4b3d4e5468433a4021aaccf712e52faa930bde10",
+      "normalizedBytes": 6701,
+      "normalizedSha256": "8d266a1ef9be3efe50fc5a8b4b3d4e5468433a4021aaccf712e52faa930bde10"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/Track.java",
+      "bytes": 5069,
+      "sha256": "b4d0fc9b0140d9e6ad8b6559b5a096b0ea727645167d6355242307de0f0f4211",
+      "normalizedBytes": 5069,
+      "normalizedSha256": "b4d0fc9b0140d9e6ad8b6559b5a096b0ea727645167d6355242307de0f0f4211"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/UpdateFileProvider.java",
+      "bytes": 3665,
+      "sha256": "9c07dc521c527437ca091fe12fb0a2823596f76005bb7e7c18c6944a4e3866e4",
+      "normalizedBytes": 3665,
+      "normalizedSha256": "9c07dc521c527437ca091fe12fb0a2823596f76005bb7e7c18c6944a4e3866e4"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/UpdateManager.java",
+      "bytes": 28773,
+      "sha256": "22485ec5c2cb84729d62a4d4a036f812512eb426ad98194ad21ef09914a117f1",
+      "normalizedBytes": 28773,
+      "normalizedSha256": "22485ec5c2cb84729d62a4d4a036f812512eb426ad98194ad21ef09914a117f1"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/WaveApi.java",
+      "bytes": 11055,
+      "sha256": "278fa0f42113a1ea85c55b3c32426475e164014309a41ead5f7c52b78a10ab73",
+      "normalizedBytes": 11055,
+      "normalizedSha256": "278fa0f42113a1ea85c55b3c32426475e164014309a41ead5f7c52b78a10ab73"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/WavePolicy.java",
+      "bytes": 3969,
+      "sha256": "83c0c084105f174c98774449bc8842c78ac8b5b3882e804819f63c6fbf4f2e20",
+      "normalizedBytes": 3969,
+      "normalizedSha256": "83c0c084105f174c98774449bc8842c78ac8b5b3882e804819f63c6fbf4f2e20"
+    },
+    {
+      "path": "app/src/main/java/com/lolzcloud/mobile/WaveSession.java",
+      "bytes": 17302,
+      "sha256": "dc7e1910c08ab675fcdf0c03c13c3f2466f67557a78a8f03990705a51f115789",
+      "normalizedBytes": 17302,
+      "normalizedSha256": "dc7e1910c08ab675fcdf0c03c13c3f2466f67557a78a8f03990705a51f115789"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/forest_art.png",
+      "bytes": 2652258,
+      "sha256": "02745fc1ec103b1435ed2e9c3d705f9f12b5bceaf80f87ef0545d09ac92ef22e",
+      "normalizedBytes": 2652258,
+      "normalizedSha256": "02745fc1ec103b1435ed2e9c3d705f9f12b5bceaf80f87ef0545d09ac92ef22e"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher.xml",
+      "bytes": 631,
+      "sha256": "b61186b90f01aea389689f5e992ae214efbf3215e2e7fe81a12898fb1ac1ddf0",
+      "normalizedBytes": 631,
+      "normalizedSha256": "b61186b90f01aea389689f5e992ae214efbf3215e2e7fe81a12898fb1ac1ddf0"
+    },
+    {
+      "path": "app/src/main/res/values/ids.xml",
+      "bytes": 516,
+      "sha256": "369fc50e19a2318cef45fe824373f0e8ed6ab5a277f8bd29cabbabed4ac8ed8c",
+      "normalizedBytes": 516,
+      "normalizedSha256": "369fc50e19a2318cef45fe824373f0e8ed6ab5a277f8bd29cabbabed4ac8ed8c"
+    },
+    {
+      "path": "app/src/main/res/values/styles.xml",
+      "bytes": 696,
+      "sha256": "cc01c68fe7333c0fbc5ba9ad16b8a510b08ae35cf672cbe9852f0577b70ab20b",
+      "normalizedBytes": 696,
+      "normalizedSha256": "cc01c68fe7333c0fbc5ba9ad16b8a510b08ae35cf672cbe9852f0577b70ab20b"
+    },
+    {
+      "path": "version.json",
+      "bytes": 50,
+      "sha256": "b5ddf18da980caf03807698f710523a4b899a62f007e0bcbd70ad5c55a4d86e9",
+      "normalizedBytes": 50,
+      "normalizedSha256": "b5ddf18da980caf03807698f710523a4b899a62f007e0bcbd70ad5c55a4d86e9"
+    }
+  ]
+}

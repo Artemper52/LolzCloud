@@ -1,0 +1,54 @@
+{
+  "status": "passed-private-pcm-candidate",
+  "checkedAt": "2026-11-15T01:15:13.287Z",
+  "version": "0.1.9",
+  "versionCode": 10,
+  "apkSha256": "63bcb7b47b861a6d7045f1af0575d90d5e50bb87e22fc0c794db3e77a5917074",
+  "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+  "published": false,
+  "waveImplementedInThisCandidate": false,
+  "sourceDigestAtFreeze": {
+    "sha256": "2a9f6efc53a8bc6b2f347b32bc14c7b80a677de32478b3086f1c30542f98743d",
+    "files": 59
+  },
+  "productionFiles": [
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/PcmDsp.java",
+      "sha256": "6f7b2fd1e252d15c4839cf60648b14e280300ed0136c0bc241a4a51e62a07df9"
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/PcmPlayback.java",
+      "sha256": "f23c37b1fce0138c082a30abe096d12b4b9fc9252b757713fd74773e705f2b29"
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/PlaybackService.java",
+      "sha256": "6599fbd457432f04482e18fb297dbf6f036813e4ecd55897b9eab7944131700c"
+    },
+    {
+      "path": "android/app/src/main/java/com/lolzcloud/mobile/MainActivity.java",
+      "sha256": "a1a1bcbdf57748753d08723bf70bd8a8b1c1a21225177ab7d6d9fcea696c8a9f"
+    },
+    {
+      "path": "android/version.json",
+      "sha256": "b5ddf18da980caf03807698f710523a4b899a62f007e0bcbd70ad5c55a4d86e9"
+    }
+  ],
+  "checks": {
+    "pcmActual": 30,
+    "portableActual": 36,
+    "cloudFixtureActual": 24,
+    "hostDsp": 33,
+    "legacyCatalogOnPreviousR2": 58
+  },
+  "previousR2Sha256": "cc1d05f4b2e75232b0059fb036481c71590ee92aa1881fd6a3310e308418e701",
+  "limitations": [
+    "API35 x86_64 emulator, no physical DAC/acoustic proof",
+    "Actual format coverage: WAV rawPCM and MP3 MediaCodec; AAC/FLAC/general provider codecs not claimed tested",
+    "API26-30 bounded EOF priming compiles but was not run on API26 device in this stage",
+    "Cloud API transport is an explicit isolated fixture, no personal OAuth/live cloud account write",
+    "Reverb is algorithmic and not a byte-identical desktop convolution",
+    "Private compressed network cache cap20MiB; up to2decoder workers; no private media upload",
+    "Room/YouTube playback is outside this personal native DSP path"
+  ],
+  "failedAttemptsPreserved": true
+}

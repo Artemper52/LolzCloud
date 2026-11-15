@@ -1,0 +1,15 @@
+{
+  "adbAfter": "List of devices attached",
+  "serial": "emulator-5554",
+  "stoppedAt": "2026-11-15T10:29:44.3831881Z",
+  "processPathsVerifiedBeforeKill": true,
+  "status": "stopped",
+  "beforeStop": "before-stop-r8.json",
+  "launcherPid": 24304,
+  "launcherExited": true,
+  "parentRelationshipVerifiedBeforeKill": true,
+  "avd": "LolzCloud",
+  "qemuPid": 3392,
+  "briefStaleAdbEnumerationAfterProcessExit": true,
+  "qemuExited": true
+}

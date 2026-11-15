@@ -1,0 +1,23 @@
+{
+  "status": "failed",
+  "error": "java.lang.AssertionError: Saving a Wave moment also retains its metadata for the visible list and common portable export",
+  "stack": "java.lang.AssertionError: Saving a Wave moment also retains its metadata for the visible list and common portable export\n\tat com.lolzcloud.mobile.test.WaveInstrumentation.check(WaveInstrumentation.java:206)\n\tat com.lolzcloud.mobile.test.WaveInstrumentation.bookmarkProbe(WaveInstrumentation.java:175)\n\tat com.lolzcloud.mobile.test.WaveInstrumentation.onStart(WaveInstrumentation.java:57)\n\tat android.app.Instrumentation$InstrumentationThread.run(Instrumentation.java:2594)\n",
+  "playbackError": "",
+  "waveError": "",
+  "checks": [
+    "A new Wave recording stays ephemeral before an explicit save action"
+  ],
+  "live": {},
+  "screenshots": [],
+  "preferencesRestored": true,
+  "runId": "be836932-7a55-4ac7-989e-ab88ba946332",
+  "version": "0.1.9",
+  "versionCode": 10,
+  "apkSha256": "430c84dcce066e9b01b2476ba1b22f08d0d7eb86763b0648025e325f0ae4103e",
+  "scope": "Declared provider fixture -> actual PCM -> genuine native PopupMenu -> moment list and portable JSON. No live Wave API or personal account in this focused phase.",
+  "productionShaUnchanged": true,
+  "checkedAt": "2026-11-15T02:16:43.589Z",
+  "emulator": "emulator-5554",
+  "avd": "LolzCloud",
+  "phase": "bookmark"
+}

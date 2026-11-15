@@ -1,0 +1,39 @@
+{
+  "status": "failed",
+  "error": "java.lang.AssertionError: Service starts bounded prefetch; audio=; wave=",
+  "playbackError": "",
+  "waveError": "",
+  "checks": [
+    "Real public Wave resolves the known liked recording to the canonical signed in-app audio source",
+    "Real Wave MP3 goes through production MediaCodec/DSP/AudioTrack without parallel playback or a browser",
+    "The visible Wave pause button stops the actual output clock",
+    "Listening seconds come from real progress and survive a pause",
+    "Recommendation input contains whitelisted public metadata and no local URI, signed stream or cookie",
+    "The real Wave saves PC-compatible played24h fingerprints before handing off audio",
+    "Pause fences a transport that ignores cancellation; its late first batch cannot replace the queue or autoplay",
+    "A late result from the old station cannot cancel or overwrite the newer station"
+  ],
+  "live": {
+    "source": "https://soundcloud.com/darkprinceee/gnoy",
+    "id": "soundcloud:1930572542",
+    "millisecondsToClock": 1388,
+    "acceptedFrames": 33041,
+    "playedFrames": 16993,
+    "inputRms": 0.20612405667552994,
+    "outputRms": 0.14592465696988033,
+    "audioSession": 89
+  },
+  "screenshots": [
+    "wave-live.png"
+  ],
+  "preferencesRestored": true,
+  "runId": "ea5473a7-7c05-4216-933a-9e637d4321e0",
+  "version": "0.1.9",
+  "versionCode": 10,
+  "apkSha256": "1eb4fde9bd346473652f2d27dfcce96992c9920df045d3caf9a4b1448b73f123",
+  "scope": "Real public /music/wave + known liked MP3 through MediaCodec/DSP/AudioTrack; genuine native start/pause touch. Cancellation/refill/end tests then use an explicitly controlled provider and generated private WAV fixtures with test metadata. Actual service, SharedPreferences, natural audio completions, background and Activity recreation. No personal account, protected-source, physical acoustic or arbitrary provider-success claim.",
+  "productionShaUnchanged": true,
+  "checkedAt": "2026-11-15T01:49:43.436Z",
+  "emulator": "emulator-5554",
+  "avd": "LolzCloud"
+}

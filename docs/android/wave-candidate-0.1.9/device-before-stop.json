@@ -1,0 +1,15 @@
+{
+  "status": "ready-to-stop",
+  "checkedAt": "2026-11-15T10:28:40.715Z",
+  "serial": "emulator-5554",
+  "avd": "LolzCloud",
+  "launcherPid": 24304,
+  "qemuPid": 3392,
+  "api": "35",
+  "abi": "x86_64",
+  "wifi": "1",
+  "mobileData": "1",
+  "nativeServicesStopped": true,
+  "activeWakeLocks": "Wake Locks: size=0",
+  "ownActiveWakeLocks": false
+}

@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "checkedAt": "2026-11-15T10:28:40.174Z",
+  "apkSha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693",
+  "rawZipNamesCanonical": true,
+  "entries": 21,
+  "dexMatchesProductionOutput": true,
+  "dex": {
+    "bytes": 512000,
+    "sha256": "219b7253390ec2e1cff536f7f201f869a0c9d4332eb2877f94200731f8cbf942"
+  },
+  "sourceDigest": "cdb5a2f7ff93beba3c58f1b38b5be3232608f2bb05c73d9f557d80039c865a17",
+  "sourceFiles": 62
+}

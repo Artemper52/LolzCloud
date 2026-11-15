@@ -1,0 +1,132 @@
+{
+  "status": "passed",
+  "releaseStatus": "private candidate; publication belongs to coordinator",
+  "checkedAt": "2026-11-15T10:31:32.583Z",
+  "versionName": "0.1.9",
+  "versionCode": 10,
+  "apk": {
+    "path": "D:\\LolzCloud-Android-Toolchain\\android-wave\\candidate-0.1.9-r8\\LolzCloud-Android-0.1.9.apk",
+    "size": 2614813,
+    "sha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693"
+  },
+  "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+  "sourceDigest": {
+    "sha256": "cdb5a2f7ff93beba3c58f1b38b5be3232608f2bb05c73d9f557d80039c865a17",
+    "files": 62
+  },
+  "inventory": "source-inventory.json",
+  "artifactVerification": "artifact-verification.json",
+  "suites": [
+    {
+      "name": "wave",
+      "report": "android-wave-verification.json",
+      "checks": 33,
+      "status": "passed",
+      "apkSha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693",
+      "preferencesRestored": true,
+      "runId": "45f78831-0373-44c6-9888-a6bd8b4eb22c",
+      "reportSha256": "7c30720ed20f538e7be01e9b05c506ccc8bb348ba53123d4b554cabae2c89898"
+    },
+    {
+      "name": "wave-bookmark",
+      "report": "bookmark-after-r8.json",
+      "checks": 4,
+      "status": "passed",
+      "apkSha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693",
+      "preferencesRestored": true,
+      "runId": "b2bdb4bb-1609-49a7-83f2-a2f743954d1b",
+      "reportSha256": "ec3453d0911cd7de665ff9462e8d5fd6fd84a5f2737b79835c1b50ab8d904d08"
+    },
+    {
+      "name": "pcm-effects",
+      "report": "android-pcm-effects-verification.json",
+      "checks": 30,
+      "status": "passed",
+      "apkSha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693",
+      "preferencesRestored": true,
+      "runId": "1f701a90-331e-4492-9144-355fc5e43899",
+      "reportSha256": "5b202ff43b839d5e4a5c5cb6c6159069fc093a1497c56f48bfffb2caf5988f0a"
+    },
+    {
+      "name": "catalog-offline",
+      "report": "android-catalog-verification.json",
+      "checks": 58,
+      "status": "passed",
+      "apkSha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693",
+      "preferencesRestored": null,
+      "runId": null,
+      "reportSha256": "2457ee11aff9876a3a7bc1a053fafbf033a352d2e398de2101c7f205177b5816"
+    },
+    {
+      "name": "portable-saf",
+      "report": "android-portable-profile-verification.json",
+      "checks": 36,
+      "status": "passed",
+      "apkSha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693",
+      "preferencesRestored": true,
+      "runId": "eb9d50d5-59de-4aca-8a9a-c534daac4666",
+      "reportSha256": "a58c1821d2079f5b2a1cfc16e49508d72431afd8a4d3abbdf295c8b06dd82e46"
+    },
+    {
+      "name": "cloud-fixture",
+      "report": "android-cloud-profile-verification.json",
+      "checks": 24,
+      "status": "passed",
+      "apkSha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693",
+      "preferencesRestored": true,
+      "runId": "492e73ec-2eb7-4c54-b491-3c8bc66380aa",
+      "reportSha256": "3e2594cc7105bbd4ec1dc171aa5887c4a431667647e6430323f0edb92160c468"
+    },
+    {
+      "name": "room-webview",
+      "report": "android-room-media-verification.json",
+      "checks": 13,
+      "status": "passed",
+      "apkSha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693",
+      "preferencesRestored": null,
+      "runId": null,
+      "reportSha256": "4819c977f0a7f3b5219b130fac7c91a7f6779904ec6a25ec7edf09dc49d4a0a7"
+    }
+  ],
+  "overlap": "Suite counts overlap and must not be summed as independent user features.",
+  "policy": [
+    {
+      "report": "wave-policy-verification.json",
+      "checks": 33,
+      "scope": "Actual production Java against PC fingerprints and cancellation gate"
+    },
+    {
+      "report": "pcm-dsp-policy-verification.json",
+      "checks": 33,
+      "scope": "Pure streaming DSP math; real accepted output is in pcm-effects suite"
+    }
+  ],
+  "interop": [
+    "node-java-roundtrip-verification.json",
+    "node-android-cloud-crypto-verification.json"
+  ],
+  "deviceReceipt": "device-receipt.json",
+  "deviceStateBeforeStop": "device-before-stop.json",
+  "public018Unchanged": {
+    "path": "android/output/LolzCloud-Android-0.1.8.apk",
+    "sha256": "e98fbdaf0fb815922a6efb3081a9d85539ff47a2ad028f2229774fc1a5989ff0",
+    "unchanged": true
+  },
+  "limits": [
+    "API35 x86_64 emulator with no physical DAC/acoustic measurement",
+    "Actual WAV/raw PCM and MP3; other device codecs/API26 runtime not established",
+    "Wave live public familiar case plus clearly controlled provider fixtures for deterministic races/refill",
+    "Room proof uses actual WebView with declared HTTPS document/media fixtures, not every real provider SDK",
+    "Cloud transport isolated; no personal OAuth or live profile PUT",
+    "Service recreation restores paused queue/preferences; no automatic Wave restart",
+    "PCM effects do not process room or YouTube WebView audio"
+  ],
+  "failedHistory": [
+    "failed-first-refill-r4.json",
+    "failed-tls-setup-r5.json",
+    "failed-draft-observation-r5.json",
+    "failed-room-observation-r7.json",
+    "failed-bookmark-menu-observation-r7.json",
+    "bookmark-before-r7.json"
+  ]
+}

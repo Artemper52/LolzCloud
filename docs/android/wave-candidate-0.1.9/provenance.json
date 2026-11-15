@@ -1,0 +1,35 @@
+{
+  "status": "private-candidate",
+  "versionName": "0.1.9",
+  "versionCode": 10,
+  "apk": {
+    "path": "D:\\LolzCloud-Android-Toolchain\\android-wave\\candidate-0.1.9-r8\\LolzCloud-Android-0.1.9.apk",
+    "size": 2614813,
+    "sha256": "2c0b76078f0b7ccc3928cfc6fe0ce082385c307ab54a2f401143324265370693"
+  },
+  "certificateSha256": "84305e6af2473179b6e124a1822eb82c0343e9bba0b5480cd5a91ecc0dceaa44",
+  "sourceDigest": {
+    "sha256": "cdb5a2f7ff93beba3c58f1b38b5be3232608f2bb05c73d9f557d80039c865a17",
+    "files": 62
+  },
+  "sourceFiles": {
+    "android/app/src/main/java/com/lolzcloud/mobile/WaveApi.java": "278fa0f42113a1ea85c55b3c32426475e164014309a41ead5f7c52b78a10ab73",
+    "android/app/src/main/java/com/lolzcloud/mobile/WavePolicy.java": "83c0c084105f174c98774449bc8842c78ac8b5b3882e804819f63c6fbf4f2e20",
+    "android/app/src/main/java/com/lolzcloud/mobile/WaveSession.java": "dc7e1910c08ab675fcdf0c03c13c3f2466f67557a78a8f03990705a51f115789",
+    "android/app/src/main/java/com/lolzcloud/mobile/PlaybackService.java": "81a7de443529e5253a5ad6a8992c98718fb3f4a2636f5571713a08faee9c3263",
+    "android/app/src/main/java/com/lolzcloud/mobile/LibraryStore.java": "a6f4810f22044707aa80e5b820d35e5a7a5c1baed0e8fd13f5302d7ec9b7f8b5",
+    "android/app/src/main/java/com/lolzcloud/mobile/OnlineCatalog.java": "7561b439fcf1b3dbe8177a477ad9cb46cd73c6b729029c9cd6bcd8a2fe6eaba7",
+    "android/app/src/main/java/com/lolzcloud/mobile/MainActivity.java": "d845eaf11617638c2dcd7ee8b777edb904dac34abf5f92502474ed05e4a3e42c",
+    "android/app/src/main/java/com/lolzcloud/mobile/PcmPlayback.java": "f23c37b1fce0138c082a30abe096d12b4b9fc9252b757713fd74773e705f2b29",
+    "android/app/src/main/java/com/lolzcloud/mobile/PcmDsp.java": "6f7b2fd1e252d15c4839cf60648b14e280300ed0136c0bc241a4a51e62a07df9"
+  },
+  "changedFromR7": [
+    "android/app/src/main/java/com/lolzcloud/mobile/MainActivity.java"
+  ],
+  "public018": {
+    "path": "android/output/LolzCloud-Android-0.1.8.apk",
+    "sha256": "e98fbdaf0fb815922a6efb3081a9d85539ff47a2ad028f2229774fc1a5989ff0",
+    "unchanged": true
+  },
+  "checkedAt": "2026-11-15T02:18:33.778Z"
+}
