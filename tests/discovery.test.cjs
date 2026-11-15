@@ -48,3 +48,23 @@ test('cancelling one caller during client discovery does not hang or cancel anot
   controller.abort(); await assert.rejects(first, { name: 'AbortError' });
   finish(key); await second; assert.equal(clients, 1);
 });
+
+test('catalogue JSON rejects oversized declared or chunked responses and cancels the stream',async()=>{
+ let cancelled=0;
+ for(const declared of [true,false]){
+  let chunk=0;const response=new Response(new ReadableStream({pull(controller){controller.enqueue(new Uint8Array(1000000));if(++chunk===10)controller.close();},cancel(){cancelled++;}}),{headers:declared?{'Content-Length':'9000000'}:{}});
+  const provider=new SoundCloudDiscovery(async()=>response,{clientIdFetcher:async()=>key});await assert.rejects(provider.request('/search/tracks'),/слишком большой/);
+ }
+ assert.equal(cancelled,2);
+});
+
+test('catalogue JSON obeys cancellation while a response body is stalled',async()=>{
+ let cancelled=false;const response=new Response(new ReadableStream({pull(){},cancel(){cancelled=true;}})),provider=new SoundCloudDiscovery(async()=>response,{clientIdFetcher:async()=>key}),controller=new AbortController(),pending=provider.request('/search/tracks',{},{signal:controller.signal});
+ await new Promise(setImmediate);controller.abort();await assert.rejects(pending,{name:'AbortError'});assert.equal(cancelled,true);
+});
+
+test('media-triggered refresh rotates only the failed public client and concurrent callers share the new bootstrap',async()=>{
+ let calls=0;const provider=new SoundCloudDiscovery(async()=>Response.json({}),{clientIdFetcher:async()=>++calls===1?'expired':key});
+ assert.equal(await provider.clientId(),'expired');assert.deepEqual(await Promise.all([provider.refreshClient('expired'),provider.refreshClient('expired'),provider.refreshClient('expired')]),[key,key,key]);assert.equal(calls,2);
+ assert.equal(await provider.refreshClient('some-other-client'),key);assert.equal(calls,2);
+});

@@ -12,14 +12,15 @@ async function coverBytes(url,fetcher,signal) {
 }
 function convert(executable,args,signal) {
   return new Promise((resolve,reject)=>{
-    const p=spawn(executable,args,{windowsHide:true,stdio:['ignore','pipe','pipe']});let micros=0,timer;
+    const p=spawn(executable,args,{windowsHide:true,stdio:['ignore','pipe','pipe']});let micros=0,timer,pending='';
     const abort=()=>{p.kill();timer=setTimeout(()=>p.kill('SIGKILL'),1500);timer.unref?.();};
     if(signal.aborted)abort();else signal.addEventListener('abort',abort,{once:true});
-    p.stdout.on('data',chunk=>{for(const m of chunk.toString().matchAll(/out_time_us=(\d+)/g))micros=Math.max(micros,Number(m[1]));});
+    const progress=line=>{const match=line.match(/^out_time_us=(\d+)\r?$/);if(match)micros=Math.max(micros,Number(match[1]));};
+    p.stdout.on('data',chunk=>{pending+=chunk.toString();let end;while((end=pending.indexOf('\n'))>=0){progress(pending.slice(0,end));pending=pending.slice(end+1);}if(pending.length>2048)pending='';});
     p.stderr.on('data',()=>{});
     const end=()=>{clearTimeout(timer);signal.removeEventListener('abort',abort);};
     p.once('error',()=>{end();reject(Error('Не удалось запустить конвертер аудио.'));});
-    p.once('close',code=>{end();if(code===0&&!signal.aborted)resolve(micros/1000000);else reject(Error('Не удалось подготовить MP3. Попробуйте другой трек или повторите загрузку.'));});
+    p.once('close',code=>{progress(pending);end();if(code===0&&!signal.aborted)resolve(micros/1000000);else reject(Error('Не удалось подготовить MP3. Попробуйте другой трек или повторите загрузку.'));});
   });
 }
 class AudioCache {
@@ -84,9 +85,16 @@ class AudioCache {
       if(hasCover)args.push('-i',thumb);
       args.push('-map','0:a:0');if(hasCover)args.push('-map','1:v:0','-c:v','copy','-disposition:v','attached_pic');else args.push('-vn');
       args.push('-sn','-dn','-map_metadata','-1','-c:a','libmp3lame','-b:a','128k','-ar','44100','-threads','1','-metadata','title='+clean(audio.track.title),'-metadata','artist='+clean(audio.track.artist,100),'-id3v2_version','3','-progress','pipe:1','-f','mp3',output);
-      const seconds=await convert(this.executable,args,signal);
-      if(track.duration>20&&seconds<track.duration*.8)throw Error('Источник отдал только отрывок. Неполная запись не отправлена.');
+      await convert(this.executable,args,signal);
       const stat=await fsp.stat(output);if(stat.size<128||stat.size>this.maxBytes)throw Error('Аудио превышает ограничение размера Telegram. Выберите более короткий трек.');
+      if(track.duration>20){
+        // A mux containing an attached cover can end its progress clock at the
+        // image's 40ms timestamp. Measure the completed audio stream itself so
+        // a full song is not mistaken for a preview. The shared preparation
+        // deadline and worker budget also cover this decode-to-null validation.
+        const seconds=await convert(this.executable,['-hide_banner','-loglevel','error','-nostdin','-protocol_whitelist','file,pipe','-i',output,'-map','0:a:0','-vn','-sn','-dn','-c:a','pcm_s16le','-threads','1','-progress','pipe:1','-f','null','-'],signal);
+        if(seconds<track.duration*.8)throw Error('Источник отдал только отрывок. Неполная запись не отправлена.');
+      }
       await this.withFiles(async()=>{signal.throwIfAborted();await this.pruneFiles(stat.size,new Set([String(track.id)]));signal.throwIfAborted();await fsp.rename(output,file);});
       return {file,track:this.state.upsert({...track,...audio.track,id:track.id}),cached:false};
     } finally {

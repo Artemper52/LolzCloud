@@ -2,6 +2,14 @@
 const { clean } = require('./lolzteam/status.cjs');
 const { scUrl } = require('./music.cjs');
 const { fetchClientId, waitForClient } = require('./soundcloud-client.cjs');
+async function readCatalogueJSON(response,signal){
+  const limit=8000000;
+  if(Number(response.headers.get('content-length'))>limit){await response.body?.cancel();throw Error('Ответ каталога SoundCloud слишком большой. Попробуй другой запрос.');}
+  const reader=response.body?.getReader();if(!reader)throw Error('Каталог SoundCloud прислал пустой ответ.');
+  const chunks=[];let size=0,complete=false;
+  try{while(true){signal.throwIfAborted();const{done,value}=await waitForClient(reader.read(),signal);if(done){complete=true;break;}size+=value.byteLength;if(size>limit)throw Error('Ответ каталога SoundCloud слишком большой. Попробуй другой запрос.');chunks.push(Buffer.from(value));}return JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(Buffer.concat(chunks)));}
+  finally{if(!complete)await reader.cancel().catch(()=>{});reader.releaseLock();}
+}
 function normalizeTrack(value) {
   if (!value || value.kind === 'playlist' || value.streamable === false || ['BLOCK', 'SNIP'].includes(value.policy)) return null;
   const url = scUrl(value.url || value.permalink_url);
@@ -29,6 +37,11 @@ class SoundCloudDiscovery {
     }
     return waitForClient(this.client, signal);
   }
+  async refreshClient(expected,signal) {
+    const previous=this.client;
+    if(previous&&await waitForClient(previous,signal)===expected&&this.client===previous)this.client=null;
+    return this.clientId(signal);
+  }
   async request(endpoint, params = {}, { signal, headers = {} } = {}) {
     if (Date.now() < this.retryAt) throw new Error('SoundCloud попросил сделать паузу. Попробуй волну немного позже.');
     const url = new URL('https://api-v2.soundcloud.com' + endpoint);
@@ -44,9 +57,9 @@ class SoundCloudDiscovery {
       await response.body?.cancel();
       if (this.client === current) this.client = null;
     }
-    if (response.status === 429) { this.retryAt = Date.now() + Math.max(60_000, (Number(response.headers.get('retry-after')) || 60) * 1000); throw new Error('SoundCloud попросил сделать паузу. Попробуй волну немного позже.'); }
-    if (!response.ok) { const error = new Error('Не удалось получить данные SoundCloud. Попробуй позже.'); error.status = response.status; throw error; }
-    return response.json();
+    if (response.status === 429) { await response.body?.cancel(); this.retryAt = Date.now() + Math.max(60_000, (Number(response.headers.get('retry-after')) || 60) * 1000); throw new Error('SoundCloud попросил сделать паузу. Попробуй волну немного позже.'); }
+    if (!response.ok) { await response.body?.cancel(); const error = new Error('Не удалось получить данные SoundCloud. Попробуй позже.'); error.status = response.status; throw error; }
+    return readCatalogueJSON(response,deadline);
   }
   async resolve(url) {
     const known = this.ids.get(url); if (known) return known;

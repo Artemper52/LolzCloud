@@ -13,6 +13,7 @@ function attributes(line) {
   return Object.fromEntries([...line.matchAll(/(?:^|,)([A-Z0-9-]+)=("[^"]*"|[^,]*)/g)].map(match => [match[1], match[2].replace(/^"|"$/g, '')]));
 }
 const isMp3 = row => /^audio\/mpeg(?:\s*;|$)/i.test(row.format?.mime_type || '');
+const FAILED_PUBLIC_CLIENT=Symbol('failed public catalogue client');
 function supportedTranscoding(row, duration = 0) {
   // FairPlay/SAMPLE-AES and CTR formats require the provider's protected player.
   // Accept only the full stream formats handled by the downloader below.
@@ -85,7 +86,7 @@ class SoundCloudAudioSource {
     for await (const chunk of response.body) { size += chunk.length; if (size > limit) { await response.body.cancel().catch(() => {}); throw new Error('Слишком большой фрагмент аудио.'); } chunks.push(Buffer.from(chunk)); }
     return Buffer.concat(chunks);
   }
-  async save(url, filename, { signal, onProgress = () => {} }) {
+  async save(url, filename, { signal, onProgress = () => {}, refreshedPublicClient = false }) {
     let headers = await this.credentials(), raw;
     try { raw = await this.provider.request('/resolve', { url }, { signal, headers }); }
     catch (error) { if (!headers.Authorization || ![401, 403].includes(error.status)) throw error; headers = {}; raw = await this.provider.request('/resolve', { url }, { signal }); }
@@ -97,21 +98,30 @@ class SoundCloudAudioSource {
     const choices = (raw.media?.transcodings || []).filter(row => supportedTranscoding(row, track.duration));
     choices.sort((a, b) => formatScore(b) - formatScore(a));
     if (!choices.length) throw new Error('SoundCloud не предоставил полный поддерживаемый поток для этой записи.');
-    let lastError;
+    let lastError,accessError;
     for (const choice of choices) {
       signal.throwIfAborted();
       try { return await this.saveFormat(raw, track, choice, headers, filename, { signal, onProgress }); }
-      catch (error) { if (signal.aborted || /^(ENOSPC|EACCES|EPERM|EEXIST)$/.test(error.code || '')) throw error; lastError = error; }
+      catch (error) { if (signal.aborted || /^(ENOSPC|EACCES|EPERM|EEXIST)$/.test(error.code || '')) throw error; lastError = error;if([401,403].includes(error.status)&&error[FAILED_PUBLIC_CLIENT])accessError=error; }
+    }
+    // Catalogue requests may still accept a published client ID after media
+    // resolution has stopped accepting it. Refresh that public configuration
+    // once, re-resolve the same recording, and retain the provider's refusal if
+    // the fresh request is also rejected. Personal OAuth is never replaced here.
+    if(accessError&&!headers.Authorization&&!refreshedPublicClient&&typeof this.provider.refreshClient==='function'){
+      await this.provider.refreshClient(accessError[FAILED_PUBLIC_CLIENT],signal);
+      return this.save(url,filename,{signal,onProgress,refreshedPublicClient:true});
     }
     throw lastError;
   }
   async saveFormat(raw, track, choice, headers, filename, { signal, onProgress }) {
     const api = new URL(choice.url);
     if (api.origin !== 'https://api-v2.soundcloud.com' || api.username || api.password) throw new Error('Неизвестный источник аудио.');
-    api.searchParams.set('client_id', await this.provider.clientId(signal));
+    const publicClient=await this.provider.clientId(signal);
+    api.searchParams.set('client_id', publicClient);
     if (raw.track_authorization) api.searchParams.set('track_authorization', raw.track_authorization);
     const info = await this.fetcher(api.href, { redirect: 'error', signal: AbortSignal.any([signal, AbortSignal.timeout(20_000)]), headers: { Accept: 'application/json', ...headers } });
-    if (!info.ok) throw new Error('Не удалось открыть аудиопоток. Возможно, трек требует отдельного доступа.');
+    if (!info.ok) { await info.body?.cancel();const error=new Error([401,403,404,410].includes(info.status)?'Не удалось открыть аудиопоток. Возможно, трек требует отдельного доступа.':'Источник временно не открыл аудиопоток. Повтори попытку позже.');error.status=info.status;error[FAILED_PUBLIC_CLIENT]=publicClient;throw error; }
     const media = mediaUrl((await info.json()).url);
     const file = await fs.open(filename, 'wx'); let size = 0, complete = false;
     onProgress({ bytes: 0, percent: 0 });

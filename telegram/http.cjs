@@ -1,10 +1,19 @@
 'use strict';
 const http=require('node:http'),fs=require('node:fs');
 const path=require('node:path');
+const {MAX_BODY,MAX_RESPONSE,validateWaveRequest}=require('../music/wave.cjs');
 function json(res,status,data){res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data));}
-function createMediaServer({links,cache,botName='lolzcloudbot',health=()=>({}),prefix='/telegram',catalog=null}) {
+function readWaveBody(req,res){return new Promise((resolve,reject)=>{
+  let size=0,done=false;const chunks=[],finish=(error,value)=>{if(done)return;done=true;clearTimeout(timer);req.off('data',data);req.off('end',end);req.off('aborted',aborted);req.off('error',aborted);res.off('close',aborted);if(error){req.resume();reject(error);}else resolve(value);};
+  const data=chunk=>{size+=chunk.length;if(size>MAX_BODY)return finish(Object.assign(Error('Профиль волны больше 1 МБ. Уменьши историю для отправки.'),{status:413}));chunks.push(chunk);};
+  const end=()=>{try{finish(null,JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(Buffer.concat(chunks))));}catch{finish(Object.assign(Error('Не удалось прочитать настройки волны.'),{status:400}));}};
+  const aborted=()=>finish(Object.assign(Error('Wave request interrupted'),{status:400}));
+  const timer=setTimeout(()=>finish(Object.assign(Error('Отправка настроек заняла слишком много времени. Повтори.'),{status:408})),5000);timer.unref();
+  req.on('data',data);req.once('end',end);req.once('aborted',aborted);req.once('error',aborted);res.once('close',aborted);
+});}
+function createMediaServer({links,cache,botName='lolzcloudbot',health=()=>({}),prefix='/telegram',catalog=null,wave=null}) {
   if(!['/telegram','/music'].includes(prefix))throw Error('Invalid media route');
-  const limits=new Map(),preparations=new Map();let metadataPending=0;
+  const limits=new Map(),preparations=new Map();let metadataPending=0,wavePending=0;
   const prepared=id=>typeof cache.exists==='function'&&cache.exists(id);
   function allowance(req,res,kind,maximum) {
     const now=Date.now(),peer=String(req.headers['x-real-ip']||req.socket.remoteAddress||'local').slice(0,100),key=kind+':'+peer;
@@ -17,7 +26,8 @@ function createMediaServer({links,cache,botName='lolzcloudbot',health=()=>({}),p
   function publicAudioError(error) {
     const text=String(error?.message||'');
     if(/полный поддерживаемый|защищённый|SAMPLE-AES/i.test(text))return 'Источник не отдал поддерживаемый полный поток. Выбери другую запись этой песни.';
-    if(/отрывок|предоставил доступ|требует.*доступ/i.test(text))return 'Источник ограничил доступ к полной записи. Выбери другой результат поиска.';
+    if(/отрывок/i.test(text))return 'Источник отдал только отрывок. Выбери другую запись полной песни.';
+    if(/предоставил доступ|требует.*доступ/i.test(text))return 'Источник ограничил доступ к полной записи. Выбери другой результат поиска.';
     if(/длинный|ограничение размера|слишком больш/i.test(text))return 'Запись превышает доступный размер или длительность. Выбери более короткий трек.';
     if(/много загрузок|Кэш временно заполнен/i.test(text))return 'Сейчас готовится много музыки. Повтори попытку через несколько секунд.';
     return 'Не удалось подготовить аудио. Повтори попытку чуть позже.';
@@ -25,6 +35,26 @@ function createMediaServer({links,cache,botName='lolzcloudbot',health=()=>({}),p
   return http.createServer(async(req,res)=>{
     try {
       const url=new URL(req.url,'http://localhost');
+      if(prefix==='/music'&&url.pathname==='/music/wave'&&wave){
+        if(req.method!=='POST')return json(res,405,{error:'Method not allowed'});
+        if(url.search)return json(res,400,{error:'Некорректный адрес волны.'});
+        if(req.headers.origin&&req.headers.origin!=='https://lolzcloud.com')return json(res,403,{error:'Открой волну в LolzCloud.'});
+        if(!/^application\/json(?:\s*;\s*charset=utf-8)?$/i.test(req.headers['content-type']||'')||req.headers['content-encoding'])return json(res,415,{error:'Настройки волны отправляются в JSON.'});
+        if(Number(req.headers['content-length'])>MAX_BODY)return json(res,413,{error:'Профиль волны больше 1 МБ. Уменьши историю для отправки.'});
+        if(!allowance(req,res,'wave',20))return;
+        if(wavePending>=8){res.setHeader('Retry-After','2');return json(res,503,{error:'Сейчас запускается много волн. Повтори через несколько секунд.'});}
+        wavePending++;const controller=new AbortController(),closed=()=>controller.abort();res.once('close',closed);
+        try{
+          const body=await readWaveBody(req,res);validateWaveRequest(body);
+          const found=await wave.recommend(body,{signal:controller.signal});if(res.destroyed)return;
+          const tracks=found.tracks.slice(0,20).map(row=>({...publicTrack(row),genre:row.genre||'',tags:row.tags||'',description:row.description||'',releaseYear:row.releaseYear||0,bpm:row.bpm||0,artistUrl:row.artistUrl||'',reason:String(row.reason||'').slice(0,180)}));
+          const response={version:1,tracks,nextCursor:found.nextCursor,context:found.context,request:found.request};
+          if(Buffer.byteLength(JSON.stringify(response))>MAX_RESPONSE)throw Error('Wave response exceeds limit');
+          return json(res,200,response);
+        }catch(error){if(!res.destroyed)return json(res,[400,408,413].includes(error.status)?error.status:503,{error:[400,408,413].includes(error.status)?error.message:'Не удалось получить волну. Проверь соединение и повтори.'});}
+        finally{res.off('close',closed);wavePending--;}
+        return;
+      }
       if(!['GET','HEAD'].includes(req.method))return json(res,405,{error:'Method not allowed'});
       if(url.pathname===prefix+'/health')return json(res,200,{ok:true,...(botName?{bot:botName}:{}),...health()});
       // Portable profiles carry a stable public identity rather than an issued

@@ -6,7 +6,7 @@ async function sourceArchive({ root = path.resolve(__dirname, '..'), filename = 
   if(ref){
     if(!/^[a-f0-9]{40}$/.test(ref))throw Error('A source snapshot requires a full commit SHA.');
     fs.mkdirSync(path.dirname(filename),{recursive:true});
-    execFileSync('git',['archive','--format=zip','--output',filename+'.tmp',ref,'--',...roots],{cwd:root});
+    execFileSync('git',['-c','core.autocrlf=false','-c','core.eol=lf','archive','--format=zip','--output',filename+'.tmp',ref,'--',...roots],{cwd:root});
     fs.renameSync(filename+'.tmp',filename);return filename;
   }
   const files = [...new Set(execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard', '--', ...roots], { cwd: root, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 }).split('\0').filter(Boolean))].sort();

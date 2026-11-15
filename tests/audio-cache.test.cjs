@@ -47,6 +47,23 @@ test('simultaneous real MP3 conversions cannot publish beyond the cache quota',a
   const result=await Promise.allSettled([cache.prepare('1'),cache.prepare('2')]);assert.equal(result.filter(row=>row.status==='fulfilled').length,1);assert.match(result.find(row=>row.status==='rejected').reason.message,/Кэш временно заполнен/);
   const files=fs.readdirSync(directory).filter(name=>/^\d+\.mp3$/.test(name));assert.equal(files.length,1);assert.ok(files.reduce((sum,name)=>sum+fs.statSync(path.join(directory,name)).size,0)<=50000);assert.equal(cache.active,0);
 });
+test('full songs with an attached album cover are validated by decoded audio rather than the image progress clock',async t=>{
+ const executable=require('ffmpeg-static');let wave,cover;
+ const {cache,directory,rows}=fixture(t,{executable,fetcher:async()=>new Response(fs.readFileSync(cover)),source:{async save(url,file){await fsp.copyFile(wave,file);return {track:rows.get('1')};}}});
+ wave=path.join(directory,'long.wav');cover=path.join(directory,'cover.png');
+ execFileSync(executable,['-hide_banner','-loglevel','error','-f','lavfi','-i','sine=frequency=660:duration=35','-threads','1',wave],{windowsHide:true});
+ execFileSync(executable,['-hide_banner','-loglevel','error','-f','lavfi','-i','color=c=green:s=64x64','-frames:v','1','-threads','1',cover],{windowsHide:true});
+ rows.set('1',{...rows.get('1'),duration:35,cover:'https://i1.sndcdn.com/fixture.png'});
+ const result=await cache.prepare('1');assert.ok(fs.statSync(result.file).size>500000);
+ const pcm=execFileSync(executable,['-hide_banner','-loglevel','error','-i',result.file,'-map','0:a:0','-vn','-ar','8000','-ac','1','-f','s16le','-'],{windowsHide:true,maxBuffer:1024*1024});assert.ok(pcm.length/16000>34&&pcm.length/16000<36);
+ const image=execFileSync(executable,['-hide_banner','-loglevel','error','-i',result.file,'-map','0:v:0','-frames:v','1','-f','image2pipe','-vcodec','mjpeg','-threads','1','-'],{windowsHide:true});assert.deepEqual(image.subarray(0,3),Buffer.from([255,216,255]));
+ assert.equal((await cache.prepare('1')).cached,true);
+});
+test('audio-only validation still rejects a genuine short preview and removes every partial MP3',async t=>{
+ const executable=require('ffmpeg-static');let wave;const {cache,directory,rows}=fixture(t,{executable,source:{async save(url,file){await fsp.copyFile(wave,file);return {track:rows.get('1')};}}});
+ wave=path.join(directory,'preview.wav');execFileSync(executable,['-hide_banner','-loglevel','error','-f','lavfi','-i','sine=frequency=660:duration=3','-threads','1',wave],{windowsHide:true});rows.set('1',{...rows.get('1'),duration:35});
+ await assert.rejects(cache.prepare('1'),/только отрывок/);assert.equal(cache.exists('1'),false);assert.deepEqual(fs.readdirSync(directory),['preview.wav']);assert.equal(cache.active,0);assert.equal(cache.pending.size,0);
+});
 test('HTTP HEAD, invalid range and disconnected stream release real cache file leases',async t=>{
   const {cache}=fixture(t),file=cache.filename('1');fs.writeFileSync(file,Buffer.concat([Buffer.from('ID3'),Buffer.alloc(1024*1024,3)]));
   const links=new MediaLinks('https://lolzcloud.com','x'.repeat(64),{prefix:'/music'}),server=createMediaServer({cache,links,prefix:'/music'});

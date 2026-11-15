@@ -123,6 +123,22 @@ test('an unavailable or malformed stream falls back to another full format and c
   raw.media.transcodings = [{ ...raw.media.transcodings[0], url: 'https://evil.test/stream' }];
   await assert.rejects(source.save(song.url, output, { signal: new AbortController().signal }), /источник/); assert.deepEqual(fs.readFileSync(output), Buffer.alloc(256, 2), 'Never remove a pre-existing file after a failure before opening it.');
 });
+
+test('public media access refreshes a stale catalogue client once and re-resolves the same recording',async t=>{
+ const dir=directory(t),raw={kind:'track',permalink_url:song.url,title:song.title,duration:2000,user:{username:song.artist},policy:'ALLOW',media:{transcodings:[160,96].map(rate=>({preset:'aac_'+rate+'k',duration:2000,format:{protocol:'hls',mime_type:'audio/mp4'},url:'https://api-v2.soundcloud.com/media/'+rate}))}};
+ let client='expired',refreshes=0,resolves=0;const attempts=[],provider={async request(endpoint,params){resolves++;assert.equal(endpoint,'/resolve');assert.equal(params.url,song.url);return raw;},async clientId(){return client;},async refreshClient(failed){assert.equal(failed,'expired');refreshes++;client='fresh';return client;}};
+ const source=new SoundCloudAudioSource(provider,async(url,options)=>{if(url.startsWith('https://api-v2')){const key=new URL(url).searchParams.get('client_id');attempts.push(key);assert.ok(!options.headers.Authorization);return key==='expired'?new Response(null,{status:403}):Response.json({url:'https://media.sndcdn.com/list'});}return url.endsWith('/list')?new Response('#EXTM3U\n#EXTINF:2,\naudio\n#EXT-X-ENDLIST'):new Response(Buffer.alloc(256,4));});
+ const output=path.join(dir,'audio');await source.save(song.url,output,{signal:new AbortController().signal});assert.equal(refreshes,1);assert.equal(resolves,2);assert.deepEqual(attempts,['expired','expired','fresh']);assert.deepEqual(fs.readFileSync(output),Buffer.alloc(256,4));
+});
+
+test('fresh public refusals remain bounded and personal OAuth or transient server errors never rotate public credentials',async t=>{
+ const dir=directory(t),raw={kind:'track',permalink_url:song.url,title:song.title,duration:2000,user:{username:song.artist},policy:'ALLOW',media:{transcodings:[{duration:2000,format:{protocol:'hls',mime_type:'audio/mp4'},url:'https://api-v2.soundcloud.com/media/track'}]}};
+ for(const [status,oauth,expectedRefresh]of [[403,false,1],[503,false,0],[403,true,0]]){
+  let calls=0,refreshes=0;const provider={async request(){return raw;},async clientId(){return 'public-config';},async refreshClient(){refreshes++;return 'public-config';}},source=new SoundCloudAudioSource(provider,async()=>{calls++;return new Response(null,{status});},{session:oauth?{cookies:{async get(){return[{value:'existing-personal-session'}];}}}:null});
+  let error;try{await source.save(song.url,path.join(dir,'refused-'+status+'-'+oauth),{signal:new AbortController().signal});}catch(value){error=value;}
+  assert.equal(error.status,status);assert.equal(refreshes,expectedRefresh);assert.equal(calls,1+expectedRefresh);assert.ok(!JSON.stringify(error).includes('public-config'));assert.equal(fs.existsSync(path.join(dir,'refused-'+status+'-'+oauth)),false);
+ }
+});
 test('session access is used only with the SoundCloud API and is never sent to media CDNs or returned in metadata', async t => {
   const dir = directory(t), raw = { kind: 'track', permalink_url: song.url, title: song.title, duration: 2000, user: { username: song.artist }, policy: 'MONETIZE', media: { transcodings: [{ preset: 'aac_160k', duration: 2000, format: { protocol: 'hls', mime_type: 'audio/mp4' }, url: 'https://api-v2.soundcloud.com/media/track' }] } }, fakeToken = 'test-existing-user-session'; let apiCalls = 0;
   const source = new SoundCloudAudioSource({ async request(endpoint, params, options) { assert.equal(options.headers.Authorization, 'OAuth ' + fakeToken); return raw; }, clientId: async () => 'client' }, async (url, options) => {
