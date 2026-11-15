@@ -266,7 +266,7 @@ import UIKit
         var observations=[[String:Any]](),revision=0
         func trace(_ attempt: [String:Any], attach: Bool = false) {
             let payload: [String:Any] = ["scope":"Real production AVPlayer tap; frequency, not merely item properties, must demonstrate rate processing.",
-                "observations":observations,"attempt":attempt]
+                "observations":observations,"attempt":attempt,"inputSignalStartBin":inputSignalStart(player) ?? -1]
             guard let data=try? JSONSerialization.data(withJSONObject:payload,options:[.sortedKeys]), let text=String(data:data,encoding:.utf8) else { return }
             print("RATE_PITCH_PROBE_JSON="+text)
             if attach {
@@ -290,7 +290,7 @@ import UIKit
                 let source=track.isLocal ? "localWAV":"seededGenuineMP3"
                 trace(snapshot(source,rate,preserve))
                 let deadline=ProcessInfo.processInfo.systemUptime+12
-                while av.currentItem?.status != .readyToPlay || (player.audioEffects.energyWindow(55)?.frames ?? 0)==0 {
+                while av.currentItem?.status != .readyToPlay || signalToneWindows(player)==nil {
                     if player.state == "error" || ProcessInfo.processInfo.systemUptime >= deadline {
                         // Record before XCTFail: continueAfterFailure=false may
                         // abort this test before a Swift catch/defer can run.
@@ -301,12 +301,15 @@ import UIKit
                     try await Task.sleep(nanoseconds:25_000_000)
                 }
                 let metric=try XCTUnwrap(player.audioEffects.measurement)
-                let rows=(20..<50).compactMap{player.audioEffects.energyWindow($0)}
+                let interval=try XCTUnwrap(signalToneWindows(player))
+                let rows=interval.range.compactMap{player.audioEffects.energyWindow($0)}
+                XCTAssertEqual(rows.count,30)
                 let frames=rows.reduce(0.0){$0+Double($1.frames)}/Double(max(1,metric.channels))
                 let crossings=rows.reduce(0.0){$0+Double($1.positiveCrossings)}
                 let hz=crossings*Double(metric.sampleRate)/max(1,frames)
                 observations.append(["source":source,"rate":rate,"preservesPitch":preserve,
                     "tapHz":hz,"sampleRate":metric.sampleRate,"frames":frames,"crossings":crossings,
+                    "inputSignalStartBin":interval.start,"firstMeasuredBin":interval.range.lowerBound,"lastMeasuredBin":interval.range.upperBound-1,
                     "algorithm":av.currentItem?.audioTimePitchAlgorithm.rawValue ?? ""])
                 trace(snapshot(source,rate,preserve))
                 // Each play creates a fresh real item/tap. Keep one audio
@@ -327,6 +330,20 @@ import UIKit
         }
     }
 
+    // The real tap receives AVPlayer padding before the file's signal (the
+    // verified first/last fixture starts in bin12 on both Simulator families).
+    // Anchor only to INPUT energy. Keep the original 200..500ms measurement
+    // interval and 550ms readiness point relative to the actual source tone.
+    private func inputSignalStart(_ player: NativePlayer) -> Int? {
+        (0..<200).first { index in
+            guard let value=player.audioEffects.energyWindow(index),value.frames>0 else { return false }
+            return Double(value.inputEnergy)/Double(value.frames)>0.0001
+        }
+    }
+    private func signalToneWindows(_ player: NativePlayer) -> (start: Int,range: Range<Int>)? {
+        guard let start=inputSignalStart(player),(player.audioEffects.energyWindow(start+55)?.frames ?? 0)>0 else { return nil }
+        return (start,(start+20)..<(start+50))
+    }
     private func independentPitch(_ player: NativePlayer,_ pitch: Double,revision: Int,client: String,request: Int = 1) {
         XCTAssertTrue(player.configureEffects(["enabled":false,"gains":[12,0,0,0,0],"preampDb":-6,
             "reverb":0.4,"echo":0.3,"normalization":true,"pitch":pitch],revision:revision,client:client,request:request))
@@ -348,6 +365,7 @@ import UIKit
             let metric=player.audioEffects.measurement
             let payload: [String:Any] = ["scope":"Actual production AVPlayer post-effects tap, including its own spectral tempo stage and C independent pitch. Seeded MP3 is not an HTTPS download proof.","phase":phase,"observations":observations,
                 "state":player.state,"error":player.error,"processedFrames":metric?.processedFrames ?? 0,"pitchProcessedFrames":metric?.pitchProcessedFrames ?? 0,
+                "inputSignalStartBin":inputSignalStart(player) ?? -1,
                 "latencyFrames":metric?.pitchLatencyFrames ?? 0,"actualRate":av.rate,"time":av.currentTime().seconds.isFinite ? av.currentTime().seconds:0]
             guard let data=try? JSONSerialization.data(withJSONObject:payload,options:[.sortedKeys]),let text=String(data:data,encoding:.utf8) else { return }
             print("INDEPENDENT_PITCH_PROBE_JSON="+text)
@@ -362,16 +380,19 @@ import UIKit
                 independentPitch(player,pitch,revision:revision,client:client)
                 player.play(track)
                 let deadline=ProcessInfo.processInfo.systemUptime+12
-                while (player.audioEffects.energyWindow(55)?.frames ?? 0)==0 || player.audioEffects.status["appliedRevision"] as? Int != revision {
+                while signalToneWindows(player)==nil || player.audioEffects.status["appliedRevision"] as? Int != revision {
                     if player.state == "error" || ProcessInfo.processInfo.systemUptime >= deadline { trace("failed-"+source,attach:true);XCTFail("Actual independent pitch PCM did not arrive");return }
                     try await settle(0.025)
                 }
-                let metric=try XCTUnwrap(player.audioEffects.measurement),windows=(20..<50).compactMap{player.audioEffects.energyWindow($0)}
+                let metric=try XCTUnwrap(player.audioEffects.measurement),interval=try XCTUnwrap(signalToneWindows(player))
+                let windows=interval.range.compactMap{player.audioEffects.energyWindow($0)}
+                XCTAssertEqual(windows.count,30)
                 let frames=windows.reduce(0.0){$0+Double($1.frames)}/Double(max(1,metric.channels)),crossings=windows.reduce(0.0){$0+Double($1.positiveCrossings)}
                 let hz=crossings*Double(metric.sampleRate)/max(1,frames),rms=sqrt(windows.reduce(0.0){$0+Double($1.outputEnergy)}/max(1,frames*Double(metric.channels)))
                 if pitch==1 { baselineHz=hz;baselineRMS=rms }
                 let expected=baselineHz*pitch
-                observations.append(["source":source,"tempo":tempo,"pitch":pitch,"expectedHz":expected,"measuredHz":hz,"rms":rms,"baselineRMS":baselineRMS,"frames":frames,"sampleRate":metric.sampleRate,"actualRate":av.rate,"position":av.currentTime().seconds])
+                observations.append(["source":source,"tempo":tempo,"pitch":pitch,"expectedHz":expected,"measuredHz":hz,"rms":rms,"baselineRMS":baselineRMS,"frames":frames,"sampleRate":metric.sampleRate,"actualRate":av.rate,"position":av.currentTime().seconds,
+                    "inputSignalStartBin":interval.start,"firstMeasuredBin":interval.range.lowerBound,"lastMeasuredBin":interval.range.upperBound-1])
                 trace("measured-"+source)
                 XCTAssertEqual(hz,expected,accuracy:max(8,expected*0.04),"Actual PCM, not a slider/item property, must establish independent tone")
                 XCTAssertGreaterThan(rms,baselineRMS*0.68);XCTAssertLessThan(rms,baselineRMS*1.48)
@@ -417,7 +438,13 @@ import UIKit
         independentPitch(player,0.5,revision:5,client:client)
         try await settle(0.2)
         XCTAssertEqual(av.rate,0);XCTAssertEqual(av.currentTime().seconds,position,accuracy:0.08);XCTAssertTrue(av.currentItem===item)
-        XCTAssertNotEqual(player.audioEffects.status["appliedRevision"] as? Int,5)
+        // AVPlayer may still render a genuine prefetched buffer while paused.
+        // An ACK is valid for that PCM; it must not imply audible autoplay.
+        if player.audioEffects.status["appliedRevision"] as? Int == 5 {
+            let prefetched=try XCTUnwrap(player.audioEffects.measurement)
+            XCTAssertGreaterThan(prefetched.pitchProcessedFrames,0);XCTAssertEqual(prefetched.prepared,1)
+            XCTAssertEqual(prefetched.pitchRatio,0.5,accuracy:0.0001)
+        }
         XCTAssertFalse(player.configureEffects(["enabled":false,"gains":[0,0,0,0,0],"preampDb":0,"reverb":0,"echo":0,"normalization":false,"pitch":2],revision:99,client:client,request:500))
         let restored=subject();XCTAssertEqual(restored.audioEffects.settings.pitch,0.5);XCTAssertFalse(restored.audioEffects.settings.enabled);XCTAssertEqual(try avPlayer(restored).rate,0)
         XCTAssertTrue(player.acceptClientIntent(client:client,request:2,handshake:false))
@@ -445,9 +472,15 @@ import UIKit
         try await waitFor("actual AVPlayer finishes the compensated stream",timeout:6) { player.state=="ended" }
         let metric=try XCTUnwrap(player.audioEffects.measurement)
         try attachEnergyTrace(player,name:"actual-tap-compensated-first-last")
-        XCTAssertGreaterThan(energy(player,0..<3),0.01)
-        XCTAssertGreaterThan(energy(player,197..<202),0.01,"The lookahead must be flushed before reporting EOF")
-        XCTAssertEqual(Double(metric.processedFrames)/Double(metric.sampleRate),2,accuracy:0.015)
+        let inputBins=(0..<256).filter{energy(player,$0..<($0+1),input:true)>0.000001}
+        let first=try XCTUnwrap(inputBins.first),last=try XCTUnwrap(inputBins.last)
+        let firstRange=max(0,first-1)..<min(256,first+2),lastRange=max(0,last-1)..<min(256,last+2)
+        XCTAssertGreaterThan(energy(player,firstRange),0.01)
+        XCTAssertGreaterThan(energy(player,lastRange),0.01,"The lookahead must be flushed before reporting EOF")
+        XCTAssertEqual(energy(player,firstRange),energy(player,firstRange,input:true),accuracy:0.000001)
+        XCTAssertEqual(energy(player,lastRange),energy(player,lastRange,input:true),accuracy:0.000001)
+        XCTAssertEqual(energy(player,0..<256),energy(player,0..<256,input:true),accuracy:0.000001,"Unity must neither discard marker energy nor add a hidden tail")
+        XCTAssertEqual(Double(last-first)*Double(metric.energyWindowFrames)/Double(metric.sampleRate),2,accuracy:0.015)
         XCTAssertEqual(av.currentTime().seconds,2,accuracy:0.08);XCTAssertEqual(av.rate,0)
     }
 
