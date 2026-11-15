@@ -1,0 +1,189 @@
+{
+  "status": "candidate-verified-not-published",
+  "version": "0.9.21",
+  "checkedAt": "2026-11-15T16:42:13.264Z",
+  "input": {
+    "inputZipSha256": "e00d87ca0dc76ca3e9f229d2fd94b4793d3663303c0653f222aeb54e8eb19030",
+    "pathValidation": "strict raw ZIP names, no backslashes/absolute/traversal/duplicate/symlinks",
+    "runtimeFiles": 155,
+    "lockEquivalentExceptRootVersion": true,
+    "dependencyDeclarationsIdentical": true,
+    "sourceVersion": "0.9.21"
+  },
+  "canonical": [
+    {
+      "label": "x64",
+      "archive": "/opt/lolzcloud-builds/release-0.9.21/dist/LolzCloud-linux-x64/resources/app.asar",
+      "asarSha256": "05f3d7220c1da2421862d4224fac9125cebecaadc236bae7965751ac0081c88d",
+      "verified": 152,
+      "roomAssetsVerified": 13,
+      "equivalentGenerated": [
+        {
+          "file": "package.json",
+          "sha256": "fe117e9f5289d491f6f00531fad3512da807de80f96148897e436faf3bf95bde",
+          "reason": "Packager removes only private/scripts/devDependencies/overrides; remaining metadata including version/main/dependencies is identical."
+        },
+        {
+          "file": "source/app/session-transfer/helper-firefox.zip",
+          "sha256": "7b03873fb1ce9a74ba6d0da36a6c8e894b39a30598ce0be4c8caaeeeeade8c46",
+          "reason": "ZIP container regenerated; all named payload bytes exactly match input."
+        },
+        {
+          "file": "source/app/session-transfer/helper.zip",
+          "sha256": "09062d9b66b085cc8735df173d0f05c72e4ae53d559b9adf0d7cd5e6e07e1bc8",
+          "reason": "ZIP container regenerated; all named payload bytes exactly match input."
+        }
+      ],
+      "mismatches": []
+    },
+    {
+      "label": "arm64",
+      "archive": "/opt/lolzcloud-builds/release-0.9.21/dist/LolzCloud-linux-arm64/resources/app.asar",
+      "asarSha256": "2915996c5c0e78f1d3307569ec392c65b6411aba06f321a8dabbe3504eb65902",
+      "verified": 152,
+      "roomAssetsVerified": 13,
+      "equivalentGenerated": [
+        {
+          "file": "package.json",
+          "sha256": "fe117e9f5289d491f6f00531fad3512da807de80f96148897e436faf3bf95bde",
+          "reason": "Packager removes only private/scripts/devDependencies/overrides; remaining metadata including version/main/dependencies is identical."
+        },
+        {
+          "file": "source/app/session-transfer/helper-firefox.zip",
+          "sha256": "7b03873fb1ce9a74ba6d0da36a6c8e894b39a30598ce0be4c8caaeeeeade8c46",
+          "reason": "ZIP container regenerated; all named payload bytes exactly match input."
+        },
+        {
+          "file": "source/app/session-transfer/helper.zip",
+          "sha256": "09062d9b66b085cc8735df173d0f05c72e4ae53d559b9adf0d7cd5e6e07e1bc8",
+          "reason": "ZIP container regenerated; all named payload bytes exactly match input."
+        }
+      ],
+      "mismatches": []
+    },
+    {
+      "label": "AppDir-x64",
+      "archive": "/opt/lolzcloud-builds/release-0.9.21/.build/AppDir-x64/resources/app.asar",
+      "asarSha256": "05f3d7220c1da2421862d4224fac9125cebecaadc236bae7965751ac0081c88d",
+      "verified": 152,
+      "roomAssetsVerified": 13,
+      "equivalentGenerated": [
+        {
+          "file": "package.json",
+          "sha256": "fe117e9f5289d491f6f00531fad3512da807de80f96148897e436faf3bf95bde",
+          "reason": "Packager removes only private/scripts/devDependencies/overrides; remaining metadata including version/main/dependencies is identical."
+        },
+        {
+          "file": "source/app/session-transfer/helper-firefox.zip",
+          "sha256": "7b03873fb1ce9a74ba6d0da36a6c8e894b39a30598ce0be4c8caaeeeeade8c46",
+          "reason": "ZIP container regenerated; all named payload bytes exactly match input."
+        },
+        {
+          "file": "source/app/session-transfer/helper.zip",
+          "sha256": "09062d9b66b085cc8735df173d0f05c72e4ae53d559b9adf0d7cd5e6e07e1bc8",
+          "reason": "ZIP container regenerated; all named payload bytes exactly match input."
+        }
+      ],
+      "mismatches": []
+    }
+  ],
+  "elf": [
+    {
+      "arch": "x64",
+      "path": "LolzCloud",
+      "architecture": "x64",
+      "mode": "777"
+    },
+    {
+      "arch": "x64",
+      "path": "chrome-sandbox",
+      "architecture": "x64",
+      "mode": "777"
+    },
+    {
+      "arch": "x64",
+      "path": "resources/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg",
+      "architecture": "x64",
+      "mode": "755"
+    },
+    {
+      "arch": "arm64",
+      "path": "LolzCloud",
+      "architecture": "arm64",
+      "mode": "777"
+    },
+    {
+      "arch": "arm64",
+      "path": "chrome-sandbox",
+      "architecture": "arm64",
+      "mode": "777"
+    },
+    {
+      "arch": "arm64",
+      "path": "resources/app.asar.unpacked/node_modules/ffmpeg-static/ffmpeg",
+      "architecture": "arm64",
+      "mode": "755"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "LolzCloud-0.9.21-linux-x64.AppImage",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.21/dist/LolzCloud-0.9.21-linux-x64.AppImage",
+      "size": 147495416,
+      "sha256": "c185db3fdd4459a6e15acebaf50ac3f15a348471cefac5a1360d6a63ec6bcc51"
+    },
+    {
+      "name": "LolzCloud-0.9.21-linux-x64.tar.gz",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.21/dist/LolzCloud-0.9.21-linux-x64.tar.gz",
+      "size": 160355970,
+      "sha256": "9e60dae6cf548c271810b2f11b6261e210f8b9a4f44956c45c06f0bcf894a801"
+    },
+    {
+      "name": "LolzCloud-0.9.21-linux-arm64.tar.gz",
+      "remotePath": "/opt/lolzcloud-builds/release-0.9.21/dist/LolzCloud-0.9.21-linux-arm64.tar.gz",
+      "size": 159436541,
+      "sha256": "46040cba79dfa191affe10def3d40ef823a793e6e623bc94e9819883e32c1515"
+    }
+  ],
+  "runtime": {
+    "checkedAt": "2026-11-15T16:33:28.691Z",
+    "status": "passed",
+    "version": "0.9.21",
+    "platform": "linux",
+    "arch": "x64",
+    "uid": 986,
+    "packagedX64TarSelfTest": "passed",
+    "appImageNormalFuseSelfTest": "passed",
+    "realKeyring": {
+      "status": "passed",
+      "platform": "linux",
+      "arch": "x64",
+      "electron": "45.2.1",
+      "node": "24.22.1",
+      "realSystemKeyring": true,
+      "backend": "gnome_libsecret",
+      "encryptedRoundTrip": true,
+      "personalAccountsUsed": false,
+      "rendererSandboxed": true,
+      "rendererSeccomp": 2,
+      "noSandboxSwitch": false
+    },
+    "personalAccountsUsed": false,
+    "arm64Runtime": "not-tested-static-only",
+    "physicalAudio": false,
+    "scope": "Native packaged self-test + real OS keyring and sandbox. No repeat of previous full music/provider/UI suites, no user installation or deploy."
+  },
+  "fullNode": {
+    "total": 564,
+    "passed": 564,
+    "failed": 0,
+    "skipped": 0,
+    "scope": "Frozen private build inpute00d87ca0dc76ca3e9f229d2fd94b4793d3663303c0653f222aeb54e8eb19030; all155 desktop files match Windows build inputs."
+  },
+  "limits": [
+    "ARM64 ELF/archive/permissions verified statically; no ARM64 runtime.",
+    "No physical DAC, Wayland or personal-account login test.",
+    "Independent-pitch and lyric-cache UI/audio proofs are recorded separately.",
+    "Private candidate checks do not establish public availability."
+  ]
+}

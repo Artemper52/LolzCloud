@@ -1,0 +1,9 @@
+{
+  "cleanup" : "Programmatic fixture dismissal and removal of this test's private directory; user Cancel\/completion callback not asserted.",
+  "duplicateRejected" : true,
+  "fileBytes" : 163,
+  "ipadAnchorChecked" : false,
+  "pausedQueueIndex" : 1,
+  "presentedController" : "UIActivityViewController",
+  "utf8Exact" : true
+}

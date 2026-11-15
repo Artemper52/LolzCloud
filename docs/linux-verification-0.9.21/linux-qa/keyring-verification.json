@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "platform": "linux",
+  "arch": "x64",
+  "electron": "45.2.1",
+  "node": "24.22.1",
+  "realSystemKeyring": true,
+  "backend": "gnome_libsecret",
+  "encryptedRoundTrip": true,
+  "personalAccountsUsed": false,
+  "rendererSandboxed": true,
+  "rendererSeccomp": 2,
+  "noSandboxSwitch": false
+}

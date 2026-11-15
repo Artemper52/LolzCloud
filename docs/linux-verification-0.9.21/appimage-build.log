@@ -1,0 +1,45 @@
+appimagetool, continuous build (git version 8c8c91f), build 296 built on 2025-12-04 17:55:56 UTC
+WARNING: gpg2 or gpg command is missing, please install it if you want to create digital signatures
+Using architecture x86_64
+Generating squashfs...
+/opt/lolzcloud-builds/release-0.9.21/.build/AppDir-x64 should be packaged as /opt/lolzcloud-builds/release-0.9.21/dist/LolzCloud-0.9.21-linux-x64.AppImage
+Downloading runtime file from https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64
+Downloaded runtime binary of size 944632
+Parallel mksquashfs: Using 10 processors
+Creating 4.0 filesystem on /opt/lolzcloud-builds/release-0.9.21/dist/LolzCloud-0.9.21-linux-x64.AppImage, block size 131072.
+[==========-                                                   ]  500/2976  16%[==================================/                           ] 1700/2976  57%[=============================================================\] 2976/2976 100%
+
+Exportable Squashfs 4.0 filesystem, zstd compressed, data block size 131072
+	compressed data, compressed metadata, compressed fragments,
+	compressed xattrs, compressed ids
+	duplicates are removed
+Filesystem size 143112.59 Kbytes (139.76 Mbytes)
+	37.98% of uncompressed filesystem size (376823.09 Kbytes)
+Inode table size 8293 bytes (8.10 Kbytes)
+	57.61% of uncompressed inode table size (14396 bytes)
+Directory table size 805 bytes (0.79 Kbytes)
+	54.80% of uncompressed directory table size (1469 bytes)
+Number of duplicate files found 1
+Number of inodes 83
+Number of files 77
+Number of fragments 34
+Number of symbolic links 0
+Number of device nodes 0
+Number of fifo nodes 0
+Number of socket nodes 0
+Number of directories 6
+Number of hard-links 0
+Number of ids (unique uids + gids) 1
+Number of uids 1
+	root (0)
+Number of gids 1
+	root (0)
+Embedding ELF...
+Marking the AppImage as executable...
+Embedding MD5 digest
+Success
+
+Please consider submitting your AppImage to AppImageHub, the crowd-sourced
+central directory of available AppImages, by opening a pull request
+at https://github.com/AppImage/appimage.github.io
+AppImage: /opt/lolzcloud-builds/release-0.9.21/dist/LolzCloud-0.9.21-linux-x64.AppImage
