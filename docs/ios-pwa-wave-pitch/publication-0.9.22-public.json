@@ -1,0 +1,474 @@
+{
+  "status": "passed",
+  "startedAt": "2026-11-15T01:23:58.199Z",
+  "finishedAt": "2026-11-15T01:24:03.429Z",
+  "release": "20261115-social-0.9.22-f798f619",
+  "version": "0.9.22",
+  "checks": 57,
+  "results": [
+    {
+      "label": "Published PWA exact bytes/SHA: app.css",
+      "bytes": 21939,
+      "sha256": "1c45f9b2bd1087330d759b6473f693fa6ac20041bfd7b955f0ac21d04cee2753"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: app.js",
+      "bytes": 107861,
+      "sha256": "56d1b64ac93b11080cdbaff5359cb388aeb5ecaf1569c525acc7fd41bdb7a51e"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: core.js",
+      "bytes": 9897,
+      "sha256": "20a8d5b82f1c392438cd6655dd0f40f253e6d8ce6aace96e123dba4edca97daf"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: effects-policy.js",
+      "bytes": 5503,
+      "sha256": "d09718958652e166fef7dcaed791d0353107601b7214814ffb13e20aecb94687"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: effects.js",
+      "bytes": 14086,
+      "sha256": "ce79663279f017d67e03d376c3664764b1a5c6b1379d239cd746c4097caf9991"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: icon-192.png",
+      "bytes": 7875,
+      "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: icon-512.png",
+      "bytes": 9687,
+      "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: icon.svg",
+      "bytes": 366,
+      "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: imports.js",
+      "bytes": 2375,
+      "sha256": "9c025444b795b53b730d27723d18006a743c11601f22c86b2f89bea9d384abc2"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: index.html",
+      "bytes": 26949,
+      "sha256": "1be4fbc39c9a579f78f4002dd53ee394cfbea7ee9118463e719215024d32c391"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: limiter-worklet.js",
+      "bytes": 2197,
+      "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: manifest.webmanifest",
+      "bytes": 440,
+      "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: normalization-worklet.js",
+      "bytes": 3376,
+      "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: offline.js",
+      "bytes": 4979,
+      "sha256": "8774eb963ff7fe0c85e61668c0355d8c3b0e3467a3e30a7ba032c49771ab3936"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: profile-cloud.js",
+      "bytes": 9042,
+      "sha256": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: profile-crypto-worker.js",
+      "bytes": 4898,
+      "sha256": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: profile-crypto.js",
+      "bytes": 2972,
+      "sha256": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: profile-policy.js",
+      "bytes": 9513,
+      "sha256": "5e2d9bf5253d7a25dba7419baf4bb8d64670a179474da02577c5a5687e75c56a"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: profile.js",
+      "bytes": 15387,
+      "sha256": "38af455641f22842cdce51913dba07442c8ceff636cf08315636cd89b08fdeac"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: sw.js",
+      "bytes": 1854,
+      "sha256": "7595a92b982049ae8cd5a8518d2c6c4086417e42b5c4886ec4775191ec443c72"
+    },
+    {
+      "label": "Published worker v7 and exact scope"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: vendor-scrypt-3.0.1.js",
+      "bytes": 17811,
+      "sha256": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: wave-history.js",
+      "bytes": 2065,
+      "sha256": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3"
+    },
+    {
+      "label": "Published PWA exact bytes/SHA: wave.js",
+      "bytes": 15089,
+      "sha256": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4"
+    },
+    {
+      "label": "Index alias equals exact released index"
+    },
+    {
+      "label": "Canonical app path redirects internally"
+    },
+    {
+      "label": "Health22 preserves room2/social1 and configured login"
+    },
+    {
+      "label": "Anonymous social API stays closed"
+    },
+    {
+      "label": "Anonymous social page redirects to same-origin login"
+    },
+    {
+      "label": "Independent music service retains public waveProtocol1"
+    },
+    {
+      "label": "Wave route remains POST-only"
+    },
+    {
+      "label": "Old published18 small file unchanged: android-update.json",
+      "bytes": 438,
+      "sha256": "474dfc0e730a09b0315ded7384f0b26f747726809001e1624815f761096a347e"
+    },
+    {
+      "label": "Old published18 small file unchanged: latest.yml",
+      "bytes": 366,
+      "sha256": "714c7a27ce1349833d3ad512daf3790d7570e4b722d67f2b14eed150eb19bb01"
+    },
+    {
+      "label": "Old published18 small file unchanged: legacy.yml",
+      "bytes": 373,
+      "sha256": "8b00ec7f458ce533fc84eb4edc335d02f95f55fae1a7267cf6db53918f4a9124"
+    },
+    {
+      "label": "Old published18 small file unchanged: LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "bytes": 10190,
+      "sha256": "b656175abd7283ab4ddb43eb46cc3b38ce666af4d9b5378c3a6e1ed98a23b129"
+    },
+    {
+      "label": "Old published18 small file unchanged: LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "bytes": 10190,
+      "sha256": "bd1b43bb821a5fb2a122f0d5e8e3e3d2b0c3bbb94f887016be79f9e6ed98aebe"
+    },
+    {
+      "label": "Old published18 small file unchanged: update-legacy.json",
+      "bytes": 588,
+      "sha256": "290775b03c3168538c727e48e87d87e12e36e2fbc1a1eb4305d1276754036664"
+    },
+    {
+      "label": "Old published18 small file unchanged: update.json",
+      "bytes": 565,
+      "sha256": "e1483da9c8b795541aca3856b38c937e993a7dbd8e0229e80eed8d2431ad15e8"
+    },
+    {
+      "label": "Old published18 small file unchanged: LolzCloud-0.9.18-SHA256SUMS.txt",
+      "bytes": 2038,
+      "sha256": "3aadf8eff5ffdf098eb8e1cdcbf7517f1fc2262fac34af87f7048a934870d098"
+    },
+    {
+      "label": "All previously published small-download bytes retained"
+    },
+    {
+      "label": "update.json retains exact18 artifact references"
+    },
+    {
+      "label": "update-legacy.json retains exact18 artifact references"
+    },
+    {
+      "label": "Android1.8/code9 untouched"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-0.9.18-linux-arm64.tar.gz",
+      "expectedFullSize": 159411491,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-0.9.18-linux-x64.AppImage",
+      "expectedFullSize": 147466744,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-0.9.18-linux-x64.tar.gz",
+      "expectedFullSize": 160326261,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-0.9.18-source.zip",
+      "expectedFullSize": 24433860,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-0.9.18-win-x64-Setup.exe",
+      "expectedFullSize": 146396034,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-0.9.18-win-x64-Setup.exe.blockmap",
+      "expectedFullSize": 152578,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-0.9.18-win-x64.zip",
+      "expectedFullSize": 196681229,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-0.9.18-win7-legacy-Setup.exe",
+      "expectedFullSize": 99541039,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-0.9.18-win7-legacy-Setup.exe.blockmap",
+      "expectedFullSize": 105010,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-0.9.18-win7-legacy-x64.zip",
+      "expectedFullSize": 134398303,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-Android-0.1.8.apk",
+      "expectedFullSize": 2573850,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-iOS-0.1.3-simulator.zip",
+      "expectedFullSize": 1060184,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-iOS-0.1.3-source.zip",
+      "expectedFullSize": 162846,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    },
+    {
+      "label": "Old release artifact still available: LolzCloud-iOS-0.1.3-unsigned.ipa",
+      "expectedFullSize": 275908,
+      "rangeBytes": 1,
+      "method": "range-only availability, not a new full-binary SHA verification"
+    }
+  ],
+  "sources": [
+    {
+      "file": "server/public/app/app.css",
+      "bytes": 21939,
+      "sha256": "1c45f9b2bd1087330d759b6473f693fa6ac20041bfd7b955f0ac21d04cee2753",
+      "contentType": "text/css; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/app.js",
+      "bytes": 107861,
+      "sha256": "56d1b64ac93b11080cdbaff5359cb388aeb5ecaf1569c525acc7fd41bdb7a51e",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/core.js",
+      "bytes": 9897,
+      "sha256": "20a8d5b82f1c392438cd6655dd0f40f253e6d8ce6aace96e123dba4edca97daf",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/effects-policy.js",
+      "bytes": 5503,
+      "sha256": "d09718958652e166fef7dcaed791d0353107601b7214814ffb13e20aecb94687",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/effects.js",
+      "bytes": 14086,
+      "sha256": "ce79663279f017d67e03d376c3664764b1a5c6b1379d239cd746c4097caf9991",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/icon-192.png",
+      "bytes": 7875,
+      "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4",
+      "contentType": "image/png"
+    },
+    {
+      "file": "server/public/app/icon-512.png",
+      "bytes": 9687,
+      "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef",
+      "contentType": "image/png"
+    },
+    {
+      "file": "server/public/app/icon.svg",
+      "bytes": 366,
+      "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6",
+      "contentType": "image/svg+xml"
+    },
+    {
+      "file": "server/public/app/imports.js",
+      "bytes": 2375,
+      "sha256": "9c025444b795b53b730d27723d18006a743c11601f22c86b2f89bea9d384abc2",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/index.html",
+      "bytes": 26949,
+      "sha256": "1be4fbc39c9a579f78f4002dd53ee394cfbea7ee9118463e719215024d32c391",
+      "contentType": "text/html; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/limiter-worklet.js",
+      "bytes": 2197,
+      "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/manifest.webmanifest",
+      "bytes": 440,
+      "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7",
+      "contentType": "application/manifest+json"
+    },
+    {
+      "file": "server/public/app/normalization-worklet.js",
+      "bytes": 3376,
+      "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/offline.js",
+      "bytes": 4979,
+      "sha256": "8774eb963ff7fe0c85e61668c0355d8c3b0e3467a3e30a7ba032c49771ab3936",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/profile-cloud.js",
+      "bytes": 9042,
+      "sha256": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/profile-crypto-worker.js",
+      "bytes": 4898,
+      "sha256": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/profile-crypto.js",
+      "bytes": 2972,
+      "sha256": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/profile-policy.js",
+      "bytes": 9513,
+      "sha256": "5e2d9bf5253d7a25dba7419baf4bb8d64670a179474da02577c5a5687e75c56a",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/profile.js",
+      "bytes": 15387,
+      "sha256": "38af455641f22842cdce51913dba07442c8ceff636cf08315636cd89b08fdeac",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/sw.js",
+      "bytes": 1854,
+      "sha256": "7595a92b982049ae8cd5a8518d2c6c4086417e42b5c4886ec4775191ec443c72",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/vendor-scrypt-3.0.1.js",
+      "bytes": 17811,
+      "sha256": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/wave-history.js",
+      "bytes": 2065,
+      "sha256": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3",
+      "contentType": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "server/public/app/wave.js",
+      "bytes": 15089,
+      "sha256": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4",
+      "contentType": "text/javascript; charset=utf-8"
+    }
+  ],
+  "smallDownloads": [
+    {
+      "name": "android-update.json",
+      "bytes": 438,
+      "sha256": "474dfc0e730a09b0315ded7384f0b26f747726809001e1624815f761096a347e"
+    },
+    {
+      "name": "latest.yml",
+      "bytes": 366,
+      "sha256": "714c7a27ce1349833d3ad512daf3790d7570e4b722d67f2b14eed150eb19bb01"
+    },
+    {
+      "name": "legacy.yml",
+      "bytes": 373,
+      "sha256": "8b00ec7f458ce533fc84eb4edc335d02f95f55fae1a7267cf6db53918f4a9124"
+    },
+    {
+      "name": "LolzCloud-browser-helper-1.2.0-chromium.zip",
+      "bytes": 10190,
+      "sha256": "b656175abd7283ab4ddb43eb46cc3b38ce666af4d9b5378c3a6e1ed98a23b129"
+    },
+    {
+      "name": "LolzCloud-browser-helper-1.2.0-firefox.zip",
+      "bytes": 10190,
+      "sha256": "bd1b43bb821a5fb2a122f0d5e8e3e3d2b0c3bbb94f887016be79f9e6ed98aebe"
+    },
+    {
+      "name": "update-legacy.json",
+      "bytes": 588,
+      "sha256": "290775b03c3168538c727e48e87d87e12e36e2fbc1a1eb4305d1276754036664"
+    },
+    {
+      "name": "update.json",
+      "bytes": 565,
+      "sha256": "e1483da9c8b795541aca3856b38c937e993a7dbd8e0229e80eed8d2431ad15e8"
+    },
+    {
+      "name": "LolzCloud-0.9.18-SHA256SUMS.txt",
+      "bytes": 2038,
+      "sha256": "3aadf8eff5ffdf098eb8e1cdcbf7517f1fc2262fac34af87f7048a934870d098"
+    }
+  ],
+  "failure": "",
+  "limits": {
+    "source": "Windows native HTTPS with an honest User-Agent; no SSH fallback",
+    "pwa": "All23files actual full bodies andSHA plus index alias",
+    "downloads": "Eight small files actual full SHA and14 payloads one-byte Range availability; prior release18 full1GB proof remains separate",
+    "network": "20sec/request,1MB/file cap,strict official origin/manual redirects,no accounts or room writes"
+  }
+}

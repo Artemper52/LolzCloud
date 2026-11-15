@@ -9,7 +9,7 @@
   const sendNative = (action, value = {}) => {
     window.webkit.messageHandlers.lolzcloud.postMessage({ action, ...value, clientId: nativeClientId, requestId: nativeRequestId });
     // Playback owns this binding. An effects edit never selects a new intent.
-    if (['queue', 'play', 'pause', 'resume', 'stop'].includes(action)) effectsController?.syncNativeIntent();
+    if (['queue', 'play', 'pause', 'resume', 'stop'].includes(action)) { effectsController?.syncNativeIntent(); syncNativeRate(); }
   };
   const currentNativeIntent = value => value?.clientId === nativeClientId && value.requestId === nativeRequestId;
   function beginNativeIntent() { if (native) nativeRequestId++; }
@@ -28,14 +28,18 @@
   try { for (const [id, value] of Object.entries(JSON.parse(localStorage.getItem('LolzCloud-lyrics-metadata-v1') || '{}')).slice(0, 500)) if (C.trackID(id) && value && typeof value.title === 'string' && value.title.length <= 300 && typeof value.artist === 'string' && value.artist.length <= 300 && C.lyricsIdentity(value.title) && C.lyricsIdentity(value.artist)) lyricsMetadata.set(id, { title: value.title, artist: value.artist }); } catch { /* Bad metadata never blocks music. */ }
   let account = null, accountPending, accountVersion = 0, frameRoomURL = '', roomAudible = false, noticeTimer, persistTimer, installPrompt, lastSavedTime = 0;
   let loginVersion = 0, loginController, loginCommitting = false;
-  let nativeQueueSignature = '', nativeQueueOwned = false, nativeCatalogReferences = false, nativeProfileExport = false, nativeQueuePositions = [];
+  let nativeQueueSignature = '', nativeQueueOwned = false, nativeCatalogReferences = false, nativeProfileExport = false, nativeQueuePositions = [], nativePitchSupported = false, nativeRateRevision = 1, nativeRateKey = '', nativeRateState = 'pending';
   const catalogAliases = new Map();
   let rate = Number.isFinite(saved.rate) && saved.rate >= 0.5 && saved.rate <= 2 ? saved.rate : 1;
+  let preservesPitch = saved.preservesPitch === true;
   let sleepDeadline = Number.isFinite(saved.sleepDeadline) && saved.sleepDeadline > 0 && saved.sleepDeadline <= Date.now() + 86400000 ? saved.sleepDeadline : 0, sleepInterval;
   const bookmarks = new Map();
   if (saved.bookmarks && typeof saved.bookmarks === 'object') { let remaining = 2000; for (const [id, rows] of Object.entries(saved.bookmarks).slice(0, 2000)) if (C.trackID(id) && Array.isArray(rows)) { const valid = rows.filter(row => row && Number.isFinite(row.position) && row.position >= 0 && row.position <= 86400 && Number.isFinite(row.createdAt)).slice(0, remaining).map(row => ({ position: row.position, createdAt: row.createdAt })); if (valid.length) bookmarks.set(id, valid); remaining -= valid.length; } }
   let importingAudio = false, nativeImportCount = 0, nativeImportErrors = 0;
   const audio = $('audio');
+  const webPitchProperties = ['preservesPitch', 'webkitPreservesPitch', 'mozPreservesPitch'].filter(name => name in audio);
+  let webPitchApplied = false;
+  applyWebPitch();
   effectsController = window.LolzCloudEffects.createController({ audio, native, sendNative,
     intent: () => ({ clientId: nativeClientId, requestId: nativeRequestId }),
     wantedPlayback: () => phase === 'playing' || phase === 'loading', onState: renderEffects,
@@ -47,21 +51,52 @@
   let cloudSnapshot = null, cloudBusy = false, cloudController, cloudEpoch = 0, cloudMessage = '';
   const node = (tag, text, className) => { const result = document.createElement(tag); if (text != null) result.textContent = text; if (className) result.className = className; return result; };
   const button = (label, handler, className = '') => { const result = node('button', label, className); result.type = 'button'; result.onclick = () => { try { Promise.resolve(handler()).catch(noticeError); } catch (error) { noticeError(error); } }; return result; };
+  let waveActive = false, waveResults = [], waveSession = 0, waveRefilling = false, waveWarmAt = 0, waveRowsSignature = '', waveAwaitNext = null;
+  const wave = window.LolzCloudWave.create({ origin, read: () => ({ current, queue, liked: [...liked] }), readWave: () => portableController.waveState(), writeWave: patch => { portableController.updateWave(patch); portableFile = null; }, onState: renderWave });
+  function renderWave(state = wave.snapshot()) {
+    waveResults = state.tracks; const taste = wave.taste(), busy = state.phase === 'loading';
+    $('wave-status').textContent = state.message; $('wave-status').dataset.error = String(state.phase === 'error'); $('wave-start').disabled = false; $('wave-start').textContent = busy ? 'Подобрать заново' : 'Включить волну'; $('wave-stop').hidden = !busy; $('wave-retry').hidden = state.phase !== 'error'; $('wave-more').hidden = !waveResults.length; $('wave-more').disabled = busy; $('wave-seed').hidden = !window.LolzCloudWave.track(current);
+    $('wave-context-label').textContent = [state.context, state.request?.text ? 'По запросу: ' + state.request.text : '', state.request?.note || ''].filter(Boolean).join(' · ');
+    for (const key of Object.keys(window.LolzCloudWave.OPTIONS)) if (document.activeElement !== $('wave-' + key)) $('wave-' + key).value = taste.preferences[key];
+    if (document.activeElement !== $('wave-genre')) $('wave-genre').value = taste.preferences.genre; if (document.activeElement !== $('wave-novelty')) $('wave-novelty').value = Math.round(taste.adventurous * 100); $('wave-novelty-value').textContent = Math.round(taste.adventurous * 100) + '%'; $('wave-context').checked = taste.preferences.autoContext; $('wave-novelty').disabled = taste.preferences.character === 'familiar'; $('wave-novelty-hint').textContent = taste.preferences.character === 'familiar' ? 'В режиме «Любимое» выбираем знакомые песни. Баланс новизны сохраним для других режимов.' : 'На 100% — только ещё не знакомые тебе записи.';
+    $('wave-current').hidden = !waveActive || !current; if (waveActive && current) { $('wave-current-title').textContent = current.title; $('wave-current-artist').textContent = current.artist; $('wave-love').setAttribute('aria-pressed', String(liked.has(canonicalID(current.id)))); $('wave-love').textContent = liked.has(canonicalID(current.id)) ? 'В любимом' : 'Нравится'; $('wave-ban-artist').hidden = !current.artist; } renderWavePlayback();
+    const signature = JSON.stringify([waveResults, current?.id]); if (waveRowsSignature !== signature) { waveRowsSignature = signature; $('wave-results').replaceChildren(...waveResults.map((track, i) => { const row = trackRow(track, waveResults, i); if (track.reason) row.querySelector('.track-meta small').append(document.createTextNode(' · ' + track.reason)); return row; })); }
+    $('wave-blocked').replaceChildren(...taste.blockedArtists.map(name => { const row = node('div', null, 'bookmark-row'); row.append(node('span', name), button('Вернуть', () => wave.unblock(name), 'text-button')); return row; }));
+  }
+  function leaveWave() { waveActive = false; waveSession++; wave.cancel(); waveRefilling = false; waveAwaitNext = null; renderWave(); }
+  async function startWave(fromCurrent = false) {
+    const token = ++waveSession, intent = playVersion, seed = fromCurrent ? current : null; waveActive = false; waveRefilling = false; waveWarmAt = 0; waveAwaitNext = null;
+    if (!native && !loaded) { effectsController.prime(); primeAudio(); }
+    if (fromCurrent) $('wave-prompt').value = '';
+    const tracks = await wave.request({ seed, query: $('wave-prompt').value });
+    if (token !== waveSession || intent !== playVersion || !tracks?.length) return;
+    waveActive = true; queue = tracks; history = []; repeat = 'off'; shuffle = false; void playAt(0); renderWave();
+  }
+  async function moreWave({ advance = false, automatic = false } = {}) {
+    if (advance) waveAwaitNext = { session: waveSession, intent: playVersion, id: current?.id, automatic };
+    if (waveRefilling) return; const token = waveSession, targetQueue = queue; waveRefilling = true; waveWarmAt = Date.now() + 30000;
+    try { const tracks = await wave.request({ append: true }); if (token !== waveSession || !tracks?.length) return; if (waveActive && queue === targetQueue) { const before = new Set(queue.map(row => row.id)), added = tracks.filter(row => !before.has(row.id)); const trim = Math.min(Math.max(0, queue.length + added.length - 200), Math.max(0, index)); if (trim) { queue.splice(0, trim); index -= trim; history = []; } queue.push(...added.slice(0, 200 - queue.length)); renderQueue(); persist(); const pending = waveAwaitNext; if (pending?.session === waveSession && pending.intent === playVersion && current?.id === pending.id && queue[index + 1]) { waveAwaitNext = null; void playAt(index + 1, { automatic: pending.automatic }); } } }
+    finally { if (token === waveSession) waveRefilling = false; }
+  }
+  function observeWave() { if (current) wave.observe(current, { phase, position: elapsed }); if (waveActive && phase === 'playing' && queue.length - index <= 5 && !waveRefilling && wave.snapshot().phase !== 'loading' && Date.now() >= waveWarmAt) void moreWave(); }
+  function renderWavePlayback() { $('wave-current-state').textContent = waveActive ? playerError || (phase === 'loading' ? 'Готовим аудио…' : phase === 'paused' ? 'На паузе' : '') : ''; $('wave-current-state').dataset.error = String(phase === 'error'); $('wave-retry-play').hidden = !waveActive || !['error', 'blocked'].includes(phase); }
+  function pruneWaveQueue() { const taste = wave.taste(), blocked = new Set(taste.blockedArtists.map(value => value.normalize('NFKC').toLowerCase().trim())); for (let i = queue.length - 1; i > index; i--) if (taste.feedback[queue[i].url]?.banned || blocked.has(queue[i].artist.normalize('NFKC').toLowerCase().trim())) queue.splice(i, 1); renderQueue(); persist(); }
   function notice(text) { clearTimeout(noticeTimer); $('notice').textContent = text; $('notice').hidden = !text; noticeTimer = setTimeout(() => { $('notice').hidden = true; }, 5000); }
   function noticeError(error) { notice(error instanceof Error ? error.message : String(error || 'Не удалось выполнить действие.')); }
-  function portableState() { return structuredClone({ liked: [...liked], bookmarks: Object.fromEntries(bookmarks), effects: effectsController.snapshot().config, rate, tracks: [...collection.values(), ...offline.values(), ...queue], collection: [...collection.values()] }); }
+  function portableState() { return structuredClone({ liked: [...liked], bookmarks: Object.fromEntries(bookmarks), effects: effectsController.snapshot().config, rate, preservesPitch, tracks: [...collection.values(), ...offline.values(), ...queue], collection: [...collection.values()] }); }
   function applyPortable(next) {
     const replacement = next.restore ? new Map((next.collection || []).map(row => { const item = C.savedTrack(row, origin); return item ? [item.id, item] : null; }).filter(Boolean)) : new Map(collection), aliases = new Map();
     for (const raw of next.refs || []) { const ref = C.referenceTrack(raw); if (!ref) continue; const existing = [...replacement.values()].find(row => row.url === ref.url && !C.referenceTrack(row)); if (existing) aliases.set(ref.id, existing.id); else if (!replacement.has(ref.id)) replacement.set(ref.id, ref); }
     const targetLiked = new Set((next.liked || []).filter(C.trackID).map(id => aliases.get(id) || id)), targetMoments = new Map();
     for (const [rawID, rows] of Object.entries(next.bookmarks || {})) { const id = aliases.get(rawID) || rawID; if (!C.trackID(id) || !Array.isArray(rows)) continue; const valid = rows.filter(row => row && Number.isFinite(row.position) && row.position >= 0 && row.position <= 86400 && Number.isFinite(row.createdAt)).map(row => ({ position: row.position, createdAt: row.createdAt })), merged = targetMoments.get(id) || []; for (const row of valid) if (!merged.some(mark => Math.abs(mark.position - row.position) < .01)) merged.push(row); if (merged.length) targetMoments.set(id, merged); }
     const settings = next.effects ? window.LolzCloudEffectsPolicy.validate(next.effects) : null, nextRate = next.rate === undefined ? rate : Number(next.rate); if (!Number.isFinite(nextRate) || nextRate < .5 || nextRate > 2) throw Error('В профиле неверная скорость воспроизведения.');
+    const nextPitch = next.preservesPitch === undefined ? preservesPitch : next.preservesPitch; if (typeof nextPitch !== 'boolean') throw Error('В профиле неверный параметр высоты звука.');
     const oldApp = localStorage.getItem('LolzCloud-app-v1'), oldEffects = localStorage.getItem('LolzCloud-effects-v1'); clearTimeout(persistTimer);
-    try { localStorage.setItem('LolzCloud-app-v1', JSON.stringify({ ...savedState(), liked: [...targetLiked], bookmarks: Object.fromEntries(targetMoments), collection: [...replacement.values()].slice(-500), rate: nextRate })); if (settings) localStorage.setItem('LolzCloud-effects-v1', JSON.stringify(settings)); }
+    try { localStorage.setItem('LolzCloud-app-v1', JSON.stringify({ ...savedState(), liked: [...targetLiked], bookmarks: Object.fromEntries(targetMoments), collection: [...replacement.values()].slice(-500), rate: nextRate, preservesPitch: nextPitch })); if (settings) localStorage.setItem('LolzCloud-effects-v1', JSON.stringify(settings)); }
     catch (error) { try { if (oldApp === null) localStorage.removeItem('LolzCloud-app-v1'); else localStorage.setItem('LolzCloud-app-v1', oldApp); if (oldEffects === null) localStorage.removeItem('LolzCloud-effects-v1'); else localStorage.setItem('LolzCloud-effects-v1', oldEffects); } catch {} throw Error('Не хватает места для переноса. Текущие данные сохранены; освободи место и повтори.'); }
     liked = targetLiked; bookmarks.clear(); for (const [id, rows] of targetMoments) bookmarks.set(id, rows); collection = replacement;
-    if (settings) void effectsController.configure(settings).catch(noticeError); if (nextRate !== rate) setRate(nextRate);
-    renderLike(); renderBookmarks(); renderLibrary(); renderComfort();
+    if (settings) void effectsController.configure(settings).catch(noticeError); if (nextPitch !== preservesPitch) setPreservesPitch(nextPitch); if (nextRate !== rate) setRate(nextRate);
+    renderLike(); renderBookmarks(); renderLibrary(); renderComfort(); renderWave();
   }
   async function lookupCatalog(row, signal) {
     const url = C.sourceURL(row.url), numeric = /^[1-9][0-9]{0,15}$/.test(row.id), endpoint = numeric ? '/music/track/' + row.id : url ? '/music/search?q=' + encodeURIComponent(url) + '&offset=0' : '';
@@ -115,8 +150,8 @@
     if (!portableFile) { try { const value = await portableController.exportProfile(); portableJSON = JSON.stringify(value); portableFile = new File([portableJSON], 'LolzCloud-profile-' + new Date().toISOString().slice(0, 10) + '.json', { type: 'application/json' }); if (portableFile.size > window.LolzCloudProfilePolicy.MAX_BYTES) { portableFile = null; throw Error('Профиль больше 750 КБ. Уменьши список для переноса.'); } renderPortable(); } catch (error) { portableError(error); } return; }
     try { if (native && nativeProfileExport) { portableOperation = crypto.randomUUID().toLowerCase(); sendNative('exportProfile', { filename: portableFile.name, json: portableJSON, operationId: portableOperation }); } else if (navigator.canShare?.({ files: [portableFile] })) await navigator.share({ files: [portableFile], title: 'Профиль LolzCloud' }); else if (native) throw Error('Для сохранения файла обнови iOS-клиент или открой LolzCloud в Safari.'); else { const url = URL.createObjectURL(portableFile), link = node('a'); link.href = url; link.download = portableFile.name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 30000); } } catch (error) { portableError(error); }
   }
-  function learnNativeCapabilities(value) { if (!native || !currentNativeIntent(value)) return; effectsController.capabilities(value); if (value.profileExport === 1) nativeProfileExport = true; if (value.catalogReferences === 1 && !nativeCatalogReferences) { nativeCatalogReferences = true; nativeQueueSignature = ''; queueMicrotask(syncNativeQueue); } }
-  function savedState() { return { queue, index, shuffle, repeat, liked: [...liked], collection: [...collection.values()].slice(-500), position: elapsed, rate, sleepDeadline, bookmarks: Object.fromEntries(bookmarks) }; }
+  function learnNativeCapabilities(value) { if (!native || !currentNativeIntent(value)) return; effectsController.capabilities(value); if (value.profileExport === 1) nativeProfileExport = true; if (value.preservesPitch === 1 && !nativePitchSupported) { nativePitchSupported = true; queueMicrotask(() => { syncNativeRate(); renderComfort(); }); } if (value.catalogReferences === 1 && !nativeCatalogReferences) { nativeCatalogReferences = true; nativeQueueSignature = ''; queueMicrotask(syncNativeQueue); } }
+  function savedState() { return { queue, index, shuffle, repeat, liked: [...liked], collection: [...collection.values()].slice(-500), position: elapsed, rate, preservesPitch, sleepDeadline, bookmarks: Object.fromEntries(bookmarks) }; }
   function persist() {
     clearTimeout(persistTimer);
     persistTimer = setTimeout(() => {
@@ -225,7 +260,7 @@
     if (!track) return;
     const id = canonicalID(track.id); if (liked.has(id)) liked.delete(id); else { liked.add(id); collection.set(track.id, track); }
     if (!liked.has(id) && !offline.has(id) && !bookmarks.get(id)?.length) collection.delete(id);
-    persist(); renderLibrary(); renderLike(); if (actionTrack?.id === track.id) renderActions();
+    persist(); renderLibrary(); renderLike(); renderWave(); if (actionTrack?.id === track.id) renderActions();
   }
   function renderLike() { const active = !!current && liked.has(canonicalID(current.id)); $('player-like').textContent = active ? '♥' : '♡'; $('player-like').setAttribute('aria-pressed', String(active)); $('player-like').setAttribute('aria-label', active ? 'Убрать из любимого' : 'Добавить в любимое'); }
   function enqueue(track) { if (queue.length >= 200) return notice('В очереди уже 200 треков. Убери несколько.'); queue.push(track); persist(); renderQueue(); notice('Добавлено в очередь'); }
@@ -240,6 +275,7 @@
   function removeQueue(position) { if (position === index) return; queue.splice(position, 1); if (position < index) index--; history = []; persist(); renderQueue(); }
   function playFrom(track, source, position) {
     if (source === queue) { playAt(position); return; }
+    if (source === waveResults) { wave.cancel(); waveSession++; waveActive = true; waveWarmAt = 0; } else leaveWave();
     const selected = Number.isInteger(position) && source[position]?.id === track.id ? position : source.indexOf(track);
     if (selected < 0) { notice('Эта запись больше недоступна в списке. Выбери песню ещё раз.'); return; }
     // Keep the chosen occurrence and its neighbours when a list exceeds the
@@ -266,6 +302,7 @@
     if (remember && previousIndex >= 0 && previousIndex !== position) history.push(previousIndex);
     if (history.length > 200) history.shift();
     index = position; current = track; phase = 'loading'; playerError = ''; elapsed = seek; duration = track.duration; loaded = false; pauseRoom();
+    wave.begin(track, seek);
     effectsController.track(track.id);
     if (native) sendNative('stop'); else { stopSource(); effectsController.prime(); if (!automatic) primeAudio(); }
     renderPlayer(); renderQueue(); renderSearch(); renderLibrary(); persist();
@@ -283,6 +320,7 @@
       else {
         audio.src = source; audio.load();
         audio.defaultPlaybackRate = audio.playbackRate = rate;
+        applyWebPitch();
         if (seek > 0) audio.addEventListener('loadedmetadata', () => { if (token === playVersion) audio.currentTime = Math.min(seek, Math.max(0, audio.duration - 0.1)); }, { once: true });
         await effectsController.beforePlay();
         if (token !== playVersion || signal.aborted) return;
@@ -299,6 +337,7 @@
     }
   }
   function pause() {
+    wave.cancel(); waveSession++; waveRefilling = false; waveAwaitNext = null;
     beginNativeIntent();
     ++playVersion; preparationController?.abort(); phase = 'paused';
     if (native) sendNative('pause'); else audio.pause(); renderPlayback(); persist();
@@ -336,8 +375,9 @@
   function openEffects(opener) { if ($('effects-dialog').open) return; effectsOpener = opener || document.activeElement; renderEffects(); $('effects-dialog').showModal(); window.history.pushState({ ...window.history.state, lolzcloudEffects: true }, '', location.href); }
   function closeEffects(fromHistory = false) { if (!$('effects-dialog').open) return; effectsFromHistory = fromHistory; $('effects-dialog').close(); }
   function next(automatic = false) {
+    if (waveActive && current && !automatic && loaded && ['playing', 'paused'].includes(phase)) { wave.react('skip', current, elapsed); wave.skipped(); }
     const target = C.nextIndex(queue.length, index, { shuffle, repeat, automatic });
-    if (target < 0) { phase = 'ended'; if (native) sendNative('pause'); else audio.pause(); renderPlayback(); persist(); return; }
+    if (target < 0) { phase = 'ended'; if (native) sendNative('pause'); else audio.pause(); renderPlayback(); persist(); if (waveActive && navigator.onLine) void moreWave({ advance: true, automatic }); return; }
     void playAt(target, { automatic });
   }
   function previous() { if (elapsed > 3 && loaded) { seek(0); return; } const prior = history.pop(); void playAt(prior ?? Math.max(0, index - 1), { remember: false }); }
@@ -350,9 +390,10 @@
     renderLike(); renderDownload(); renderPlayback();
     $('player-shuffle').setAttribute('aria-pressed', String(shuffle)); $('player-repeat').setAttribute('aria-pressed', String(repeat !== 'off')); $('player-repeat').textContent = repeat === 'one' ? '↻1' : '↻'; $('player-repeat').setAttribute('aria-label', repeat === 'one' ? 'Повтор одного трека' : repeat === 'all' ? 'Повтор всей очереди' : 'Повтор выключен');
     syncNativeQueue();
-    renderComfort(); renderBookmarks();
+    renderComfort(); renderBookmarks(); renderWave();
   }
   function renderPlayback() {
+    observeWave(); renderWavePlayback();
     const playing = phase === 'playing', loading = phase === 'loading', label = playing ? 'Пауза' : loading ? 'Отменить загрузку' : 'Воспроизвести';
     for (const id of ['mini-play', 'player-play']) { $(id).textContent = playing ? 'Ⅱ' : loading ? '·' : '▶'; $(id).setAttribute('aria-label', label); }
     $('player-state').textContent = playerError || (loading ? 'Готовим аудио…' : current ? current.local ? offline.has(current.id) ? 'На устройстве' : 'Локальный файл не найден' : offline.has(current.id) ? 'На устройстве' : 'SoundCloud · аудио LolzCloud' : '');
@@ -453,6 +494,8 @@
   function playerTab(tab) { const lyrics = tab === 'lyrics'; for (const name of ['queue', 'lyrics']) { $('tab-' + name).setAttribute('aria-selected', String(name === tab)); $('tab-' + name).tabIndex = name === tab ? 0 : -1; $('panel-' + name).hidden = name !== tab; } if (lyrics) void loadLyrics(); if (matchMedia('(max-width:759px)').matches) $('player-tabs').scrollIntoView({ block: 'start' }); }
   function renderComfort() {
     $('player-rate').value = rate; $('player-rate-value').textContent = Number(rate.toFixed(2)) + '×';
+    $('player-preserves-pitch').checked = preservesPitch;
+    $('player-pitch-status').textContent = native && !nativePitchSupported ? 'Этот iOS-клиент не поддерживает переключение высоты. Значение сохранится для переноса.' : !native && !webPitchApplied ? 'Браузер не поддерживает переключение высоты. Значение сохранится для переноса.' : native && ['error', 'unsupported'].includes(nativeRateState) ? 'Сейчас настройка высоты недоступна. Значение сохранено для переноса.' : native && nativeRateState !== 'applied' ? 'Настройка применится при воспроизведении.' : preservesPitch ? 'При изменении скорости высота голоса сохраняется.' : 'Скорость и высота голоса меняются вместе.';
     for (const control of $('rate-presets').children) control.setAttribute('aria-pressed', String(Math.abs(+control.dataset.rate - rate) < 0.001));
     $('sleep-status').textContent = sleepDeadline > 0 && !native ? 'Веб-таймер проверяется при воспроизведении и возврате. В фоне iOS может приостановить его.' : '';
     $('sleep-active').hidden = !sleepDeadline; $('sleep-active').textContent = 'Осталось ' + Math.max(1, Math.ceil((sleepDeadline - Date.now()) / 60000)) + ' мин.';
@@ -461,8 +504,26 @@
   function setRate(value, { edited = false } = {}) {
     const nextRate = Number(value); if (!Number.isFinite(nextRate) || nextRate < 0.5 || nextRate > 2) return;
     if (edited) { portableController.editedSound({ rate: nextRate }); portableFile = null; }
-    rate = nextRate; if (native) sendNative('rate', { value: rate }); else audio.defaultPlaybackRate = audio.playbackRate = rate;
+    rate = nextRate; if (native) { nativeRateRevision++; if (nativePitchSupported) syncNativeRate(); else sendNative('rate', { value: rate }); } else { audio.defaultPlaybackRate = audio.playbackRate = rate; applyWebPitch(); }
     renderComfort(); updateMediaSession(); persist();
+  }
+  function applyWebPitch() { if (native) return; webPitchApplied = false; for (const name of webPitchProperties) try { audio[name] = preservesPitch; if (audio[name] === preservesPitch) webPitchApplied = true; } catch { /* Store the desired portable flag even when a browser refuses it. */ } }
+  function setPreservesPitch(value, { edited = false } = {}) {
+    if (typeof value !== 'boolean') return; preservesPitch = value;
+    if (edited) { portableController.editedSound({ preservesPitch }); portableFile = null; }
+    if (native) { nativeRateRevision++; if (nativePitchSupported) syncNativeRate(); } else applyWebPitch();
+    renderComfort(); persist();
+  }
+  function syncNativeRate() {
+    if (!native || !nativePitchSupported) return;
+    const key = nativeClientId + ':' + nativeRequestId + ':' + nativeRateRevision; if (key === nativeRateKey) return; nativeRateKey = key; nativeRateState = 'pending';
+    sendNative('rate', { value: rate, preservesPitch, revision: nativeRateRevision });
+  }
+  function receiveNativeRate(value) {
+    if (!nativePitchSupported || !currentNativeIntent(value) || value.rateRevision !== nativeRateRevision || value.rate !== rate || value.preservesPitch !== preservesPitch) return;
+    if (value.rateState === 'applied' && value.rateAppliedRevision === nativeRateRevision) nativeRateState = 'applied';
+    else if (['pending', 'unsupported', 'error'].includes(value.rateState)) nativeRateState = value.rateState;
+    renderComfort();
   }
   function checkSleep() {
     if (!sleepDeadline || Date.now() < sleepDeadline) return false;
@@ -501,8 +562,9 @@
     } catch { if (token === roomLyricsVersion) $('room-lyrics-status').textContent = 'Текст не найден или нет связи с LRCLIB. Комната продолжает играть.'; }
   }
   function showView(name, focus = false) {
-    if (!['search', 'library', 'rooms', 'profile'].includes(name)) return;
-    view = name; for (const tab of ['search', 'library', 'rooms', 'profile']) { $('view-' + tab).hidden = tab !== name; const control = document.querySelector('[data-view="' + tab + '"]'); if (tab === name) control.setAttribute('aria-current', 'page'); else control.removeAttribute('aria-current'); }
+    if (!['search', 'wave', 'library', 'rooms', 'profile'].includes(name)) return;
+    view = name; for (const tab of ['search', 'wave', 'library', 'rooms', 'profile']) { $('view-' + tab).hidden = tab !== name; const control = document.querySelector('[data-view="' + tab + '"]'); if (tab === name) control.setAttribute('aria-current', 'page'); else control.removeAttribute('aria-current'); }
+    if (name === 'wave') renderWave();
     if (name === 'library') { renderLibrary(); void refreshOffline(); }
     if (name === 'rooms' || name === 'profile') void loadAccount();
     if (focus) $('main').focus({ preventScroll: true });
@@ -593,6 +655,19 @@
   $('search-form').onsubmit = event => { event.preventDefault(); $('search-query').blur(); void search(); };
   $('search-query').oninput = () => { if (searching) { ++searchVersion; searchController?.abort(); searching = false; $('search-submit').disabled = false; $('search-status').textContent = 'Нажми «Найти», чтобы выполнить новый поиск.'; } $('search-more').hidden = $('search-query').value.trim() !== searchedQuery || !nextOffset; };
   $('search-more').onclick = () => { void search(true); };
+  for (const [key, rows] of Object.entries(window.LolzCloudWave.OPTIONS)) for (const [value, label] of rows) { const option = node('option', label); option.value = value; $('wave-' + key).append(option); }
+  const waveAction = handler => { try { Promise.resolve(handler()).catch(noticeError); } catch (error) { noticeError(error); } };
+  $('wave-form').onsubmit = event => { event.preventDefault(); $('wave-prompt').blur(); waveAction(() => startWave()); };
+  $('wave-prompt').oninput = () => { wave.cancel(); waveSession++; waveRefilling = false; };
+  $('wave-seed').onclick = () => waveAction(() => startWave(true)); $('wave-retry').onclick = () => waveAction(() => waveActive ? moreWave() : startWave()); $('wave-more').onclick = () => waveAction(() => moreWave()); $('wave-stop').onclick = () => { wave.cancel(); waveSession++; waveRefilling = false; };
+  for (const key of Object.keys(window.LolzCloudWave.OPTIONS)) $('wave-' + key).onchange = () => waveAction(() => wave.configure({ preferences: { [key]: $('wave-' + key).value } }));
+  $('wave-genre').onchange = () => waveAction(() => wave.configure({ preferences: { genre: $('wave-genre').value } })); $('wave-context').onchange = () => waveAction(() => wave.configure({ preferences: { autoContext: $('wave-context').checked } }));
+  $('wave-novelty').oninput = () => { $('wave-novelty-value').textContent = $('wave-novelty').value + '%'; }; $('wave-novelty').onchange = () => waveAction(() => wave.configure({ adventurous: +$('wave-novelty').value / 100 }));
+  $('wave-reset').onclick = () => waveAction(() => { wave.reset(); $('wave-prompt').value = ''; renderWave(); });
+  $('wave-love').onclick = () => waveAction(() => { if (!waveActive || !current) return; const wasLiked = liked.has(canonicalID(current.id)); wave.react(wasLiked ? 'unlove' : 'love', current); toggleLike(current); });
+  $('wave-next').onclick = () => next(); $('wave-ban').onclick = () => waveAction(() => { if (waveActive && current) { wave.react('ban', current); pruneWaveQueue(); next(); } });
+  $('wave-retry-play').onclick = resume;
+  $('wave-ban-artist').onclick = () => waveAction(() => { if (waveActive && current) { wave.react('artist-ban', current); pruneWaveQueue(); next(); } });
   $('navigation').onclick = event => { const name = event.target.closest('[data-view]')?.dataset.view; if (name) showView(name, true); };
   document.querySelector('.brand').onclick = event => { event.preventDefault(); showView('search', true); };
   $('library-filters').onclick = event => { const filter = event.target.closest('[data-filter]')?.dataset.filter; if (!filter) return; libraryFilter = filter; libraryVisible = 300; for (const button of $('library-filters').children) button.setAttribute('aria-pressed', String(button.dataset.filter === filter)); renderLibrary(); };
@@ -636,8 +711,9 @@
   $('effects-reset').onclick = () => configureEffects(window.LolzCloudEffectsPolicy.preset('original'));
   $('effects-retry').onclick = () => configureEffects({});
   $('player-rate').oninput = () => setRate($('player-rate').value, { edited: true }); $('rate-presets').onclick = event => { const control = event.target.closest('[data-rate]'); if (control) setRate(control.dataset.rate, { edited: true }); };
+  $('player-preserves-pitch').onchange = () => setPreservesPitch($('player-preserves-pitch').checked, { edited: true });
   $('sleep-select').onchange = () => setSleep(+$('sleep-select').value); $('bookmark-add').onclick = addBookmark;
-  $('queue-clear').onclick = () => { queue = current ? [current] : []; index = current ? 0 : -1; history = []; persist(); renderQueue(); notice('В очереди остался текущий трек'); };
+  $('queue-clear').onclick = () => { leaveWave(); queue = current ? [current] : []; index = current ? 0 : -1; history = []; persist(); renderQueue(); notice('В очереди остался текущий трек'); };
   $('player-tabs').onclick = event => { const tab = event.target.closest('[data-player-tab]')?.dataset.playerTab; if (tab) playerTab(tab); };
   $('player-tabs').onkeydown = event => { if (['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) { event.preventDefault(); const tab = event.key === 'Home' ? 'queue' : event.key === 'End' ? 'lyrics' : $('tab-queue').getAttribute('aria-selected') === 'true' ? 'lyrics' : 'queue'; playerTab(tab); $('tab-' + tab).focus(); } };
   $('lyrics-retry').onclick = () => { void loadLyrics(true); };
@@ -689,21 +765,21 @@
   audio.addEventListener('pause', () => { if (native || !loaded || ['loading', 'error', 'ended', 'blocked'].includes(phase)) return; phase = 'paused'; renderPlayback(); persist(); });
   audio.addEventListener('waiting', () => { if (native || !loaded || audio.paused) return; phase = 'loading'; renderPlayback(); });
   audio.addEventListener('loadedmetadata', () => { if (!loaded || native) return; if (Number.isFinite(audio.duration) && audio.duration > 0) duration = audio.duration; renderTime(); });
-  audio.addEventListener('timeupdate', () => { if (!loaded || native) return; elapsed = audio.currentTime; checkSleep(); renderTime(); updateMediaSession(); if (Date.now() - lastSavedTime > 5000) { lastSavedTime = Date.now(); persist(); } });
+  audio.addEventListener('timeupdate', () => { if (!loaded || native) return; elapsed = audio.currentTime; observeWave(); checkSleep(); renderTime(); updateMediaSession(); if (Date.now() - lastSavedTime > 5000) { lastSavedTime = Date.now(); wave.flush(); persist(); } });
   audio.addEventListener('ended', () => { if (loaded && !native) next(true); });
   audio.addEventListener('error', () => { if (!loaded || native) return; phase = 'error'; playerError = 'Запись не загрузилась. Проверь сеть и нажми «Повторить».'; renderPlayback(); });
   window.addEventListener('lolzcloud:capabilities', event => learnNativeCapabilities(event.detail));
   window.addEventListener('lolzcloud:profileExport', event => { const value = event.detail; if (!native || !currentNativeIntent(value) || value.operationId !== portableOperation) return; if (value.state === 'error') portableError(Error(typeof value.error === 'string' ? value.error.slice(0, 300) : 'Не удалось открыть отправку файла.')); else if (value.state === 'shared' || value.state === 'cancelled') $('portable-status').textContent = 'Панель отправки закрыта. Файл можно сохранить ещё раз.'; });
   window.addEventListener('lolzcloud:effects', event => { if (native) { learnNativeCapabilities(event.detail); effectsController.receiveNative(event.detail); } });
   window.addEventListener('lolzcloud:playback', event => {
-    if (!native) return; const value = event.detail; learnNativeCapabilities(value); if (!current) return;
+    if (!native) return; const value = event.detail; learnNativeCapabilities(value); receiveNativeRate(value); if (!current) return;
     if (!currentNativeIntent(value) || typeof value.id === 'string' && value.id !== current.id || !['loading', 'playing', 'paused', 'ended', 'error'].includes(value.state)) return;
     if (!loaded && value.id !== current.id) return; loaded = true;
-    if (Number.isFinite(value.rate) && value.rate >= 0.5 && value.rate <= 2) rate = value.rate;
+    if (!nativePitchSupported && Number.isFinite(value.rate) && value.rate >= 0.5 && value.rate <= 2) rate = value.rate;
     if (Number.isFinite(value.sleepDeadline) && value.sleepDeadline >= 0 && value.sleepDeadline !== sleepDeadline) { sleepDeadline = value.sleepDeadline; scheduleSleep(); persist(); }
     if (Number.isFinite(value.time)) elapsed = Math.max(0, value.time); if (Number.isFinite(value.duration) && value.duration > 0) duration = value.duration;
     if (typeof value.queue === 'boolean') nativeQueueOwned = value.queue;
-    if (value.state === 'ended' && !nativeQueueOwned) { next(true); return; } phase = value.state; playerError = typeof value.error === 'string' ? value.error.slice(0, 300) : ''; renderPlayback(); renderComfort(); checkSleep();
+    if (value.state === 'ended' && !nativeQueueOwned) { next(true); return; } phase = value.state; playerError = typeof value.error === 'string' ? value.error.slice(0, 300) : ''; renderPlayback(); renderComfort(); checkSleep(); if (value.state === 'ended' && nativeQueueOwned && waveActive && index === queue.length - 1 && repeat !== 'one' && navigator.onLine) void moreWave({ advance: true, automatic: true });
   });
   window.addEventListener('lolzcloud:selection', event => {
     if (!native) return; const value = event.detail, position = nativeCatalogReferences ? value?.index : nativeQueuePositions[value?.index];
@@ -714,7 +790,7 @@
     const changed = index !== position || current?.id !== expected.id;
     nativeQueueOwned = value.queue === true;
     if (!changed && loaded) return;
-    if (changed) { if (index >= 0) history.push(index); if (history.length > 200) history.shift(); elapsed = 0; duration = expected.duration; }
+    if (changed) { if (index >= 0) history.push(index); if (history.length > 200) history.shift(); elapsed = 0; duration = expected.duration; wave.begin(expected); }
     ++playVersion; preparationController?.abort(); index = position; current = expected; loaded = true; playerError = ''; nativeQueueOwned = value.queue === true; phase = 'loading'; effectsController.track(expected.id);
     renderPlayer(); renderQueue(); persist();
     if (changed && $('tab-lyrics').getAttribute('aria-selected') === 'true') void loadLyrics();
@@ -739,12 +815,12 @@
   function connectivity() { $('connection').hidden = navigator.onLine; }
   window.addEventListener('online', () => { connectivity(); if (['rooms', 'profile'].includes(view)) void loadAccount(true); }); window.addEventListener('offline', connectivity);
   document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); else { checkSleep(); connectivity(); if (['rooms', 'profile'].includes(view)) void loadAccount(); } });
-  window.addEventListener('pagehide', () => { clearTimeout(persistTimer); try { localStorage.setItem('LolzCloud-app-v1', JSON.stringify(savedState())); } catch {} });
-  renderPlayer(); renderQueue(); renderLibrary(); renderComfort(); renderBookmarks(); renderEffects(); renderPortable(); scheduleSleep(); checkSleep(); connectivity(); renderGate('rooms-gate', 'rooms'); renderGate('profile-gate', 'profile'); void refreshOffline(); if (native) { sendNative('rate', { value: rate }); sendNative('capabilities'); }
+  window.addEventListener('pagehide', () => { wave.flush(); clearTimeout(persistTimer); try { localStorage.setItem('LolzCloud-app-v1', JSON.stringify(savedState())); } catch {} });
+  renderPlayer(); renderQueue(); renderLibrary(); renderComfort(); renderBookmarks(); renderEffects(); renderPortable(); renderWave(); scheduleSleep(); checkSleep(); connectivity(); renderGate('rooms-gate', 'rooms'); renderGate('profile-gate', 'profile'); void refreshOffline(); if (native) { if (nativePitchSupported) syncNativeRate(); else sendNative('rate', { value: rate }); sendNative('capabilities'); }
   if (native) $('install-open').hidden = true;
   if (native) { $('audio-import-control').hidden = true; $('native-audio-import').hidden = false; }
   if (!native && (/iPad|iPhone|iPod/.test(navigator.userAgent) || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) { document.querySelector('.volume-label').hidden = true; document.querySelector('.player-actions').append(node('span', 'Громкость — кнопками устройства', 'hint')); }
   if ('serviceWorker' in navigator && !native) navigator.serviceWorker.register('/app/sw.js', { scope: '/app/' }).catch(() => { /* Streaming remains available when private browsing denies a worker. */ });
   // Read-only diagnostic surface is useful to the isolated regression harness.
-  window.LolzCloudApp = Object.freeze({ snapshot: () => ({ view, phase, current: current?.id || '', queue: queue.map(track => track.id), index, liked: [...liked], offline: [...offline.keys()], elapsed, duration, roomAudible, native, rate, sleepDeadline, effects: effectsController.snapshot(), bookmarks: current ? (bookmarks.get(current.id) || []).map(row => row.position) : [] }), openRoom });
+  window.LolzCloudApp = Object.freeze({ snapshot: () => ({ view, phase, current: current?.id || '', queue: queue.map(track => track.id), index, liked: [...liked], offline: [...offline.keys()], elapsed, duration, roomAudible, native, rate, preservesPitch, pitchSupported: native ? nativePitchSupported : webPitchApplied, nativeRateRevision, nativeRateState, sleepDeadline, effects: effectsController.snapshot(), wave: { active: waveActive, ...wave.snapshot(), tracks: wave.snapshot().tracks.map(row => row.id) }, bookmarks: current ? (bookmarks.get(current.id) || []).map(row => row.position) : [] }), openRoom });
 })();

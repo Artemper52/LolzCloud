@@ -1,0 +1,20 @@
+[
+  {
+    "file": "/opt/lolzcloud-server/uploads/20261115-social-0.9.22-f798f619.tar.gz",
+    "bytes": 175566,
+    "sha256": "dd3e99501942c15b73ba7a70cc31d4152cedf2a91b107f6566966781354f183c",
+    "reused": false
+  },
+  {
+    "file": "/opt/lolzcloud-server/uploads/20261115-social-0.9.22-f798f619-smoke.cjs",
+    "bytes": 5129,
+    "sha256": "382af5a9826d3c3f72e64365bb445a35c518f5e4bd3a6cb13df4067af69b38f6",
+    "reused": false
+  },
+  {
+    "file": "/opt/lolzcloud-server/uploads/20261115-social-0.9.22-f798f619.sh",
+    "bytes": 3020,
+    "sha256": "b72b434460c6da8b445cad356760e4511a6fe41044dc96e7d9f61fe16a516041",
+    "reused": false
+  }
+]

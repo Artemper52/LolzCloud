@@ -1,0 +1,53 @@
+{
+  "status": "deployed-and-verified",
+  "version": "0.9.22",
+  "release": "20261115-social-0.9.22-f798f619",
+  "publicOrigin": "https://lolzcloud.com",
+  "checkedAt": "2026-11-15T01:24:03.429Z",
+  "archiveSha256": "dd3e99501942c15b73ba7a70cc31d4152cedf2a91b107f6566966781354f183c",
+  "sourceInventory": {
+    "file": "source-files.json",
+    "sha256": "e46aa118025a5c77ce8ddc433c3cf33b05624c24151f558cd6225e2d11391446",
+    "sourceFiles": 23
+  },
+  "localStagedSmoke": "all23HTTPfullbytes/SHA,indexalias,room2,social1,anonymous401",
+  "transport": "direct tronacc-recovery SSH; strict host key/BatchMode/IdentitiesOnly; exclusive stdin uploads; no jump,connection failures or deployment retry",
+  "current": "/opt/lolzcloud-server/releases/20261115-social-0.9.22-f798f619",
+  "previous": "/opt/lolzcloud-server/releases/20261114-social-0.9.21-6d684b09",
+  "privateState": {
+    "backupPath": "/var/backups/lolzcloud/20261115-social-0.9.22-f798f619",
+    "directoryMode": "0700",
+    "filesMode": "0600",
+    "remainedOnServer": true,
+    "exported": false
+  },
+  "publicQA": {
+    "status": "passed",
+    "checks": 57,
+    "sourceFiles": 23,
+    "source": "Windows HTTPS, actual fullsourcebytes, no fallback",
+    "sw": "lolzcloud-app-shell-v7",
+    "downloadLimits": "Eight old18 small files fullSHA;14 olderpayloads one-byteRangeavailability. No new fullbinarySHAclaim."
+  },
+  "unchanged": {
+    "music": "20261115T010411-music-bfe7ef6d",
+    "nginxMainAndMusicBytes": true,
+    "musicWaveBodyLimit": 1000000,
+    "downloads": "0.9.18/Android0.1.8/native0.1.3 retained"
+  },
+  "files": [
+    {
+      "file": "publication-0.9.22-public.json",
+      "sha256": "c42a4f03b14c98a44d5d5ca6279539f12688517668cf11e3ae9e3bacc8447e8a"
+    },
+    {
+      "file": "publication-0.9.22-server.json",
+      "sha256": "594050fd4893c24e9a409669be52965e4298b5b485ab65c93fece25afcdcfc54"
+    },
+    {
+      "file": "publication-0.9.22-upload.json",
+      "sha256": "4bed09c1d312853b514afc9a281efb08d7ce6e61191c5fb9dbdbba25b5ee3a65"
+    }
+  ],
+  "limits": "No private-account/room writes. No desktop/Android/iOS binary mutation, tags, commits, signing or native-device QA."
+}

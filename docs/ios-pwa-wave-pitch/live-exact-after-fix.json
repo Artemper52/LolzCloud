@@ -1,0 +1,200 @@
+{
+  "ok": true,
+  "mode": "exact-retained-source-retry",
+  "exactTrackId": "2171798382",
+  "checkedAt": "2026-11-15T01:07:18.867Z",
+  "count": 7,
+  "checks": [
+    "Live seed is exact official catalogue metadata",
+    "The retained exact source is selected before any audio request",
+    "Exact source retry makes zero new Wave requests",
+    "Live preparation retains the exact selected recommendation",
+    "The exact official selected recommendation plays actual HTMLAudio",
+    "Actual official audio playback advances time",
+    "Explicit Pause stops the same live audio"
+  ],
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/music/prepare/2171798382/5b820464d51f8b78159df7d0"
+    },
+    {
+      "method": "GET",
+      "path": "/music/prepare/2171798382/5b820464d51f8b78159df7d0"
+    },
+    {
+      "method": "GET",
+      "path": "/music/prepare/2171798382/5b820464d51f8b78159df7d0"
+    },
+    {
+      "method": "GET",
+      "path": "/music/audio/2171798382/5b820464d51f8b78159df7d0.mp3"
+    }
+  ],
+  "seed": {
+    "id": "2171798382",
+    "url": "https://soundcloud.com/creepypastak1ng/svalka-5"
+  },
+  "selection": {
+    "view": "search",
+    "phase": "paused",
+    "current": "2171798382",
+    "queue": [
+      "2171798382"
+    ],
+    "index": 0,
+    "liked": [
+      "2171798382"
+    ],
+    "offline": [],
+    "elapsed": 0,
+    "duration": 83,
+    "roomAudible": false,
+    "native": false,
+    "rate": 1,
+    "preservesPitch": false,
+    "pitchSupported": true,
+    "nativeRateRevision": 1,
+    "nativeRateState": "pending",
+    "sleepDeadline": 0,
+    "effects": {
+      "state": "bypassed",
+      "capabilities": {
+        "eq": true,
+        "preamp": true,
+        "reverb": true,
+        "echo": true,
+        "normalization": true,
+        "pitch": false
+      },
+      "appliedRevision": 0,
+      "processedFrames": 0,
+      "sampleRate": 0,
+      "channels": 0,
+      "headroomDb": 0,
+      "error": "",
+      "normalization": null,
+      "peakDb": -96,
+      "reductionDb": 0,
+      "config": {
+        "enabled": false,
+        "gains": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "preampDb": 0,
+        "reverb": 0,
+        "echo": 0,
+        "normalization": false
+      },
+      "revision": 1,
+      "effectsSchema": 2,
+      "engine": "web",
+      "graphCreated": false,
+      "contextState": "none",
+      "sourceId": ""
+    },
+    "wave": {
+      "active": false,
+      "phase": "idle",
+      "message": "",
+      "context": "",
+      "request": null,
+      "tracks": [],
+      "prompt": "",
+      "anchor": null,
+      "cursor": 0,
+      "history": 0
+    },
+    "bookmarks": []
+  },
+  "playing": {
+    "state": {
+      "view": "search",
+      "phase": "playing",
+      "current": "2171798382",
+      "queue": [
+        "2171798382"
+      ],
+      "index": 0,
+      "liked": [
+        "2171798382"
+      ],
+      "offline": [],
+      "elapsed": 0,
+      "duration": 82.848798,
+      "roomAudible": false,
+      "native": false,
+      "rate": 1,
+      "preservesPitch": false,
+      "pitchSupported": true,
+      "nativeRateRevision": 1,
+      "nativeRateState": "pending",
+      "sleepDeadline": 0,
+      "effects": {
+        "state": "bypassed",
+        "capabilities": {
+          "eq": true,
+          "preamp": true,
+          "reverb": true,
+          "echo": true,
+          "normalization": true,
+          "pitch": false
+        },
+        "appliedRevision": 0,
+        "processedFrames": 0,
+        "sampleRate": 0,
+        "channels": 0,
+        "headroomDb": 0,
+        "error": "",
+        "normalization": null,
+        "peakDb": -96,
+        "reductionDb": 0,
+        "config": {
+          "enabled": false,
+          "gains": [
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "preampDb": 0,
+          "reverb": 0,
+          "echo": 0,
+          "normalization": false
+        },
+        "revision": 1,
+        "effectsSchema": 2,
+        "engine": "web",
+        "graphCreated": false,
+        "contextState": "none",
+        "sourceId": "2171798382"
+      },
+      "wave": {
+        "active": false,
+        "phase": "idle",
+        "message": "",
+        "context": "",
+        "request": null,
+        "tracks": [],
+        "prompt": "",
+        "anchor": null,
+        "cursor": 0,
+        "history": 0
+      },
+      "bookmarks": []
+    },
+    "src": "https://lolzcloud.com/music/audio/2171798382/5b820464d51f8b78159df7d0.mp3",
+    "paused": false,
+    "readyState": 4
+  },
+  "failure": "",
+  "screenshots": [
+    "D:\\LolzCloud-Android-Toolchain\\pwa-wave-candidate\\live-exact-after-fix\\wave-live-390.png"
+  ],
+  "limits": "One official Wave POST; exact selected source only; isolated Chromium profile/local candidate shell; no account writes, native/safari/physical-output proof or candidate deployment."
+}

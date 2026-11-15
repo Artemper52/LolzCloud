@@ -1,0 +1,162 @@
+{
+  "createdAt": "2026-11-15T01:15:07.043Z",
+  "assets": [
+    {
+      "file": "server/public/app/app.css",
+      "bytes": 21939,
+      "sha256": "1c45f9b2bd1087330d759b6473f693fa6ac20041bfd7b955f0ac21d04cee2753"
+    },
+    {
+      "file": "server/public/app/app.js",
+      "bytes": 107861,
+      "sha256": "56d1b64ac93b11080cdbaff5359cb388aeb5ecaf1569c525acc7fd41bdb7a51e"
+    },
+    {
+      "file": "server/public/app/core.js",
+      "bytes": 9897,
+      "sha256": "20a8d5b82f1c392438cd6655dd0f40f253e6d8ce6aace96e123dba4edca97daf"
+    },
+    {
+      "file": "server/public/app/effects-policy.js",
+      "bytes": 5503,
+      "sha256": "d09718958652e166fef7dcaed791d0353107601b7214814ffb13e20aecb94687"
+    },
+    {
+      "file": "server/public/app/effects.js",
+      "bytes": 14086,
+      "sha256": "ce79663279f017d67e03d376c3664764b1a5c6b1379d239cd746c4097caf9991"
+    },
+    {
+      "file": "server/public/app/icon-192.png",
+      "bytes": 7875,
+      "sha256": "747e49be748468f916599f06b7f71e52f3785ebadac95b212054d938930420f4"
+    },
+    {
+      "file": "server/public/app/icon-512.png",
+      "bytes": 9687,
+      "sha256": "3b51140c8d402014b25ba17ce171cede08edf768b2a682502b1b11c6809b07ef"
+    },
+    {
+      "file": "server/public/app/icon.svg",
+      "bytes": 366,
+      "sha256": "45c316a864c90e8f9676836dde15916db301db3b8d3d5ba36759e8f50a0d44d6"
+    },
+    {
+      "file": "server/public/app/imports.js",
+      "bytes": 2375,
+      "sha256": "9c025444b795b53b730d27723d18006a743c11601f22c86b2f89bea9d384abc2"
+    },
+    {
+      "file": "server/public/app/index.html",
+      "bytes": 26949,
+      "sha256": "1be4fbc39c9a579f78f4002dd53ee394cfbea7ee9118463e719215024d32c391"
+    },
+    {
+      "file": "server/public/app/limiter-worklet.js",
+      "bytes": 2197,
+      "sha256": "09520f52a57b8029d8c3db68414f1098d14b50df67334d5ff983223a6f663112"
+    },
+    {
+      "file": "server/public/app/manifest.webmanifest",
+      "bytes": 440,
+      "sha256": "1956ba5b0770d4bee293fd48003be392fd1b44e2b2f450eb631d703c140970e7"
+    },
+    {
+      "file": "server/public/app/normalization-worklet.js",
+      "bytes": 3376,
+      "sha256": "70ac21285d0115d6779f510a2baae3b2ff91b936ca06546a3d8a8a126e2f6664"
+    },
+    {
+      "file": "server/public/app/offline.js",
+      "bytes": 4979,
+      "sha256": "8774eb963ff7fe0c85e61668c0355d8c3b0e3467a3e30a7ba032c49771ab3936"
+    },
+    {
+      "file": "server/public/app/profile-cloud.js",
+      "bytes": 9042,
+      "sha256": "80ddef0fa1c5c748406495e4447c649b8df9df9a9505c72f235ead5ebdcaef64"
+    },
+    {
+      "file": "server/public/app/profile-crypto-worker.js",
+      "bytes": 4898,
+      "sha256": "5e1b40e0b93a0eecf0fdcd4a17833d47c236dbb21c95321520fea5f71dcfdb66"
+    },
+    {
+      "file": "server/public/app/profile-crypto.js",
+      "bytes": 2972,
+      "sha256": "c84289d718ffc6ee93c6c48aa35b225a535c586d719cd526fdb76b0698484206"
+    },
+    {
+      "file": "server/public/app/profile-policy.js",
+      "bytes": 9513,
+      "sha256": "5e2d9bf5253d7a25dba7419baf4bb8d64670a179474da02577c5a5687e75c56a"
+    },
+    {
+      "file": "server/public/app/profile.js",
+      "bytes": 15387,
+      "sha256": "38af455641f22842cdce51913dba07442c8ceff636cf08315636cd89b08fdeac"
+    },
+    {
+      "file": "server/public/app/sw.js",
+      "bytes": 1854,
+      "sha256": "7595a92b982049ae8cd5a8518d2c6c4086417e42b5c4886ec4775191ec443c72"
+    },
+    {
+      "file": "server/public/app/vendor-scrypt-3.0.1.js",
+      "bytes": 17811,
+      "sha256": "544292934136527d60acc9e337d8c7b953f412e81314aa551a12d4230afd449d"
+    },
+    {
+      "file": "server/public/app/wave-history.js",
+      "bytes": 2065,
+      "sha256": "0c30c3661850413b3be3441b40c316f9a089b632138bb7e414ecd4e2ce7c57c3"
+    },
+    {
+      "file": "server/public/app/wave.js",
+      "bytes": 15089,
+      "sha256": "0cafd7a386ca72b06b4547ef698f22b2502d0585daa0685d3cc153b67bff3eb4"
+    }
+  ],
+  "tests": [
+    {
+      "file": "tests/pwa-wave-ui.cjs",
+      "sha256": "cff339bb63ff542ef3f1841b4e36a09d1b5abce6f5886be19292cc3e6e99bcad",
+      "bytes": 24761
+    },
+    {
+      "file": "tests/pwa-wave.test.cjs",
+      "sha256": "986f4634b681398baec2bf9d669085cb5d97cf735633296cecf08ee15292f425",
+      "bytes": 10356
+    },
+    {
+      "file": "tests/pwa-wave-live.cjs",
+      "sha256": "9a35969f5868fd61ce7e90818383a66dd0aa513eb979409cf80d3e669c2f5f56",
+      "bytes": 6542
+    },
+    {
+      "file": "tests/pwa-pitch-ui.cjs",
+      "sha256": "fdff9a9756f9be122e3e7c54f3f2428f6cd4f13c5cf50d4424e60b5847366cfa",
+      "bytes": 21742
+    },
+    {
+      "file": "tests/pwa-profile.test.cjs",
+      "sha256": "4e08022821ca306fdb7b901a14c328bc23ec559dc3b1366438185f33903b679d",
+      "bytes": 14821
+    },
+    {
+      "file": "tests/pwa-ui.cjs",
+      "sha256": "e8088e6c3d16b800bd58cbc62ee0223f0be733538b3bf6dac87238e7bf1400c3",
+      "bytes": 42706
+    },
+    {
+      "file": "tests/pwa-effects-ui.cjs",
+      "sha256": "d22f49da3afd55cb73618a84994932cfcb78db26ea704e42d2dba0ce1815ecd9",
+      "bytes": 30814
+    },
+    {
+      "file": "tests/run-pwa-ui.cjs",
+      "sha256": "90ed3f3303c251d4ec878c97175da31dfca790849e09e7afd776cea9ac5a742a",
+      "bytes": 1485
+    }
+  ]
+}
