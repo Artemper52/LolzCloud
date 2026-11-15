@@ -1,95 +1,82 @@
 {
   "status": "passed",
-  "checkedAt": "2026-11-15T14:18:56.834329+00:00",
-  "version": "0.1.5",
-  "build": 6,
-  "sourceCommit": "f7a58a94841f7709388ad003ea40f092f0625d79",
-  "workflowURL": "https://github.com/Artemper52/LolzCloud/blob/f7a58a94841f7709388ad003ea40f092f0625d79/.github/workflows/verify-ios-tone.yml",
-  "runURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43722084582",
-  "runId": 43722084582,
+  "checkedAt": "2026-11-15T16:50:54.940110+00:00",
+  "version": "0.1.6",
+  "build": 7,
+  "sourceCommit": "55e3ac9700ce8e9330b5c190746f3fd6544f16cd",
+  "runId": 43736437440,
+  "runURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43736437440",
+  "workflowURL": "https://github.com/Artemper52/LolzCloud/blob/55e3ac9700ce8e9330b5c190746f3fd6544f16cd/.github/workflows/verify-ios-room.yml",
   "publication": "prepared-not-published",
-  "scope": "Actual Apple SDK simulator/device compilation plus17 hosted XCTest on each fresh iPhone/iPad Simulator. PCM proof is from the production C AVPlayer tap, not UI sliders or synthetic media callbacks. No physical-device/signing claim.",
+  "scope": "Apple SDK simulator/device build,102 media/account/room policies and20 hosted XCTest on each fresh iPhone/iPad Simulator. New scope is real AVPlayer room ownership, actual WK bridge/suspension/offline flow and genuine MP3 commonMetadata persistence.",
   "sdk": {
     "status": "passed",
-    "jobId": 132836308032,
+    "jobId": 132880004906,
     "xcode": "26.3",
     "iPhoneOSSDK": "26.2",
     "simulatorSDK": "26.2",
     "minimumDeployment": "16.4",
     "simulatorBuild": "passed",
     "genericDeviceArchive": "passed",
-    "policyTests": 84,
+    "policyTests": 102,
     "artifact": {
-      "id": 14165115495,
-      "bytes": 1383121,
-      "sha256": "3130f22694f6523905dd456312b585337ff92a112725ca3a2fc65cf91af3d473"
+      "id": 14170259760,
+      "bytes": 1646341,
+      "sha256": "134296213e77e2323caa823783014c32d84d902769e74af7b69d7e2470380919"
     }
   },
   "pureVerification": {
     "linux": {
-      "passed": 84,
+      "passed": 102,
       "failed": 0,
       "swift": "6.2.1"
     },
     "macOS": {
-      "passed": 84,
+      "passed": 102,
       "failed": 0
-    },
-    "addressSanitizerLinux": {
-      "passed": 84,
-      "failed": 0,
-      "leakSanitizerEnabled": false
     },
     "versionNode": {
       "passed": 2,
       "failed": 0
     },
-    "standaloneC": {
-      "cases": 24,
-      "asan": true,
-      "leakSanitizerEnabled": true,
-      "renderHeapCalls": 0,
-      "fullPipelineTimelineFrames": 48000,
-      "maximumRelativeFrequencyError": 0.001136364
-    }
+    "addressSanitizer": "Not rerun; unchanged DSP raw hashes match published1.5 and its historical ASAN evidence."
   },
   "runtime": {
     "iphone": {
       "status": "passed",
-      "passed": 17,
+      "passed": 20,
       "failed": 0,
       "skipped": 0,
-      "jobId": 132836958256,
+      "jobId": 132880701049,
       "device": {
-        "uuid": "D20C0C08-5FE5-4FA0-B24E-3625AF520276",
+        "uuid": "7876C996-9381-41B0-9F6F-98AE2817799E",
         "family": "iphone",
         "device": "iPhone 16",
         "runtime": "iOS 26.2",
         "version": "26.2"
       },
       "artifact": {
-        "id": 14164304940,
-        "name": "LolzCloud-iOS-runtime-iphone-43722084582",
-        "size_in_bytes": 610345,
-        "digest": "sha256:a92028de6da529ae854217f8555f0d9cd46654d5d65567f12e9dd2865be1d704",
+        "id": 14171096742,
+        "name": "LolzCloud-iOS-runtime-iphone-43736437440",
+        "size_in_bytes": 1004962,
+        "digest": "sha256:c9136c8ae5d93d85c8072988b49aedcf586de420528b027cea8350e1d6757eb0",
         "expired": false,
-        "url": "https://api.github.com/repos/Artemper52/LolzCloud/actions/artifacts/14164304940",
         "workflow_run": {
-          "head_branch": "codex/recover-ios-tone-0.1.5",
+          "head_branch": "codex/recover-ios-room-0.1.6",
           "head_repository_id": 1446029268,
-          "head_sha": "f7a58a94841f7709388ad003ea40f092f0625d79",
-          "id": 43722084582,
+          "head_sha": "55e3ac9700ce8e9330b5c190746f3fd6544f16cd",
+          "id": 43736437440,
           "repository_id": 1446029268
         }
       },
-      "rawReportSha256": "eac454daaba75506896e7760e1094e10bb3777e7defa157245f881f8bebce157",
+      "rawReportSha256": "3259a3a4f3688f429e5cbecb14da038fa19335599d97a9df727676654f634454",
       "testSummary": {
         "devicesAndConfigurations": [
           {
             "device": {
               "architecture": "arm64",
-              "deviceId": "D20C0C08-5FE5-4FA0-B24E-3625AF520276",
-              "deviceName": "LolzCloud-runtime-1794751625343",
+              "deviceId": "7876C996-9381-41B0-9F6F-98AE2817799E",
+              "deviceName": "LolzCloud-runtime-1794760839785",
               "modelName": "iPhone 16",
               "osBuildNumber": "23C54",
               "osVersion": "26.2",
@@ -97,7 +84,7 @@
             },
             "expectedFailures": 0,
             "failedTests": 0,
-            "passedTests": 17,
+            "passedTests": 20,
             "skippedTests": 0,
             "testPlanConfiguration": {
               "configurationId": "1",
@@ -108,44 +95,75 @@
         "environmentDescription": "LolzCloudRuntime · Built with macOS 15.8.2",
         "expectedFailures": 0,
         "failedTests": 0,
-        "finishTime": 1794752107.029,
-        "passedTests": 17,
+        "finishTime": 1794761326.025,
+        "passedTests": 20,
         "result": "Passed",
         "skippedTests": 0,
-        "startTime": 1794751865.982,
+        "startTime": 1794761086.364,
         "statistics": [],
         "testFailures": [],
         "title": "Test - LolzCloudRuntime",
         "topInsights": [],
-        "totalTestCount": 17
+        "totalTestCount": 20
       },
       "traces": {
-        "independent-pitch": {
-          "path": "docs/ios-runtime-0.1.5/iphone-independent-pitch.json",
-          "sha256": "4096d171ba802102b6c4387cc000bcaaae9d57e47a848a7112047fc42b156f73",
-          "bytes": 4615
-        },
-        "rate-preserve": {
-          "path": "docs/ios-runtime-0.1.5/iphone-rate-preserve.json",
+        "actual-avplayer-rate-pitch-probe": {
+          "path": "docs/ios-runtime-0.1.6/iphone-actual-avplayer-rate-pitch-probe.json",
           "sha256": "df65ff1a0bdd18f9d11d670e22e5e43bf1e0733a97b62cbb83c1308081deec76",
           "bytes": 2352
         },
-        "first-last": {
-          "path": "docs/ios-runtime-0.1.5/iphone-first-last.json",
-          "sha256": "9fdaaa78bcc19320073415e231d7af1c98b85f96f85379a43a1d6c587d2b8d64",
-          "bytes": 24315
+        "actual-independent-pitch-probe": {
+          "path": "docs/ios-runtime-0.1.6/iphone-actual-independent-pitch-probe.json",
+          "sha256": "877b74ab2dd8aa9d82aafcbeb5766cfde66151a8d2b51a3601fd832563959bef",
+          "bytes": 4599
         },
-        "echo": {
-          "path": "docs/ios-runtime-0.1.5/iphone-echo.json",
+        "actual-avplayer-echo-energy": {
+          "path": "docs/ios-runtime-0.1.6/iphone-actual-avplayer-echo-energy.json",
           "sha256": "1668db7dd1a68d86fc5f1234b7d798135dafd35002a73fd4390de0adb20c605c",
           "bytes": 21709
         },
-        "reverb": {
-          "path": "docs/ios-runtime-0.1.5/iphone-reverb.json",
+        "actual-avplayer-reverb-energy": {
+          "path": "docs/ios-runtime-0.1.6/iphone-actual-avplayer-reverb-energy.json",
           "sha256": "8249cc34648dd71bd5240760984c883e5c97a22f3cb460d623aeec69d64ede6a",
           "bytes": 25769
+        },
+        "actual-avplayer-reverb-complete-relative-tail": {
+          "path": "docs/ios-runtime-0.1.6/iphone-actual-avplayer-reverb-complete-relative-tail.json",
+          "sha256": "8249cc34648dd71bd5240760984c883e5c97a22f3cb460d623aeec69d64ede6a",
+          "bytes": 25769
+        },
+        "actual-tap-compensated-first-last": {
+          "path": "docs/ios-runtime-0.1.6/iphone-actual-tap-compensated-first-last.json",
+          "sha256": "9fdaaa78bcc19320073415e231d7af1c98b85f96f85379a43a1d6c587d2b8d64",
+          "bytes": 24315
+        },
+        "native-room-offline-scope": {
+          "path": "docs/ios-runtime-0.1.6/iphone-native-room-offline-scope.json",
+          "sha256": "3d5a6621bc6024019ec3945907c7500ecdb20e37b4a5ac91d3e0bf862567684d",
+          "bytes": 294
+        },
+        "profile-share-scope": {
+          "path": "docs/ios-runtime-0.1.6/iphone-profile-share-scope.json",
+          "sha256": "20fc8d114ea7c72821c986941d736d997a96383dafa6a8b00555a8753b746ccf",
+          "bytes": 327
         }
       },
+      "screenshots": [
+        {
+          "path": "docs/ios-runtime-0.1.6/iphone-native-offline-controls-iphone.png",
+          "sha256": "8ace1e49e60c2321a80b119740a76462e1eccb9ac603bb646efb6fcd2df339b1",
+          "bytes": 283619,
+          "width": 1179,
+          "height": 2556
+        },
+        {
+          "path": "docs/ios-runtime-0.1.6/iphone-actual-system-profile-share-iphone.png",
+          "sha256": "7f59e29814c819ff81a72f8a5c394e254c37b74f5b85ebd0a6d3fe7551e5e293",
+          "bytes": 516400,
+          "width": 1179,
+          "height": 2556
+        }
+      ],
       "independentPitchObservations": [
         {
           "actualRate": 1,
@@ -157,7 +175,7 @@
           "lastMeasuredBin": 49,
           "measuredHz": 910,
           "pitch": 1,
-          "position": 0.595912001,
+          "position": 0.587516251,
           "rms": 0.0863032951147124,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -173,7 +191,7 @@
           "lastMeasuredBin": 71,
           "measuredHz": 453.3333333333333,
           "pitch": 0.5,
-          "position": 0.375549251,
+          "position": 0.381996593,
           "rms": 0.08067168978924477,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -189,7 +207,7 @@
           "lastMeasuredBin": 71,
           "measuredHz": 1136.6666666666667,
           "pitch": 1.25,
-          "position": 0.366592958,
+          "position": 0.382362938,
           "rms": 0.08343756951540728,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -205,7 +223,7 @@
           "lastMeasuredBin": 71,
           "measuredHz": 1820,
           "pitch": 2,
-          "position": 0.369377824,
+          "position": 0.377414262,
           "rms": 0.0853088058429528,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -221,7 +239,7 @@
           "lastMeasuredBin": 68,
           "measuredHz": 453.3333333333333,
           "pitch": 0.5,
-          "position": 0.596314395,
+          "position": 0.593713583,
           "rms": 0.08067076211098027,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -237,7 +255,7 @@
           "lastMeasuredBin": 68,
           "measuredHz": 1136.6666666666667,
           "pitch": 1.25,
-          "position": 0.623570105,
+          "position": 0.601262,
           "rms": 0.08345454906991383,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -253,7 +271,7 @@
           "lastMeasuredBin": 68,
           "measuredHz": 1820,
           "pitch": 2,
-          "position": 0.586514,
+          "position": 0.593748918,
           "rms": 0.08530648450172433,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -269,7 +287,7 @@
           "lastMeasuredBin": 72,
           "measuredHz": 660,
           "pitch": 1,
-          "position": 0.490406722,
+          "position": 0.511401767,
           "rms": 0.08395143461819288,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
@@ -285,7 +303,7 @@
           "lastMeasuredBin": 74,
           "measuredHz": 330,
           "pitch": 0.5,
-          "position": 0.371594453,
+          "position": 0.369316156,
           "rms": 0.08054039594975838,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
@@ -301,7 +319,7 @@
           "lastMeasuredBin": 74,
           "measuredHz": 823.3333333333334,
           "pitch": 1.25,
-          "position": 0.366647983,
+          "position": 0.374271374,
           "rms": 0.08027460657627249,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
@@ -317,7 +335,7 @@
           "lastMeasuredBin": 74,
           "measuredHz": 1320,
           "pitch": 2,
-          "position": 0.370189909,
+          "position": 0.375694,
           "rms": 0.08000572291255195,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
@@ -333,7 +351,7 @@
           "lastMeasuredBin": 70,
           "measuredHz": 330,
           "pitch": 0.5,
-          "position": 0.587521508,
+          "position": 0.614014011,
           "rms": 0.08054039404786827,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
@@ -349,7 +367,7 @@
           "lastMeasuredBin": 70,
           "measuredHz": 826.6666666666666,
           "pitch": 1.25,
-          "position": 0.582462515,
+          "position": 0.575879615,
           "rms": 0.08027665852482542,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
@@ -365,192 +383,54 @@
           "lastMeasuredBin": 70,
           "measuredHz": 1320,
           "pitch": 2,
-          "position": 0.612548672,
+          "position": 0.615083172,
           "rms": 0.08000843427850718,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
           "tempo": 1.5
         }
       ],
-      "ratePreserveObservations": [
-        {
-          "algorithm": "Spectral",
-          "crossings": 273,
-          "firstMeasuredBin": 20,
-          "frames": 14400,
-          "inputSignalStartBin": 0,
-          "lastMeasuredBin": 49,
-          "preservesPitch": true,
-          "rate": 1,
-          "sampleRate": 48000,
-          "source": "localWAV",
-          "tapHz": 910
-        },
-        {
-          "algorithm": "Varispeed",
-          "crossings": 409,
-          "firstMeasuredBin": 32,
-          "frames": 14400,
-          "inputSignalStartBin": 12,
-          "lastMeasuredBin": 61,
-          "preservesPitch": false,
-          "rate": 1.5,
-          "sampleRate": 48000,
-          "source": "localWAV",
-          "tapHz": 1363.3333333333333
-        },
-        {
-          "algorithm": "Spectral",
-          "crossings": 273,
-          "firstMeasuredBin": 39,
-          "frames": 14400,
-          "inputSignalStartBin": 19,
-          "lastMeasuredBin": 68,
-          "preservesPitch": true,
-          "rate": 1.5,
-          "sampleRate": 48000,
-          "source": "localWAV",
-          "tapHz": 910
-        },
-        {
-          "algorithm": "Varispeed",
-          "crossings": 204,
-          "firstMeasuredBin": 32,
-          "frames": 14400,
-          "inputSignalStartBin": 12,
-          "lastMeasuredBin": 61,
-          "preservesPitch": false,
-          "rate": 0.75,
-          "sampleRate": 48000,
-          "source": "localWAV",
-          "tapHz": 680
-        },
-        {
-          "algorithm": "Spectral",
-          "crossings": 273,
-          "firstMeasuredBin": 42,
-          "frames": 14400,
-          "inputSignalStartBin": 22,
-          "lastMeasuredBin": 71,
-          "preservesPitch": true,
-          "rate": 0.75,
-          "sampleRate": 48000,
-          "source": "localWAV",
-          "tapHz": 910
-        },
-        {
-          "algorithm": "Spectral",
-          "crossings": 198,
-          "firstMeasuredBin": 43,
-          "frames": 13230,
-          "inputSignalStartBin": 23,
-          "lastMeasuredBin": 72,
-          "preservesPitch": true,
-          "rate": 1,
-          "sampleRate": 44100,
-          "source": "seededGenuineMP3",
-          "tapHz": 660
-        },
-        {
-          "algorithm": "Varispeed",
-          "crossings": 297,
-          "firstMeasuredBin": 34,
-          "frames": 13230,
-          "inputSignalStartBin": 14,
-          "lastMeasuredBin": 63,
-          "preservesPitch": false,
-          "rate": 1.5,
-          "sampleRate": 44100,
-          "source": "seededGenuineMP3",
-          "tapHz": 990
-        },
-        {
-          "algorithm": "Spectral",
-          "crossings": 198,
-          "firstMeasuredBin": 41,
-          "frames": 13230,
-          "inputSignalStartBin": 21,
-          "lastMeasuredBin": 70,
-          "preservesPitch": true,
-          "rate": 1.5,
-          "sampleRate": 44100,
-          "source": "seededGenuineMP3",
-          "tapHz": 660
-        },
-        {
-          "algorithm": "Varispeed",
-          "crossings": 148,
-          "firstMeasuredBin": 35,
-          "frames": 13230,
-          "inputSignalStartBin": 15,
-          "lastMeasuredBin": 64,
-          "preservesPitch": false,
-          "rate": 0.75,
-          "sampleRate": 44100,
-          "source": "seededGenuineMP3",
-          "tapHz": 493.3333333333333
-        },
-        {
-          "algorithm": "Spectral",
-          "crossings": 198,
-          "firstMeasuredBin": 45,
-          "frames": 13230,
-          "inputSignalStartBin": 25,
-          "lastMeasuredBin": 74,
-          "preservesPitch": true,
-          "rate": 0.75,
-          "sampleRate": 44100,
-          "source": "seededGenuineMP3",
-          "tapHz": 660
-        }
-      ],
-      "latencyBoundary": {
-        "inputAndOutputEnergyMatched": true,
-        "firstInputBin": 12,
-        "lastInputBin": 212,
-        "markerSpacingSeconds": 2.0,
-        "actualSourceFramesIncludingApplePadding": 110592,
-        "sampleRate": 48000,
-        "assetDurationSeconds": 2,
-        "AVPlayerDurationAssertion": "2s +/-80ms; passed"
+      "roomOfflineScope": {
+        "commands": 5,
+        "fixture": "Declared own-origin HTMLAudio room and actual WK message bridge; no provider login or server mutation",
+        "offline": "Permanent media suspension, blank-document commit, private file play, seek/next/previous/repeat-one, fresh app reload without autoplay"
       }
     },
     "ipad": {
       "status": "passed",
-      "passed": 17,
+      "passed": 20,
       "failed": 0,
       "skipped": 0,
-      "jobId": 132836958194,
+      "jobId": 132880701145,
       "device": {
-        "uuid": "EDDFA263-9DA8-4290-8CEE-3A5A697BA7E8",
+        "uuid": "FE21AEEF-0349-4614-8850-093E8FDC0E43",
         "family": "ipad",
         "device": "iPad Pro 11-inch (M4) (16GB)",
         "runtime": "iOS 26.2",
         "version": "26.2"
       },
       "artifact": {
-        "id": 14165980248,
-        "name": "LolzCloud-iOS-runtime-ipad-43722084582",
-        "size_in_bytes": 710709,
-        "digest": "sha256:b17a175ad5386277632e22d99565112cd222af265878ac21687637f28cf73c58",
+        "id": 14170942072,
+        "name": "LolzCloud-iOS-runtime-ipad-43736437440",
+        "size_in_bytes": 690385,
+        "digest": "sha256:6c79de04e015289f4107105e0712d05f9ba1635ea5f133a18e6216cde38c5267",
         "expired": false,
-        "url": "https://api.github.com/repos/Artemper52/LolzCloud/actions/artifacts/14165980248",
         "workflow_run": {
-          "head_branch": "codex/recover-ios-tone-0.1.5",
+          "head_branch": "codex/recover-ios-room-0.1.6",
           "head_repository_id": 1446029268,
-          "head_sha": "f7a58a94841f7709388ad003ea40f092f0625d79",
-          "id": 43722084582,
+          "head_sha": "55e3ac9700ce8e9330b5c190746f3fd6544f16cd",
+          "id": 43736437440,
           "repository_id": 1446029268
         }
       },
-      "rawReportSha256": "6034dfce2350c14f13f4edf3deb25dd0d6ccd527f46a2a31a674e0c3f3bc2f67",
+      "rawReportSha256": "8b96afb4c6c5b6a79909b118317152a6c6a0f9b9e61686cf2fc9087c283f6618",
       "testSummary": {
         "devicesAndConfigurations": [
           {
             "device": {
               "architecture": "arm64",
-              "deviceId": "EDDFA263-9DA8-4290-8CEE-3A5A697BA7E8",
-              "deviceName": "LolzCloud-runtime-1794751532435",
+              "deviceId": "FE21AEEF-0349-4614-8850-093E8FDC0E43",
+              "deviceName": "LolzCloud-runtime-1794760800469",
               "modelName": "iPad Pro 11-inch (M4) (16GB)",
               "osBuildNumber": "23C54",
               "osVersion": "26.2",
@@ -558,7 +438,7 @@
             },
             "expectedFailures": 0,
             "failedTests": 0,
-            "passedTests": 17,
+            "passedTests": 20,
             "skippedTests": 0,
             "testPlanConfiguration": {
               "configurationId": "1",
@@ -569,44 +449,75 @@
         "environmentDescription": "LolzCloudRuntime · Built with macOS 15.8.2",
         "expectedFailures": 0,
         "failedTests": 0,
-        "finishTime": 1794752018.479,
-        "passedTests": 17,
+        "finishTime": 1794761302.495,
+        "passedTests": 20,
         "result": "Passed",
         "skippedTests": 0,
-        "startTime": 1794751771.138,
+        "startTime": 1794761013.737,
         "statistics": [],
         "testFailures": [],
         "title": "Test - LolzCloudRuntime",
         "topInsights": [],
-        "totalTestCount": 17
+        "totalTestCount": 20
       },
       "traces": {
-        "independent-pitch": {
-          "path": "docs/ios-runtime-0.1.5/ipad-independent-pitch.json",
-          "sha256": "a8c416f589c95d66168c2523421cbfbfc7c14db4305bd38759f9eecc686a0a99",
-          "bytes": 4607
-        },
-        "rate-preserve": {
-          "path": "docs/ios-runtime-0.1.5/ipad-rate-preserve.json",
+        "actual-avplayer-rate-pitch-probe": {
+          "path": "docs/ios-runtime-0.1.6/ipad-actual-avplayer-rate-pitch-probe.json",
           "sha256": "df65ff1a0bdd18f9d11d670e22e5e43bf1e0733a97b62cbb83c1308081deec76",
           "bytes": 2352
         },
-        "first-last": {
-          "path": "docs/ios-runtime-0.1.5/ipad-first-last.json",
-          "sha256": "9fdaaa78bcc19320073415e231d7af1c98b85f96f85379a43a1d6c587d2b8d64",
-          "bytes": 24315
+        "actual-independent-pitch-probe": {
+          "path": "docs/ios-runtime-0.1.6/ipad-actual-independent-pitch-probe.json",
+          "sha256": "5beff61297aabf4bd190e1f288012c0caa826ce3d962a3dadd036c39864d565f",
+          "bytes": 4615
         },
-        "echo": {
-          "path": "docs/ios-runtime-0.1.5/ipad-echo.json",
+        "actual-avplayer-echo-energy": {
+          "path": "docs/ios-runtime-0.1.6/ipad-actual-avplayer-echo-energy.json",
           "sha256": "1668db7dd1a68d86fc5f1234b7d798135dafd35002a73fd4390de0adb20c605c",
           "bytes": 21709
         },
-        "reverb": {
-          "path": "docs/ios-runtime-0.1.5/ipad-reverb.json",
+        "actual-avplayer-reverb-energy": {
+          "path": "docs/ios-runtime-0.1.6/ipad-actual-avplayer-reverb-energy.json",
           "sha256": "8249cc34648dd71bd5240760984c883e5c97a22f3cb460d623aeec69d64ede6a",
           "bytes": 25769
+        },
+        "actual-avplayer-reverb-complete-relative-tail": {
+          "path": "docs/ios-runtime-0.1.6/ipad-actual-avplayer-reverb-complete-relative-tail.json",
+          "sha256": "8249cc34648dd71bd5240760984c883e5c97a22f3cb460d623aeec69d64ede6a",
+          "bytes": 25769
+        },
+        "actual-tap-compensated-first-last": {
+          "path": "docs/ios-runtime-0.1.6/ipad-actual-tap-compensated-first-last.json",
+          "sha256": "9fdaaa78bcc19320073415e231d7af1c98b85f96f85379a43a1d6c587d2b8d64",
+          "bytes": 24315
+        },
+        "native-room-offline-scope": {
+          "path": "docs/ios-runtime-0.1.6/ipad-native-room-offline-scope.json",
+          "sha256": "3d5a6621bc6024019ec3945907c7500ecdb20e37b4a5ac91d3e0bf862567684d",
+          "bytes": 294
+        },
+        "profile-share-scope": {
+          "path": "docs/ios-runtime-0.1.6/ipad-profile-share-scope.json",
+          "sha256": "51853d6d4b22f1bcbdc516afb538ad12b1c04fc05b96cff79d91e2a04a58fc4a",
+          "bytes": 326
         }
       },
+      "screenshots": [
+        {
+          "path": "docs/ios-runtime-0.1.6/ipad-native-offline-controls-ipad.png",
+          "sha256": "bfdbb7a5b361edcacc629a41b6397babf6225888f21ce9a236310ee5571bfcdd",
+          "bytes": 266369,
+          "width": 1668,
+          "height": 2420
+        },
+        {
+          "path": "docs/ios-runtime-0.1.6/ipad-actual-system-profile-share-ipad.png",
+          "sha256": "4b65fb3aef42ce9f0021d85564aa60224ee130d6033ec0894e512cfb44c3c25f",
+          "bytes": 486630,
+          "width": 1668,
+          "height": 2420
+        }
+      ],
       "independentPitchObservations": [
         {
           "actualRate": 1,
@@ -618,7 +529,7 @@
           "lastMeasuredBin": 49,
           "measuredHz": 910,
           "pitch": 1,
-          "position": 0.596539458,
+          "position": 0.5950735,
           "rms": 0.0863032951147124,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -634,7 +545,7 @@
           "lastMeasuredBin": 71,
           "measuredHz": 453.3333333333333,
           "pitch": 0.5,
-          "position": 0.381302845,
+          "position": 0.368574042,
           "rms": 0.08067168978924477,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -650,7 +561,7 @@
           "lastMeasuredBin": 71,
           "measuredHz": 1136.6666666666667,
           "pitch": 1.25,
-          "position": 0.366677489,
+          "position": 0.380635459,
           "rms": 0.08343756951540728,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -666,7 +577,7 @@
           "lastMeasuredBin": 71,
           "measuredHz": 1820,
           "pitch": 2,
-          "position": 0.384484656,
+          "position": 0.382662926,
           "rms": 0.0853088058429528,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -682,7 +593,7 @@
           "lastMeasuredBin": 68,
           "measuredHz": 453.3333333333333,
           "pitch": 0.5,
-          "position": 0.595179771,
+          "position": 0.61565652,
           "rms": 0.08067076211098027,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -698,7 +609,7 @@
           "lastMeasuredBin": 68,
           "measuredHz": 1136.6666666666667,
           "pitch": 1.25,
-          "position": 0.587083125,
+          "position": 0.621391728,
           "rms": 0.08345454906991383,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -714,7 +625,7 @@
           "lastMeasuredBin": 68,
           "measuredHz": 1820,
           "pitch": 2,
-          "position": 0.584250854,
+          "position": 0.586654376,
           "rms": 0.08530648450172433,
           "sampleRate": 48000,
           "source": "localWAV",
@@ -730,7 +641,7 @@
           "lastMeasuredBin": 72,
           "measuredHz": 660,
           "pitch": 1,
-          "position": 0.506608203,
+          "position": 0.512663561,
           "rms": 0.08395143461819288,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
@@ -746,7 +657,7 @@
           "lastMeasuredBin": 74,
           "measuredHz": 330,
           "pitch": 0.5,
-          "position": 0.37217307,
+          "position": 0.370217285,
           "rms": 0.08054039594975838,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
@@ -762,7 +673,7 @@
           "lastMeasuredBin": 74,
           "measuredHz": 823.3333333333334,
           "pitch": 1.25,
-          "position": 0.36048284,
+          "position": 0.377446675,
           "rms": 0.08027460657627249,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
@@ -778,7 +689,7 @@
           "lastMeasuredBin": 74,
           "measuredHz": 1320,
           "pitch": 2,
-          "position": 0.374547209,
+          "position": 0.372417395,
           "rms": 0.08000572291255195,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
@@ -794,7 +705,7 @@
           "lastMeasuredBin": 70,
           "measuredHz": 330,
           "pitch": 0.5,
-          "position": 0.586332432,
+          "position": 0.612329657,
           "rms": 0.08054039404786827,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
@@ -810,7 +721,7 @@
           "lastMeasuredBin": 70,
           "measuredHz": 826.6666666666666,
           "pitch": 1.25,
-          "position": 0.576725267,
+          "position": 0.576906876,
           "rms": 0.08027665852482542,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
@@ -826,176 +737,41 @@
           "lastMeasuredBin": 70,
           "measuredHz": 1320,
           "pitch": 2,
-          "position": 0.589126736,
+          "position": 0.610256895,
           "rms": 0.08000843427850718,
           "sampleRate": 44100,
           "source": "seededGenuineMP3",
           "tempo": 1.5
         }
       ],
-      "ratePreserveObservations": [
-        {
-          "algorithm": "Spectral",
-          "crossings": 273,
-          "firstMeasuredBin": 20,
-          "frames": 14400,
-          "inputSignalStartBin": 0,
-          "lastMeasuredBin": 49,
-          "preservesPitch": true,
-          "rate": 1,
-          "sampleRate": 48000,
-          "source": "localWAV",
-          "tapHz": 910
-        },
-        {
-          "algorithm": "Varispeed",
-          "crossings": 409,
-          "firstMeasuredBin": 32,
-          "frames": 14400,
-          "inputSignalStartBin": 12,
-          "lastMeasuredBin": 61,
-          "preservesPitch": false,
-          "rate": 1.5,
-          "sampleRate": 48000,
-          "source": "localWAV",
-          "tapHz": 1363.3333333333333
-        },
-        {
-          "algorithm": "Spectral",
-          "crossings": 273,
-          "firstMeasuredBin": 39,
-          "frames": 14400,
-          "inputSignalStartBin": 19,
-          "lastMeasuredBin": 68,
-          "preservesPitch": true,
-          "rate": 1.5,
-          "sampleRate": 48000,
-          "source": "localWAV",
-          "tapHz": 910
-        },
-        {
-          "algorithm": "Varispeed",
-          "crossings": 204,
-          "firstMeasuredBin": 32,
-          "frames": 14400,
-          "inputSignalStartBin": 12,
-          "lastMeasuredBin": 61,
-          "preservesPitch": false,
-          "rate": 0.75,
-          "sampleRate": 48000,
-          "source": "localWAV",
-          "tapHz": 680
-        },
-        {
-          "algorithm": "Spectral",
-          "crossings": 273,
-          "firstMeasuredBin": 42,
-          "frames": 14400,
-          "inputSignalStartBin": 22,
-          "lastMeasuredBin": 71,
-          "preservesPitch": true,
-          "rate": 0.75,
-          "sampleRate": 48000,
-          "source": "localWAV",
-          "tapHz": 910
-        },
-        {
-          "algorithm": "Spectral",
-          "crossings": 198,
-          "firstMeasuredBin": 43,
-          "frames": 13230,
-          "inputSignalStartBin": 23,
-          "lastMeasuredBin": 72,
-          "preservesPitch": true,
-          "rate": 1,
-          "sampleRate": 44100,
-          "source": "seededGenuineMP3",
-          "tapHz": 660
-        },
-        {
-          "algorithm": "Varispeed",
-          "crossings": 297,
-          "firstMeasuredBin": 34,
-          "frames": 13230,
-          "inputSignalStartBin": 14,
-          "lastMeasuredBin": 63,
-          "preservesPitch": false,
-          "rate": 1.5,
-          "sampleRate": 44100,
-          "source": "seededGenuineMP3",
-          "tapHz": 990
-        },
-        {
-          "algorithm": "Spectral",
-          "crossings": 198,
-          "firstMeasuredBin": 41,
-          "frames": 13230,
-          "inputSignalStartBin": 21,
-          "lastMeasuredBin": 70,
-          "preservesPitch": true,
-          "rate": 1.5,
-          "sampleRate": 44100,
-          "source": "seededGenuineMP3",
-          "tapHz": 660
-        },
-        {
-          "algorithm": "Varispeed",
-          "crossings": 148,
-          "firstMeasuredBin": 35,
-          "frames": 13230,
-          "inputSignalStartBin": 15,
-          "lastMeasuredBin": 64,
-          "preservesPitch": false,
-          "rate": 0.75,
-          "sampleRate": 44100,
-          "source": "seededGenuineMP3",
-          "tapHz": 493.3333333333333
-        },
-        {
-          "algorithm": "Spectral",
-          "crossings": 198,
-          "firstMeasuredBin": 45,
-          "frames": 13230,
-          "inputSignalStartBin": 25,
-          "lastMeasuredBin": 74,
-          "preservesPitch": true,
-          "rate": 0.75,
-          "sampleRate": 44100,
-          "source": "seededGenuineMP3",
-          "tapHz": 660
-        }
-      ],
-      "latencyBoundary": {
-        "inputAndOutputEnergyMatched": true,
-        "firstInputBin": 12,
-        "lastInputBin": 212,
-        "markerSpacingSeconds": 2.0,
-        "actualSourceFramesIncludingApplePadding": 110592,
-        "sampleRate": 48000,
-        "assetDurationSeconds": 2,
-        "AVPlayerDurationAssertion": "2s +/-80ms; passed"
+      "roomOfflineScope": {
+        "commands": 5,
+        "fixture": "Declared own-origin HTMLAudio room and actual WK message bridge; no provider login or server mutation",
+        "offline": "Permanent media suspension, blank-document commit, private file play, seek/next/previous/repeat-one, fresh app reload without autoplay"
       }
     }
   },
   "compiledProductionHashes": {
     "AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
-    "App.swift": "3b5c81223f5a8cc905f825c805ae1b716a9b6dd168ba0a28a834d89cf51bcf71",
+    "App.swift": "1c6866502e19d58f07da0a7affdd52704e4028b3d272b7708e38197ea49ebf58",
     "AudioEffectsPolicy.swift": "6896cb5c5f14f552cf874ce2abb051a9223c8107818eaee1f706ac1415a05f80",
     "DSPCore.c": "f8c4d8ccdf7651a5ef795207abbd69435a417885f3e08279f246afbc32fc443e",
     "NativeAudioTap.c": "357042c12d2a2e7c4e1b7d3703be8b5b090b6cf5734105cac29f01112dfb2e43",
     "PCMStream.c": "c457db11ca8452c64d8ed61843e09203090df24ef9ccf29ecca45110e54cc5cf",
     "PitchCore.c": "577adbdad248f57bf66b53146eabf21b6b90acddae5ad6c7acef19bf1b7b3e0b",
-    "MediaPolicy.swift": "e1497aa0f6564aff26211dcb634072dfd6b3ab5ab2ea215927355e6e7abc4c5e",
+    "MediaPolicy.swift": "9674f8c92c96eb695579f85b21e97fe943d8a6d272f445c728c669d07d3d9f68",
     "NativeAudioEffects.swift": "acf5527e749b4ed5a512ea63c2e96245b46c928d4cdfd8f3f619894999bcbc82",
     "NativeCatalog.swift": "757ee942d3f9d6e9854f8b2ffed1bdb3ebcd8da0d25e45ac22be8c8795937c0f",
-    "NativePlayer.swift": "ae5beed1ed3373f041072f69a25e921e590f627214879fe58dda2e193853adc0",
+    "NativePlayer.swift": "4b4a1c885eb257d8f1f7056efc4b55c10f3445a66718d71cc036a3f6fe562d78",
     "NativeProfileShare.swift": "2818dccc99e4c9e61c8603ca979ccf77b62389797a0fdaf5bc75734665eb23c5",
-    "NativeRatePolicy.swift": "fc6feb5626219cdec2f0a3e6b4f2233ae7c19e15f183ef57f84a7c5abb18da39"
+    "NativeRatePolicy.swift": "fc6feb5626219cdec2f0a3e6b4f2233ae7c19e15f183ef57f84a7c5abb18da39",
+    "NativeRoomPolicy.swift": "b8e270f95827c199ffb621c33f71440c28ab82f7156a810c379aa8ee7965008f"
   },
   "canonicalInputHashes": {
     "ios/KernelTests/pitch-probe.c": "661f1cee89fd5bbd0904a6ced649a33d731cdc0201d27444d424218ff97a77f7",
+    "ios/LolzCloud.xcodeproj/project.pbxproj": "c886e236ad88fa32fb2167e0f92147108029714f5d9b200ae6bd79eb37138394",
     "ios/LolzCloud/AccountLogin.swift": "f11bf7ee2bec7f5d82d523694644811bf1b80baca6babcb0c98d1f201e480734",
-    "ios/LolzCloud/App.swift": "3b5c81223f5a8cc905f825c805ae1b716a9b6dd168ba0a28a834d89cf51bcf71",
+    "ios/LolzCloud/App.swift": "1c6866502e19d58f07da0a7affdd52704e4028b3d272b7708e38197ea49ebf58",
     "ios/LolzCloud/AudioEffectsPolicy.swift": "6896cb5c5f14f552cf874ce2abb051a9223c8107818eaee1f706ac1415a05f80",
     "ios/LolzCloud/DSP/DSPCore.c": "f8c4d8ccdf7651a5ef795207abbd69435a417885f3e08279f246afbc32fc443e",
     "ios/LolzCloud/DSP/NativeAudioEffectsBridge.h": "b2a95cc7ee4c027b32d49a7f97a25dab0e5734e5381ae24cb0a48ccf30795317",
@@ -1006,37 +782,42 @@
     "ios/LolzCloud/DSP/include/LCDSPCore.h": "3e58e30abd74bda5831788b0a43ec0f7ee9cfbea3f0fdc206bcbac6603c68f86",
     "ios/LolzCloud/DSP/include/LCPCMStream.h": "a277ed54f1422c59801669cbbee18e50b5d9fa2d80f8735d74977bb4f494765c",
     "ios/LolzCloud/DSP/include/LCPitchCore.h": "909204e813ca5adcfa4a2a5989d74a161fa00c04137517ae1aa09a08feeb45a6",
-    "ios/LolzCloud/MediaPolicy.swift": "e1497aa0f6564aff26211dcb634072dfd6b3ab5ab2ea215927355e6e7abc4c5e",
+    "ios/LolzCloud/Info.plist": "53c5cc0a3bd94221aacbd18efca650d5f9e36e5ebf42982364e22ccfae0e8a64",
+    "ios/LolzCloud/MediaPolicy.swift": "9674f8c92c96eb695579f85b21e97fe943d8a6d272f445c728c669d07d3d9f68",
     "ios/LolzCloud/NativeAudioEffects.swift": "acf5527e749b4ed5a512ea63c2e96245b46c928d4cdfd8f3f619894999bcbc82",
     "ios/LolzCloud/NativeCatalog.swift": "757ee942d3f9d6e9854f8b2ffed1bdb3ebcd8da0d25e45ac22be8c8795937c0f",
-    "ios/LolzCloud/NativePlayer.swift": "ae5beed1ed3373f041072f69a25e921e590f627214879fe58dda2e193853adc0",
+    "ios/LolzCloud/NativePlayer.swift": "4b4a1c885eb257d8f1f7056efc4b55c10f3445a66718d71cc036a3f6fe562d78",
     "ios/LolzCloud/NativeProfileShare.swift": "2818dccc99e4c9e61c8603ca979ccf77b62389797a0fdaf5bc75734665eb23c5",
     "ios/LolzCloud/NativeRatePolicy.swift": "fc6feb5626219cdec2f0a3e6b4f2233ae7c19e15f183ef57f84a7c5abb18da39",
-    "ios/Package.swift": "8cae4be078f48a5c66293c42531ca613ae8d2d0b2dd01324d96ce1a5d3e7141b",
-    "ios/RuntimeTests/NativeRuntimeTests.swift": "7169363486150e2677923bee1343756ca5564fba01692dd5c6242ed483b5ee0b",
+    "ios/LolzCloud/NativeRoomPolicy.swift": "b8e270f95827c199ffb621c33f71440c28ab82f7156a810c379aa8ee7965008f",
+    "ios/Package.swift": "ee1c6f0e44288f2805a3ea569a34980eee379394dbf8de33d30329d7900a35cd",
+    "ios/ROOM_HANDOFF.md": "6c03c15d304b3307946d212ca41100304a4e09007df736b3dfa3f7ab154f5f06",
+    "ios/RuntimeTests/NativeRuntimeTests.swift": "23180de87d573262cd0937e58880962b1fd09ddec03dbcc571680a4dc7e18f99",
     "ios/Tests/AdvancedAudioEffectsTests.swift": "0e99d1eb1f560792f840bbb7275a8ccf5bf6f0756a9d91cc07e84efcfb5295d0",
     "ios/Tests/AudioEffectsTests.swift": "ba52ce833fff36f9298f0389a945ad10a09748fee2ac2b8ef30b3b9d83832c0b",
+    "ios/Tests/ImportedAudioMetadataTests.swift": "9f6baf6c20fd878f27532c8825a7120a64d347a2d8e6284b10c2ca58417c6054",
     "ios/Tests/IndependentPitchTests.swift": "245cd5750555eed82e801648eaa69fd76cace4b8b34572fec82bd764200a0729",
     "ios/Tests/MediaPolicyTests.swift": "fc6ea87bafb7987286b934f721437874d314e5d3f1e4678f90cf53beb32f4913",
     "ios/Tests/NativeCatalogTests.swift": "94a90789e7387938dc9b1b031848e06460d875685f92c91bc00c5e525fc600e0",
     "ios/Tests/NativeRatePolicyTests.swift": "3305d55b34791621426f1fc7008ee59b2f638b47bc8065d0cf120eb3f34ee3e2",
+    "ios/Tests/NativeRoomPolicyTests.swift": "74219eb7034924a022aa9b8653c374f9ac3fd0b8c5924eb7167c552035307d9a",
     "ios/Tests/PortableProfileFileTests.swift": "6217c5e690cd983c3fe90985d8213435aee1070dcd8aa135b5d3dd9390dbac1f",
-    "ios/tools/CheckProject.swift": "5ffba84ba5f9a3a71758f53ed9cfd2ef849c1166af0c955b3c76b07f66077a13",
-    "ios/tools/project.cjs": "9af6891b0842bab1a89451b88e7ae99fe31f1ca5681bea1b9505546ac6525193",
-    "ios/tools/runtime-project.cjs": "2ee1862b9e87c7ecad72ee30cb0c634be645251ddf771ce9e3dceea8c3517fa6"
+    "ios/tools/CheckProject.swift": "4ea2beec30661dc32b6ff73e92e0d97e810db1baa5d223e54706efc47f059c01",
+    "ios/tools/project.cjs": "539ed3b268dd86760e38e6b11af6b3ab10309c1e89f662adde09feadbe9a2d13",
+    "ios/tools/runtime-project.cjs": "c23972585b7c99e3bbe8ece8a6a53eef04147fb3c6891f05b336edfd0e9f5492"
   },
-  "canonicalInputsVerified": 31,
-  "compiledProductionInputsVerified": 13,
-  "infoPlistSha256": "2d444897427aadcad285c8aaa178bb69c15ac75c30e6386c08b0fb11a450ebd5",
+  "canonicalInputsVerified": 37,
+  "compiledProductionInputsVerified": 14,
+  "infoPlistSha256": "53c5cc0a3bd94221aacbd18efca650d5f9e36e5ebf42982364e22ccfae0e8a64",
   "binaries": [
     {
-      "name": "LolzCloud-iOS-0.1.5-simulator.zip",
-      "bytes": 1106970,
-      "sha256": "f10ee1d6c48477c1c732bf2b6c9ebf045ca26163f34e79a8ba02ecb7b58ed5d1",
+      "name": "LolzCloud-iOS-0.1.6-simulator.zip",
+      "bytes": 1317138,
+      "sha256": "0c8928c9e85e2d30e89a818b217d23149d45fe6b3ff9ad5573b3aa604d696e61",
       "bundle": {
         "id": "com.lolzcloud.ios",
-        "version": "0.1.5",
-        "build": "6",
+        "version": "0.1.6",
+        "build": "7",
         "minimumOS": "16.4",
         "families": [
           1,
@@ -1066,13 +847,13 @@
       "appleDistributionSigned": false
     },
     {
-      "name": "LolzCloud-iOS-0.1.5-unsigned.ipa",
-      "bytes": 287374,
-      "sha256": "d834698cedde7f12b9077f2cbc535186790e9560673bf9cdb70734100fcfdbe1",
+      "name": "LolzCloud-iOS-0.1.6-unsigned.ipa",
+      "bytes": 340629,
+      "sha256": "a99b90e9f8abb64d53b4096888680e29346e1f1720dabb98fc304078b864cd81",
       "bundle": {
         "id": "com.lolzcloud.ios",
-        "version": "0.1.5",
-        "build": "6",
+        "version": "0.1.6",
+        "build": "7",
         "minimumOS": "16.4",
         "families": [
           1,
@@ -1094,103 +875,103 @@
       "appleDistributionSigned": false
     }
   ],
-  "audioProof": {
-    "independentPitch": true,
-    "pitchBounds": [
-      0.5,
-      2
+  "hostedSource": {
+    "total": 20,
+    "historical17BodiesUnchangedIgnoringLineEndings": true,
+    "firstSuccessful20BodiesRawUnchanged": true,
+    "newTests": [
+      "testImportReadsRealMP3MetadataAndPersistsPrivateCopy",
+      "testRoomOwnershipFencesRealSoloAndRoutesSystemTransportWithoutAutoplay",
+      "testRealWebKitRoomCommandsAndSuspendedOfflineHandoff"
+    ]
+  },
+  "roomOwnership": {
+    "capability": "roomTransport:1",
+    "owner": [
+      "roomId",
+      "documentId",
+      "epoch"
     ],
-    "measuredPitchRatios": [
-      0.5,
-      1,
-      1.25,
-      2
+    "snapshotRevisionIndependentOfEpoch": true,
+    "commands": [
+      "play",
+      "pause",
+      "next",
+      "previous",
+      "seek"
     ],
-    "measuredTempos": [
-      0.75,
-      1,
-      1.5
-    ],
-    "measurement": "Positive crossings over the original full200..500ms interval relative to actual INPUT-signal onset, never chosen by output frequency; original4% and RMS0.68..1.48 bounds retained.",
+    "deliveryTTLSeconds": 3,
+    "completionAfterAcceptedSeconds": 60,
+    "absoluteDeadlineSeconds": 63,
+    "maximumPending": 8,
+    "acceptedIsNotPlaybackSuccess": true,
+    "oldSoloQueueFencedAfterReleaseOrDocumentReplacement": true,
+    "explicitSoloOnly": true,
+    "background": "Best effort ready trusted WK attempt, never native solo fallback; physical suspended delivery unproved."
+  },
+  "metadataImport": {
+    "actualID3TitleArtistRead": true,
+    "filenameDoesNotOverrideEmbeddedMetadata": true,
+    "privateCopyBytesUnchanged": true,
+    "atomicIndexReloadPreservesMetadata": true,
+    "maximumMetadataItems": 64,
+    "maximumStringsPerField": 4,
+    "metadataCancellationAfterSeconds": 3,
+    "artworkValuesLoaded": false
+  },
+  "offline": {
+    "persistentWKMediaSuspensionBeforeBlankDocument": true,
+    "oldBridgeMessagesRefused": true,
+    "sharedQueuePolicy": true,
+    "realPrivateFilePlaybackSeekNextPreviousRepeatOne": true,
+    "freshAppReloadDoesNotAutoplay": true,
+    "fullOfflineEQAndLyricsUI": false
+  },
+  "audioRegression": {
+    "actualIndependentObservationsPerFamily": 14,
     "maximumRelativeFrequencyError": 0.0036630036630037046,
     "measuredRMSRatioRange": [
       0.9347355973344299,
       1.0
     ],
-    "actualObservationsPerFamily": 14,
-    "legacyPreservesPitchObservationsPerFamily": 10,
-    "EQDisabledDuringIndependentTone": true,
-    "tempoAndDurationUnchanged": true,
-    "firstLastMarkersPreserved": true,
-    "renderAllocationProof": "C wrapper reports0 malloc/calloc/realloc/free during render; all buffers allocated at prepare.",
-    "physicalOutputMeasured": false
+    "firstLastInputOutputMarkersPreserved": true,
+    "old17ThresholdsUnchanged": true
   },
-  "protocol": {
-    "legacyDiscovery": {
-      "effectsSchema": 2,
-      "maxEffectsSchema": 3,
-      "independentPitch": 1
-    },
-    "acceptedExactConfigFieldCounts": [
-      3,
-      6,
-      7
-    ],
-    "pitchDefault": 1,
-    "legacyShapesForcePitchUnity": true,
-    "independentPitchActiveWithEQDisabled": true,
-    "tagRevisionConfigACKFences": true,
-    "capabilityPitchRequiresSupportedActualMatchingPCM": true,
-    "pausedPrefetchACK": "Allowed only for genuine processed PCM; never resumes transport."
-  },
-  "behaviorVerified": [
-    "All14 previous hosted test names remain passing with frequency and amplitude thresholds unchanged.",
-    "Native queue/system commands, repeat/shuffle, seek, exact duplicate occurrence and EOF retain one AVPlayer.",
-    "Tone edits do not enable saved EQ, cancel pending play, change transport generation or start paused audio.",
-    "New settings persist and survive pause, resume, seek and duplicate queue advancement.",
-    "Three/six-field legacy configuration echoes remain exact; seven-field schema3 is negotiated separately.",
-    "Existing EQ/preamp, echo/reverb/normalization, finite limiter, local import/cache/catalog, tagged WK trust and anchored UIKit profile-share tests remain passing."
-  ],
   "history": [
     {
-      "sourceCommit": "0121028ad5935713e68b3a005eca20efab273027",
-      "runId": 43716323649,
-      "SDK": "passed83 policy/Xcode26.3/SDK26.2",
-      "runtime": "Both failed; tap became unavailable after12288 frames. Not accepted as a release.",
-      "fix": "Confirmed C valid-discontinuity bug: a4096-frame new Start exceeded2048-frame re-prime. Added failing regression, then split input at lookahead boundary without render allocation."
+      "sourceCommit": "78d6d5da6416a9df1200b515f56fe9975fc8bb8c",
+      "runURL": "https://github.com/Artemper52/LolzCloud/actions/runs/43734381305",
+      "policy": 100,
+      "iphone": 20,
+      "ipad": 20,
+      "status": "passed-first-candidate-not-final",
+      "finding": "Common foreground-only event guard prevented any immediate background room-command attempt.",
+      "revision": "Only event dispatch guard, pure ready/trusted/background policy, two policy regressions and protocol note; no NativePlayer/DSP/hosted20 changes."
     },
     {
-      "sourceCommit": "b4dbdc703e722c1a534127cb184f3cd997a8050b",
-      "runId": 43719231775,
-      "SDK": "passed84 policy/Xcode26.3/SDK26.2",
-      "runtime": "Both failed four assertions, with actual prepared PCM restored.",
-      "confirmedEvidence": "Input/output first/last marker energies were identical in bins12/212; source included2.304s Apple padding around the2s asset. Early absolute tap-zero tone windows included source silence. Paused prefetched real PCM could legitimately acknowledge a settings revision.",
-      "fix": "Hosted tests only: same complete200..500ms interval and550ms readiness relative to measured INPUT onset; same4% frequency/RMS bounds and12s deadline. First/last energy compared with input,2s marker spacing and AVPlayer clock. Paused ACK requires genuine processed pitch frames while pause/clock/item assertions remain."
-    },
-    {
-      "sourceCommit": "f7a58a94841f7709388ad003ea40f092f0625d79",
-      "runId": 43722084582,
-      "productionSource": "Identical to b4; only the reviewed hosted-test measurement origin changed.",
-      "iphone": {
-        "passed": 17,
-        "failed": 0,
-        "skipped": 0
-      },
-      "ipad": {
-        "passed": 17,
-        "failed": 0,
-        "skipped": 0
-      }
+      "sourceCommit": "55e3ac9700ce8e9330b5c190746f3fd6544f16cd",
+      "runId": 43736437440,
+      "policy": 102,
+      "iphone": 20,
+      "ipad": 20,
+      "status": "passed-final-candidate"
     }
   ],
+  "published15Preserved": {
+    "verificationSha256": "4622dc58c72b64729af3d1c7be21ad1d6a4e336354636d6377af3686227ed7f8",
+    "path": "ios/verification-0.1.5.json"
+  },
   "limits": [
-    "No physical iPhone/iPad, acoustic output, Bluetooth, AirPlay, calls or lock-screen test.",
-    "Actual hosted PCM spectra cover mono WAV and genuine cached MP3; not exhaustive codec or stereo-device qualification.",
-    "The network-track MP3 is seeded in the private cache, not an HTTPS download or personal-account proof.",
-    "No formant preservation, studio-quality or subjective complex-music quality claim.",
-    "Device IPA has no Apple CMS distribution signature or provisioning; recipient signing is required. Simulator ZIP requires Xcode on Mac.",
-    "External Documents Provider selection, personal browser pairing, user share-sheet Cancel/destination persistence remain unverified; share cleanup is programmatic.",
-    "Swift ASAN disables LeakSanitizer for XCTest; standalone C ASAN/LSan is enabled.",
-    "Published Native0.1.4 and release19 artifacts/history were not overwritten."
+    "No physical iPhone/iPad, actual Control Center button/lock-screen interaction, Bluetooth, AirPlay, calls or acoustic output test.",
+    "Background command dispatch is proven by explicit active/background delivery-policy tests and the real runnable WK bridge, not by a physical background/locked-device session. Full OS suspension can still expire commands honestly.",
+    "The room fixture is declared own-origin HTMLAudio with real WK messages. It does not claim authenticated provider playback or real-room server mutation. Independent browser QA covers HTTP/SSE/controller/lease/queue integration.",
+    "Native offline seek/Next/Previous/repeat methods are invoked by hosted tests and the attached SwiftUI view is captured; XCUI screen taps/gestures are not asserted.",
+    "Actual MP3 tags are read from a genuine MP3 with declared ID3 test frames in the app sandbox. External Documents Provider selection and personal file-provider behavior remain unverified.",
+    "Native offline full EQ UI and lyrics provider/editor are remaining parity work, not implemented by this revision.",
+    "The network-track MP3 is seeded in the private cache, not an HTTPS download or personal-account proof. No personal OAuth/browser session was used.",
+    "Device IPA is unsigned without Apple CMS/provisioning; recipient signing is required. Simulator ARM64 linker/ad-hoc CodeDirectory is not Apple distribution signing.",
+    "Deployment16.4 is verified as the compile target; actual hosted runtime uses iOS26.2 only.",
+    "The unchanged DSP retains actual PCM regressions; no formant-preservation, studio-quality or subjective complex-music quality claim.",
+    "New102 policy tests ran normally on Linux/macOS. ASAN was not rerun for this Swift-only change; historical1.5 standalone C/ASAN evidence remains separate."
   ]
 }
